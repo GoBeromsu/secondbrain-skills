@@ -13,7 +13,7 @@ Twenty-five Agent Skills that let an agent run an Obsidian vault as a second bra
 Each package is one `SKILL.md` that owns one job. There is no root skill, no dispatcher and no shared runtime. Your agent loads the package the task needs and nothing else.
 
 ```sh
-claude plugin marketplace add Xia-Ataraxia/secondbrain-skills
+claude plugin marketplace add GoBeromsu/secondbrain-skills
 claude plugin install secondbrain-skills@secondbrain-skills
 ```
 
@@ -80,11 +80,11 @@ Install through each runtime's own plugin or skill registry, and update the same
 
 | Runtime | Install | Update |
 | --- | --- | --- |
-| Claude Code | `claude plugin marketplace add Xia-Ataraxia/secondbrain-skills`, then `claude plugin install secondbrain-skills@secondbrain-skills` | `claude plugin marketplace update secondbrain-skills`, then `claude plugin update secondbrain-skills@secondbrain-skills` |
-| Codex | `codex plugin marketplace add Xia-Ataraxia/secondbrain-skills`, then `codex plugin add secondbrain-skills@secondbrain-skills` | `codex plugin marketplace upgrade secondbrain-skills`, then `codex plugin add secondbrain-skills@secondbrain-skills` |
-| GJC | `gjc plugin marketplace add Xia-Ataraxia/secondbrain-skills`, then `gjc plugin install secondbrain-skills@secondbrain-skills` | `gjc plugin marketplace update secondbrain-skills`, then `gjc plugin upgrade secondbrain-skills@secondbrain-skills` |
-| Grok Build | `grok plugin marketplace add Xia-Ataraxia/secondbrain-skills`, then install from the Marketplace tab | the Marketplace tab |
-| Hermes | `hermes plugins install Xia-Ataraxia/secondbrain-skills --enable` (portable plugin; skills resolve as `<namespace>:<name>`) | automatic with `plugins.auto_apply: true` |
+| Claude Code | `claude plugin marketplace add GoBeromsu/secondbrain-skills`, then `claude plugin install secondbrain-skills@secondbrain-skills` | `claude plugin marketplace update secondbrain-skills`, then `claude plugin update secondbrain-skills@secondbrain-skills` |
+| Codex | `codex plugin marketplace add GoBeromsu/secondbrain-skills`, then `codex plugin add secondbrain-skills@secondbrain-skills` | `codex plugin marketplace upgrade secondbrain-skills`, then `codex plugin add secondbrain-skills@secondbrain-skills` |
+| GJC | `gjc plugin marketplace add GoBeromsu/secondbrain-skills`, then `gjc plugin install secondbrain-skills@secondbrain-skills` | `gjc plugin marketplace update secondbrain-skills`, then `gjc plugin upgrade secondbrain-skills@secondbrain-skills` |
+| Grok Build | `grok plugin marketplace add GoBeromsu/secondbrain-skills`, then install from the Marketplace tab | the Marketplace tab |
+| Hermes | `hermes plugins install GoBeromsu/secondbrain-skills --enable` (portable plugin; skills resolve as `<namespace>:<name>`) | automatic with `plugins.auto_apply: true` |
 
 Runtimes without a plugin registry (Cursor, generic Agent Skills) read `skills/<name>/` folders from their skill directory; use their own documented import.
 
