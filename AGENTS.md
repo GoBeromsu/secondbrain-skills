@@ -9,12 +9,9 @@ This repository owns twenty-five independent Agent Skills, the `secondbrain-skil
 
 There is no callable root skill, mandatory shared runtime, compatibility alias, or hidden dispatcher. A package name is one lowercase hyphenated segment naming a task (`ingest`) or a format (`obsidian-canvas`), never a role or version; native packages keep the `obsidian-` prefix, knowledge packages never use it. Files inside a package are named for their subject without repeating the package or resource kind (`ingest/references/papers.md`), lowercase and hyphenated, with no dates or version suffixes. Each capability has exactly one owning package; checks stay at package format (`claude plugin validate . --strict`). Verify behavior by actually running it; the repository keeps no tests.
 
-Use packaged CLIs (`qmd`, `obsidian-cli`, `defuddle`, `yt-dlp`, `git`) directly; the skill names the commands and the agent runs them. Attaching a wrapper script to a packaged CLI — a hook, launcher, queue, debounce or alias around its commands — is an anti-pattern: do not write one, and never reimplement a CLI or its regression suite. A script that checks this repository's own artifacts without calling a packaged CLI (for example `skills/ingest/scripts/verify_paper.py`) is not a wrapper.
-
 ## Authoring
 
 - Keep required references, assets, and scripts inside the owning package. Compose neighboring packages by explicit identity only when the task needs them. Define each rule once at its owner and name or invoke that skill instead of copying its procedure.
-- Prefer naming an existing tool (`defuddle`, `yt-dlp`, the aside browser, `qmd`, `obsidian-cli`, `git`) over shipping a script that wraps or polices it. A script stays only for exact bookkeeping of our own artifacts that a model cannot hold, never around a CLI.
 - Never write comments.
 - Make the smallest behavioral diff the task needs. Before editing and before submitting, keep a file change only if leaving it unchanged would break the requested behavior; never change a file just for wording consistency. Add no speculative abstraction, unused eval or scaffolding, or example, commentary or report decoration that only repeats a rule.
 - Preserve MIT notices for upstream-derived files in `NOTICE`. This repository is its own canonical source: packages state their rules directly, with no upstream comparison or lineage record; history is the Git log.
