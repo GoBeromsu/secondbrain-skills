@@ -104,10 +104,13 @@ AGENTS.md                기여자와 에이전트를 위한 저장소 계약
 - **[구요한 (Yohan Koo)](https://github.com/johnfkoo951/cmds-llm-wiki)**, cmds-llm-wiki. 지식 패키지는 그의 명령에서 출발했고, 지금은 이 저장소가 정본이며 소유자의 결정에 따라 달라진 부분이 있습니다. 원 저장소의 파일은 하나도 담지 않았습니다. Paper Mode P-7 검증기 `skills/ingest/scripts/verify_paper.py`는 그의 스크립트 없이 이 저장소가 직접 구현한 것입니다. 원 저장소는 라이선스를 공개하지 않았고, 여기서 그것을 재라이선스하지 않습니다.
 - **[Andrej Karpathy](https://github.com/karpathy)**, cmds-llm-wiki가 바탕으로 삼은 LLM Wiki 패턴.
 - **[Steph Ango (kepano)](https://github.com/kepano/obsidian-skills)**, obsidian-skills (MIT). `obsidian-markdown`, `obsidian-bases`, `obsidian-canvas`, `obsidian-cli`는 여기서 출발해 수정했습니다.
-- **[Jonghak Seo](https://github.com/Jonghakseo/pi-extension)**, pi-extension (MIT). `obsidian-visualize`의 검사 린트와 skeleton·style 참조는 여기서 가져와 고쳤습니다.
+- **[Jonghak Seo](https://github.com/Jonghakseo/pi-extension)**, pi-extension (MIT). `obsidian-visualize`의 검사 린트와 팔레트·간격 지침은 여기서 가져와 고쳤습니다.
 - **[Obsidian](https://github.com/obsidianmd/pele)**, Pele (MIT). `obsidian-visualize`의 Pele 분기는 공개된 호환성·보안 문서를 따릅니다. Pele 파일은 하나도 싣지 않습니다.
 - **[구요한 (Yohan Koo)](https://pele.cmdspace.work/)**, CMDSPACE Pele 갤러리. `obsidian-visualize` Pele 카탈로그의 쓸 때·피할 때·크기 한도와 관찰된 함정은 이 갤러리를 참고했고, 예제는 모두 이 저장소가 직접 썼습니다.
-- **[Iconify](https://iconify.design/)**, **[LobeHub icons](https://github.com/lobehub/lobe-icons)**, 아이콘 모음. `obsidian-visualize`의 그림은 실행 시 이들의 공개 URL을 가리킵니다. 아이콘 파일은 하나도 싣지 않습니다.
+- **[coleam00](https://github.com/coleam00/excalidraw-diagram-skill)**, excalidraw-diagram-skill. 라이선스 파일이 없습니다. 그 아이디어를 Excalidraw 디자인 지침에 다시 표현했고, 복사한 것은 없습니다.
+- **[Zsolt Viczian](https://github.com/zsviczian/obsidian-excalidraw-plugin)**, Obsidian용 Excalidraw 플러그인 (AGPL-3.0)과 동반 플러그인 Excalidraw Extras(라이선스는 확인하지 못했습니다). API 사실을 확인하는 용도로만 읽었고, 코드와 문장은 복사하지 않았습니다.
+- **[Excalidraw](https://github.com/excalidraw/excalidraw-libraries)**와 excalidraw-libraries (MIT). 디자인 아이디어를 참고하는 데만 썼습니다.
+- **[robtaylor](https://robtaylor.github.io/excalidraw-diagrams/)**, Excalidraw 예제 모음. 아이디어를 참고했습니다. 라이선스를 주장하거나 확인하지 않았고, 복사한 것은 없습니다.
 
 이들의 보증이나 제휴 관계를 주장하지 않습니다. "Obsidian"은 이 스킬들이 대상으로 하는 서드파티 애플리케이션의 이름입니다.
 

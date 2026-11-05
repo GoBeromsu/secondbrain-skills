@@ -4,13 +4,13 @@ Decide whether a diagram family will render in the Obsidian installation that ac
 
 ## Why this is a separate question
 
-Since Obsidian 1.15.0 the app no longer includes Mermaid. A `mermaid` fence is drawn by Pele, Obsidian's own MIT-licensed renderer, which targets Mermaid 12.1.0 syntax and supports every diagram type built into Mermaid 12.1.0. `loadMermaid()` and `window.mermaid` are kept as a compatibility surface that draws with Pele; `window.pele` is available once `loadMermaid()` resolves. Inside `obsidian eval`, `loadMermaid` is not a global: reach it through `ExcalidrawAutomate.obsidian.loadMermaid()` or open the note in preview. Earlier apps ship a Mermaid build pinned inside the app. Neither renderer is a plugin, separately installable, or user-selectable: each moves only when the app moves.
+Since Obsidian 1.15.0 the app no longer includes Mermaid. A `mermaid` fence is drawn by Pele, Obsidian's own MIT-licensed renderer, which targets Mermaid 12.1.0 syntax and supports every diagram type built into Mermaid 12.1.0. `loadMermaid()` is kept as a compatibility surface that draws with Pele and makes `window.pele` available; the load command is in [`pele.md`](pele.md). Earlier apps ship a Mermaid build pinned inside the app. Neither renderer is a plugin, separately installable, or user-selectable: each moves only when the app moves.
 
 Consequences:
 
 - **The app version is the gate.** 1.15.0 or later means Pele; earlier means an older pinned Mermaid bundle with the version gates below. A vault synced to several devices is only as new as its oldest app.
 - **A pass elsewhere is not evidence here.** mermaid.live, code hosts and other note apps run real Mermaid, not Pele, on their own schedule.
-- **Identical source looks different.** Pele uses its own layout, so node positions, spacing and edge paths differ from Mermaid. Mermaid themes and `themeVariables` colors do not apply; colors and fonts come from the vault theme through `--mermaid-*` CSS variables. Judge appearance only in the target.
+- **Identical source looks different.** Pele uses its own layout, so node positions, spacing and edge paths differ from Mermaid. Mermaid themes do not apply and `themeVariables` colors act only as series palettes (pele.run/compatibility); colors and fonts come from the vault theme through `--mermaid-*` CSS variables. Judge appearance only in the target.
 - **No code runs.** Pele ignores JavaScript callbacks in `click`, blocks `javascript:`, `data:` and `vbscript:` links, escapes text and filters styles. That is why 1.15.0 removed the *Show Mermaid diagrams in notes* setting and draws diagrams without asking.
 - **Not supported by Pele:** ZenUML and other external Mermaid plugins, and arbitrary HTML labels. Source over 50,000 characters, SVG output over 4,000,000 characters, or a flowchart over 5,000 edges is rejected.
 
@@ -39,19 +39,19 @@ The optional-suffix pattern is the useful general rule: when both spellings are 
 
 Families Pele added beyond the old catalog — `quadrantChart`, `requirementDiagram`, `gitGraph`, `C4*`, `block`, `packet`, `radar-beta`, `venn-beta`, `ishikawa`, `wardley-beta`, `railroad-*`, `treeView-beta`, `cynefin-beta`, `eventmodeling`, `usecase-beta`, `agentflow-beta`, `swimlane-beta` — need 1.15.0+ everywhere the note is read. Start from their patterns in the catalog's Pele-only section, not from memory. Pele also accepts `C4Container`, `C4Component`, `C4Dynamic`, `C4Deployment`, `railroad-beta`, `railroad-abnf-beta`, `railroad-peg-beta`, and the unsuffixed `block`, `packet` and `ishikawa`.
 
-## The Pele inside the app lags Pele releases
+## The Pele inside the app can lag Pele releases
 
-Obsidian bundles one Pele build and moves it only when the app updates, so a feature in Pele's release notes is not evidence for the vault. In Obsidian 1.15.0 (installer 1.13.4), `pele.render()` rejected a Hangul sankey node name and drew `<kbd>` and `<code>` label tags as plain text, both of which Pele 1.9.0 supports. Probe a feature from a recent release before relying on it, and keep the older form when the probe fails.
+Obsidian bundles one Pele build and moves it only when the app updates, so a feature in Pele's release notes is not evidence for the vault. On Obsidian 1.15.0 with installer 1.13.4 `pele.render()` rejected a Hangul sankey node name; on 1.15.1 with installer 1.15.0 it accepts one. Probe a feature from a recent release on the target app before relying on it, and keep the older form when the probe fails.
 
-Host options are the app's choice, not the note's. Obsidian 1.15.0 typesets `$$...$$` labels with MathJax in a rendered note (observed through Obsidian's Markdown renderer), while a bare `pele.render()` call without a `math` resolver shows the TeX source. The narrow-width switch from `LR` to `TB`, sankey gradients and the size limits are host options too; a note cannot set them.
+Host options are the app's choice, not the note's: `$$...$$` labels are typeset with MathJax in a rendered note and show TeX source from a bare `pele.render()`, and the narrow-width switch from `LR` to `TB`, sankey gradients and the size limits cannot be set by a note.
 
-A `---` delimited config header or a `%%{init}%%` directive is accepted by Pele, but configuration support varies by diagram type, and on older bundles it is version-gated on its own. If a block fails, remove the config and retest before concluding the family is unsupported.
+A `---` config header or a `%%{init}%%` directive is accepted but changes nothing but `title` in the flowcharts tested ([`pele.md`](pele.md)); a block that fails is not failing because of it unless removing it fixes the block.
 
 ## Capability probe
 
 There are two probes. Neither writes a note in the read-only form.
 
-**Parse/render probe (level B, read-only).** In a running 1.15.0+ app, through the `eval` command that `obsidian-cli` owns, load the renderer as the Verification section of [`SKILL.md`](../SKILL.md) shows, then call `pele.render(source)` once per candidate. It returns `{svg}` or throws a `PeleError` such as *No diagram type detected for the given text.* or *Parse error on line N*. This proves Pele's grammar acceptance in that app, not that the note renders. Run the `obsidian` CLI directly; do not wrap it in a script.
+**Parse/render probe (level C, read-only).** In a running 1.15.0+ app, run the commands in [`pele.md`](pele.md): `window.pele.render(source)` returns `{svg}` or throws a `PeleError` such as *No diagram type detected for the given text.* or *Parse error on line N*. This proves Pele's grammar acceptance in that app, not that the note renders. Run the `obsidian` CLI directly; do not wrap it in a script.
 
 **Render probe (level D).** Writing a probe note is a vault mutation: it needs the task's own authorization, an agreed location, and an agreed cleanup. A scratch vault avoids the question and answers it just as well, because the renderer belongs to the app, not to the vault. Put one fence per candidate family into a single note, each with the smallest body that family accepts:
 

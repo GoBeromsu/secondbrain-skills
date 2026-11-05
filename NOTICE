@@ -6,10 +6,6 @@ derived from MIT-licensed upstream work; the rest is authored here. This file
 records which is which, file by file, so the notice travels with the copies that
 require it.
 
-The additive plugin-first visualization lineage is mapped separately in
-`skills/obsidian-visualize/references/source-map.json`; the authenticated native records
-are not rewritten by this addition.
-
 
 1. MIT-licensed upstream: obsidian-skills
 -----------------------------------------
@@ -115,10 +111,19 @@ section.
     Pele documentation (pele.run) and obsidianmd/pele  skills/obsidian-visualize
     JSON Canvas 1.0 specification                        skills/obsidian-canvas,
                                                          skills/obsidian-visualize
-    zsviczian/obsidian-excalidraw-plugin, including its
-      published automation type surface                   skills/obsidian-visualize
-    Iconify and lobehub/lobe-icons, referenced by public
-      URL at runtime; no icon file is shipped             skills/obsidian-visualize
+    zsviczian/obsidian-excalidraw-plugin (AGPL-3.0) and the
+      Excalidraw Extras plugin (licence not verified), read
+      for API facts only; no code or prose copied       skills/obsidian-visualize
+    coleam00/excalidraw-diagram-skill
+      (https://github.com/coleam00/excalidraw-diagram-skill),
+      no licence file; ideas re-expressed, nothing copied skills/obsidian-visualize
+    Excalidraw and excalidraw/excalidraw-libraries (MIT)
+      (https://github.com/excalidraw/excalidraw-libraries),
+      ideas only                                          skills/obsidian-visualize
+    robtaylor
+      (https://robtaylor.github.io/excalidraw-diagrams/),
+      consulted for ideas; no licence verified, nothing copied
+                                                          skills/obsidian-visualize
     obsidianmd/obsidian-clipper (MIT) at
       6d56d618b00bd970aa738d6a7a61edee27783e81, and its
       obsidianmd/knap template engine                     skills/obsidian-clipper
@@ -192,13 +197,15 @@ Source: https://github.com/Jonghakseo/pi-extension
 Revision: a4a8107885d2e944d03d8ebc7d9b1cdcf8b7521f
 Upstream package: packages/skill-excalidraw/skills/excalidraw
 
-    skills/obsidian-visualize/scripts/inspect.mjs       <- scripts/excal.mjs (inspection/lint portion, adapted)
-    skills/obsidian-visualize/references/style.md       <- references/style.md (adapted)
-    skills/obsidian-visualize/references/skeleton.md    <- references/skeleton.md (adapted)
+    skills/obsidian-visualize/scripts/inspect.mjs                  <- scripts/excal.mjs (inspection/lint portion, adapted)
+        upstream SHA-256 7152cf017c1da711e5e9c271629f2d99b6f4d33b0ad285e69873855837ccccd1
+    skills/obsidian-visualize/references/excalidraw-design.md      <- references/style.md (palette and spacing, adapted)
+        upstream SHA-256 b72046fc126f6e66b114d96e3c00e0691f4155fbe055b92750914e8a9ce4db10
 
-Original source hashes/bytes, complete tree exclusions and the owning F05
-mapping are in skills/obsidian-visualize/references/source-map.json. Modifications are
-recorded in the package Git history. No standalone app, font,
+Upstream `references/skeleton.md` (SHA-256
+e2a4f9549a7628ffadad87bf51f1b5d3bb4d70406b274377ff6f788583e5acd9) was adapted
+earlier and is no longer shipped. The rest of the upstream tree was not adopted.
+Modifications are recorded in the package Git history. No standalone app, font,
 binary or Obsidian plugin is copied. The following upstream grant is also
 retained verbatim in skills/obsidian-visualize/references/NOTICE for independent installs:
 
