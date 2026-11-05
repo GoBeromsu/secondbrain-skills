@@ -17,7 +17,9 @@ versions separately. Unknown installed versions stay unknown.
 The implementation facts below were inspected in official source revision
 `f30b4c5d3dcb66ac76ced8f05d9e95409ee94c79`, whose manifest declares 2.28.1.
 This is a source pin, not a minimum compatible version or installed-version
-claim. Method admission is still required:
+claim. A later run used plugin 2.29.1 in Obsidian 1.15.1; only the behavior listed
+in [`workbench.md`](workbench.md) was observed there. Method admission is still
+required:
 
 - `getAPI(view)` creates a separate EA workbench; `clear()` begins a transaction.
 - `copyViewElementsToEAforEditing(elements, true)` clones selected elements and
@@ -45,37 +47,11 @@ infer a new installed surface from an older prose example.
 
 ## Create and open
 
-For a new drawing, keep the deterministic Python path in `SKILL.md`. It emits
-`.excalidraw.md`, the plugin marker, text index and full JSON. Run the generator
-and `Scene.check()`, retain its write receipt, then open the exact output through
-the selected `obsidian-cli` surface. Compare the loaded element ids/count with
+A new drawing is written directly as `SKILL.md` describes, with no plugin involved.
+Open it through the selected `obsidian-cli` surface only when the plugin path needs
+it, because with the plugin's `compress` setting on, opening re-saves the file as
+`compressed-json`. Compare the loaded element ids/count with
 the authored scene; focus the exact Excalidraw view, not a same-named note.
-
-For an already normalized upstream/exported `.excalidraw` scene, use
-[`../scripts/import_scene.py`](../scripts/import_scene.py):
-
-```sh
-python3 scripts/import_scene.py \
-  --source Synthetic/Flow.excalidraw \
-  --target Synthetic/Flow.excalidraw.md \
-  --expected-source-sha256 <digest-of-the-exact-inspected-source>
-```
-
-Run paths relative to the resolved workspace/vault, not necessarily the package.
-Both paths are mandatory. The adapter is stdlib-only and new-file-only: it
-preserves the entire scene envelope, element ids, custom fields and embedded
-`files`, builds the native text index from raw/original text, checks references
-and assets, creates exclusively and reads back. It refuses skeleton elements,
-pending Mermaid, missing image data, symlinks and collisions. It never replaces
-an existing plugin drawing. Existing frontmatter, prose, text records and
-plugin-managed assets are therefore not rebuilt from a standalone source.
-The Python format/readback check proves A/B only; open and inspect in the plugin
-to establish C/D, including real image loading.
-
-Do not silently use EA `create({templatePath})` as this adapter. In the inspected
-implementation, the generated Markdown text index is based on the EA workbench,
-while template elements are concatenated separately. That path needs its own
-template-text/asset checks before it can replace this complete-wrapper adapter.
 
 ## Inspect, lint and edit
 
@@ -89,7 +65,7 @@ node scripts/inspect.mjs lint Synthetic/Flow.excalidraw.md
 
 It reports ids, labels, frames, connections, dimensions, dangling/one-way
 bindings and heuristic overlaps/tight labels. Warnings are not font measurement
-or render proof. Full structural validation remains the Python validator.
+or render proof.
 For compressed drawings, the reader refuses; use native scene readback and
 inspect a task-owned JSON export instead. Never patch codec bytes.
 
@@ -144,7 +120,7 @@ mutation to make its receipt look clean.
 
 ## Mermaid into the plugin drawing
 
-For a new Mermaid drawing, first create/open an empty deterministic plugin
+For a new Mermaid drawing, first create/open an empty plugin
 drawing at the exact approved destination. Take a fresh snapshot, then call
 `update(context, {baseline, expectedSha256, mermaid: source})`. Conversion occurs
 through the installed plugin's `addMermaid`, not a separately bundled renderer.
@@ -155,13 +131,13 @@ An error/null/empty conversion, id collision or conflicting image id stops
 before native commit. Re-import is another additive transaction, not an implicit
 replacement of earlier Mermaid ids. Plan replacement/deletion separately.
 Native flowchart conversion is the intended first runtime fixture. Other diagram
-types may produce image fallbacks; their assets and Embedded Files serialization
-require separate runtime checks. If that changes protected Markdown, the helper
-reports a partial preservation failure rather than claiming success.
+types may produce image fallbacks, which would put an image in the vault, so do
+not insert them; report the diagram type instead. If a conversion still changes
+protected Markdown, the helper reports a partial preservation failure rather than claiming success.
 
 For the upstream skeleton shorthand and palette/layout recipes, read
 [`skeleton.md`](skeleton.md) and [`style.md`](style.md). Do not pass an unnormalized
-standalone skeleton directly to `elementsDict` or to the Markdown adapter.
+standalone skeleton directly to `elementsDict`.
 
 ## Reload, export, inspect
 
@@ -187,8 +163,7 @@ When an approved isolated app surface is available, record app/plugin versions,
 artifact hashes and profile/vault identity in private evidence. Use a new
 task-owned synthetic vault/profile, copied approved plugin artifacts only, and
 no user settings/data/profile. Keep all drawings, assets and exports there.
-Exercise: create/open, full-scene import with labels and an inline image,
-selected edit with a user custom field and an unrelated control drawing,
+Exercise: create/open, selected edit with a user custom field and an unrelated control drawing,
 flowchart Mermaid insertion, stale disk/live refusal, compressed-file native
 readback, independent reload and plugin export. Inspect desktop and narrow view
 captures where meaningful. Compare control and attachment hashes, then close

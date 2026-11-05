@@ -3,8 +3,8 @@
 Adapted from the pinned pi-extension style reference; see [../NOTICE](NOTICE).
 These are palette, spacing and layout
 recipes, not evidence that an installed plugin has a particular font or renderer.
-Compute coordinates with the deterministic generator; for native edits preserve
-existing geometry unless its change is explicitly selected.
+For native edits preserve existing geometry unless its change is explicitly
+selected.
 
 ## 팔레트 (Excalidraw 기본 색)
 

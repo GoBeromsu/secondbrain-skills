@@ -117,6 +117,8 @@ section.
                                                          skills/obsidian-visualize
     zsviczian/obsidian-excalidraw-plugin, including its
       published automation type surface                   skills/obsidian-visualize
+    Iconify and lobehub/lobe-icons, referenced by public
+      URL at runtime; no icon file is shipped             skills/obsidian-visualize
     obsidianmd/obsidian-clipper (MIT) at
       6d56d618b00bd970aa738d6a7a61edee27783e81, and its
       obsidianmd/knap template engine                     skills/obsidian-clipper

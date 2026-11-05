@@ -8,7 +8,7 @@ Done means: the diagram family fits the relationship being shown, the prefix and
 
 Obsidian 1.15.0 stopped bundling Mermaid. The fence is still written ```` ```mermaid ```` and the grammar is still Mermaid's, but Pele draws it: Mermaid 12.1.0 syntax, every built-in Mermaid 12.1.0 diagram type, Pele's own layout, and colors and fonts from the vault theme. Pele runs no code, so diagrams render without a confirmation setting. [`pele-compatibility.md`](pele-compatibility.md) holds the differences, limits and the gate for older apps.
 
-Pele has no command-line tool. Its only runtime surface inside Obsidian is `window.pele` (`render`, `parse`, `detectType`, `supports`) and the `loadMermaid()`/`window.mermaid` compatibility shim, reached through the official CLI's `eval`. Name those calls; do not write a script around them.
+Pele has no command-line tool. Its only runtime surface inside Obsidian is `window.pele` (`render`, `parse`, `detectType`, `supports`) and the `loadMermaid()`/`window.mermaid` compatibility shim, reached through the official CLI's `eval`. Neither exists until `loadMermaid()` has run, and `eval` has no global `loadMermaid`; the working command is in the Verification section of [`SKILL.md`](../SKILL.md). Name those calls; do not write a script around them.
 
 ## Evidence ladder
 
@@ -17,7 +17,7 @@ Four separate claims. Never report a higher level on the strength of a lower one
 | Level | What it proves | How it is produced |
 | --- | --- | --- |
 | A — Authoring check | The prefix, grammar, labels, and fence follow the documented rules | Reading the source against [`pele-catalog.md`](pele-catalog.md) and the rules below |
-| B — Parse validation | A named renderer accepts the grammar | `pele.render(source)` through `obsidian eval` in a 1.15.0+ app, with the app version stated. mermaid.live or Mermaid CLI only prove real Mermaid, not Pele |
+| B — Parse validation | A named renderer accepts the grammar | `pele.render(source)` through `obsidian eval` in a 1.15.0+ app, using the command in the Verification section of [`SKILL.md`](../SKILL.md), with the version from `obsidian version` stated. mermaid.live or Mermaid CLI only prove real Mermaid, not Pele |
 | C — Materialized readback | The intended bytes are in the intended note and nothing else moved | Re-reading the file after the write and diffing against what you intended |
 | D — Render QA | This vault's renderer draws it in the note | Opening the note in the target Obsidian and looking at the result |
 
@@ -34,7 +34,7 @@ When a level cannot be reached — no app access, no vault authorization, headle
 5. **Write labels** under the escaping and readability rules below.
 6. **Fence it exactly** (see Fences and placement).
 7. **Only if the task actually edits a note:** confirm write authorization for that exact note, make the narrowest possible edit, and read the file back (see Editing a note safely).
-8. **Render QA** in the target installation, recording the Obsidian app and installer versions it reports.
+8. **Render QA** in the target installation only when asked, because level B already proves the grammar and needs no opened note. Record the app and installer versions from `obsidian version`.
 9. **On a renderer failure, fall back without losing meaning** (see Failing without degrading meaning).
 
 ## Choosing the family

@@ -1,15 +1,25 @@
 # Live Plugin Edits (Exception Path)
 
-Use this path for the authorized native plugin edits in [`../SKILL.md`](../SKILL.md): selected edits of a plugin-managed drawing, Mermaid addition and embedding through the plugin's file store. Fresh geometry remains a deterministic file from [`../scripts/excalidraw_scene.py`](../scripts/excalidraw_scene.py); element count is never the reason to switch.
+Use this path for the authorized native plugin edits in [`../SKILL.md`](../SKILL.md): selected edits of a plugin-managed drawing and Mermaid addition. Fresh geometry is written directly as a new file; element count is never the reason to switch.
 
 [`plugin-workflow.md`](plugin-workflow.md) gives the pinned implementation facts
 and the executable helper with full live/disk/asset preimages and preservation
 checks. The older illustrative snapshot below covers only its enumerated fields;
 it does not by itself establish whole-element, Markdown or asset preservation.
-Use the executable helper for the strengthened transaction. No snippet here has
-been verified in a current installed plugin by this source change.
+Use the executable helper for the strengthened transaction. The snippets below
+were not run as written in a current installed plugin by this source change; the
+behavior listed next was observed on plugin 2.29.1 in Obsidian 1.15.1.
 
-This path trades a deterministic, re-runnable file for a mutation against live app state. It needs an installed plugin, an open drawing, and its own proof that the result reached disk. Nothing here installs, enables, or updates anything.
+This path trades a plain written file for a mutation against live app state. It needs an installed plugin, an open drawing, and its own proof that the result reached disk. Nothing here installs, enables, or updates anything.
+
+What driving the plugin did in practice, so a run plans for it:
+
+- A leaf can open as markdown first. `app.workspace.getLeaf("tab").openFile(file)` and a wait of about 2 s gave an `excalidraw` view; `plugin.setExcalidrawView` does not exist. A leaf can also vanish between two calls, so look it up again each time.
+- The first save or batch left out arrows in every run, and `connectObjects` in the same batch drew none. Add them in a second pass with `copyViewElementsToEAforEditing` and `connectObjects`, then read the file back.
+- An arrow label did not persist in one run. Check labels on the reloaded scene.
+- `ea` calls carry no layout check: one run saved three overlapping boxes.
+- Opening the drawing rewrites it as `compressed-json`, so run the lint before opening it.
+- After an edit through a leaf editor, a read of the file sees the old bytes until autosave runs. One check counted 0 blocks and a later one counted 1.
 
 ## Contents
 
@@ -46,7 +56,7 @@ Read the result as a gate:
 | `pluginEnabled: false` | Report the missing layer and stop. Do not install or enable it, and do not guess a command that might. |
 | `apiPresent: false` | Same. The plugin can be enabled while the automation object is unavailable in this context. |
 | `missingMethods` non-empty | Stop. Name the methods; the installed version does not expose what the task needs. |
-| The target path is absent from `openDrawings` | This exception path does not apply. Either ask the user to open the drawing, or generate a file instead. |
+| The target path is absent from `openDrawings` | This exception path does not apply. Either ask the user to open the drawing, or write a new file instead. |
 
 Verify method names against the plugin's published [API surface](https://github.com/zsviczian/obsidian-excalidraw-plugin/blob/master/docs/API/ExcalidrawAutomate.d.ts) for the installed version rather than from memory. A method that is absent is a stop, not an invitation to improvise a substitute.
 
@@ -150,4 +160,4 @@ An export that was produced but not inspected is not render QA. Say "exported, n
 
 ## 6. Reporting this path
 
-State: the plugin version the probe returned, that this exception path was used and which of the two cases justified it, the element ids added, the baseline comparison result, and whether the render was inspected. Level C and D from the ladder in [`../SKILL.md`](../SKILL.md) apply here exactly as they do to a generated file — a live scene that "looks right" is not level C, and an uninspected export is not level D.
+State: the plugin version the probe returned, that this exception path was used and which of the two cases justified it, the element ids added, the baseline comparison result, and whether the render was inspected. Level C and D from the ladder in [`../SKILL.md`](../SKILL.md) apply here exactly as they do to a directly written file — a live scene that "looks right" is not level C, and an uninspected export is not level D.

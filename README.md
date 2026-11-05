@@ -109,6 +109,7 @@ AGENTS.md                repository contract for contributors and agents
 - **[Jonghak Seo](https://github.com/Jonghakseo/pi-extension)**, pi-extension (MIT). The inspection lint and the skeleton and style references in `obsidian-visualize` are adapted from it.
 - **[Obsidian](https://github.com/obsidianmd/pele)**, Pele (MIT). The Pele branch of `obsidian-visualize` follows its public compatibility and security documentation; no Pele file is shipped.
 - **[Yohan Koo (구요한)](https://pele.cmdspace.work/)**, the CMDSPACE Pele gallery. The use, avoid and size guidance and the observed pitfalls in the `obsidian-visualize` Pele catalog were consulted from it; every example there is this repository's own.
+- **[Iconify](https://iconify.design/)** and **[LobeHub icons](https://github.com/lobehub/lobe-icons)**, icon sets. Drawings from `obsidian-visualize` point at their public URLs at runtime; no icon file is shipped.
 
 No endorsement by any of them is claimed. "Obsidian" names the third-party application these skills target.
 

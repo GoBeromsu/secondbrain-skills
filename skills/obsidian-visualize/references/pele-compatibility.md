@@ -4,7 +4,7 @@ Decide whether a diagram family will render in the Obsidian installation that ac
 
 ## Why this is a separate question
 
-Since Obsidian 1.15.0 the app no longer includes Mermaid. A `mermaid` fence is drawn by Pele, Obsidian's own MIT-licensed renderer, which targets Mermaid 12.1.0 syntax and supports every diagram type built into Mermaid 12.1.0. `loadMermaid()` and `window.mermaid` are kept as a compatibility surface that draws with Pele; `window.pele` is available once `loadMermaid()` resolves. Earlier apps ship a Mermaid build pinned inside the app. Neither renderer is a plugin, separately installable, or user-selectable: each moves only when the app moves.
+Since Obsidian 1.15.0 the app no longer includes Mermaid. A `mermaid` fence is drawn by Pele, Obsidian's own MIT-licensed renderer, which targets Mermaid 12.1.0 syntax and supports every diagram type built into Mermaid 12.1.0. `loadMermaid()` and `window.mermaid` are kept as a compatibility surface that draws with Pele; `window.pele` is available once `loadMermaid()` resolves. Inside `obsidian eval`, `loadMermaid` is not a global: reach it through `ExcalidrawAutomate.obsidian.loadMermaid()` or open the note in preview. Earlier apps ship a Mermaid build pinned inside the app. Neither renderer is a plugin, separately installable, or user-selectable: each moves only when the app moves.
 
 Consequences:
 
@@ -51,7 +51,7 @@ A `---` delimited config header or a `%%{init}%%` directive is accepted by Pele,
 
 There are two probes. Neither writes a note in the read-only form.
 
-**Parse/render probe (level B, read-only).** In a running 1.15.0+ app, through the `eval` command that `obsidian-cli` owns, call `pele.render(source)` once per candidate. It returns `{svg}` or throws a `PeleError` such as *No diagram type detected for the given text.* or *Parse error on line N*. This proves Pele's grammar acceptance in that app, not that the note renders. Run the `obsidian` CLI directly; do not wrap it in a script.
+**Parse/render probe (level B, read-only).** In a running 1.15.0+ app, through the `eval` command that `obsidian-cli` owns, load the renderer as the Verification section of [`SKILL.md`](../SKILL.md) shows, then call `pele.render(source)` once per candidate. It returns `{svg}` or throws a `PeleError` such as *No diagram type detected for the given text.* or *Parse error on line N*. This proves Pele's grammar acceptance in that app, not that the note renders. Run the `obsidian` CLI directly; do not wrap it in a script.
 
 **Render probe (level D).** Writing a probe note is a vault mutation: it needs the task's own authorization, an agreed location, and an agreed cleanup. A scratch vault avoids the question and answers it just as well, because the renderer belongs to the app, not to the vault. Put one fence per candidate family into a single note, each with the smallest body that family accepts:
 
@@ -127,8 +127,8 @@ If any of these could not be checked, say which, rather than implying a full pas
 Record what was observed, not what was assumed:
 
 ```text
-Obsidian app version: <as reported by the app>
-Installer version:    <as reported by the app>
+Obsidian app version: <from `obsidian version`>
+Installer version:    <from `obsidian version`>
 Platform:             <desktop OS or mobile>
 Renderer:             Pele (1.15.0+) | bundled Mermaid, version unknown
 Renders:              <families that drew>

@@ -23,10 +23,8 @@ membership. Merely retaining the shorthand fields does not create those facts.
 
 ## Materialize through the owning workflow
 
-- For fresh drawings, use `Scene.box`, `Scene.text`, `Scene.arrow`, `Scene.frame`,
-  `add_to_frame` and `group` from the deterministic package-local generator. Its
-  ids derive from namespace/keys rather than random normalization. The generator
-  stays the source of truth; never rewrite generated output by hand.
+- For fresh drawings, write full elements from the template in
+  [`../SKILL.md`](../SKILL.md); shorthand is not a saved format.
 - For existing drawings, copy selected elements into ExcalidrawAutomate with
   `copyViewElementsToEAforEditing`, keep their ids and unknown/custom fields,
   change only the approved fields and persist through `addElementsToView`.
@@ -35,8 +33,6 @@ membership. Merely retaining the shorthand fields does not create those facts.
 - For Mermaid layout, use the installed plugin's `addMermaid` through the bounded
   workflow in [plugin-workflow.md](plugin-workflow.md). Check returned ids and
   image assets rather than assuming every diagram type becomes editable shapes.
-- Import only already-full `.excalidraw` scenes through the new-file adapter.
-  Skeleton normalization is not an offline-import capability of that adapter.
 
 The read-only inspection tool recognizes shorthand so it can explain missing
 normalization. Its warnings do not establish plugin compatibility. Native C/D

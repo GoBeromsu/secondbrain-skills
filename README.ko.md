@@ -107,6 +107,7 @@ AGENTS.md                기여자와 에이전트를 위한 저장소 계약
 - **[Jonghak Seo](https://github.com/Jonghakseo/pi-extension)**, pi-extension (MIT). `obsidian-visualize`의 검사 린트와 skeleton·style 참조는 여기서 가져와 고쳤습니다.
 - **[Obsidian](https://github.com/obsidianmd/pele)**, Pele (MIT). `obsidian-visualize`의 Pele 분기는 공개된 호환성·보안 문서를 따릅니다. Pele 파일은 하나도 싣지 않습니다.
 - **[구요한 (Yohan Koo)](https://pele.cmdspace.work/)**, CMDSPACE Pele 갤러리. `obsidian-visualize` Pele 카탈로그의 쓸 때·피할 때·크기 한도와 관찰된 함정은 이 갤러리를 참고했고, 예제는 모두 이 저장소가 직접 썼습니다.
+- **[Iconify](https://iconify.design/)**, **[LobeHub icons](https://github.com/lobehub/lobe-icons)**, 아이콘 모음. `obsidian-visualize`의 그림은 실행 시 이들의 공개 URL을 가리킵니다. 아이콘 파일은 하나도 싣지 않습니다.
 
 이들의 보증이나 제휴 관계를 주장하지 않습니다. "Obsidian"은 이 스킬들이 대상으로 하는 서드파티 애플리케이션의 이름입니다.
 
