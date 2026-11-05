@@ -6,22 +6,38 @@ Done means: the diagram family fits the relationship being shown, the prefix and
 
 ## What changed
 
-Obsidian 1.15.0 stopped bundling Mermaid. The fence is still written ```` ```mermaid ```` and the grammar is still Mermaid's, but Pele draws it: Mermaid 12.1.0 syntax, every built-in Mermaid 12.1.0 diagram type, Pele's own layout, and colors and fonts from the vault theme. Pele runs no code, so diagrams render without a confirmation setting. [`pele-compatibility.md`](pele-compatibility.md) holds the differences, limits and the gate for older apps.
+Obsidian 1.15.0 stopped bundling Mermaid. The fence is still written ```` ```mermaid ```` and the grammar is still Mermaid 12.1.0's, but Pele draws it with its own layout and the vault theme's colors and fonts, and runs no code, so there is no setting to enable. **Writing the right fence is the work; a probe only confirms it.** [`pele-compatibility.md`](pele-compatibility.md) holds the differences, limits and the gate for older apps.
 
-Pele has no command-line tool. Its only runtime surface inside Obsidian is `window.pele` (`render`, `parse`, `detectType`, `supports`) and the `loadMermaid()`/`window.mermaid` compatibility shim, reached through the official CLI's `eval`. Name those calls; do not write a script around them.
+Pele has no command-line tool and needs no plugin. To confirm a fence without opening the note, call Pele's runtime from `obsidian eval`. `window.pele` is not guaranteed to exist yet and `loadMermaid` is not a global, so load it through the Excalidraw plugin first, then call `window.pele.render(source)`. `render` is synchronous: it returns `{svg}` or throws a `PeleError` carrying the parse error text.
+
+```bash
+obsidian vault=<name> eval code='(()=>{const r=window.__check={s:"run"};ExcalidrawAutomate.obsidian.loadMermaid().then(()=>{try{r.n=window.pele.render("flowchart LR\n  A --> B").svg.length;r.s="ok"}catch(e){r.s="fail";r.e=String(e.message)}});return "ok"})()'
+obsidian vault=<name> eval code='JSON.stringify(window.__check)'
+```
+
+To check every fence of a note, read the file with `app.vault.cachedRead`, take each ```` ```mermaid ```` body and render it the same way. Without the Excalidraw plugin, open the note as a preview tab and count what drew, then close the tab:
+
+```bash
+obsidian vault=<name> eval code='(()=>{const f=app.vault.getAbstractFileByPath("<path>");const l=app.workspace.getLeaf("tab");window.__leaf=l;l.openFile(f,{state:{mode:"preview"}}).then(()=>setTimeout(()=>{window.__n=l.view.previewMode.containerEl.querySelectorAll("svg.pele").length},1500));return "ok"})()'
+obsidian vault=<name> eval code='window.__n'
+obsidian vault=<name> eval code='window.__leaf.detach()'
+```
+
+To look at the result, take a screenshot while the preview tab is open and before it is detached, with a path outside the vault, then open the PNG:
+
+```bash
+obsidian vault=<name> dev:screenshot path=<absolute-path>.png
+```
+
+It captures the whole app window, so it also shows other open tab titles: keep it out of the vault and out of anything shipped. Colors come from the app's theme (a light theme in the run that was checked; a dark theme was not). Do not rasterize a saved `pele.render` SVG with `rsvg-convert` or similar: the SVG draws with `var(--pele-*)` theme variables that only resolve inside the app, and flowchart and sequence boxes come out solid black. Korean text, colors and layout were correct in the screenshot of flowchart, sequence and pie.
+
+A block that fails to draw in the preview stays in the page as a box of text beginning with `Parse error` or `Lexical error`, so reading the text of each `.el-pre` element names the failing block. `window.pele.supports("<keyword>")` answers whether a diagram keyword exists without rendering.
 
 ## Evidence ladder
 
-Four separate claims. Never report a higher level on the strength of a lower one.
+The ladder is in [`../SKILL.md`](../SKILL.md). For a Pele block: A is the source read against [`pele-catalog.md`](pele-catalog.md) and the rules here; B is the note's bytes re-read after the write; C is `window.pele.render(source)` accepting the grammar, with the version from `obsidian version` stated (mermaid.live or the Mermaid CLI prove real Mermaid, not Pele); D is the note open in the target Obsidian and looked at.
 
-| Level | What it proves | How it is produced |
-| --- | --- | --- |
-| A — Authoring check | The prefix, grammar, labels, and fence follow the documented rules | Reading the source against [`pele-catalog.md`](pele-catalog.md) and the rules below |
-| B — Parse validation | A named renderer accepts the grammar | `pele.render(source)` through `obsidian eval` in a 1.15.0+ app, with the app version stated. mermaid.live or Mermaid CLI only prove real Mermaid, not Pele |
-| C — Materialized readback | The intended bytes are in the intended note and nothing else moved | Re-reading the file after the write and diffing against what you intended |
-| D — Render QA | This vault's renderer draws it in the note | Opening the note in the target Obsidian and looking at the result |
-
-B is not D. `pele.render()` in one app proves grammar acceptance there, not the note's layout, theme, or an older device's bundle. C is not D either: writing a fence is not rendering it.
+C is not D: `pele.render()` proves grammar acceptance in one app, not the note's layout, theme, or an older device's bundle. B is not D either: writing a fence is not rendering it.
 
 When a level cannot be reached — no app access, no vault authorization, headless environment — say which level was reached and name the rest as unverified.
 
@@ -34,7 +50,7 @@ When a level cannot be reached — no app access, no vault authorization, headle
 5. **Write labels** under the escaping and readability rules below.
 6. **Fence it exactly** (see Fences and placement).
 7. **Only if the task actually edits a note:** confirm write authorization for that exact note, make the narrowest possible edit, and read the file back (see Editing a note safely).
-8. **Render QA** in the target installation, recording the Obsidian app and installer versions it reports.
+8. **Render QA** in the target installation only when asked, because level C already proves the grammar and needs no opened note. Record the app and installer versions from `obsidian version`.
 9. **On a renderer failure, fall back without losing meaning** (see Failing without degrading meaning).
 
 ## Choosing the family
@@ -78,22 +94,40 @@ Each catalog pattern also names when to avoid its family and the size past which
 
 Split a diagram at a real boundary (phase, actor, subsystem) as soon as labels overlap or edges cross unreadably. Pele scales wide diagrams down and lets the reader zoom and pan; that is not readability. Two readable diagrams beat one complete unreadable one.
 
-## Syntax that actually breaks
+## Syntax pitfalls
 
-Each rule below was rechecked with `pele.render()` in Obsidian 1.15.0.
+Every row failed in Obsidian 1.15.1 (installer 1.15.0) through `window.pele.render()` or a preview tab. Quote every label as a habit: it is cheap, and `(` and `|` fail without it.
 
-- **Prefix is literal.** `stateDiagram-v2`, `sequenceDiagram`, `classDiagram`, `architecture-beta` — exact case, exact suffix. An unknown prefix fails with *No diagram type detected*, not a fallback.
-- **`flowchart` vs `graph`.** Both are accepted; `flowchart` is the current documented keyword and the one to write.
-- **Lowercase `end` breaks a flowchart.** Write `End` or `END`, or put the word inside a quoted label.
-- **A node id starting with `o` or `x` right after an edge changes the edge.** `A---oB` is a circle edge and `A---xB` a cross edge; add a space or capitalize (`A--- Ops`).
-- **Quote troublesome labels.** Parentheses, colons, slashes, `#`, and non-ASCII belong inside `"..."`: `id1["Renewal (second request)"]`. Quote the label, not the identifier, and do not add quotes to grammars that take bare keys, such as `architecture-beta` service ids.
-- **Escape with entity codes when quoting is not enough.** `#quot;` for a double quote, `#35;` for `#`, decimal codes like `#9829;`.
-- **Line breaks.** Use `<br/>`, or a Markdown string label — a double-quoted label whose text is wrapped in backticks — which also takes `**bold**`. Pele also breaks on a literal `\n` inside a quoted label, but older bundles print the two characters, so do not write it.
-- **No HTML labels.** Pele draws labels as SVG text; arbitrary HTML is not rendered. `<code>`, `<kbd>`, `<sub>` and `<sup>` draw as plain text in Obsidian 1.15.0; write a literal angle bracket as `#lt;` and `#gt;`.
-- **Math labels.** A `$$...$$` label is typeset by the host. Obsidian 1.15.0 typesets it with MathJax in a rendered note; a bare `pele.render()` call shows the TeX source. Math works in flowchart, swimlane, sequence, state, class, ER, mindmap, kanban, block, requirement and use case.
-- **Subgraph `direction` holds in Pele** even when an edge crosses the boundary; older bundles ignore it then. Do not rely on it for layout that must survive both.
-- **Comments are `%%` at line start.** They are not Markdown comments and not HTML comments.
-- **No themes.** `theme` and `themeVariables` colors do not apply; the vault theme decides colors.
+| You wrote | Pele says | Fix |
+| --- | --- | --- |
+| `A[Renewal (second request)]` | `Parse error ... got 'PS'` | `A["Renewal (second request)"]` |
+| `A -->\|yes (ok)\| B` | `Parse error ... got 'PS'` | `A -->\|"yes (ok)"\| B` |
+| `A[a\|b]` | `Parse error ... got 'PIPE'` | quote the label |
+| `participant X as "CI(빌드/테스트)"` | no error: the quotes print literally in the box | sequence has no quoted form: write `participant X as CI(빌드/테스트)` bare |
+| `A --> end` | `Parse error ... got 'end'` | `End`, or `[end]`, which draws |
+| `subgraph S1` with no `end` | `Parse error ... Expecting 'end'` | close every subgraph |
+| `statediagram-v2`, `sequencediagram`, `gitgraph` | `No diagram type detected` | exact case: `stateDiagram-v2`, `sequenceDiagram`, `gitGraph` |
+| `zenuml`, a comment-only fence, an empty fence | `No diagram type detected` | ZenUML is unsupported; use `sequenceDiagram` |
+| `pie` with `A : 3` | `Lexical error` | quote labels: `"A" : 3` |
+| `pie title "Loans"` | no error: the quotes print literally in the title | bare title: `pie title Loans` (slice labels stay quoted) |
+| two diagrams in one fence | `Parse error` at the second prefix | one fence per diagram |
+| `<!-- c -->` inside the diagram | `Parse error` | `%%` at line start |
+| a fence tagged ```` ```Mermaid ```` | none: drawn as a plain code block (raw text) | lowercase `mermaid` |
+
+Keep the user's own wording in a label, parentheses and slashes included; do not rename "CI(빌드/테스트)" to "CI 빌드·테스트" to dodge a parse error. Forms that printed the text exactly as written (screenshot or SVG text): flowchart, class and mindmap `["CI(빌드/테스트)"]`, ER relation label `: "has (many)"`, state `state "CI(빌드/테스트)" as S`, and in sequence a bare `participant X as CI(빌드/테스트)`, a bare participant id `CI(빌드/테스트)`, a bare message `A->>B: 빌드(테스트) 요청`, or entity codes `#40;` and `#41;` for the parentheses. If a form is missing for a type you need, say so to the user when you change a label.
+
+Passed, and so not pitfalls: Korean labels bare or quoted, in flowchart, sequence, state, pie, mindmap, gantt, class, ER, journey, timeline and sankey; `<br>` and `<br/>`; `:`, `/`, `#`, `&` and `{}` in an unquoted flowchart label; a `mermaid` fence in a list item, a callout and a `~~~` fence; `graph` for `flowchart`; `stateDiagram` without `-v2`; `sankey`, `treemap` and `xychart` without `-beta`.
+
+Accepted but ignored, so a diagram that "works in mermaid.live and looks different here" is usually this and not an error: `%%{init}%%` and front-matter `theme`, `themeVariables`, `layout`, and `flowchart.curve` all produced the same SVG as no config. Only front-matter `title` changed the output. Colors come from the vault theme.
+
+Rules that hold beyond the table:
+
+- **A node id starting with `o` or `x` right after an edge changes the edge.** `A---oB` is a circle edge in Mermaid grammar; add a space or capitalize.
+- **Escape with entity codes when quoting is not enough.** `#quot;` for a double quote, `#35;` for `#`, `#lt;` and `#gt;` for angle brackets.
+- **Line breaks.** `<br/>`, or a Markdown string label (a quoted label wrapped in backticks, which also takes `**bold**`). A literal `\n` also breaks in Pele but older bundles print it, so do not write it.
+- **No HTML labels.** `<b>` draws as text; `<kbd>` and `<code>` lose the tag and use the mono font.
+- **Math.** A `$$...$$` label is typeset by the host: MathJax in a rendered note, TeX source from a bare `pele.render()`.
+- **Subgraph `direction` holds in Pele** even when an edge crosses the boundary; older bundles ignore it then.
 
 ## Fences and placement
 
@@ -139,7 +173,7 @@ Silently shipping a smaller diagram that says less is a wrong answer that looks 
 ## Boundaries
 
 - Mermaid rendered anywhere other than the target Obsidian install — a static site, a code host, a live editor — runs real Mermaid and does not inherit this baseline.
-- The Excalidraw plugin's own Mermaid import (`addMermaid`) converts source into drawing elements; it belongs to the Excalidraw branch in [`plugin-workflow.md`](plugin-workflow.md), and whether it uses Pele is unverified.
+- The Excalidraw plugin's own Mermaid import (`addMermaid`) converts source into drawing elements; it belongs to the Excalidraw branch in [`excalidraw-plugin.md`](excalidraw-plugin.md), and whether it uses Pele is unverified.
 - Vault policy owns whether the note may be written at all.
 
 ## Verification
@@ -149,5 +183,5 @@ Silently shipping a smaller diagram that says less is a wrong answer that looks 
 - [ ] Labels are quoted or escaped where the grammar needs it, and contain no literal `\n`.
 - [ ] The block is in an exact `mermaid` fence, one diagram per fence, correctly nested if inside a callout or list.
 - [ ] If a note was edited: authorization existed, the edit was anchored, and readback confirmed unrelated content is unchanged.
-- [ ] The highest evidence level actually reached is reported, with the Obsidian app and installer versions when level B or D was reached.
+- [ ] The highest evidence level actually reached is reported, with the Obsidian app and installer versions when level C or D was reached.
 - [ ] Any fallback preserves the original meaning, or explicitly lists what it drops.

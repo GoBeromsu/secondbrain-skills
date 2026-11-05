@@ -1,215 +1,88 @@
 ---
 name: obsidian-visualize
-description: Chooses the visual form for vault knowledge and builds it — a JSON Canvas of existing notes, a deterministic .excalidraw.md drawing, or a mermaid block rendered by Pele (Obsidian 1.15+ draws Mermaid with Pele). Use for an architecture, data-flow, pipeline, sequence, dependency or status diagram; a flowchart, sequence, class, state, ER, gantt, journey, pie, mindmap, timeline, sankey, kanban, treemap, architecture, xychart, swimlane, gitGraph, quadrant or C4 block; a mermaid block showing a parse error, raw text or an empty box in Reading view or Live Preview, or working in mermaid.live but not in the vault; a beta prefix needing a version-gated fallback; generating, replacing, inspecting, importing, editing or rendering Excalidraw in Obsidian, including plugin Mermaid import; or deciding between Canvas, Excalidraw, Pele and a plain table. 플로우차트·아키텍처도·개념도·머메이드·펠레. Not for JSON Canvas schema details, note prose and properties, or installing a plugin — use obsidian-canvas, obsidian-markdown or obsidian-cli.
+description: "Chooses the visual form and builds it: a JSON Canvas of notes, an Excalidraw drawing (.excalidraw.md; plugin CLI or script), or a mermaid block drawn by Pele (Obsidian 1.15+). Use for an architecture, data-flow, pipeline, sequence, dependency, status or concept diagram; a mind map, sketchnote or sticky notes; a flowchart, sequence, class, state, ER, gantt, journey, pie, mindmap, timeline, sankey, kanban, treemap, architecture, xychart, swimlane, gitGraph, quadrant or C4 block; a mermaid block with a parse error, raw text or empty box in Reading view or Live Preview, or fine in mermaid.live but not the vault; a beta prefix needing a version-gated fallback; generating, replacing, inspecting, importing, editing, exporting or rendering Excalidraw, including plugin Mermaid import; or choosing between Canvas, Excalidraw, Pele and a plain table. 플로우차트·아키텍처도·개념도·머메이드·펠레·손그림·마인드맵·스케치노트. Not for Canvas schema, note prose or properties, or plugin installs: use obsidian-canvas, obsidian-markdown or obsidian-cli."
 license: MIT
 ---
 
 # Obsidian Visualize
 
-Pick the visual form the evidence supports, then produce the file that carries it — a diagram is a file with a documented shape, not a runtime object that needs a plugin to exist.
+Pick the form the content supports, build it on the surface that fits, and look at the result before calling it done. A table that answers the question beats a diagram that decorates it.
 
-Done means: the form fits what is being shown, every claim in the drawing traces to inspected evidence, the drawing is a new file unless replacing a named one was asked for, static validation is clean, readback proves the intended bytes landed, and the report says exactly which evidence level was reached instead of implying a picture was seen.
+## Choose the form
 
-## Choose the form first
-
-| What the nodes are | Form | Why |
+| What the nodes are | Form | Writer |
 | --- | --- | --- |
-| Existing vault notes to navigate — a map of content, a reading path, a note dependency map | **JSON Canvas** (`.canvas`) | Nodes are file references; clicking one opens the note |
-| Free shapes with no backing note — architecture, data flow, deployment, status cards, labelled routes | **Excalidraw** (`.excalidraw.md`) | Arbitrary geometry, styling, bound labels, frames |
-| A small structural diagram that belongs *inside* a note's prose | **Pele diagram** (a `mermaid` fence) | Travels with the note; no attachment to manage; Obsidian 1.15.0+ draws it with Pele in the vault theme |
-| Values, comparisons, ordered attributes | **Markdown table** | A table that answers the question beats a diagram that decorates it |
+| Existing vault notes to navigate | **JSON Canvas** (`.canvas`) | direct file write; schema in `obsidian-canvas` |
+| Free shapes with no backing note: architecture, data flow, mind map, sketch, annotated figure | **Excalidraw** (`.excalidraw.md`) | plugin CLI, or `scripts/draw.py` offline |
+| A small structural diagram inside a note's prose | **Pele** (a `mermaid` fence) | the note edit itself |
 
-This is a decision, not a fallback ladder. Do not deliver a Canvas because Excalidraw geometry looked tedious, and do not deliver an Excalidraw drawing of note titles when the user wants to click through to the notes. If the request names a form, that form is the answer unless it cannot carry the content — then say so before switching.
+If the request names a form, that form is the answer unless it cannot carry the content; say so before switching. Do not deliver a Canvas because Excalidraw looked tedious, nor an Excalidraw of note titles when the reader should click through to notes. For a Canvas, every `file` node and wikilink target must resolve in the destination vault; a plausible name is not a resolved one.
 
-This package owns three branches: Canvas, Excalidraw and Pele. `obsidian-canvas` owns the `.canvas` node/edge schema, colors, and ID rules; `obsidian-markdown` owns note prose, links, and properties. This package owns the choice above, Excalidraw file generation, Pele diagram source, and the vault-specific checks in the workflow below. Compose those packages by name when the task genuinely reaches into them; nothing here dispatches to them automatically.
+Ground every box and arrow in inspected evidence (files at a pinned revision, note contents, measured values). Label declared configuration as declared. A reference image supplies visual language only, never services or numbers.
 
-## Pele branch
+## Excalidraw
 
-A diagram inside a note is a ```` ```mermaid ```` fence. Since Obsidian 1.15.0 the app no longer includes Mermaid and draws that fence with Pele, Obsidian's own renderer for Mermaid 12.1.0 syntax. Follow [`references/pele.md`](references/pele.md) for the meaning-first workflow, family choice, syntax rules, fences, safe note edits, fallbacks and its own evidence ladder; [`references/pele-catalog.md`](references/pele-catalog.md) for copy-ready blocks; and [`references/pele-compatibility.md`](references/pele-compatibility.md) for the app-version gate, Pele's differences from Mermaid and the probes. The rest of this file is the Canvas and Excalidraw branches.
+Open [`references/excalidraw-plugin.md`](references/excalidraw-plugin.md) for the CLI, skeleton fields and feature-to-surface table, and [`references/excalidraw-design.md`](references/excalidraw-design.md) to choose the drawing's pattern, palette and spacing before placing anything; its fidelity check (each stated relationship is one arrow, labels in the user's language) and its sketch guidance apply to every drawing.
 
-## CLI rule
+1. **Probe.** `obsidian vault=<name> obsidian-excalidraw-plugin:status` and `schema action=<cmd>`. If the plugin or CLI is absent, make a new drawing with `draw.py`, the only offline writer; never install or enable a plugin to make a drawing work. Editing an existing drawing without the app is an unmet prerequisite: report it, write nothing.
+2. **Create.** Native `create` with a new `path`: skeleton elements, Lucide `icons`, frames, sticky notes, arrows bound by `start`/`end`. It never overwrites. Choose coordinates from the pattern; the reply's `data.idMap` holds the real ids.
+3. **Edit.** Fix in place, never delete and recreate: `open`, `read source=live` for the `revision`, then `apply` with `expectedRevision`. A stale revision changes nothing; re-read and rebuild.
+4. **Export and look.** `export` (with `requestId`, `path`, `source`, and a vault-relative `out` ending `.png`) writes the image; copy it out of the vault, view it. Fix every defect listed in the design reference's render loop, re-export, repeat until you would show it unqualified. An export that was not looked at is not render QA.
+5. **Clean up.** Close tabs you opened and delete any export from the vault.
 
-Run packaged CLIs directly: `obsidian` (owned by `obsidian-cli`) for opening, `eval` and readback, `python3` and `node` for this package's own files. Pele has no CLI; its in-app `pele.render()` is reached through `obsidian eval`, written into the command, not into a launcher. A script here only builds or checks this package's own artifacts — the scene generator, the full-scene importer, the read-only inspector, and the in-app workbench payload. None of them shells out to a CLI, and none may: a wrapper, hook, launcher, queue, debounce or alias around a packaged CLI is the anti-pattern this collection forbids.
+Offline, or for a plain boxes-and-arrows graph, `scripts/draw.py` lays out and writes the file:
+
+`python3 scripts/draw.py <spec.json|-> <out.excalidraw.md> [--replace]`
+
+It writes a new file and prints one JSON line with `path`, `sha256`, `elements`, `by_type`, `crossings`, `warnings`. Non-empty `warnings` means look at the drawing. If it warns about crossings, do not rerun hoping for better: draw by hand through native `create` with chosen coordinates and a pattern from the design reference. `--replace` redoes only this script's own output; any other existing file is refused.
+
+- Top level: `direction` (`LR`, `TB`), `title`, `frames` `[{id,label}]`, `nodes`, `edges`.
+- Node: `id`, `label` (required), `shape` (`rectangle`, `ellipse`, `diamond`, `text`, `note`), `color` (`blue`, `green`, `yellow`, `red`, `purple`, `gray`, `note`), `frame`, `group`, `link`, `icon` (URL), `roughness` 0/1/2, `strokeStyle` `solid`/`dashed`/`dotted`.
+- Edge: `from`, `to` (required), `label`, `dashed`, `head` (`arrow`, `triangle`, `bar`, `dot`, `none`).
+
+`node scripts/inspect.mjs lint <file>` checks a plain file's ids, two-way bindings and overlaps; it refuses `compressed-json`, which the plugin writes once a drawing has been opened.
+
+What the CLI cannot do (elbow arrows, Mermaid-to-elements, embedded notes and pages, frontmatter keys) goes through a trusted EA script, as `excalidraw-plugin.md` describes, only in a disposable or approved vault. `obsidian eval` is synchronous: start an async call that stores its result on `window`, then read it in a second call. Opening a drawing makes the plugin re-save it compressed, so never hand-edit the compressed block.
+
+Icons for named services stay URLs (`icon` in the spec); never save an image in the vault, and say it loads from a third party on first open.
+
+## Pele
+
+A diagram inside a note is a `mermaid` fence. On Obsidian 1.15+ Pele draws it, so correct syntax is the work and a probe only confirms it.
+
+- `pele` and `loadMermaid` are not globals. Run `ExcalidrawAutomate.obsidian.loadMermaid()` first; then `window.pele.render(src)` is synchronous and throws on a parse error.
+- Without the Excalidraw plugin, open the note in a preview tab and count `svg.pele`; a failed block shows as text beginning "Parse error".
+- The commands are in [`references/pele.md`](references/pele.md), with no second copy here. Its "Syntax pitfalls" section is what to check when a block fails; [`references/pele-catalog.md`](references/pele-catalog.md) has copy-ready blocks and [`references/pele-compatibility.md`](references/pele-compatibility.md) the version gate for beta prefixes.
+
+Extras (the `excalidraw-extras` companion plugin) adds two things to a drawing: Mermaid converted to editable elements, when the user wants to hand-edit a Mermaid diagram, and LaTeX for math. Otherwise use a Pele fence. Its absence is normal; install it only when asked. Details are in `excalidraw-plugin.md`; `pele.md` does not own them.
 
 ## Evidence ladder
 
-The Canvas and Excalidraw branches make four separate claims; the Pele branch's ladder is in its reference. Never report a higher one on the strength of a lower one.
+Report the highest level actually reached; a lower one never stands in for a higher one.
 
-| Level | What it proves | How it is produced |
+| Level | Proves | Produced by |
 | --- | --- | --- |
-| A — Static validation | The scene is structurally sound: unique ids, resolvable two-way bindings, finite geometry | `Scene.check()` / `validate_scene()` before writing |
-| B — Materialized readback | The intended bytes are at the intended path and still parse | The writer's own readback; `read_drawing()` afterwards |
-| C — Runtime load | The target app opened the file as a drawing and reports the expected element count | Opening the file in the target Obsidian (`obsidian-cli` owns the command surface) and comparing against `Scene.summary()` |
-| D — Render QA | The drawing is actually legible: no overlaps, no clipping, correct hierarchy | Exporting an image through the installed plugin and looking at it |
+| A static | Structure is sound: unique ids, mirrored bindings, finite geometry, grammar by the rules | `inspect.mjs lint`, `draw.py`'s own readback, the schema, reading the source |
+| B readback | The intended bytes are at the intended path and parse | `read source=disk`, re-reading the file |
+| C runtime load | The running app loaded it and counts match | CLI `read`, `getSceneFromFile`, `pele.render` |
+| D rendered | The picture is legible and was looked at | native `export` viewed, a preview tab inspected |
 
-A and B on the generator/import path need nothing but Python and the filesystem. C needs a target installation; D additionally needs the Excalidraw plugin present and a human or vision-capable reviewer looking at the export. This package cannot install or enable a plugin and carries no rasteriser: its native helper asks an already-enabled plugin to export the reloaded drawing. An SVG or PNG assembled from the same numbers, or rendered in a standalone Excalidraw app, does not prove the Obsidian plugin parses it.
+"Written and read back" is a complete result at B; "renders correctly" is not.
 
-When C or D cannot be reached, name the level reached and list the rest as unverified. "Validated and written" is a complete, honest result at level B. "Rendered correctly" is a lie at level B.
+## Native procedure
 
-## Workflow
+For any change to an existing drawing, Canvas or note:
 
-1. **Ground the content.** Collect the evidence for every claim the diagram will make: files at a pinned revision, note contents, measured values. Label declared configuration as declared and inspected behavior as inspected; do not merge a name-similar concept into a box because the words matched. A reference image supplies visual language only — never services, protocols, or numbers.
-2. **Choose the form** with the table above, and choose the view the evidence supports (pipeline, sequence, data contract, deployment, observability). An architectural request answered with a three-box linear overview is the wrong view even when it validates.
-3. **Write a small deterministic generator** that computes layout from measured text. For Excalidraw, import [`scripts/excalidraw_scene.py`](scripts/excalidraw_scene.py) and build with `Scene`. For Canvas, a short dict-and-`json.dump` script is enough; the schema belongs to `obsidian-canvas`. Never hand-place coordinates by eye and never hand-edit the generated file — fix the generator and regenerate.
-4. **Validate before writing** (level A). Excalidraw: `Scene.check()` must be empty. Canvas: unique ids, every `fromNode`/`toNode` resolves, no two nodes overlap, and — this package's own check — every `file` node path and every wikilink target actually resolves in the destination vault. A plausible note name is not a resolved one.
-5. **Write a new file** (level B). `Scene.write()` refuses to touch an existing path unless the replacement rules below are satisfied, and reads the result back before returning.
-6. **Load it in the target app** (level C) and compare the element count against `Scene.summary()["total"]`.
-7. **Render QA** (level D) only when the plugin is present: export an image through it, look at the result for overlapping cards, clipped labels, unreadable text, and wrong hierarchy, then fix the generator and regenerate. [`references/workbench.md`](references/workbench.md) has the admission probe, the async handshake the CLI needs, and the reload-then-render order.
-8. **Report** the path, the form and why, the evidence trail, and the highest level actually reached.
+1. Resolve the exact path and the effect the task authorized; with no target path, stay read-only.
+2. Read its current bytes (`read`, or the file) and keep the `revision`.
+3. `apply` only the selected ids, so unrelated elements, frontmatter and prose stay as they were.
+4. Use the least destructive surface that does it: `apply` over recreate, `create` for a new path, never an overwrite.
+5. Read back the persisted result, not the live scene.
+6. Report the level reached, plugin and app versions, and anything unmet.
+7. Leave a runtime fact unknown when neither the docs nor the installed version settles it.
 
-## Excalidraw file anatomy
+## Done when
 
-An `.excalidraw.md` drawing is Markdown, top to bottom:
-
-````text
----
-excalidraw-plugin: parsed
----
-Optional plaintext description shown in Reading view.
-
-# Excalidraw Data
-
-## Text Elements
-Ingest ^Kh3nD0pQ2f
-
-Store ^b7TqL1wRxa
-
-%%
-## Drawing
-```json
-{"type":"excalidraw","version":2,"source":"…","elements":[…],"appState":{…},"files":{}}
-```
-%%
-````
-
-- `excalidraw-plugin: parsed` is the marker that makes the note a drawing.
-- `## Text Elements` is a human-readable index: the element's text, a space, then `^<elementId>`, one blank line between entries. The plugin reads the real scene from the fenced JSON.
-- The `%%` pair hides the scene from Reading view.
-- The plugin can also store the scene as `compressed-json`. That is codec output. Never author or hand-edit it; this package refuses both to write it and to diff against it.
-
-Element essentials the generator already handles: a **bound label** needs `containerId` on the text *and* a mirrored `{"type":"text","id":…}` entry in the container's `boundElements`; an **arrow** needs `startBinding`/`endBinding` of `{elementId, focus, gap}` mirrored as `{"type":"arrow","id":…}` on both endpoints, with `points` relative to the arrow's own origin and the first point exactly `[0, 0]`; **frames** and **groups** relate elements through `frameId` and `groupIds`. Missing either half of a two-way reference renders wrong or breaks on reload, which is what level A checks.
-
-## Plugin-first import and editing
-
-When the request is to see or change Excalidraw **inside Obsidian**, use
-[`references/plugin-workflow.md`](references/plugin-workflow.md). It covers
-new `.excalidraw.md` creation and exact opening, an inspected full-scene import,
-selected-id native edits, Mermaid addition, independent plugin readback and
-native export QA. Existing plugin drawings, their text indexes, frontmatter,
-prose and assets are not replaced with a fresh standalone scene.
-
-The package-local tools are [`scripts/import_scene.py`](scripts/import_scene.py)
-(new-file-only full-scene adapter),
-[`scripts/inspect.mjs`](scripts/inspect.mjs) (read-only inspection/layout lint),
-and [`scripts/plugin-workbench.js`](scripts/plugin-workbench.js) (native
-ExcalidrawAutomate snapshot, selected update, Mermaid addition and PNG export).
-Read [`references/skeleton.md`](references/skeleton.md) for upstream shorthand
-adaptation boundaries and [`references/style.md`](references/style.md) for
-palette/spacing/layout recipes. Their capability mapping is in
-[`source-map.json`](references/source-map.json).
-
-Resolve exact artifact and authorized effect; inspect current bytes and live
-preimages; preserve everything outside the selected ids/fields; use the selected
-supported native surface; reload the exact persisted result; report actual
-evidence and prerequisites; leave unresolved version/runtime facts unknown.
-No default destination, standalone app lifecycle or plugin installation is added.
-
-## The generator API
-
-`scripts/excalidraw_scene.py` is Python 3.9+ standard library only — no pip install, no plugin, no network. Import it directly:
-
-```python
-import sys
-sys.path.insert(0, "skills/obsidian-visualize/scripts")
-from excalidraw_scene import Scene, read_drawing
-
-scene = Scene(namespace="Systems/Ingest Overview")
-frame = scene.frame(-60, -60, 1220, 220, "Ingest path")
-ingest = scene.box(0, 0, 260, "Ingest\ncollect raw events", 20, "#0369a1", "#ffffff")
-store = scene.box(420, 0, 260, "Store\nappend to the log", 20, "#334155", "#ffffff")
-scene.add_to_frame(frame, ingest, store)
-scene.arrow(ingest, store, "events")
-
-defects = scene.check()
-assert not defects, defects
-report = scene.write("Systems/Ingest Overview.excalidraw.md", frontmatter={"tags": ["diagram"]})
-print(report.path, report.sha256, report.summary)
-```
-
-**Determinism.** `namespace` is the only entropy source. Element ids, `seed`, `versionNonce` and `updated` derive from `(namespace, element kind, creation order, optional key)` — no clock, no PRNG. The same generator run twice produces byte-identical output, and because ids ignore element text, relabelling a card keeps its id and its diff small. Pass `key="ingest"` to pin an id to a name instead of to creation order when the build order may change.
-
-**Builders** — each returns the element dict, which you may mutate for style:
-
-| Call | Result |
-| --- | --- |
-| `Scene(namespace, view_background="#ffffff", grid_size=None)` | One scene per output file |
-| `.rect(x, y, width, height, stroke, background="transparent", key=None, **style)` | Rounded rectangle |
-| `.text(x, y, body, font_size, color, max_width=None, container=None, align="left", valign="top", link=None, key=None, **style)` | Text, measured and optionally wrapped; `container=` writes both halves of the bound-label pair |
-| `.box(x, y, width, body, font_size, stroke, background, link=None, pad_x=14, pad_y=10, text_color=None, dashed=False, min_height=0, key=None)` | Card: rectangle plus bound label, height fitted to the wrapped text. Returns the rectangle |
-| `.arrow(start, end, label=None, start_side="right", end_side="left", dashed=False, elbow_y=None, gap=6, key=None)` | Two-way bound arrow; elbows through the midpoint when the anchors do not line up, or through `elbow_y` |
-| `.frame(x, y, width, height, name, key=None, **style)` | Frame. Create it before its members so it sits behind them |
-| `.add_to_frame(frame, *members)` / `.group(*members, key=None)` | Set `frameId`; share a deterministic `groupIds` entry |
-
-**Measurement** — `wrap(text, font_size, max_width)`, `dims(text, font_size)`, `text_width(line, font_size)`, `char_ratio(char)`. Advance width is east-asian aware: wide and fullwidth characters cost a full `fontSize`, everything else `0.6×`, and combining marks, joiners, variation selectors and conjoining Hangul jamo cost nothing, so decomposed text measures like its precomposed form. It is an estimate, not font metrics — an emoji ZWJ sequence is over-measured, which widens a card rather than clipping it. If a real font still clips, widen `max_width`; do not add a metrics dependency.
-
-**Inspection and output** — `.check(ignore_overlaps=False)`, `.summary()`, `.to_scene()`, `.render(frontmatter=None, description="")`, `.write(...)`. Standalone: `validate_scene(scene)`, `validate_scene_json(text)`, `scene_summary(scene)`, `render_drawing(scene, …)`, `extract_scene(document)`, `read_drawing(path) -> (document, sha256, scene)`, `build_scene(elements, …)`.
-
-**Refusals.** Non-finite or negative geometry, a blank color, a non-positive font size, an unknown anchor side, an arrow bound to itself or to an element from another `Scene`, padding wider than its card, and any attempt to override a derived `id`/`type`/`seed`/`versionNonce` all raise at construction time. `SceneDefect` (carrying `.defects`) is raised instead of writing a scene that fails validation; `SceneWriteError` is raised for every unsafe write and for a readback that does not match intent.
-
-**Overlaps** are a layout heuristic, not a schema error: two filled rectangles that intersect produce a defect prefixed `overlap:`. Passing `allow_overlaps=True` writes anyway and returns those defects in `report.allowed_overlaps` — quote them in the report rather than silently dropping them.
-
-## Replacing an existing drawing
-
-A new visualization request is a new file. `write()` refuses an existing path outright, and refuses `overwrite=True` without `expected_sha256`, because a replacement whose baseline was never read is a blind overwrite.
-
-```python
-document, digest, previous = read_drawing("Systems/Ingest Overview.excalidraw.md")
-# keep `document` as the backup, and diff `previous` against what you are about to write
-report = scene.write(path, overwrite=True, expected_sha256=digest)
-assert not report.removed_ids, report.removed_ids   # nothing dropped silently
-```
-
-The writer then verifies the digest still matches, writes atomically (temp file in the destination directory, then an exclusive link or an atomic replace — never a truncate-then-write), reads the result back, revalidates it, and reports the diff. It also refuses a path that is a directory or a symlink, a path not ending in `.md`, and any existing file that has no `## Drawing` section — so a plain note can never be turned into a drawing by accident, even with a correct digest.
-
-`report` is the receipt to quote: `path`, `sha256`, `size`, `replaced`, `summary`, `added_ids`, `removed_ids`, `binding_changes`, `allowed_overlaps`.
-
-## Safety rules
-
-- Producing a valid drawing is not authorization to write into a vault. Resolve the exact target path and the authorized effect first; stay read-only when either is missing.
-- Back up and diff before replacing. `removed_ids` or unexplained `binding_changes` mean stop and report, not continue.
-- Never hand-patch generated output, never author `compressed-json`, and never write a drawing through a shell redirect or stream editor.
-- Never put a host path, vault name, account identifier, private note content, or secret into a shipped example, a frontmatter field, or an element link.
-- Never click through a trust, permission, or plugin-installation dialog in the target app to make a drawing render. Report the missing layer and hand that decision to the operator.
-- A failed check, an unresolved link, or an uninspected render is a partial result. Report it as a blocker, not a success.
-
-## Live plugin edits (exception path)
-
-Use the plugin's automation API for an authorized selected edit of a plugin-managed drawing, Mermaid insertion into that drawing, or embedding through the plugin's own file store. Fresh geometry still uses deterministic file generation; element count is not a reason to switch surfaces. Native workbench updates preserve the existing document instead of regenerating it.
-
-[`references/workbench.md`](references/workbench.md) covers plugin and API admission, the build-and-persist calls, the caller-owned token handshake the CLI's synchronous `eval` requires, and the reload-then-render order that separates "the live scene looks right" from "the file on disk holds it".
-
-## Requirements
-
-- Python 3.9+ for the generator. Standard library only, by design.
-- Node.js for optional read-only `inspect.mjs` (author checks used 24.21.0). No npm dependency or build is required. `plugin-workbench.js` runs in the admitted Obsidian JavaScript context using its native EA API and Web Crypto; it has no server or browser dependency.
-- Level C needs a target Obsidian installation; `obsidian-cli` owns the command surface for opening a file and reading back what loaded.
-- Level D additionally needs the Excalidraw plugin already installed and enabled in that vault. Its absence is a normal outcome to report, not a failure to work around.
-- Primary sources: the [Excalidraw plugin repository](https://github.com/zsviczian/obsidian-excalidraw-plugin) and its published [ExcalidrawAutomate API surface](https://github.com/zsviczian/obsidian-excalidraw-plugin/blob/master/docs/API/ExcalidrawAutomate.d.ts) for the drawing format and API, the [JSON Canvas 1.0 spec](https://jsoncanvas.org/spec/1.0/) for the Canvas branch, and the [Obsidian 1.15.0 changelog](https://obsidian.md/changelog/2026-10-22-desktop-v1.15.0/), the [Pele repository](https://github.com/obsidianmd/pele) and [pele.run/compatibility](https://pele.run/compatibility) for the Pele branch.
-- The Pele branch needs no plugin or script. Level B needs a running Obsidian 1.15.0+ reached through `obsidian eval`; level D needs the target installation.
-
-## Verification
-
-- [ ] The chosen form matches the selection table, and the reason is stated.
-- [ ] A Pele diagram also passed the verification list in `references/pele.md`.
-- [ ] No script added or run here wraps a packaged CLI.
-- [ ] Every box, label, and arrow traces to inspected evidence; declared configuration is labelled as declared.
-- [ ] Layout came from a deterministic generator, not from hand-placed coordinates.
-- [ ] `Scene.check()` is empty, or every remaining defect is an `overlap:` one that was deliberately allowed and reported.
-- [ ] The drawing is a new file, or a replacement backed by `read_drawing()`, a digest, and a reviewed id/binding diff.
-- [ ] Wikilink and Canvas `file` targets resolve in the destination vault.
-- [ ] The report names the highest evidence level reached (A, B, C, or D) and lists the rest as unverified.
-- [ ] No host path, vault name, account identifier, or secret appears in the output.
-
-## Attribution
-
-The deterministic generator, full-scene adapter, native workbench helper and plugin workflow are original work under the repository's MIT `LICENSE`. Inspection/layout lint and the skeleton/style resources are adapted from Jonghak Seo's MIT-licensed pi-extension at the pin in [source-map.json](references/source-map.json), with its full grant retained in [NOTICE](references/NOTICE). No standalone app, font, binary or Obsidian plugin is redistributed. See Git history for source facts, versions, modifications and unrun runtime checks.
+- The form matches the table and the reason is stated.
+- Every claim traces to evidence; every `file` and wikilink target resolves.
+- A drawing was exported and looked at (D), or the report names the level it stopped at.

@@ -1,6 +1,4 @@
 #!/usr/bin/env node
-// Adapted from Jonghak Seo pi-extension; see ../references/NOTICE.
-// Read-only inspection and layout lint. No server, browser, or writer.
 import fs from "node:fs";
 import path from "node:path";
 const die = (message) => { console.error(message); process.exit(1); };
@@ -153,7 +151,6 @@ function lint(file) {
 				}
 			}
 			if (isSkel(e) && SHAPES.has(e.type) && e.label?.text && typeof e.width === "number") {
-				// Fonts render wider than the estimate; diamonds need extra room around their text.
 				const fontSize = e.label.fontSize ?? 20;
 				const scale = e.type === "diamond" ? 1.5 : 1;
 				const needW = (textWidthEstimate(e.label.text, fontSize) + 48) * scale;
@@ -164,7 +161,6 @@ function lint(file) {
 					);
 			}
 		}
-		// partial overlaps between top-level boxes (containment is treated as intentional grouping)
 		const boxes = elements
 			.filter((e) => (SHAPES.has(e.type) || (e.type === "text" && !e.containerId)) && typeof e.x === "number")
 			.map((e) => {

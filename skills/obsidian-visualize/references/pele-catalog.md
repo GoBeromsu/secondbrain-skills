@@ -2,7 +2,7 @@
 
 Copy-ready patterns for the Pele branch, one per family. Each pattern names when to use the family, when another family carries the meaning better, the size past which it stops being readable, and the pitfalls observed in Pele. Replace labels and data; leave the grammar alone.
 
-**Status of these entries:** each block is authored against the Mermaid grammar documentation, and every block in this file parsed and rendered through `pele.render()` in Obsidian 1.15.0 (installer 1.13.4, desktop) — level B in [`pele.md`](pele.md). Every pitfall marked *observed* was reproduced the same way. None of them is renderer-verified in your target note; only opening it in the target Obsidian produces level D. Run the compatibility gate in [`pele-compatibility.md`](pele-compatibility.md) before using a version-gated or Pele-only family on an app older than 1.15.0.
+**Status of these entries:** each block is authored against the Mermaid grammar documentation, and all 39 blocks in this file were rendered one by one through `window.pele.render()` in Obsidian 1.15.1 (installer 1.15.0, desktop) and all returned an SVG; a sample with Korean labels was screenshotted and looked at (level D); the 39 renders are level C, as defined in [`../SKILL.md`](../SKILL.md). Every pitfall marked *observed* was reproduced the same way. None of them is renderer-verified in your target note; only opening it in the target Obsidian produces level D. Run the compatibility gate in [`pele-compatibility.md`](pele-compatibility.md) before using a version-gated or Pele-only family on an app older than 1.15.0.
 
 All examples are synthetic and describe a fictional public library branch.
 
@@ -53,7 +53,7 @@ reader asks for a title`"] --> B{"On shelf?"}
 
 - Below about 640 pixels of width Pele may draw a `flowchart LR` top-to-bottom. The note cannot pin the direction; write the diagram so it reads both ways.
 - Two subgraphs with no edge between them stack vertically even under `LR`. To compare them side by side, make two diagrams.
-- `<code>`, `<kbd>`, `<sub>` and `<sup>` inside a label draw as plain text in Obsidian 1.15.0 (*observed*). Write a literal angle bracket as `#lt;` and `#gt;`.
+- `<code>` and `<kbd>` inside a label lose the tag and use the mono font; `<sub>` and `<sup>` were not retested. Write a literal angle bracket as `#lt;` and `#gt;`.
 
 ### Sequence diagram
 
@@ -328,7 +328,7 @@ Computer area,Leaves,60
 
 Current Mermaid accepts `sankey` and `sankey-beta`; older bundles accept only `sankey-beta`, so the suffixed form is the compatible one. Wrap any value containing a comma in double quotes.
 
-- Node names must be ASCII in Obsidian 1.15.0: a Hangul name fails with *Parse error on line 2* (*observed*). Put non-English explanation in the caption.
+- Hangul node names fail on Obsidian 1.15.0 with installer 1.13.4 and draw on 1.15.1 with installer 1.15.0; probe before using non-ASCII names on an older installer.
 - Do not write totals into node names; Pele appends each node's value itself. A very small flow draws hairline-thin and disappears in dark themes.
 
 **Fallback:** a `flowchart LR` whose edge labels carry the quantities.
