@@ -1,7 +1,7 @@
 {
   "name": "secondbrain-skills",
   "displayName": "Obsidian Skills",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "description": "Twenty-five self-contained Agent Skills: eight native Obsidian packages and seventeen knowledge packages, including four archival principles. The principles are local candidate additions; historical Claude Code evidence in an isolated project scope does not verify this candidate. New runtime loads are unverified. This is a public prerelease.",
   "author": {
     "name": "beomsukoh",
