@@ -95,7 +95,7 @@ A,B,1
 
 Open the note in the target installation and read the result per block. A drawn diagram is a pass. An error message, a raw dump of the source, or a blank area where the block should be is a failure — all three mean the same thing for the gate.
 
-Check both Reading view and Live Preview: the same block can render in one and not the other, and both are reachable by whoever reads the note.
+Check both Reading view and Live Preview: the same block can render in one and not the other, and both are reachable by whoever reads the note. Pele rendered in Live Preview on Obsidian 1.15.1 (installer 1.15.0); count `svg.pele` inside `.cm-content`, because counting the whole view container doubles it.
 
 ## Reading a failure
 

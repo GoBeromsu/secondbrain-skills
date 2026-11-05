@@ -27,7 +27,7 @@ Text is free by default. A shape is for something an arrow lands on, a shape who
 
 ## Real values and zoom
 
-Put the evidence in a small neutral `rectangle` with monospace text beside the box it explains, tied by a thin dashed line: a three-line payload, an endpoint, a sample row. Synthetic values only. Layer the drawing for three reading distances: a one-line flow, labelled zones, then detail inside the zones; a small drawing needs the first two.
+Put the evidence in a small neutral `rectangle` with `fontFamily` 3 text (fixed width, observed) beside the box it explains, tied by a thin dashed line: a three-line payload, an endpoint, a sample row. Synthetic values only. Layer the drawing for three reading distances: a one-line flow, labelled zones, then detail inside the zones; a small drawing needs the first two.
 
 ## What to look at
 
@@ -74,7 +74,7 @@ Text inside pale fills stays `#1e1e1e` or the stroke hue. On a dark canvas, free
 - Width estimate: about one font size per CJK character, 0.55 per Latin character. Rendered fonts run wider: keep 48 px side padding and break long labels with `\n`.
 - Snap to multiples of 20; same column shares `x`, same row shares `y`.
 - Sizes: standard 200x80, compact 140x60, marker dot 14x14, decision diamond 220x120; the focal element is about one and a half times the standard box.
-- Gaps: 60 px or more for plain arrows, 120 px or more when the arrow carries a label.
+- Gaps: 60 px or more for plain arrows. A labelled arrow needs a gap wider than the label itself, estimated by the width rule above.
 - The focal element gets 200 px of clear air; supporting detail packs tighter.
 - Flow left to right or top to bottom; radial only for hub-and-spoke.
 - `roughness: 1` suits brainstorming and notes; `0` suits specs. Pick one per drawing.
@@ -130,15 +130,15 @@ A request for a sketch, hand-drawn look or 손그림 changes the look, not only 
 - Lines and connectors curved or slightly bent, free title text, unequal spacing.
 - `fontFamily` and `fontSize` on a shape go inside its `label`, not on the shape; the CLI rejects them on the shape.
 
-Korean text does not become handwritten. Observed on plugin 2.29.1: for `fontFamily` 1 to 9, Latin letters change face (1 and 5 handwritten, 7 heavy display, 3 and 8 monospace) while Hangul fell back to the same clean sans every time. No value gives handwritten Korean; carry the sketch look through roughness, shapes and curves, and say so when a user expects handwriting.
+For hand-style Korean set `fontFamily` 5 and check the export: it is the only family whose Hangul is hand-style on plugin 2.29.1 (visual reading; the per-family table and its network note are in [`excalidraw-plugin.md`](excalidraw-plugin.md)). Family 4 with a local font was not tried. `scripts/draw.py` hard-codes family 2 and its spec has no font field, so its Hangul should be that plain sans (inferred from family 2; no `draw.py` Hangul render was looked at). Use node `roughness` and shapes there, or create the drawing through the CLI when you need more of the sketch look: `draw.py` edges take no `roughness` or curve, and unknown keys are ignored without a warning (edge `roughness`, `curve`, `curved` and node `fillStyle` exited 0 with `warnings: []` and changed nothing).
 
 ## Sticky notes
 
-A `stickynote` made through the CLI always carries a date stamp (such as `6 Nov`); the CLI has no field to remove it, a `date` key is rejected, and the stamp is not a separate element `apply delete` can remove. A `stickynote` element written by `scripts/draw.py` rendered in the plugin's export with no stamp (observed once, a disk export on plugin 2.29.1). For a dateless note through the CLI, draw a yellow `rectangle` with `label`.
+A `stickynote` made through the CLI always carries a date stamp (such as `6 Nov`); the CLI has no field to remove it, a `date` key is rejected, and the stamp is not a separate element `apply delete` can remove. `ea.addStickyNote` stamps it too. A raw `stickynote` element in a file written by `scripts/draw.py` had no stamp on a disk export and after opening and exporting live; the cause is unknown. For a dateless note through the CLI, draw a yellow `rectangle` with `label`.
 
 ## Fixing a drawing
 
-`create` never overwrites, so do not delete and recreate. `open` the drawing, `read source=live` for the `revision` (detail `elements` lists ids), then `apply` with `expectedRevision`. Observed: one `apply` combining `update` (colour and roughness), `delete` and `add` succeeded, a read back showed the changes, and deleting a shape also removed its bound text. Use the real ids from the read. For a redesign rather than a fix, `create` a new path. Operation fields are in [`excalidraw-plugin.md`](excalidraw-plugin.md).
+`create` never overwrites, so do not delete and recreate. `open` the drawing, `read source=live` for the `revision` (detail `elements` lists ids), then `apply` with `expectedRevision`. Observed: one `apply` combining `update` (colour and roughness), `delete` and `add` succeeded, `saveStatus` was persisted, `read source=disk` showed the changes, a moved element's bound label moved with it, and deleting a shape also removed its bound text. Use the real ids from the read. For a redesign rather than a fix, `create` a new path. Operation fields are in [`excalidraw-plugin.md`](excalidraw-plugin.md).
 
 ## Render, look, fix
 
