@@ -461,6 +461,8 @@ def main(argv):
         return 1
     try:
         spec = json.loads(sys.stdin.read() if argv[1] == "-" else open(argv[1], encoding="utf-8").read())
+        if os.path.islink(argv[2]):
+            raise ValueError("refusing symlink: %s" % argv[2])
         if os.path.exists(argv[2]):
             if not rep:
                 raise ValueError("output exists: %s (--replace redoes a file this script wrote)" % argv[2])
@@ -474,17 +476,25 @@ def main(argv):
         if files:
             out += "## Embedded Files\n" + "\n".join("%s: %s" % kv for kv in files.items()) + "\n\n"
         out += "%%\n## Drawing\n```json\n" + json.dumps(sc, ensure_ascii=False, separators=(",", ":")) + "\n```\n%%\n"
-        os.makedirs(os.path.dirname(os.path.abspath(argv[2])), exist_ok=True)
-        tmp = os.path.join(os.path.dirname(os.path.abspath(argv[2])), ".draw-%s.tmp" % uuid.uuid4().hex)
-        fd = os.open(tmp, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o666)
+        d = os.path.dirname(os.path.abspath(argv[2]))
+        os.makedirs(d, exist_ok=True)
+        st = os.stat(argv[2]) if rep and os.path.exists(argv[2]) else None
+        tmp = os.path.join(d, ".draw-%s.tmp" % uuid.uuid4().hex)
+        fd = os.open(tmp, os.O_CREAT | os.O_EXCL | os.O_WRONLY, st.st_mode & 0o777 if st else 0o666)
         try:
+            if st:
+                os.fchmod(fd, st.st_mode & 0o777)
+                try:
+                    os.fchown(fd, -1, st.st_gid)
+                except PermissionError:
+                    pass
             with os.fdopen(fd, "w", encoding="utf-8") as f:
                 f.write(out)
             raw = open(tmp, "rb").read()
             back = json.loads(raw.decode().split("```json\n")[1].split("\n```")[0])["elements"]
             if len(back) != len(els):
                 raise ValueError("readback element count mismatch")
-            if rep:
+            if st:
                 os.replace(tmp, argv[2])
             else:
                 os.link(tmp, argv[2])

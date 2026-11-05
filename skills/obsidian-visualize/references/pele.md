@@ -29,7 +29,7 @@ To look at the result, take a screenshot while the preview tab is open and befor
 obsidian vault=<name> dev:screenshot path=<absolute-path>.png
 ```
 
-It captures the whole app window, so it also shows other open tab titles: keep it out of the vault and out of anything shipped. Colors come from the app's theme (a light theme in the run that was checked; a dark theme was not). Do not rasterize a saved `pele.render` SVG with `rsvg-convert` or similar: the SVG draws with `var(--pele-*)` theme variables that only resolve inside the app, and flowchart and sequence boxes come out solid black. Korean text, colors and layout were correct in the screenshot of flowchart, sequence and pie.
+It captures the whole app window, so it also shows other open tab titles: keep it out of the vault and out of anything shipped. Colors come from the app's theme; flowchart, sequence and pie blocks on Obsidian 1.15.1 rendered legibly in Reading view and Live Preview under the dark theme (observed); other families were not checked, and the catalog's theme warnings still apply. Do not rasterize a saved `pele.render` SVG with `rsvg-convert` or similar: the SVG draws with `var(--pele-*)` theme variables that only resolve inside the app, and flowchart and sequence boxes come out solid black. Korean text, colors and layout in those three families were correct in the screenshot in both light and dark.
 
 A block that fails to draw in the preview stays in the page as a box of text beginning with `Parse error` or `Lexical error`, so reading the text of each `.el-pre` element names the failing block. `window.pele.supports("<keyword>")` answers whether a diagram keyword exists without rendering.
 
