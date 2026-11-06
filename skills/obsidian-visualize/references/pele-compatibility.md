@@ -10,7 +10,7 @@ Consequences:
 
 - **The app version is the gate.** 1.15.0 or later means Pele; earlier means an older pinned Mermaid bundle with the version gates below. A vault synced to several devices is only as new as its oldest app.
 - **A pass elsewhere is not evidence here.** mermaid.live, code hosts and other note apps run real Mermaid, not Pele, on their own schedule.
-- **Identical source looks different.** Pele uses its own layout, so node positions, spacing and edge paths differ from Mermaid. Mermaid themes do not apply and `themeVariables` colors act only as series palettes (pele.run/compatibility); colors and fonts come from the vault theme through `--mermaid-*` CSS variables. Judge appearance only in the target.
+- **Identical source looks different.** Pele uses its own layout, so node positions, spacing and edge paths differ from Mermaid. Mermaid themes do not apply and `themeVariables` colors act only as series palettes (pele.run/compatibility); colors and fonts come from the vault theme through `--pele-*` CSS variables (pele.run/theming; the 1.15.0 changelog says `--mermaid-*`). Judge appearance only in the target.
 - **No code runs.** Pele ignores JavaScript callbacks in `click`, blocks `javascript:`, `data:` and `vbscript:` links, escapes text and filters styles. That is why 1.15.0 removed the *Show Mermaid diagrams in notes* setting and draws diagrams without asking.
 - **Not supported by Pele:** ZenUML and other external Mermaid plugins, and arbitrary HTML labels. Source over 50,000 characters, SVG output over 4,000,000 characters, or a flowchart over 5,000 edges is rejected.
 

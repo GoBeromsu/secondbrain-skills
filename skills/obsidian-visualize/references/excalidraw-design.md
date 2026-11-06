@@ -130,7 +130,7 @@ A request for a sketch, hand-drawn look or 손그림 changes the look, not only 
 - Lines and connectors curved or slightly bent, free title text, unequal spacing.
 - `fontFamily` and `fontSize` on a shape go inside its `label`, not on the shape; the CLI rejects them on the shape.
 
-For hand-style Korean set `fontFamily` 5 and check the export: it is the only family whose Hangul is hand-style on plugin 2.29.1 (visual reading; the per-family table and its network note are in [`excalidraw-plugin.md`](excalidraw-plugin.md)). Family 4 with a local font was not tried. `scripts/draw.py` hard-codes family 2 and its spec has no font field, so its Hangul should be that plain sans (inferred from family 2; no `draw.py` Hangul render was looked at). Use node `roughness` and shapes there, or create the drawing through the CLI when you need more of the sketch look: `draw.py` edges take no `roughness` or curve, and unknown keys are ignored without a warning (edge `roughness`, `curve`, `curved` and node `fillStyle` exited 0 with `warnings: []` and changed nothing).
+For hand-style Korean set `fontFamily` 5 and check the export: it is the only family whose Hangul is hand-style on plugin 2.29.1 (visual reading; the per-family table and its network note are in [`excalidraw-plugin.md`](excalidraw-plugin.md)). Family 4 with a local font was not tried. `scripts/draw.py` hard-codes family 2 and its spec has no font field, so its Hangul should be that plain sans (inferred from family 2; no `draw.py` Hangul render was looked at). Use node `roughness` and shapes there, or create the drawing through the CLI when you need more of the sketch look: `draw.py` edges take no `roughness` or curve.
 
 ## Sticky notes
 
