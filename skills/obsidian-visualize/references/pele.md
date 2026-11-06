@@ -120,6 +120,8 @@ Passed, and so not pitfalls: Korean labels bare or quoted, in flowchart, sequenc
 
 Accepted but ignored, so a diagram that "works in mermaid.live and looks different here" is usually this and not an error: `%%{init}%%` and front-matter `theme`, `themeVariables`, `layout`, and `flowchart.curve` all produced the same SVG as no config. Only front-matter `title` changed the output. Colors come from the vault theme.
 
+Per-diagram styling that does work: in a flowchart, `classDef` with `:::name` or `class A,B name`, `style A fill:#f96,stroke:#333`, and `linkStyle 0 stroke:#f00,stroke-width:4px` change the drawn SVG (level C on Obsidian 1.15.1; `style` and `linkStyle` also seen in a level D screenshot). `style A fill:url(javascript:x)` is a parse error.
+
 Rules that hold beyond the table:
 
 - **A node id starting with `o` or `x` right after an edge changes the edge.** `A---oB` is a circle edge in Mermaid grammar; add a space or capitalize.

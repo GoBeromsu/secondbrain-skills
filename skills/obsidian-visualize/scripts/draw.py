@@ -8,6 +8,9 @@ SHAPES = ("rectangle", "ellipse", "diamond", "text", "note")
 HEADS = {"arrow": "arrow", "triangle": "triangle", "bar": "bar", "dot": "dot", "none": None}
 HEAD = "---\nexcalidraw-plugin: parsed\n---\n\n# Excalidraw Data\n\n## Text Elements\n"
 GAPC, BANDGAP, PAD, GAP = 50, 160, 40, 4
+KEYS = {"top": ("direction", "frames", "nodes", "edges", "title"), "frames": ("id", "label"),
+        "nodes": ("id", "label", "shape", "color", "roughness", "strokeStyle", "frame", "icon", "group", "link"),
+        "edges": ("from", "to", "head", "dashed", "label")}
 B62 = string.digits + string.ascii_letters
 
 
@@ -91,6 +94,14 @@ def parse(s):
         if e.get("head", "arrow") not in HEADS:
             raise ValueError("head is one of %s" % ", ".join(HEADS))
     return dr, frames, nodes, edges
+
+
+def unknown(spec):
+    w = ["unknown key %r at top level ignored" % k for k in spec if k not in KEYS["top"]]
+    for part in ("frames", "nodes", "edges"):
+        for i, x in enumerate(spec.get(part) or []):
+            w += ["unknown key %r on %s %s ignored" % (k, part[:-1], x.get("id", i)) for k in x if k not in KEYS[part]]
+    return w
 
 
 def layout(dr, frames, nodes, edges):
@@ -470,6 +481,7 @@ def main(argv):
                 raise ValueError("not replacing %s: its bytes are not this script's output" % argv[2])
         els, texts, files, nbox, nodeel = build(spec)
         cr, warns = check(els, nbox, nodeel, spec.get("edges") or [])
+        warns += unknown(spec)
         sc = dict(type="excalidraw", version=2, source="https://github.com/zsviczian/obsidian-excalidraw-plugin", elements=els,
                   appState=dict(gridSize=None, viewBackgroundColor="#ffffff"), files={})
         out = HEAD + "\n\n".join("%s ^%s" % (t["text"], t["id"]) for t in texts) + "\n\n"
