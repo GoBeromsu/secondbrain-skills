@@ -1,12 +1,18 @@
 # Pele diagrams
 
-Produce a `mermaid` fence that carries the intended meaning and renders in the renderer the target Obsidian installation actually ships: Pele from 1.15.0, an older pinned Mermaid bundle before that.
+Produce a `mermaid` fence that carries the intended meaning and renders in Pele, the renderer Obsidian 1.15.0 and later ship.
 
-Done means: the diagram family fits the relationship being shown, the prefix and grammar are accepted by the target renderer, the source sits in an exact `mermaid` fence, unrelated note content is byte-for-byte untouched, and every claim is backed by the evidence level that actually produced it.
+Done means: the diagram family fits the relationship being shown, the prefix and grammar are accepted by Pele, the source sits in an exact `mermaid` fence, unrelated note content is byte-for-byte untouched, and every claim is backed by the evidence level that actually produced it.
 
-## What changed
+## What Pele is
 
-Obsidian 1.15.0 stopped bundling Mermaid. The fence is still written ```` ```mermaid ```` and the grammar is still Mermaid 12.1.0's, but Pele draws it with its own layout and the vault theme's colors and fonts, and runs no code, so there is no setting to enable. **Writing the right fence is the work; a probe only confirms it.** [`pele-compatibility.md`](pele-compatibility.md) holds the differences, limits and the gate for older apps.
+Obsidian 1.15.0 stopped bundling Mermaid. Every `mermaid` fence is drawn by Pele, an MIT-licensed renderer that targets Mermaid 12.1.0 syntax and every diagram type built into it. It uses its own layout and the vault theme's colors and fonts, and runs no code, so there is no setting to enable.
+
+- **Another renderer is not evidence.** mermaid.live and code hosts run real Mermaid, and node positions, spacing and edge paths differ from Pele's. Mermaid themes do not apply and `themeVariables` colors act only as series palettes (pele.run/compatibility); colors and fonts come from the vault theme through `--pele-*` CSS variables (pele.run/theming; the 1.15.0 changelog says `--mermaid-*`). Judge appearance only in the target app.
+- **No code runs.** Pele ignores JavaScript callbacks in `click`, blocks `javascript:`, `data:` and `vbscript:` links, escapes text and filters styles. ZenUML and other external Mermaid plugins and arbitrary HTML labels are not supported. Source over 50,000 characters, SVG output over 4,000,000 characters, or a flowchart over 5,000 edges is rejected.
+- **The Pele inside the app can lag Pele releases.** Obsidian moves its bundled Pele only when the app updates, so a feature in Pele's release notes is not evidence for the vault. On Obsidian 1.15.0 with installer 1.13.4 `pele.render()` rejected a Hangul sankey node name; on 1.15.1 with installer 1.15.0 it accepts one. Probe a recent feature on the target app first. A synced vault is only as new as its oldest app: probe on each device that renders it, keep the older form if a probe fails, and never quote a version from another machine.
+- **Host options are the app's, not the note's:** the narrow-width switch from `LR` to `TB` and sankey gradients and the size limits cannot be set by a note.
+- **Keywords.** Write `flowchart` (`graph` is an alias) and `stateDiagram-v2`. `-beta` is optional where Pele accepts both spellings (`sankey`, `treemap`, `xychart`); `architecture-beta` is the only spelling Pele lists. Pele also accepts `C4Container`, `C4Component`, `C4Dynamic`, `C4Deployment`, `railroad-beta`, `railroad-abnf-beta`, `railroad-peg-beta`, and the unsuffixed `block`, `packet` and `ishikawa`.
 
 Pele has no command-line tool and needs no plugin. To confirm a fence without opening the note, call Pele's runtime from `obsidian eval`. `window.pele` is not guaranteed to exist yet and `loadMermaid` is not a global, so load it through the Excalidraw plugin first, then call `window.pele.render(source)`. `render` is synchronous: it returns `{svg}` or throws a `PeleError` carrying the parse error text.
 
@@ -29,7 +35,9 @@ To look at the result, take a screenshot while the preview tab is open and befor
 obsidian vault=<name> dev:screenshot path=<absolute-path>.png
 ```
 
-It captures the whole app window, so it also shows other open tab titles: keep it out of the vault and out of anything shipped. Colors come from the app's theme; flowchart, sequence and pie blocks on Obsidian 1.15.1 rendered legibly in Reading view and Live Preview under the dark theme (observed); other families were not checked, and the catalog's theme warnings still apply. Do not rasterize a saved `pele.render` SVG with `rsvg-convert` or similar: the SVG draws with `var(--pele-*)` theme variables that only resolve inside the app, and flowchart and sequence boxes come out solid black. Korean text, colors and layout in those three families were correct in the screenshot in both light and dark.
+The screenshot captures the whole app window, so it also shows other tab titles: keep it out of the vault and out of anything shipped. Do not rasterize a saved `pele.render` SVG with `rsvg-convert` or similar: `var(--pele-*)` variables only resolve inside the app and boxes come out black. Flowchart, sequence and pie blocks, including Korean text, were legible in both themes on 1.15.1 (observed); other families were not checked.
+
+Writing a probe note is a vault mutation: it needs the task's own authorization, an agreed location and an agreed cleanup. A scratch vault avoids the question, because the renderer belongs to the app, not the vault. Pele draws in Reading view and in Live Preview (observed on 1.15.1, installer 1.15.0); in Live Preview count `svg.pele` inside `.cm-content`, because counting the whole view container doubles it. Run the `obsidian` CLI directly; do not wrap it in a script.
 
 A block that fails to draw in the preview stays in the page as a box of text beginning with `Parse error` or `Lexical error`, so reading the text of each `.el-pre` element names the failing block. `window.pele.supports("<keyword>")` answers whether a diagram keyword exists without rendering.
 
@@ -37,21 +45,18 @@ A block that fails to draw in the preview stays in the page as a box of text beg
 
 The ladder is in [`../SKILL.md`](../SKILL.md). For a Pele block: A is the source read against [`pele-catalog.md`](pele-catalog.md) and the rules here; B is the note's bytes re-read after the write; C is `window.pele.render(source)` accepting the grammar, with the version from `obsidian version` stated (mermaid.live or the Mermaid CLI prove real Mermaid, not Pele); D is the note open in the target Obsidian and looked at.
 
-C is not D: `pele.render()` proves grammar acceptance in one app, not the note's layout, theme, or an older device's bundle. B is not D either: writing a fence is not rendering it.
-
 When a level cannot be reached — no app access, no vault authorization, headless environment — say which level was reached and name the rest as unverified.
 
 ## Workflow
 
 1. **State the meaning first.** Write the sentence the diagram must communicate (sequence of steps, message order, state transitions, proportions, hierarchy, flow quantities). The sentence chooses the family.
 2. **Pick the smallest family that carries it** using the table below.
-3. **Apply the compatibility gate** in [`pele-compatibility.md`](pele-compatibility.md). An unknown app version is an old one.
-4. **Start from the catalog entry**, not from memory. Replace labels and data; leave the grammar alone.
-5. **Write labels** under the escaping and readability rules below.
-6. **Fence it exactly** (see Fences and placement).
-7. **Only if the task actually edits a note:** confirm write authorization for that exact note, make the narrowest possible edit, and read the file back (see Editing a note safely).
-8. **Render QA** in the target installation only when asked, because level C already proves the grammar and needs no opened note. Record the app and installer versions from `obsidian version`.
-9. **On a renderer failure, fall back without losing meaning** (see Failing without degrading meaning).
+3. **Start from the catalog entry**, not from memory. Replace labels and data; leave the grammar alone.
+4. **Write labels** under the escaping and readability rules below.
+5. **Fence it exactly** (see Fences and placement).
+6. **Only if the task actually edits a note:** confirm write authorization for that exact note, make the narrowest possible edit, and read the file back (see Editing a note safely).
+7. **Render QA** in the target installation only when asked; level C already proves the grammar and needs no opened note. Record the app and installer versions from `obsidian version`; Pele exposes no version field, so never invent one. Check labels at the note's real width and in dark mode, with nothing clipped or overlapping, and name what was not checked; an error, a raw source dump or a blank area all fail.
+8. **On a parse error, fix the source.** If the family cannot carry the meaning, change family without dropping information (see Failing without degrading meaning).
 
 ## Choosing the family
 
@@ -68,29 +73,29 @@ When a level cannot be reached — no app access, no vault authorization, headle
 | Branching outline of one topic | `mindmap` | Indentation is the grammar — keep it consistent |
 | Dated milestones in order | `timeline` | One period line, then its events |
 | Quantified flow between stages | `sankey-beta` | CSV-shaped rows: source, target, value |
-| Work items across workflow columns | `kanban` | Version-gated before 1.15.0 |
-| Nested proportions | `treemap-beta` | Version-gated before 1.15.0 |
-| Services, groups, and their links | `architecture-beta` | Version-gated before 1.15.0 |
-| Numeric series over categories | `xychart-beta` | Version-gated before 1.15.0 |
-| Several actors handing off one process | `swimlane-beta` | Pele-only |
-| A page or screen divided into a grid | `block-beta` | Pele-only |
-| Agents splitting work and calling tools | `agentflow-beta` | Pele-only |
-| Versions, branches and merges | `gitGraph` | Pele-only; case-exact keyword |
-| Screens, commands and events changing state | `eventmodeling` | Pele-only |
-| A few subjects profiled on several criteria | `radar-beta` | Pele-only |
-| Items placed on two criteria | `quadrantChart` | Pele-only |
-| Overlap of two or three sets | `venn-beta` | Pele-only |
-| Requirements traced to what satisfies them | `requirementDiagram` | Pele-only |
-| People, systems and external systems | `C4Context` | Pele-only |
-| What actors want from a system | `usecase-beta` | Pele-only |
-| Fixed-width fields of an identifier | `packet-beta` | Pele-only |
-| A notation rule as EBNF | `railroad-ebnf-beta` | Pele-only |
-| Folder and file paths | `treeView-beta` | Pele-only |
-| Causes of one problem by category | `ishikawa-beta` | Pele-only |
-| Work sorted into Cynefin domains | `cynefin-beta` | Pele-only |
-| Value chain by visibility and evolution | `wardley-beta` | Pele-only |
+| Work items across workflow columns | `kanban` | |
+| Nested proportions | `treemap-beta` | |
+| Services, groups, and their links | `architecture-beta` | |
+| Numeric series over categories | `xychart-beta` | |
+| Several actors handing off one process | `swimlane-beta` | |
+| A page or screen divided into a grid | `block-beta` | |
+| Agents splitting work and calling tools | `agentflow-beta` | |
+| Versions, branches and merges | `gitGraph` | Case-exact keyword |
+| Screens, commands and events changing state | `eventmodeling` | |
+| A few subjects profiled on several criteria | `radar-beta` | |
+| Items placed on two criteria | `quadrantChart` | |
+| Overlap of two or three sets | `venn-beta` | |
+| Requirements traced to what satisfies them | `requirementDiagram` | |
+| People, systems and external systems | `C4Context` | |
+| What actors want from a system | `usecase-beta` | |
+| Fixed-width fields of an identifier | `packet-beta` | |
+| A notation rule as EBNF | `railroad-ebnf-beta` | |
+| Folder and file paths | `treeView-beta` | |
+| Causes of one problem by category | `ishikawa-beta` | |
+| Work sorted into Cynefin domains | `cynefin-beta` | |
+| Value chain by visibility and evolution | `wardley-beta` | |
 
-Each catalog pattern also names when to avoid its family and the size past which it stops being readable. Use a Pele-only family only when every device that reads the note runs 1.15.0+.
+Each catalog pattern also names when to avoid its family and the size past which it stops being readable.
 
 Split a diagram at a real boundary (phase, actor, subsystem) as soon as labels overlap or edges cross unreadably. Pele scales wide diagrams down and lets the reader zoom and pan; that is not readability. Two readable diagrams beat one complete unreadable one.
 
@@ -114,22 +119,24 @@ Every row failed in Obsidian 1.15.1 (installer 1.15.0) through `window.pele.rend
 | `<!-- c -->` inside the diagram | `Parse error` | `%%` at line start |
 | a fence tagged ```` ```Mermaid ```` | none: drawn as a plain code block (raw text) | lowercase `mermaid` |
 
+If the minimal block renders but yours does not, remove the config header, metadata, styling and per-point labels one at a time.
+
 Keep the user's own wording in a label, parentheses and slashes included; do not rename "CI(빌드/테스트)" to "CI 빌드·테스트" to dodge a parse error. Forms that printed the text exactly as written (screenshot or SVG text): flowchart, class and mindmap `["CI(빌드/테스트)"]`, ER relation label `: "has (many)"`, state `state "CI(빌드/테스트)" as S`, and in sequence a bare `participant X as CI(빌드/테스트)`, a bare participant id `CI(빌드/테스트)`, a bare message `A->>B: 빌드(테스트) 요청`, or entity codes `#40;` and `#41;` for the parentheses. If a form is missing for a type you need, say so to the user when you change a label.
 
-Passed, and so not pitfalls: Korean labels bare or quoted, in flowchart, sequence, state, pie, mindmap, gantt, class, ER, journey, timeline and sankey; `<br>` and `<br/>`; `:`, `/`, `#`, `&` and `{}` in an unquoted flowchart label; a `mermaid` fence in a list item, a callout and a `~~~` fence; `graph` for `flowchart`; `stateDiagram` without `-v2`; `sankey`, `treemap` and `xychart` without `-beta`.
+Passed, and so not pitfalls: Korean labels bare or quoted, in flowchart, sequence, state, pie, mindmap, gantt, class, ER, journey, timeline and sankey; `<br>` and `<br/>`; `:`, `/`, `#`, `&` and `{}` in an unquoted flowchart label; a `mermaid` fence in a list item, a callout and a `~~~` fence; `graph` for `flowchart`; `stateDiagram` without `-v2`.
 
 Accepted but ignored, so a diagram that "works in mermaid.live and looks different here" is usually this and not an error: `%%{init}%%` and front-matter `theme`, `themeVariables`, `layout`, and `flowchart.curve` all produced the same SVG as no config. Only front-matter `title` changed the output. Colors come from the vault theme.
 
-Per-diagram styling that does work: in a flowchart, `classDef` with `:::name` or `class A,B name`, `style A fill:#f96,stroke:#333`, and `linkStyle 0 stroke:#f00,stroke-width:4px` change the drawn SVG (level C on Obsidian 1.15.1; `style` and `linkStyle` also seen in a level D screenshot). `style A fill:url(javascript:x)` is a parse error.
+Per-diagram styling that does work: in a flowchart, `classDef` with `:::name` or `class A,B name`, `style A fill:#f96,stroke:#333`, and `linkStyle 0 stroke:#f00,stroke-width:4px` change the drawn SVG (level C on Obsidian 1.15.1). `style A fill:url(javascript:x)` is a parse error.
 
 Rules that hold beyond the table:
 
 - **A node id starting with `o` or `x` right after an edge changes the edge.** `A---oB` is a circle edge in Mermaid grammar; add a space or capitalize.
 - **Escape with entity codes when quoting is not enough.** `#quot;` for a double quote, `#35;` for `#`, `#lt;` and `#gt;` for angle brackets.
-- **Line breaks.** `<br/>`, or a Markdown string label (a quoted label wrapped in backticks, which also takes `**bold**`). A literal `\n` also breaks in Pele but older bundles print it, so do not write it.
+- **Line breaks.** `<br/>`, or a Markdown string label (a quoted label wrapped in backticks, which also takes `**bold**`).
 - **No HTML labels.** `<b>` draws as text; `<kbd>` and `<code>` lose the tag and use the mono font.
 - **Math.** A `$$...$$` label is typeset by the host: MathJax in a rendered note, TeX source from a bare `pele.render()`.
-- **Subgraph `direction` holds in Pele** even when an edge crosses the boundary; older bundles ignore it then.
+- **Subgraph `direction` holds in Pele** even when an edge crosses the boundary.
 
 ## Fences and placement
 
@@ -163,7 +170,7 @@ Authoring a diagram grants no write permission. A write needs the task's own aut
 
 ## Failing without degrading meaning
 
-When the target renderer rejects the chosen family, the replacement must still carry the sentence from step 1.
+When Pele rejects the chosen family and the source cannot be fixed, the replacement must still carry the sentence from step 1.
 
 1. Re-state what the original diagram encoded: entities, relations, order, quantities, hierarchy.
 2. Choose a fallback that keeps all of it — usually `flowchart` for structure, `pie` for a single-level proportion, or a Markdown table for values.
@@ -174,16 +181,26 @@ Silently shipping a smaller diagram that says less is a wrong answer that looks 
 
 ## Boundaries
 
-- Mermaid rendered anywhere other than the target Obsidian install — a static site, a code host, a live editor — runs real Mermaid and does not inherit this baseline.
-- The Excalidraw plugin's own Mermaid import (`addMermaid`) converts source into drawing elements; it belongs to the Excalidraw branch in [`excalidraw-plugin.md`](excalidraw-plugin.md), and whether it uses Pele is unverified.
+- Mermaid rendered anywhere other than Obsidian — a static site, a code host, a live editor — runs real Mermaid and does not inherit this baseline.
 - Vault policy owns whether the note may be written at all.
 
 ## Verification
 
 - [ ] The sentence the diagram must carry is stated, and the family carries it.
-- [ ] The prefix is exact, and any version-gated family passed the compatibility gate.
-- [ ] Labels are quoted or escaped where the grammar needs it, and contain no literal `\n`.
+- [ ] The prefix is exact.
+- [ ] Labels are quoted or escaped where the grammar needs it.
 - [ ] The block is in an exact `mermaid` fence, one diagram per fence, correctly nested if inside a callout or list.
 - [ ] If a note was edited: authorization existed, the edit was anchored, and readback confirmed unrelated content is unchanged.
 - [ ] The highest evidence level actually reached is reported, with the Obsidian app and installer versions when level C or D was reached.
-- [ ] Any fallback preserves the original meaning, or explicitly lists what it drops.
+- [ ] Any replacement family preserves the original meaning, or explicitly lists what it drops.
+
+## Sources
+
+- Obsidian 1.15.0 desktop changelog (early access, 2026-10-22), for the switch to Pele, the removed setting, `--mermaid-*` variables and the `loadMermaid()`/`window.pele` surface: <https://obsidian.md/changelog/2026-10-22-desktop-v1.15.0/>
+- Pele repository, MIT: <https://github.com/obsidianmd/pele>
+- Pele site, theming and compatibility differences from Mermaid: <https://pele.run>, <https://pele.run/theming>, <https://pele.run/compatibility>
+- Pele security and size limits: <https://pele.run/security>
+- Pele release notes, for features added after the build an app bundles: <https://github.com/obsidianmd/pele/releases>
+- CMDSPACE Pele gallery, for use, avoid and size guidance per family observed in Pele 1.9.0: <https://pele.cmdspace.work/>
+- Mermaid documentation, for grammar: <https://mermaid.js.org/intro/>, flowchart quoting and entity codes: <https://mermaid.js.org/syntax/flowchart.html>
+- Obsidian advanced formatting help, for the `mermaid` fence and `internal-link` class: <https://help.obsidian.md/advanced-syntax>
