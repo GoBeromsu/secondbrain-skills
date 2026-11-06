@@ -1,6 +1,6 @@
 ---
 name: obsidian-visualize
-description: "Chooses the visual form and builds it: a JSON Canvas of notes, an Excalidraw drawing (.excalidraw.md; plugin CLI or script), or a mermaid block drawn by Pele (Obsidian 1.15+). Use for an architecture, data-flow, pipeline, sequence, dependency, status or concept diagram; a mind map, sketchnote or sticky notes; a flowchart, sequence, class, state, ER, gantt, journey, pie, mindmap, timeline, sankey, kanban, treemap, architecture, xychart, swimlane, gitGraph, quadrant or C4 block; a mermaid block with a parse error, raw text or empty box in Reading view or Live Preview, or fine in mermaid.live but not the vault; a beta prefix needing a version-gated fallback; generating, replacing, inspecting, importing, editing, exporting or rendering Excalidraw, including plugin Mermaid import; or choosing between Canvas, Excalidraw, Pele and a plain table. 플로우차트·아키텍처도·개념도·머메이드·펠레·손그림·마인드맵·스케치노트. Not for Canvas schema, note prose or properties, or plugin installs: use obsidian-canvas, obsidian-markdown or obsidian-cli."
+description: "Chooses the visual form and builds it: a JSON Canvas of notes, an Excalidraw drawing (.excalidraw.md; plugin CLI or script), or a mermaid block drawn by Pele (Obsidian 1.15+). Use for an architecture, data-flow, pipeline, sequence, dependency, status or concept diagram; a mind map, sketchnote or sticky notes; a flowchart, sequence, class, state, ER, gantt, journey, pie, mindmap, timeline, sankey, kanban, treemap, architecture, xychart, swimlane, gitGraph, quadrant or C4 block; a mermaid block with a parse error, raw text or empty box in Reading view or Live Preview, or fine in mermaid.live but not the vault; a `-beta` keyword question; generating, replacing, inspecting, importing, editing, exporting or rendering Excalidraw, including plugin Mermaid import; or choosing between Canvas, Excalidraw, Pele and a plain table. 플로우차트·아키텍처도·개념도·머메이드·펠레·손그림·마인드맵·스케치노트. Not for Canvas schema, note prose or properties, or plugin installs: use obsidian-canvas, obsidian-markdown or obsidian-cli."
 license: MIT
 ---
 
@@ -48,11 +48,10 @@ Icons for named services stay URLs (`icon` in the spec); never save an image in 
 
 ## Pele
 
-A diagram inside a note is a `mermaid` fence. On Obsidian 1.15+ Pele draws it, so correct syntax is the work and a probe only confirms it.
+A diagram inside a note is a `mermaid` fence. Pele draws it, so correct syntax is the work and a probe only confirms it. Obsidian 1.15.0+ only; earlier apps are out of scope.
 
-- `pele` and `loadMermaid` are not globals. Run `ExcalidrawAutomate.obsidian.loadMermaid()` first; then `window.pele.render(src)` is synchronous and throws on a parse error.
-- Without the Excalidraw plugin, open the note in a preview tab and count `svg.pele`; a failed block shows as text beginning "Parse error".
-- The commands are in [`references/pele.md`](references/pele.md), with no second copy here. Its "Syntax pitfalls" section is what to check when a block fails; [`references/pele-catalog.md`](references/pele-catalog.md) has copy-ready blocks and [`references/pele-compatibility.md`](references/pele-compatibility.md) the version gate for beta prefixes.
+- Probe commands and the `loadMermaid` step are in [`references/pele.md`](references/pele.md).
+- When a block fails, check the "Syntax pitfalls" section of that file; [`references/pele-catalog.md`](references/pele-catalog.md) has copy-ready blocks for the rest.
 
 Extras (the `excalidraw-extras` companion plugin) adds two things to a drawing: Mermaid converted to editable elements, when the user wants to hand-edit a Mermaid diagram, and LaTeX for math. Otherwise use a Pele fence. Its absence is normal; install it only when asked. Details are in `excalidraw-plugin.md`; `pele.md` does not own them.
 
@@ -63,7 +62,7 @@ Report the highest level actually reached; a lower one never stands in for a hig
 | Level | Proves | Produced by |
 | --- | --- | --- |
 | A static | Structure is sound: unique ids, mirrored bindings, finite geometry, grammar by the rules | `inspect.mjs lint`, `draw.py`'s own readback, the schema, reading the source |
-| B readback | The intended bytes are at the intended path and parse | `read source=disk`, re-reading the file |
+| B readback | The intended bytes are at the intended path and parse | `read source=disk`, re-reading the file after the write; the write alone is not B |
 | C runtime load | The running app loaded it and counts match | CLI `read`, `getSceneFromFile`, `pele.render` |
 | D rendered | The picture is legible and was looked at | native `export` viewed, a preview tab inspected |
 

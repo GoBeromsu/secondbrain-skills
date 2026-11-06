@@ -1,25 +1,20 @@
 # Diagram catalog
 
-Copy-ready patterns for the Pele branch, one per family. Each pattern names when to use the family, when another family carries the meaning better, the size past which it stops being readable, and the pitfalls observed in Pele. Replace labels and data; leave the grammar alone.
+Copy-ready patterns for Pele, one per family. Each pattern names when to use the family, when another family carries the meaning better, the size past which it stops being readable, and the pitfalls observed in Pele. Replace labels and data; leave the grammar alone.
 
-**Status of these entries:** each block is authored against the Mermaid grammar documentation, and all 39 blocks in this file were rendered one by one through `window.pele.render()` in Obsidian 1.15.1 (installer 1.15.0, desktop) and all returned an SVG; a sample with Korean labels was screenshotted and looked at (level D); the 39 renders are level C, as defined in [`../SKILL.md`](../SKILL.md). Every pitfall marked *observed* was reproduced the same way. None of them is renderer-verified in your target note; only opening it in the target Obsidian produces level D. Run the compatibility gate in [`pele-compatibility.md`](pele-compatibility.md) before using a version-gated or Pele-only family on an app older than 1.15.0.
+**Status of these entries:** all 39 blocks were rendered one by one through `window.pele.render()` in Obsidian 1.15.1 (installer 1.15.0, desktop), which is level C; a sample with Korean labels was also screenshotted (level D). Levels are defined in [`../SKILL.md`](../SKILL.md). Pitfalls marked *observed* were reproduced the same way; none is verified in your target note until it is opened there.
 
 All examples are synthetic and describe a fictional public library branch.
 
 ## Contents
 
-- Conservative core — [flowchart](#flowchart), [sequence](#sequence-diagram), [class](#class-diagram), [state](#state-diagram), [entity relationship](#entity-relationship-diagram), [gantt](#gantt), [journey](#user-journey), [pie](#pie), [mindmap](#mindmap), [timeline](#timeline)
-- Version-gated — [sankey](#sankey), [kanban](#kanban), [treemap](#treemap), [architecture](#architecture), [xy chart](#xy-chart)
-- Pele-only — [swimlane](#swimlane), [block](#block), [agentflow](#agentflow), [git graph](#git-graph), [event modeling](#event-modeling), [radar](#radar), [quadrant](#quadrant-chart), [venn](#venn), [requirement](#requirement-diagram), [C4 context](#c4-context), [use case](#use-case), [packet](#packet), [railroad](#railroad), [tree view](#tree-view), [ishikawa](#ishikawa), [cynefin](#cynefin), [wardley](#wardley-map)
-- [Fallbacks that keep the meaning](#fallbacks-that-keep-the-meaning)
+- Families — [flowchart](#flowchart), [sequence](#sequence-diagram), [class](#class-diagram), [state](#state-diagram), [entity relationship](#entity-relationship-diagram), [gantt](#gantt), [journey](#user-journey), [pie](#pie), [mindmap](#mindmap), [timeline](#timeline), [sankey](#sankey), [kanban](#kanban), [treemap](#treemap), [architecture](#architecture), [xy chart](#xy-chart), [swimlane](#swimlane), [block](#block), [agentflow](#agentflow), [git graph](#git-graph), [event modeling](#event-modeling), [radar](#radar), [quadrant](#quadrant-chart), [venn](#venn), [requirement](#requirement-diagram), [C4 context](#c4-context), [use case](#use-case), [packet](#packet), [railroad](#railroad), [tree view](#tree-view), [ishikawa](#ishikawa), [cynefin](#cynefin), [wardley](#wardley-map)
 
-## Conservative core
-
-These families have been part of Mermaid long enough that Pele and any older bundle new enough to render diagrams at all are expected to accept them. Prefer them whenever they can carry the meaning.
+## Families
 
 ### Flowchart
 
-Ordered steps with branches. The default choice, and the fallback for any structural diagram.
+Ordered steps with branches. The default choice for any structural diagram.
 
 **Use** for steps, branches and loops, or cause and dependency explained one arrow at a time. **Avoid** when three or more actors hand work to each other (swimlane) or when messages run in time order (sequence). **Keep under** 15 nodes; a label is a name line plus at most one role line.
 
@@ -54,6 +49,18 @@ reader asks for a title`"] --> B{"On shelf?"}
 - Below about 640 pixels of width Pele may draw a `flowchart LR` top-to-bottom. The note cannot pin the direction; write the diagram so it reads both ways.
 - Two subgraphs with no edge between them stack vertically even under `LR`. To compare them side by side, make two diagrams.
 - `<code>` and `<kbd>` inside a label lose the tag and use the mono font; `<sub>` and `<sup>` were not retested. Write a literal angle bracket as `#lt;` and `#gt;`.
+
+A flowchart can carry per-diagram styling with `classDef` and `:::`, `style` and `linkStyle`; see [`pele.md`](pele.md). `linkStyle` counts edges from 0 in source order.
+
+```mermaid
+flowchart LR
+  A[Hold request]:::urgent --> B{Copy on shelf?}
+  B -->|Yes| C[Reserve copy]
+  B -->|No| D[Add to queue]
+  classDef urgent fill:#f96,stroke:#333,color:#000
+  style C fill:#cfe,stroke:#393
+  linkStyle 2 stroke:#f00,stroke-width:3px
+```
 
 ### Sequence diagram
 
@@ -305,10 +312,6 @@ timeline
 
 Pele paints section headers and period boxes with the background colour as text colour, so legibility depends on the vault theme's contrast; check it at level D.
 
-## Version-gated
-
-Pele (Obsidian 1.15.0+) renders every family below. Each still needs the compatibility gate first, because a vault is also read on devices whose app predates Pele and ships an older Mermaid bundle; each entry names the fallback to use when that bundle rejects it. The `-beta` spellings are kept because Pele accepts them and older bundles need them.
-
 ### Sankey
 
 Quantified flow between stages, written as three-column CSV: source, target, value.
@@ -326,12 +329,10 @@ Reading room,Leaves,50
 Computer area,Leaves,60
 ```
 
-Current Mermaid accepts `sankey` and `sankey-beta`; older bundles accept only `sankey-beta`, so the suffixed form is the compatible one. Wrap any value containing a comma in double quotes.
+Wrap any value containing a comma in double quotes.
 
-- Hangul node names fail on Obsidian 1.15.0 with installer 1.13.4 and draw on 1.15.1 with installer 1.15.0; probe before using non-ASCII names on an older installer.
+- Probe on the target app before using non-ASCII names (see the lag rule in [`pele.md`](pele.md)).
 - Do not write totals into node names; Pele appends each node's value itself. A very small flow draws hairline-thin and disappears in dark themes.
-
-**Fallback:** a `flowchart LR` whose edge labels carry the quantities.
 
 ### Kanban
 
@@ -351,8 +352,6 @@ kanban
 ```
 
 Metadata keys are `assigned`, `ticket`, and `priority`; `priority` accepts only `Very High`, `High`, `Low`, and `Very Low`. Narrower than its natural width (about 640 pixels), Pele folds three columns into two plus one.
-
-**Fallback:** a Markdown table with one column per stage, or headings with task lists. Both keep every item and its stage.
 
 ### Treemap
 
@@ -374,8 +373,6 @@ treemap-beta
 
 Upstream marks this as a new diagram type whose syntax may still change, so pin the exact spelling you verified. At narrow widths Pele draws a small group as an empty box without its name or children and truncates small tile names character by character.
 
-**Fallback:** `pie` for a single level, plus a table or nested list for the levels `pie` cannot show. Do not ship the `pie` alone if the hierarchy was the point.
-
 ### Architecture
 
 Services, the groups that contain them, and directed links between them.
@@ -394,10 +391,7 @@ architecture-beta
 
 Service and group ids are bare keys — do not quote them. Labels go in `[]`, icons in `()`. Built-in icons are `cloud`, `database`, `disk`, `internet`, and `server`; anything else needs a registered icon pack the bundled renderer may not have.
 
-- Quote labels that hold non-ASCII, dots or hyphens: `service kiosk(server)["Self-checkout"]`. Pele accepts them bare, but pre-1.15 bundles rejected them.
 - Declaration order sets the layout. If an edge runs through another service, reorder the declarations. A bent edge may overlap a group border.
-
-**Fallback:** the flowchart under [Fallbacks](#fallbacks-that-keep-the-meaning), which keeps the topology and loses only the icons.
 
 ### XY chart
 
@@ -414,7 +408,7 @@ xychart-beta
     line [800, 880, 1000, 960, 1100]
 ```
 
-Current Mermaid accepts `xychart` and `xychart-beta`; older bundles accept only `xychart-beta`. Keep every series the same length as the x-axis category list. Start the y-axis at 0 and end it a little above the largest value.
+Pele accepts `xychart` and `xychart-beta`. Keep every series the same length as the x-axis category list. Start the y-axis at 0 and end it a little above the largest value.
 
 With more than seven categories or long category names, use horizontal bars: in vertical bars Pele silently drops every other category label that does not fit. `xychart horizontal` is Pele-only.
 
@@ -428,15 +422,9 @@ xychart horizontal
 
 The chart keeps its height when narrowed, so give it its own height budget in a narrow column.
 
-**Fallback:** a Markdown table of the same numbers. It keeps every value and loses only the shape — say so when you ship it.
-
-## Pele-only
-
-These families need Obsidian 1.15.0+ on every device that reads the note. Each fallback is a conservative-core diagram or a table that keeps the meaning.
-
 ### Swimlane
 
-**Use** when several actors share one process and the hand-offs are the point. **Avoid** with a single actor (flowchart). **Keep under** 4 lanes and 12 nodes. **Fallback:** a flowchart with one subgraph per actor.
+**Use** when several actors share one process and the hand-offs are the point. **Avoid** with a single actor (flowchart). **Keep under** 4 lanes and 12 nodes.
 
 ```mermaid
 swimlane-beta LR
@@ -460,7 +448,7 @@ One subgraph is one lane; name lanes after people or roles. The diagram stays ne
 
 ### Block
 
-**Use** for a page, screen or system divided into a grid where relative cell size is the meaning. **Avoid** when flow is the point (flowchart). **Keep under** 4 columns and 12 blocks. **Fallback:** a nested list or table of the regions.
+**Use** for a page, screen or system divided into a grid where relative cell size is the meaning. **Avoid** when flow is the point (flowchart). **Keep under** 4 columns and 12 blocks.
 
 ```mermaid
 block-beta
@@ -480,7 +468,7 @@ block-beta
 
 ### Agentflow
 
-**Use** for agents that split work and call tools. **Avoid** when no tool is called (swimlane). **Keep under** 4 flows and 10 nodes. **Fallback:** a flowchart with one subgraph per agent and tool calls as edge labels.
+**Use** for agents that split work and call tools. **Avoid** when no tool is called (swimlane). **Keep under** 4 flows and 10 nodes.
 
 ```mermaid
 agentflow-beta TB
@@ -511,7 +499,7 @@ Node shapes are `input`, `task`, `tool`, `action` and `refdoc`. A connector is d
 
 ### Git graph
 
-**Use** for versions, branches and merges, including drafts and revisions of a document. **Avoid** without branches (timeline). **Keep under** 3 branches and 12 commits. **Fallback:** a timeline per branch.
+**Use** for versions, branches and merges, including drafts and revisions of a document. **Avoid** without branches (timeline). **Keep under** 3 branches and 12 commits.
 
 ```mermaid
 ---
@@ -535,7 +523,7 @@ gitGraph
 
 ### Event modeling
 
-**Use** for a design where screens, commands, events and processors change state over time. **Avoid** outside design documents (sequence reads more easily). **Keep under** 8 timeframes. **Fallback:** a sequence diagram plus a table of fields.
+**Use** for a design where screens, commands, events and processors change state over time. **Avoid** outside design documents (sequence reads more easily). **Keep under** 8 timeframes.
 
 ```mermaid
 eventmodeling
@@ -560,7 +548,7 @@ data HoldPlaced {
 
 ### Radar
 
-**Use** for the profiles of a few subjects across several criteria. **Avoid** with two criteria (quadrant) or one (xy chart). **Keep under** 3–8 axes and 4 curves; two curves read best. **Fallback:** a table, one row per subject.
+**Use** for the profiles of a few subjects across several criteria. **Avoid** with two criteria (quadrant) or one (xy chart). **Keep under** 3–8 axes and 4 curves; two curves read best.
 
 ```mermaid
 radar-beta
@@ -578,7 +566,7 @@ State `max` and `min` explicitly.
 
 ### Quadrant chart
 
-**Use** for placing items on two criteria and naming the quadrants. **Avoid** when positions are an impression without evidence, or say in the caption that they are a judgement. **Keep under** 12 points. **Fallback:** a 2×2 table.
+**Use** for placing items on two criteria and naming the quadrants. **Avoid** when positions are an impression without evidence, or say in the caption that they are a judgement. **Keep under** 12 points.
 
 ```mermaid
 quadrantChart
@@ -595,11 +583,11 @@ quadrantChart
   "Book bus": [0.85, 0.25]
 ```
 
-Quote axis labels, quadrant labels and point names, and keep parentheses and colons out of them: Pele accepts both, but pre-1.15 Mermaid rejected them. Do not quote `title`; Pele draws the quotes. The minimum width is about 280 pixels, so a square column suits it best.
+Do not quote `title`; Pele draws the quotes. The minimum width is about 280 pixels, so a square column suits it best.
 
 ### Venn
 
-**Use** for the overlap of two or three sets and what sits in each intersection. **Avoid** with four or more sets (table or quadrant). **Keep under** 3 sets. **Fallback:** a table of items by membership.
+**Use** for the overlap of two or three sets and what sits in each intersection. **Avoid** with four or more sets (table or quadrant). **Keep under** 3 sets.
 
 ```mermaid
 venn-beta
@@ -617,7 +605,7 @@ venn-beta
 
 ### Requirement diagram
 
-**Use** for tracing requirements to what satisfies or verifies them. **Avoid** for presentations (a table reads better). **Keep under** 5 requirements. **Fallback:** a table with one row per requirement and its satisfying and verifying elements.
+**Use** for tracing requirements to what satisfies or verifies them. **Avoid** for presentations (a table reads better). **Keep under** 5 requirements.
 
 ```mermaid
 requirementDiagram
@@ -648,7 +636,7 @@ requirementDiagram
 
 ### C4 context
 
-**Use** for people, internal systems and external systems on one page. **Avoid** when component layout is the point (architecture). **Keep under** 8 elements. **Fallback:** a flowchart with a subgraph for the system boundary.
+**Use** for people, internal systems and external systems on one page. **Avoid** when component layout is the point (architecture). **Keep under** 8 elements.
 
 ```mermaid
 C4Context
@@ -669,7 +657,7 @@ When relation labels collide, move one with `UpdateRelStyle(from, to, $offsetX, 
 
 ### Use case
 
-**Use** for what actors want from a system and its scope. **Avoid** for a feature list (table). **Keep under** 3 actors and 8 use cases. **Fallback:** a flowchart with a subgraph for the system boundary.
+**Use** for what actors want from a system and its scope. **Avoid** for a feature list (table). **Keep under** 3 actors and 8 use cases.
 
 ```mermaid
 usecase-beta
@@ -691,7 +679,7 @@ Keep actor and use-case ids ASCII and put the display name in quoted parentheses
 
 ### Packet
 
-**Use** for the position and width of fixed-length fields in an identifier or code. **Avoid** when field lengths vary (railroad). **Keep under** 12 fields. **Fallback:** a table of positions and meanings.
+**Use** for the position and width of fixed-length fields in an identifier or code. **Avoid** when field lengths vary (railroad). **Keep under** 12 fields.
 
 ```mermaid
 ---
@@ -712,7 +700,7 @@ When the cells are characters rather than bits, say so in the title.
 
 ### Railroad
 
-**Use** for a notation or naming rule written as EBNF. **Avoid** for a one-line rule (show an example in prose). **Keep under** 6 rules. **Fallback:** the EBNF in a code block.
+**Use** for a notation or naming rule written as EBNF. **Avoid** for a one-line rule (show an example in prose). **Keep under** 6 rules.
 
 ```mermaid
 railroad-ebnf-beta
@@ -729,7 +717,7 @@ Write optional parts as `[ … ]`. Two `?` in one rule are read as an EBNF speci
 
 ### Tree view
 
-**Use** for folders, files and other path-shaped hierarchies. **Avoid** when the hierarchy carries sizes (treemap). **Keep under** 20 lines. **Fallback:** a nested list in a code block.
+**Use** for folders, files and other path-shaped hierarchies. **Avoid** when the hierarchy carries sizes (treemap). **Keep under** 20 lines.
 
 ```mermaid
 treeView-beta
@@ -745,7 +733,7 @@ End folders with `/`; `##` starts a right-hand comment. An entry whose name star
 
 ### Ishikawa
 
-**Use** for collecting the causes of one problem by category. **Avoid** when causes depend on each other (flowchart). **Keep under** 4–6 categories and 15 causes. **Fallback:** a nested list under the problem.
+**Use** for collecting the causes of one problem by category. **Avoid** when causes depend on each other (flowchart). **Keep under** 4–6 categories and 15 causes.
 
 ```mermaid
 ishikawa-beta
@@ -763,7 +751,7 @@ The first line is the problem, one indent a category, two indents a cause.
 
 ### Cynefin
 
-**Use** for sorting work into clear, complicated, complex and chaotic domains and showing movement between them. **Avoid** without evidence for the placement. **Keep under** 3 items per domain. **Fallback:** a four-row table.
+**Use** for sorting work into clear, complicated, complex and chaotic domains and showing movement between them. **Avoid** without evidence for the placement. **Keep under** 3 items per domain.
 
 ```mermaid
 cynefin-beta
@@ -784,7 +772,7 @@ Items are quoted strings. Transition labels overlap the dashed domain borders, a
 
 ### Wardley map
 
-**Use** for placing value-chain components by visibility and evolution. **Avoid** presenting impressionistic coordinates as data; say in the caption that placement is a judgement. **Keep under** 10 components. **Fallback:** a flowchart of the dependencies plus a table of evolution stages.
+**Use** for placing value-chain components by visibility and evolution. **Avoid** presenting impressionistic coordinates as data; say in the caption that placement is a judgement. **Keep under** 10 components.
 
 ```mermaid
 wardley-beta
@@ -807,30 +795,3 @@ note "Placement is a judgement" [0.15, 0.30]
 ```
 
 Coordinates are `[visibility, evolution]`. Quote names; an unquoted name with a dot fails with *Lexical error* (*observed*). Notes draw at the same weight as the title.
-
-## Fallbacks that keep the meaning
-
-A fallback replaces the drawing, never the information. Worked example — the architecture diagram above, expressed with the conservative core:
-
-```mermaid
-flowchart LR
-  subgraph Branch systems
-    kiosk[Self checkout]
-    catalog[Catalog service]
-    store[(Loan database)]
-  end
-  kiosk --> catalog
-  catalog --> store
-```
-
-Every service, the group boundary, and both links survive; only the icon set is gone, which is the kind of loss worth one sentence of disclosure.
-
-| Gated family | Fallback | What the fallback drops |
-| --- | --- | --- |
-| `sankey` | `flowchart LR` with quantities in edge labels | Width-proportional flow |
-| `kanban` | Table with one column per stage | Card metadata styling |
-| `treemap-beta` | `pie` plus a nested list | Area proportionality across levels |
-| `architecture-beta` | `flowchart LR` with a subgraph per group | Icons and port-level edge anchoring |
-| `xychart-beta` | Table of values | The visual shape of the series |
-
-Each Pele-only pattern names its own fallback. When the dropped column above matters to the reader, keep it in prose or a table beside the fallback rather than deleting it.
