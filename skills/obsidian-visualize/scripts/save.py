@@ -73,10 +73,13 @@ def main():
         time.sleep(1.5)
     res = save(v, path)
     ok = all(r.get("status") == "persisted" for r in res)
+    if ok and a.close and res:
+        if js(v, leaves(path) + "window.__s=L.some(l=>l.view.isDirty());"):
+            ok = False
     closed = False
     if not ok:
         print(json.dumps(dict(drawing=path, saved=False, closed=False, elements=None, outcomes=res)))
-        sys.exit("save not confirmed as persisted; nothing was closed")
+        sys.exit("save not confirmed as persisted and clean; nothing was closed")
     elements = None
     if a.open:
         live, disk = live_total(v, path), plugin(v, "read", {"path": path, "source": "disk", "detail": "summary"})
