@@ -6,12 +6,74 @@ PAL = {"blue": ("#a5d8ff", "#1971c2"), "green": ("#b2f2bb", "#2f9e44"), "yellow"
        "note": ("#fff3bf", "#e67700")}
 SHAPES = ("rectangle", "ellipse", "diamond", "text", "note")
 HEADS = {"arrow": "arrow", "triangle": "triangle", "bar": "bar", "dot": "dot", "none": None}
-HEAD = "---\nexcalidraw-plugin: parsed\n---\n\n# Excalidraw Data\n\n## Text Elements\n"
+def head(sig):
+    return "---\nexcalidraw-plugin: parsed\n%s: %s\n---\n\n# Excalidraw Data\n\n## Text Elements\n" % ("draw-py", sig)
+
+
+B64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/="
+
+
+def lz_decode(b64):
+    """LZString decompressFromBase64, the format the Excalidraw plugin saves."""
+    vals = [B64.index(c) for c in re.sub(r"\s", "", b64)]
+    pos, bit, n = 0, 0, 0
+
+    def read(k):
+        nonlocal pos, bit, n
+        r = 0
+        for i in range(k):
+            r |= ((vals[n] >> (5 - pos)) & 1) << i
+            pos += 1
+            if pos == 6:
+                pos, n = 0, n + 1
+        return r
+
+    dic, enlarge, nbits = {0: 0, 1: 1, 2: 2}, 4, 3
+    first = read(2)
+    if first == 2:
+        return ""
+    w = chr(read(8 if first == 0 else 16))
+    dic[3] = w
+    out = [w]
+    while n < len(vals):
+        c = read(nbits)
+        if c in (0, 1):
+            dic[len(dic)] = chr(read(8 if c == 0 else 16))
+            c = len(dic) - 1
+            enlarge -= 1
+            if enlarge == 0:
+                enlarge, nbits = 1 << nbits, nbits + 1
+        elif c == 2:
+            break
+        entry = dic[c] if c in dic else w + w[0]
+        out.append(entry)
+        dic[len(dic)] = w + entry[0]
+        enlarge -= 1
+        w = entry
+        if enlarge == 0:
+            enlarge, nbits = 1 << nbits, nbits + 1
+    return "".join(out)
+
+
+def signature(els):
+    """Hash of what a person would change by editing: ids, kinds, text and box geometry. Text and arrow sizes are left out because the plugin re-measures them on save."""
+    rows = []
+    for e in els:
+        if e.get("isDeleted"):
+            continue
+        r = [e["id"], e["type"], e.get("text") or e.get("name") or ""]
+        if e["type"] not in ("text", "arrow", "line"):
+            r += [round(e.get(k, 0)) for k in ("x", "y", "width", "height")]
+        rows.append(r)
+    return hashlib.sha256(json.dumps(sorted(rows), ensure_ascii=False).encode()).hexdigest()[:16]
+
+
 GAPC, BANDGAP, PAD, GAP = 50, 160, 40, 4
 KEYS = {"top": ("direction", "frames", "nodes", "edges", "title"), "frames": ("id", "label"),
         "nodes": ("id", "label", "shape", "color", "roughness", "strokeStyle", "frame", "icon", "group", "link"),
         "edges": ("from", "to", "head", "dashed", "label")}
 B62 = string.digits + string.ascii_letters
+
 
 
 def sha(s):
@@ -117,7 +179,7 @@ def nsize(n):
     else:
         w, h = max(180, 2 * (w + 16)), max(100, 2 * (h + 16))
     if ic:
-        h += 56
+        w += 56
     if sh != "text":
         w, h = up20(w), up20(h)
     return w, h
@@ -145,7 +207,7 @@ def layout_frames(dr, frames, nodes, edges):
             c[k] = y + V[k]["cs"] / 2
             y += V[k]["cs"] + GAPC
     # classify edges and allocate lanes per gap (gap g lies right of column g)
-    lanes, lab = {}, {}
+    lanes, lab, ori = {}, {}, {}
     for i, e in enumerate(edges):
         a, b = col[e["from"]], col[e["to"]]
         lw = (meas(e["label"], 16)[0] + 20 if LR else 30) if e.get("label") else 0
@@ -154,14 +216,32 @@ def layout_frames(dr, frames, nodes, edges):
                 lanes.setdefault(a, []).append(("e", i))
             continue
         s, d = (e["from"], e["to"]) if a < b else (e["to"], e["from"])
-        lanes.setdefault(col[s], []).append(("o", s))
-        if col[d] - col[s] > 1:
-            lanes.setdefault(col[d] - 1, []).append(("i", d))
+        ori[i] = (s, d)
         if e.get("label"):
             for g in range(col[s], col[d]):
                 lab[g] = max(lab.get(g, 0), lw)
+    # each end of an edge gets its own port on the node side and each edge its own lane,
+    # so fan-outs and fan-ins never share a trunk
+    outp, inp = {}, {}
+    for side, tab in ((0, outp), (1, inp)):
+        by = {}
+        for i, (s, d) in ori.items():
+            by.setdefault(s if side == 0 else d, []).append(i)
+        for node, ix in by.items():
+            far = lambda i: c[ori[i][1] if side == 0 else ori[i][0]]
+            ix.sort(key=lambda i: (far(i), i))
+            step = min(32, (V[node]["cs"] - 24) / max(len(ix) - 1, 1))
+            for j, i in enumerate(ix):
+                tab[i] = (j - (len(ix) - 1) / 2) * step
+            ups = [i for i in ix if far(i) < c[node]]
+            dns = [i for i in ix if far(i) >= c[node]][::-1]
+            for i in ups + dns:
+                if side == 0:
+                    lanes.setdefault(col[ori[i][0]], []).append(("o", i))
+                elif col[ori[i][1]] - col[ori[i][0]] > 1:
+                    lanes.setdefault(col[ori[i][1]] - 1, []).append(("i", i))
     slots = {g: list(dict.fromkeys(v)) for g, v in lanes.items()}
-    gap = [up20(2 * PAD + 60 + lab.get(g, 0) + 20 * len(slots.get(g, []))) for g in range(max(ncol - 1, 0) + 1)]
+    gap = [up20(2 * PAD + 60 + 2 * lab.get(g, 0) + 20 * len(slots.get(g, []))) for g in range(max(ncol - 1, 0) + 1)]
     m0 = [0]
     for g in range(ncol - 1):
         m0.append(m0[-1] + colw[g] + gap[g])
@@ -190,19 +270,20 @@ def layout_frames(dr, frames, nodes, edges):
                 pts = [(mp[u] + V[u]["ms"] + GAP, c[u]), (x, c[u]), (x, c[v]), (mp[v] + V[v]["ms"] + GAP, c[v])]
             paths.append(pts)
             continue
-        pts = [(mp[s] + V[s]["ms"] + GAP, c[s]), (lx(col[s], ("o", s)), c[s])]
+        ys, yd = c[s] + outp[i], c[d] + inp[i]
+        pts = [(mp[s] + V[s]["ms"] + GAP, ys), (lx(col[s], ("o", i)), ys)]
         if col[d] - col[s] > 1:
-            if (c[s] + c[d]) / 2 < (cmin + cmax) / 2:
+            if (ys + yd) / 2 < (cmin + cmax) / 2:
                 y = cmin - PAD - 70 - 20 * ntop
                 ntop += 1
             else:
                 y = cmax + PAD + 40 + 20 * nbot
                 nbot += 1
-            pts += [(pts[-1][0], y), (lx(col[d] - 1, ("i", d)), y)]
-            pts.append((pts[-1][0], c[d]))
+            pts += [(pts[-1][0], y), (lx(col[d] - 1, ("i", i)), y)]
+            pts.append((pts[-1][0], yd))
         else:
-            pts.append((pts[-1][0], c[d]))
-        pts.append((mp[d] - GAP, c[d]))
+            pts.append((pts[-1][0], yd))
+        pts.append((mp[d] - GAP, yd))
         if rev:
             pts.reverse()
         q = [pts[0]]
@@ -324,15 +405,18 @@ def layout(dr, frames, nodes, edges):
         restack()
     for k in c:
         c[k] = round((c[k] - V[k]["cs"] / 2) / 20) * 20 + V[k]["cs"] / 2
-    grp = {}
-    for i, (a, b) in enumerate(ends):
-        grp.setdefault(frozenset((a, b)), []).append(i)
-    off = {}
-    for g in grp.values():
-        step = min(16, (min(V[ends[g[0]][0]]["cs"], V[ends[g[0]][1]]["cs"]) - 16) / max(len(g) - 1, 1))
-        for j, i in enumerate(g):
-            off[i] = (j - (len(g) - 1) / 2) * step
-    rows = [[c[k] + (off[i] if j in (0, len(ch) - 1) else 0) for j, k in enumerate(ch)] for i, ch in enumerate(chains)]
+    oo, io = {}, {}
+    for side, tab in ((0, oo), (1, io)):
+        by = {}
+        for i, ch in enumerate(chains):
+            by.setdefault(ch[0] if side == 0 else ch[-1], []).append(i)
+        for node, ix in by.items():
+            ix.sort(key=lambda i: (c[chains[i][1] if side == 0 else chains[i][-2]], i))
+            step = min(32, (V[node]["cs"] - 24) / max(len(ix) - 1, 1))
+            for j, i in enumerate(ix):
+                tab[i] = (j - (len(ix) - 1) / 2) * step
+    off = {(i, j): (oo if j == 0 else io)[i] for i, ch in enumerate(chains) for j in (0, len(ch) - 1)}
+    rows = [[c[k] + off.get((i, j), 0) for j, k in enumerate(ch)] for i, ch in enumerate(chains)]
     hops = {}
     for i, ch in enumerate(chains):
         for j in range(len(ch) - 1):
@@ -360,7 +444,7 @@ def layout(dr, frames, nodes, edges):
                 g = V[chains[i][j]]["l"]
                 lab[g] = max(lab.get(g, 0), lw)
     colw = [up20(max(V[k]["ms"] for k in l)) for l in lays]
-    gap = [up20(max(100, 80 + 20 * nt.get(g, 0)) + lab.get(g, 0)) for g in range(nl - 1)]
+    gap = [up20(max(100, 80 + 20 * nt.get(g, 0)) + 2 * lab.get(g, 0)) for g in range(nl - 1)]
     m0 = [0]
     for g in range(nl - 1):
         m0.append(m0[-1] + colw[g] + gap[g])
@@ -444,8 +528,9 @@ def build(spec):
             texts.append(b)
             continue
         ic = bool(n.get("icon"))
-        t = txt(k, "text", x + (w - tw) / 2, y + h - 5 - th if ic else y + (h - th) / 2, n["label"], 20,
-                verticalAlign="bottom" if ic else "middle", groupIds=gids, frameId=fr, containerId=eid(k, "box"))
+        start = x + (w - (54 + tw)) / 2 if ic else x
+        t = txt(k, "text", start + 54 if ic else x + (w - tw) / 2, y + (h - th) / 2, n["label"], 20,
+                textAlign="left" if ic else "center", groupIds=gids, frameId=fr, containerId=eid(k, "box"))
         b = el(k, "box", "stickynote" if n["shape"] == "note" else n["shape"], x, y, w, h, strokeColor=st, backgroundColor=bg,
                groupIds=gids, frameId=fr, link=n.get("link"), roundness={"type": 3} if n["shape"] == "rectangle" else None,
                boundElements=[{"type": "text", "id": t["id"]}], **rs)
@@ -455,7 +540,7 @@ def build(spec):
         if ic:
             fid = sha(n["icon"])
             files[fid] = n["icon"]
-            els.append(el(k, "image", "image", x + (w - 40) / 2, y + max(16, 0.3 * h - 20), 40, 40, groupIds=gids,
+            els.append(el(k, "image", "image", start, y + (h - 40) / 2, 40, 40, groupIds=gids,
                           frameId=fr, fileId=fid, scale=[1, 1], crop=None, status="saved"))
     arrows, taken, box0 = [], [], [box[n["id"]] for n in nodes]
     for i, e in enumerate(edges):
@@ -463,7 +548,8 @@ def build(spec):
         if e.get("label"):
             lw, lh = meas(e["label"], 16)
             best = None
-            for j in range(len(p) - 1):
+            hs = [j for j in range(len(p) - 1) if p[j][1] == p[j + 1][1]]
+            for j in hs or range(len(p) - 1):
                 cx, cy = (p[j][0] + p[j + 1][0]) / 2, (p[j][1] + p[j + 1][1]) / 2
                 rc = (cx - lw / 2, cy - lh / 2, lw, lh)
                 sc = sum(hit(rc, b) for b in box0) + \
@@ -537,6 +623,12 @@ def check(els, nbox, nodeel, edges):
                     raise ValueError("check 2: arrow %s crosses box %s" % (e["id"], k))
         segs.append(sg)
         owner.append(e["id"])
+    for f in els:
+        if f["type"] == "frame":
+            tr = (f["x"], f["y"] - 26, meas(f["name"], 16)[0] + 8, 26)
+            for sg, o in zip(segs, owner):
+                if any(seghit(tr, p, q) for p, q in sg):
+                    warns.append("arrow %s crosses the title of frame %r" % (o, f["name"]))
     cr = 0
     for i, A in enumerate(segs):
         for B in segs[i + 1:]:
@@ -560,18 +652,27 @@ def check(els, nbox, nodeel, edges):
 
 
 def ours(raw):
-    m = re.fullmatch(re.escape(HEAD) + r".*?%%\n## Drawing\n```json\n(.*)\n```\n%%\n", raw, re.S)
+    """True for this script's own plain output, or for that file after the plugin re-saved it, while its content is unedited."""
+    m = re.match(r"---\n(?:.*\n)*?draw-py: ([0-9a-f]{16})\n(?:.*\n)*?---\n", raw)
+    if not m:
+        return False
     try:
-        return bool(m) and json.dumps(json.loads(m.group(1)), ensure_ascii=False, separators=(",", ":")) == m.group(1)
-    except ValueError:
+        plain = re.fullmatch(re.escape(head(m.group(1))) + r".*?%%\n## Drawing\n```json\n(.*)\n```\n%%\n", raw, re.S)
+        if plain:
+            d = json.loads(plain.group(1))
+            return json.dumps(d, ensure_ascii=False, separators=(",", ":")) == plain.group(1) and signature(d["elements"]) == m.group(1)
+        c = re.search(r"```compressed-json\n(.*?)\n```", raw, re.S)
+        return bool(c) and signature(json.loads(lz_decode(c.group(1)))["elements"]) == m.group(1)
+    except (ValueError, KeyError, TypeError, IndexError):
         return False
 
 
 def main(argv):
     rep = "--replace" in argv
-    argv = [a for a in argv if a != "--replace"]
+    force = "--force" in argv
+    argv = [a for a in argv if a not in ("--replace", "--force")]
     if len(argv) != 3:
-        print("usage: draw.py <spec.json|-> <out.excalidraw.md> [--replace]", file=sys.stderr)
+        print("usage: draw.py <spec.json|-> <out.excalidraw.md> [--replace [--force]]", file=sys.stderr)
         return 1
     try:
         spec = json.loads(sys.stdin.read() if argv[1] == "-" else open(argv[1], encoding="utf-8").read())
@@ -580,14 +681,14 @@ def main(argv):
         if os.path.exists(argv[2]):
             if not rep:
                 raise ValueError("output exists: %s (--replace redoes a file this script wrote)" % argv[2])
-            if not ours(open(argv[2], encoding="utf-8").read()):
-                raise ValueError("not replacing %s: its bytes are not this script's output" % argv[2])
+            if not force and not ours(open(argv[2], encoding="utf-8").read()):
+                raise ValueError("not replacing %s: it is not this script's unedited output (a foreign drawing, or edited in Obsidian). Change it with the plugin's :apply instead of regenerating; --replace --force overwrites it" % argv[2])
         els, texts, files, nbox, nodeel = build(spec)
         cr, warns = check(els, nbox, nodeel, spec.get("edges") or [])
         warns += unknown(spec)
         sc = dict(type="excalidraw", version=2, source="https://github.com/zsviczian/obsidian-excalidraw-plugin", elements=els,
                   appState=dict(gridSize=None, viewBackgroundColor="#ffffff"), files={})
-        out = HEAD + "\n\n".join("%s ^%s" % (t["text"], t["id"]) for t in texts) + "\n\n"
+        out = head(signature(els)) + "\n\n".join("%s ^%s" % (t["text"], t["id"]) for t in texts) + "\n\n"
         if files:
             out += "## Embedded Files\n" + "\n".join("%s: %s" % kv for kv in files.items()) + "\n\n"
         out += "%%\n## Drawing\n```json\n" + json.dumps(sc, ensure_ascii=False, separators=(",", ":")) + "\n```\n%%\n"
