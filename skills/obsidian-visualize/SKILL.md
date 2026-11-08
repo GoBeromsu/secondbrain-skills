@@ -1,6 +1,6 @@
 ---
 name: obsidian-visualize
-description: "Chooses the visual form and builds it: a JSON Canvas of notes, an Excalidraw drawing (.excalidraw.md; plugin CLI or script), or a mermaid block drawn by Pele (Obsidian 1.15+). Use for an architecture, data-flow, pipeline, sequence, dependency, status or concept diagram; a mind map, sketchnote or sticky notes; a flowchart, sequence, class, state, ER, gantt, journey, pie, mindmap, timeline, sankey, kanban, treemap, architecture, xychart, swimlane, gitGraph, quadrant or C4 block; a mermaid block with a parse error, raw text or empty box in Reading view or Live Preview, or fine in mermaid.live but not the vault; a `-beta` keyword question; generating, replacing, inspecting, importing, editing, exporting or rendering Excalidraw, including plugin Mermaid import; or choosing between Canvas, Excalidraw, Pele and a plain table. 플로우차트·아키텍처도·개념도·머메이드·펠레·손그림·마인드맵·스케치노트. Not for Canvas schema, note prose or properties, or plugin installs: use obsidian-canvas, obsidian-markdown or obsidian-cli."
+description: "Chooses the visual form and builds it: a JSON Canvas (.canvas), an Excalidraw drawing (.excalidraw.md), or a mermaid block drawn by Pele (Obsidian 1.15+). Use for creating, editing or validating a .canvas file (nodes, edges, groups, IDs); an architecture, data-flow, pipeline, sequence, dependency, status or concept diagram; a mind map, sketchnote or sticky notes; a flowchart, sequence, class, state, ER, gantt, journey, pie, mindmap, timeline, sankey, kanban, treemap, architecture, xychart, swimlane, gitGraph, quadrant or C4 block; a mermaid block with a parse error, raw text or empty box in Reading view or Live Preview, or fine in mermaid.live but not the vault; a `-beta` keyword question; generating, replacing, inspecting, importing, editing, exporting or rendering Excalidraw, including plugin Mermaid import; or choosing between Canvas, Excalidraw, Pele and a plain table. 캔버스·플로우차트·아키텍처도·개념도·머메이드·펠레·손그림·마인드맵·스케치노트. Not for note prose or properties, or plugin installs: use obsidian-markdown or obsidian-cli."
 license: MIT
 ---
 
@@ -12,13 +12,17 @@ Pick the form the content supports, build it on the surface that fits, and look 
 
 | What the nodes are | Form | Writer |
 | --- | --- | --- |
-| Existing vault notes to navigate | **JSON Canvas** (`.canvas`) | direct file write; schema in `obsidian-canvas` |
+| Existing vault notes to navigate | **JSON Canvas** (`.canvas`) | direct file write; schema in `references/canvas.md` |
 | Free shapes with no backing note: architecture, data flow, mind map, sketch, annotated figure | **Excalidraw** (`.excalidraw.md`) | plugin CLI, or `scripts/draw.py` offline |
 | A small structural diagram inside a note's prose | **Pele** (a `mermaid` fence) | the note edit itself |
 
 If the request names a form, that form is the answer unless it cannot carry the content; say so before switching. Do not deliver a Canvas because Excalidraw looked tedious, nor an Excalidraw of note titles when the reader should click through to notes. For a Canvas, every `file` node and wikilink target must resolve in the destination vault; a plausible name is not a resolved one.
 
 Ground every box and arrow in inspected evidence (files at a pinned revision, note contents, measured values). Label declared configuration as declared. A reference image supplies visual language only, never services or numbers.
+
+## Canvas
+
+A `.canvas` file is JSON Canvas 1.0, written directly as a file; no plugin or CLI is required. Open [`references/canvas.md`](references/canvas.md) for the node, edge, color and ID schema and its validation checklist, [`references/canvas-operations.md`](references/canvas-operations.md) before changing a canvas that already holds user data, and [`references/canvas-examples.md`](references/canvas-examples.md) for complete documents. Existing IDs, unrelated nodes and edges, unknown keys and node order survive an edit; a duplicate or dangling ID is reported, never repaired silently.
 
 ## Excalidraw
 

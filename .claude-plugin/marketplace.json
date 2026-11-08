@@ -1,7 +1,7 @@
 {
   "name": "secondbrain-skills",
   "version": "0.11.0",
-  "description": "Twenty-five independent secondbrain-skills packages: eight native Obsidian and seventeen knowledge packages, including four archival principles. This is a public prerelease; the principles are local candidate additions, not verified runtime loads.",
+  "description": "Twenty-four independent secondbrain-skills packages: seven native Obsidian and seventeen knowledge packages, including four archival principles. This is a public prerelease; the principles are local candidate additions, not verified runtime loads.",
   "owner": {
     "name": "beomsukoh",
     "url": "https://beomsukoh.com"
@@ -11,7 +11,7 @@
       "name": "secondbrain-skills",
       "source": "./",
       "displayName": "Obsidian Skills",
-      "description": "Twenty-five self-contained Agent Skills: eight native Obsidian and seventeen knowledge packages. Four independently usable archival principles are included. This is a distribution container, not a router, dispatcher, or shared runtime.",
+      "description": "Twenty-four self-contained Agent Skills: seven native Obsidian and seventeen knowledge packages. Four independently usable archival principles are included. This is a distribution container, not a router, dispatcher, or shared runtime.",
       "category": "knowledge-management",
       "tags": [
         "obsidian",
@@ -27,11 +27,10 @@
       "metadata": {
         "releaseStatus": "prerelease",
         "router": "none",
-        "packageCount": 8,
+        "packageCount": 7,
         "packages": [
           "obsidian-markdown",
           "obsidian-bases",
-          "obsidian-canvas",
           "obsidian-visualize",
           "obsidian-cli",
           "obsidian-clipper",

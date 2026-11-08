@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/brand/hero.svg" alt="secondbrain-skills: Obsidian 볼트를 위한 독립된 Agent Skill 스물다섯 개, 네이티브 여덟 개와 지식 열일곱 개" width="880">
+  <img src="assets/brand/hero.svg" alt="secondbrain-skills: Obsidian 볼트를 위한 독립된 Agent Skill 스물네 개, 네이티브 일곱 개와 지식 열일곱 개" width="880">
 </p>
 
 <p align="center">
@@ -8,7 +8,7 @@
 
 # secondbrain-skills
 
-에이전트가 Obsidian 볼트를 세컨드 브레인으로 운영하게 해 주는 Agent Skill 스물다섯 개입니다. 자료를 모으고, 원문을 보존하고, 위키로 엮고, 출처를 달아 답합니다.
+에이전트가 Obsidian 볼트를 세컨드 브레인으로 운영하게 해 주는 Agent Skill 스물네 개입니다. 자료를 모으고, 원문을 보존하고, 위키로 엮고, 출처를 달아 답합니다.
 
 패키지 하나는 한 가지 일을 맡는 `SKILL.md` 하나입니다. 루트 스킬도, 디스패처도, 공유 런타임도 없습니다. 에이전트는 그 작업에 필요한 패키지만 불러옵니다.
 
@@ -67,8 +67,7 @@ claude plugin install secondbrain-skills@secondbrain-skills
 | --- | --- |
 | `obsidian-markdown` | Obsidian Flavored Markdown: 위키링크, 임베드, 콜아웃, 속성, 태그, 블록 참조. |
 | `obsidian-bases` | `.base` 데이터베이스 뷰: 필터, 수식, 요약, 그룹화, 함수 레퍼런스. |
-| `obsidian-canvas` | JSON Canvas `.canvas` 파일: 노드, 엣지, 좌표, 안정적인 ID. |
-| `obsidian-visualize` | 노트에 맞는 시각 형식 선택: Canvas, `.excalidraw.md` 장면, `mermaid` 펜스의 Pele 다이어그램. |
+| `obsidian-visualize` | 시각 형식을 고르고 만들기: JSON Canvas `.canvas` 파일(노드, 엣지, 좌표, 안정적인 ID), `.excalidraw.md` 장면, `mermaid` 펜스의 Pele 다이어그램. |
 | `obsidian-cli` | 공식 `obsidian` 바이너리: 읽기, 생성, 검색, 이동, 점검. |
 | `obsidian-clipper` | Web Clipper 템플릿, 선택자, 변수. |
 | `obsidian-doctor` | 정제된 증거로 하는 플러그인·Templater 장애 진단. |
@@ -103,7 +102,7 @@ AGENTS.md                기여자와 에이전트를 위한 저장소 계약
 
 - **[구요한 (Yohan Koo)](https://github.com/johnfkoo951/cmds-llm-wiki)**, cmds-llm-wiki. 지식 패키지는 그의 명령에서 출발했고, 지금은 이 저장소가 정본이며 소유자의 결정에 따라 달라진 부분이 있습니다. 원 저장소의 파일은 하나도 담지 않았습니다. Paper Mode P-7 검증기 `skills/ingest/scripts/verify_paper.py`는 그의 스크립트 없이 이 저장소가 직접 구현한 것입니다. 원 저장소는 라이선스를 공개하지 않았고, 여기서 그것을 재라이선스하지 않습니다.
 - **[Andrej Karpathy](https://github.com/karpathy)**, cmds-llm-wiki가 바탕으로 삼은 LLM Wiki 패턴.
-- **[Steph Ango (kepano)](https://github.com/kepano/obsidian-skills)**, obsidian-skills (MIT). `obsidian-markdown`, `obsidian-bases`, `obsidian-canvas`, `obsidian-cli`는 여기서 출발해 수정했습니다.
+- **[Steph Ango (kepano)](https://github.com/kepano/obsidian-skills)**, obsidian-skills (MIT). `obsidian-markdown`, `obsidian-bases`, `obsidian-cli`, 그리고 `obsidian-visualize`의 JSON Canvas 레퍼런스는 여기서 출발해 수정했습니다.
 - **[Jonghak Seo](https://github.com/Jonghakseo/pi-extension)**, pi-extension (MIT). `obsidian-visualize`의 검사 린트와 팔레트·간격 지침은 여기서 가져와 고쳤습니다.
 - **[Obsidian](https://github.com/obsidianmd/pele)**, Pele (MIT). `obsidian-visualize`의 Pele 분기는 공개된 호환성·보안 문서를 따릅니다. Pele 파일은 하나도 싣지 않습니다.
 - **[구요한 (Yohan Koo)](https://pele.cmdspace.work/)**, CMDSPACE Pele 갤러리. `obsidian-visualize` Pele 카탈로그의 쓸 때·피할 때·크기 한도와 관찰된 함정은 이 갤러리를 참고했고, 예제는 모두 이 저장소가 직접 썼습니다.

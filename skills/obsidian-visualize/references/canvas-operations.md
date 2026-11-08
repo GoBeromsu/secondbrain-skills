@@ -1,6 +1,6 @@
 # Canvas Operations Reference
 
-How to change a `.canvas` file that already holds user data, which conditions are errors, and which verification claims are separate. The schema itself lives in [../SKILL.md](../SKILL.md); this reference does not restate node or edge fields.
+How to change a `.canvas` file that already holds user data, which conditions are errors, and which verification claims are separate. The schema itself lives in [canvas.md](canvas.md); this reference does not restate node or edge fields.
 
 ## Authorization boundary
 

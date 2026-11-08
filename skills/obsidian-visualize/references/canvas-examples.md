@@ -1,6 +1,6 @@
 # Obsidian Canvas Complete Examples
 
-Complete, parseable JSON Canvas documents for the schema defined in [../SKILL.md](../SKILL.md). Every ID below is a literal example value: generate fresh 16-character lowercase hex IDs rather than reusing these, and check them against the union of existing node and edge IDs in the target file. Before adapting any of these into a file that already exists, apply [operations.md](operations.md).
+Complete, parseable JSON Canvas documents for the schema defined in [canvas.md](canvas.md). Every ID below is a literal example value: generate fresh 16-character lowercase hex IDs rather than reusing these, and check them against the union of existing node and edge IDs in the target file. Before adapting any of these into a file that already exists, apply [canvas-operations.md](canvas-operations.md).
 
 ## Simple Canvas with Text and Connections
 

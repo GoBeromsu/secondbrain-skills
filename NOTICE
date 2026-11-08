@@ -56,8 +56,8 @@ and in the README attribution, not inside each package.
     skills/obsidian-markdown/references/PROPERTIES.md      <- skills/obsidian-markdown/references/PROPERTIES.md
     skills/obsidian-bases/SKILL.md                         <- skills/obsidian-bases/SKILL.md
     skills/obsidian-bases/references/FUNCTIONS_REFERENCE.md <- skills/obsidian-bases/references/FUNCTIONS_REFERENCE.md
-    skills/obsidian-canvas/SKILL.md                        <- skills/json-canvas/SKILL.md
-    skills/obsidian-canvas/references/EXAMPLES.md          <- skills/json-canvas/references/EXAMPLES.md
+    skills/obsidian-visualize/references/canvas.md         <- skills/json-canvas/SKILL.md
+    skills/obsidian-visualize/references/canvas-examples.md <- skills/json-canvas/references/EXAMPLES.md
     skills/obsidian-cli/SKILL.md                           <- skills/obsidian-cli/SKILL.md
 
 One further upstream section is owned elsewhere in this repository: the Mermaid
@@ -105,12 +105,11 @@ this repository and none of them endorses it. Exact URLs, and where applicable
 exact revisions, are recorded in each package's Git history and attribution
 section.
 
-    Obsidian Help and Obsidian developer documentation   all eight packages
+    Obsidian Help and Obsidian developer documentation   all seven packages
     Mermaid documentation, and the mermaid-js/mermaid
       diagram detectors on its development branch        skills/obsidian-visualize
     Pele documentation (pele.run) and obsidianmd/pele  skills/obsidian-visualize
-    JSON Canvas 1.0 specification                        skills/obsidian-canvas,
-                                                         skills/obsidian-visualize
+    JSON Canvas 1.0 specification                        skills/obsidian-visualize
     zsviczian/obsidian-excalidraw-plugin (AGPL-3.0) and the
       Excalidraw Extras plugin (licence not verified), read
       for API facts only; no code or prose copied       skills/obsidian-visualize

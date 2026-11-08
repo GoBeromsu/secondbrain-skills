@@ -1,6 +1,6 @@
 ---
 name: obsidian-clipper
-description: Authors, validates, and repairs Obsidian Web Clipper template JSON — schema fields, behaviors, triggers, typed properties, variables, selectors, filters, and template logic. Use when the user wants a Web Clipper template for a site or a content type, needs a clipping template imported, fixed, or diagnosed, asks why a clipped note is empty or missing a field, or asks how Clipper variables, selectors, filters, or logic behave. Not for Obsidian Markdown syntax, `.base` file internals, `.canvas` graph structure, or vault CLI operations — use the obsidian-markdown, obsidian-bases, obsidian-canvas, or obsidian-cli package.
+description: Authors, validates, and repairs Obsidian Web Clipper template JSON — schema fields, behaviors, triggers, typed properties, variables, selectors, filters, and template logic. Use when the user wants a Web Clipper template for a site or a content type, needs a clipping template imported, fixed, or diagnosed, asks why a clipped note is empty or missing a field, or asks how Clipper variables, selectors, filters, or logic behave. Not for Obsidian Markdown syntax, `.base` file internals, `.canvas` graph structure, or vault CLI operations — use the obsidian-markdown, obsidian-bases, obsidian-visualize, or obsidian-cli package.
 license: MIT
 ---
 
@@ -34,7 +34,7 @@ Not owned here:
 
 - Note body syntax — callouts, wikilinks, embeds, property formatting inside a finished note. `obsidian-markdown` owns that; name it by identity only when the task actually reaches a note.
 - `.base` structure, filters, formulas, and views. `obsidian-bases` owns those; this package consumes only a Base's property keys and their intended types.
-- `.canvas` graph structure and vault-aware CLI operations, owned by `obsidian-canvas` and `obsidian-cli`.
+- `.canvas` graph structure and vault-aware CLI operations, owned by `obsidian-visualize` and `obsidian-cli`.
 - What the vault's property vocabulary should be. The target vault's written convention decides; when it states none, ask instead of inventing one.
 
 The extension, a configured vault, Interpreter, and a model provider are runtime facts. Their absence is normal and fully supported — a template is authored and statically validated without any of them.
