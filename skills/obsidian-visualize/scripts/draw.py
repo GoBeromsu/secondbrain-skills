@@ -104,7 +104,124 @@ def unknown(spec):
     return w
 
 
+def nsize(n):
+    w, h = meas(n["label"])
+    ic = bool(n.get("icon")) and n["shape"] != "text"
+    sh = n["shape"]
+    if sh == "text":
+        pass
+    elif sh in ("rectangle", "note"):
+        w, h = max(160, w + 48), max(72, h + 32)
+    elif sh == "ellipse":
+        w, h = max(160, 1.5 * (w + 16)), max(80, 1.5 * (h + 16))
+    else:
+        w, h = max(180, 2 * (w + 16)), max(100, 2 * (h + 16))
+    if ic:
+        h += 56
+    if sh != "text":
+        w, h = up20(w), up20(h)
+    return w, h
+
+
+def layout_frames(dr, frames, nodes, edges):
+    """Frames are columns (LR) or rows (TB) in declared order; nodes stack inside their frame."""
+    LR = dr == "LR"
+    cols = {f["id"]: i for i, f in enumerate(frames)}
+    ncol = len(frames) + (1 if any(not n.get("frame") for n in nodes) else 0)
+    col = {n["id"]: cols[n["frame"]] if n.get("frame") else len(frames) for n in nodes}
+    V, members = {}, [[] for _ in range(ncol)]
+    for n in nodes:
+        w, h = nsize(n)
+        V[n["id"]] = dict(l=col[n["id"]], b=col[n["id"]], ms=w if LR else h, cs=h if LR else w, node=n)
+        members[col[n["id"]]].append(n["id"])
+    pos = {k: i for m in members for i, k in enumerate(m)}
+    colw = [up20(max([V[k]["ms"] for k in m], default=0)) for m in members]
+    tall = [sum(V[k]["cs"] for k in m) + GAPC * max(len(m) - 1, 0) for m in members]
+    top = max(tall, default=0)
+    c = {}
+    for m, t in zip(members, tall):
+        y = round((top - t) / 2 / 20) * 20
+        for k in m:
+            c[k] = y + V[k]["cs"] / 2
+            y += V[k]["cs"] + GAPC
+    # classify edges and allocate lanes per gap (gap g lies right of column g)
+    lanes, lab = {}, {}
+    for i, e in enumerate(edges):
+        a, b = col[e["from"]], col[e["to"]]
+        lw = (meas(e["label"], 16)[0] + 20 if LR else 30) if e.get("label") else 0
+        if a == b:
+            if abs(pos[e["from"]] - pos[e["to"]]) > 1:
+                lanes.setdefault(a, []).append(("e", i))
+            continue
+        s, d = (e["from"], e["to"]) if a < b else (e["to"], e["from"])
+        lanes.setdefault(col[s], []).append(("o", s))
+        if col[d] - col[s] > 1:
+            lanes.setdefault(col[d] - 1, []).append(("i", d))
+        if e.get("label"):
+            for g in range(col[s], col[d]):
+                lab[g] = max(lab.get(g, 0), lw)
+    slots = {g: list(dict.fromkeys(v)) for g, v in lanes.items()}
+    gap = [up20(2 * PAD + 60 + lab.get(g, 0) + 20 * len(slots.get(g, []))) for g in range(max(ncol - 1, 0) + 1)]
+    m0 = [0]
+    for g in range(ncol - 1):
+        m0.append(m0[-1] + colw[g] + gap[g])
+    mp = {k: m0[V[k]["l"]] + (colw[V[k]["l"]] - V[k]["ms"]) / 2 for k in V}
+    cmin = min([c[k] - V[k]["cs"] / 2 for k in V], default=0)
+    cmax = max([c[k] + V[k]["cs"] / 2 for k in V], default=0)
+
+    def lx(g, key):
+        return m0[g] + colw[g] + PAD + 20 + lab.get(g, 0) + 20 * slots[g].index(key)
+    ntop = nbot = 0
+    paths = []
+    for i, e in enumerate(edges):
+        u, v = e["from"], e["to"]
+        a, b = col[u], col[v]
+        rev = a > b
+        s, d = (v, u) if rev else (u, v)
+        if a == b:
+            if abs(pos[u] - pos[v]) == 1:
+                mc = mp[u] + V[u]["ms"] / 2
+                up_ = c[u] < c[v]
+                y0 = c[u] + (V[u]["cs"] / 2 + GAP) * (1 if up_ else -1)
+                y1 = c[v] - (V[v]["cs"] / 2 + GAP) * (1 if up_ else -1)
+                pts = [(mc, y0), (mc, y1)]
+            else:
+                x = lx(a, ("e", i))
+                pts = [(mp[u] + V[u]["ms"] + GAP, c[u]), (x, c[u]), (x, c[v]), (mp[v] + V[v]["ms"] + GAP, c[v])]
+            paths.append(pts)
+            continue
+        pts = [(mp[s] + V[s]["ms"] + GAP, c[s]), (lx(col[s], ("o", s)), c[s])]
+        if col[d] - col[s] > 1:
+            if (c[s] + c[d]) / 2 < (cmin + cmax) / 2:
+                y = cmin - PAD - 70 - 20 * ntop
+                ntop += 1
+            else:
+                y = cmax + PAD + 40 + 20 * nbot
+                nbot += 1
+            pts += [(pts[-1][0], y), (lx(col[d] - 1, ("i", d)), y)]
+            pts.append((pts[-1][0], c[d]))
+        else:
+            pts.append((pts[-1][0], c[d]))
+        pts.append((mp[d] - GAP, c[d]))
+        if rev:
+            pts.reverse()
+        q = [pts[0]]
+        for p in pts[1:]:
+            if p != q[-1]:
+                q.append(p)
+        paths.append(q)
+    box = {}
+    for k, v in V.items():
+        x, y = (mp[k], c[k] - v["cs"] / 2) if LR else (c[k] - v["cs"] / 2, mp[k])
+        box[k] = (x, y, v["ms"] if LR else v["cs"], v["cs"] if LR else v["ms"])
+    if not LR:
+        paths = [[(p[1], p[0]) for p in r] for r in paths]
+    return V, box, paths, None, None
+
+
 def layout(dr, frames, nodes, edges):
+    if frames:
+        return layout_frames(dr, frames, nodes, edges)
     LR = dr == "LR"
     fi = {f["id"]: i for i, f in enumerate(frames)}
     ids = [n["id"] for n in nodes]
@@ -139,21 +256,7 @@ def layout(dr, frames, nodes, edges):
         L(i)
     V = {}
     for n in nodes:
-        w, h = meas(n["label"])
-        ic = bool(n.get("icon")) and n["shape"] != "text"
-        sh = n["shape"]
-        if sh == "text":
-            pass
-        elif sh in ("rectangle", "note"):
-            w, h = max(160, w + 48), max(72, h + 32)
-        elif sh == "ellipse":
-            w, h = max(160, 1.5 * (w + 16)), max(80, 1.5 * (h + 16))
-        else:
-            w, h = max(180, 2 * (w + 16)), max(100, 2 * (h + 16))
-        if ic:
-            h += 56
-        if sh != "text":
-            w, h = up20(w), up20(h)
+        w, h = nsize(n)
         V[n["id"]] = dict(l=lay[n["id"]], b=fi[n["frame"]] if n.get("frame") else len(frames),
                           ms=w if LR else h, cs=h if LR else w, node=n)
     chains = []

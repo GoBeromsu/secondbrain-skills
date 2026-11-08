@@ -26,19 +26,26 @@ A `.canvas` file is JSON Canvas 1.0, written directly as a file; no plugin or CL
 
 ## Excalidraw
 
-Open [`references/excalidraw-plugin.md`](references/excalidraw-plugin.md) for the CLI, skeleton fields and feature-to-surface table, and [`references/excalidraw-design.md`](references/excalidraw-design.md) to choose the drawing's pattern, palette and spacing before placing anything; its fidelity check (each stated relationship is one arrow, labels in the user's language) and its sketch guidance apply to every drawing.
+Open [`references/excalidraw-design.md`](references/excalidraw-design.md) to choose the drawing's pattern, palette and spacing before placing anything; its fidelity check (each stated relationship is one arrow, labels in the user's language) and its sketch guidance apply to every drawing. The common case is a loop of two scripts, so [`references/excalidraw-plugin.md`](references/excalidraw-plugin.md) is needed only to edit an existing drawing or for a plugin edge case.
+
+**Update first.** Keep the Excalidraw plugin on its latest version: `python3 scripts/update-plugin.py --vault <name>` (prints `plugin`, `before`, `after`). The CLI has no update command; if the script fails, use Settings → Community plugins → Check for updates. If `obsidian-excalidraw-plugin:*` commands return "not found" while the plugin is enabled, run `obsidian vault=<name> plugin:reload id=obsidian-excalidraw-plugin` once.
+
+**Write, then look:**
+
+```
+python3 scripts/draw.py <spec.json|-> <out.excalidraw.md> [--replace]
+python3 scripts/export.py <vault-relative drawing> [--out <abs path outside vault>] [--vault Ataraxia] [--max-width 1600] [--scale 1] [--placeholder-images] [--source auto|live|disk]
+```
+
+`export.py` writes the PNG outside the vault, deletes its vault copy even on failure, and prints one JSON line with `drawing`, `png`, `width`, `height`, `bytes`. View the PNG, fix defects, rerun. The plugin documents its own CLI: `obsidian vault=<name> obsidian-excalidraw-plugin:skill` and `:schema action=<create|export|apply|read>`.
 
 1. **Probe.** `obsidian vault=<name> obsidian-excalidraw-plugin:status` and `schema action=<cmd>`. If the plugin or CLI is absent, make a new drawing with `draw.py`, the only offline writer; never install or enable a plugin to make a drawing work. Editing an existing drawing without the app is an unmet prerequisite: report it, write nothing.
 2. **Create.** Native `create` with a new `path`: skeleton elements, Lucide `icons`, frames, sticky notes, arrows bound by `start`/`end`. It never overwrites. Choose coordinates from the pattern; the reply's `data.idMap` holds the real ids.
 3. **Edit.** Fix in place, never delete and recreate: `open`, `read source=live` for the `revision`, then `apply` with `expectedRevision`. A stale revision changes nothing; re-read and rebuild.
-4. **Export and look.** `export` (with `requestId`, `path`, `source`, and a vault-relative `out` ending `.png`) writes the image; copy it out of the vault, view it. Fix every defect listed in the design reference's render loop, re-export, repeat until you would show it unqualified. An export that was not looked at is not render QA.
-5. **Clean up.** Close tabs you opened and delete any export from the vault.
+4. **Export and look.** `scripts/export.py` writes the image outside the vault; view it. Fix every defect listed in the design reference's render loop, re-export, repeat until you would show it unqualified. An export that was not looked at is not render QA.
+5. **Clean up.** Close tabs you opened; `export.py` leaves no export in the vault.
 
-Offline, or for a plain boxes-and-arrows graph, `scripts/draw.py` lays out and writes the file:
-
-`python3 scripts/draw.py <spec.json|-> <out.excalidraw.md> [--replace]`
-
-It writes a new file and prints one JSON line with `path`, `sha256`, `elements`, `by_type`, `crossings`, `warnings`. Non-empty `warnings` means look at the drawing. Unknown spec keys are ignored and named there. If it warns about crossings, do not rerun hoping for better: draw by hand through native `create` with chosen coordinates and a pattern from the design reference. `--replace` redoes only this script's own output; any other existing file is refused.
+Offline, or for a plain boxes-and-arrows graph, `scripts/draw.py` (usage above) lays out and writes the file. It writes a new file and prints one JSON line with `path`, `sha256`, `elements`, `by_type`, `crossings`, `warnings`. Non-empty `warnings` means look at the drawing. Unknown spec keys are ignored and named there. If it warns about crossings, do not rerun hoping for better: draw by hand through native `create` with chosen coordinates and a pattern from the design reference. `--replace` redoes only this script's own output; any other existing file is refused.
 
 - Top level: `direction` (`LR`, `TB`), `title`, `frames` `[{id,label}]`, `nodes`, `edges`.
 - Node: `id`, `label` (required), `shape` (`rectangle`, `ellipse`, `diamond`, `text`, `note`), `color` (`blue`, `green`, `yellow`, `red`, `purple`, `gray`, `note`), `frame`, `group`, `link`, `icon` (URL), `roughness` 0/1/2, `strokeStyle` `solid`/`dashed`/`dotted`.
@@ -48,7 +55,7 @@ It writes a new file and prints one JSON line with `path`, `sha256`, `elements`,
 
 What the CLI cannot do (elbow arrows, Mermaid-to-elements, embedded notes and pages, frontmatter keys) goes through a trusted EA script, as `excalidraw-plugin.md` describes, only in a disposable or approved vault. `obsidian eval` is synchronous: start an async call that stores its result on `window`, then read it in a second call. Opening a drawing makes the plugin re-save it compressed, so never hand-edit the compressed block.
 
-Icons for named services stay URLs (`icon` in the spec); never save an image in the vault, and say it loads from a third party on first open.
+Images: an external image (logo, icon, web screenshot) stays a URL in the drawing's Embedded Files (`icon` in the spec); never download it into the vault, and tell the user it loads from a third party on first open. To check layout without the network use `export.py --placeholder-images`, otherwise a live export. If export fails with `ASSETS_UNAVAILABLE` on remote images (seen with SVG logos from `cdn.simpleicons.org`), do not retry or download them: rerun `export.py --placeholder-images` to check layout and tell the user to confirm the logos by opening the drawing in Obsidian. Only images already in the vault are referenced as vault files.
 
 ## Pele
 
