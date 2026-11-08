@@ -1,14 +1,8 @@
----
-name: obsidian-canvas
-description: Create and edit JSON Canvas files (.canvas) with nodes, edges, groups, and connections. Use when working with .canvas files, creating visual canvases, mind maps, flowcharts, or when the user mentions Canvas files in Obsidian. Not for Markdown note syntax, .base file internals, or diagrams written as code blocks inside a note.
-license: MIT
----
+# JSON Canvas
 
-# Obsidian Canvas Skill
+The JSON Canvas format: file structure, node and edge schemas, geometry, colors, ID generation, and validation. Reading or writing a `.canvas` file needs no other package.
 
-This package owns the JSON Canvas format: file structure, node and edge schemas, geometry, colors, ID generation, examples, and validation. It operates on its own; it does not require, dispatch to, or discover another skill to read or write a `.canvas` file.
-
-Being able to produce a valid canvas is not authorization to change a destination vault. Resolve the exact target path and the authorized effect before any write, and keep the operation read-only when either is missing. See [references/operations.md](references/operations.md) for safe edits, error conditions, readback, and rendering.
+Being able to produce a valid canvas is not authorization to change a destination vault. Resolve the exact target path and the authorized effect before any write, and keep the operation read-only when either is missing. See [canvas-operations.md](canvas-operations.md) for safe edits, error conditions, readback, and rendering.
 
 ## File Structure
 
@@ -61,7 +55,7 @@ A canvas file (`.canvas`) contains two top-level arrays following the [JSON Canv
 4. Write the updated JSON back to the file
 5. **Validate**: Re-check all ID uniqueness and edge reference integrity after editing
 
-Workflows 2 and 4 modify a file that already holds user data. Follow the retention and error rules in [references/operations.md](references/operations.md): keep existing IDs, keep unrelated nodes, edges, and undefined keys, and treat duplicate or dangling IDs as errors instead of repairing them silently.
+Workflows 2 and 4 modify a file that already holds user data. Follow the retention and error rules in [canvas-operations.md](canvas-operations.md): keep existing IDs, keep unrelated nodes, edges, and undefined keys, and treat duplicate or dangling IDs as errors instead of repairing them silently.
 
 ## Nodes
 
@@ -243,15 +237,15 @@ After creating or editing a canvas file, verify:
 
 If validation fails, check for duplicate IDs, dangling edge references, or malformed JSON strings (especially unescaped newlines in text content). Report the failure with the offending `id` and field and leave the file unchanged; do not rename, drop, or invent objects to make the checklist pass.
 
-This checklist is static validation of a document you hold. It does not prove that the file was materialized at the intended path, that referenced attachments exist, or that the canvas renders. Those are separate claims; see [references/operations.md](references/operations.md).
+This checklist is static validation of a document you hold. It does not prove that the file was materialized at the intended path, that referenced attachments exist, or that the canvas renders. Those are separate claims; see [canvas-operations.md](canvas-operations.md).
 
 ## Operations
 
-[references/operations.md](references/operations.md) covers safe graph extension, duplicate and dangling ID errors, malformed input and missing attachments, exact readback versus rendering, and the optional Markdown embed boundary.
+[canvas-operations.md](canvas-operations.md) covers safe graph extension, duplicate and dangling ID errors, malformed input and missing attachments, exact readback versus rendering, and the optional Markdown embed boundary.
 
 ## Complete Examples
 
-See [references/EXAMPLES.md](references/EXAMPLES.md) for full canvas examples including mind maps, project boards, research canvases, and flowcharts.
+See [canvas-examples.md](canvas-examples.md) for full canvas examples including mind maps, project boards, research canvases, and flowcharts.
 
 ## References
 
@@ -260,4 +254,4 @@ See [references/EXAMPLES.md](references/EXAMPLES.md) for full canvas examples in
 
 ## Attribution
 
-The format documentation and examples in this package are derived from the `json-canvas` skill in [kepano/obsidian-skills](https://github.com/kepano/obsidian-skills) at commit `3ccff5338ea700537839b21900aa5358a0402c98`, MIT License, Copyright (c) 2026 Steph Ango (@kepano). See Git history for the recorded revision and modifications.
+The format documentation and examples in this reference and `canvas-examples.md` are derived from the `json-canvas` skill in [kepano/obsidian-skills](https://github.com/kepano/obsidian-skills) at commit `3ccff5338ea700537839b21900aa5358a0402c98`, MIT License, Copyright (c) 2026 Steph Ango (@kepano). See Git history for the recorded revision and modifications.

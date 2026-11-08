@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/brand/hero.svg" alt="secondbrain-skills: twenty-five independent Agent Skills for Obsidian vaults, eight native and seventeen knowledge packages" width="880">
+  <img src="assets/brand/hero.svg" alt="secondbrain-skills: twenty-four independent Agent Skills for Obsidian vaults, seven native and seventeen knowledge packages" width="880">
 </p>
 
 <p align="center">
@@ -8,7 +8,7 @@
 
 # secondbrain-skills
 
-Twenty-five Agent Skills that let an agent run an Obsidian vault as a second brain: collect a source, keep the original, compile it into a wiki, and answer from it with citations.
+Twenty-four Agent Skills that let an agent run an Obsidian vault as a second brain: collect a source, keep the original, compile it into a wiki, and answer from it with citations.
 
 Each package is one `SKILL.md` that owns one job. There is no root skill, no dispatcher and no shared runtime. Your agent loads the package the task needs and nothing else.
 
@@ -67,8 +67,7 @@ Six more packages hold the stance that the eleven above work from.
 | --- | --- |
 | `obsidian-markdown` | Obsidian Flavored Markdown: wikilinks, embeds, callouts, properties, tags, block references. |
 | `obsidian-bases` | `.base` database views: filters, formulas, summaries, grouping and the function reference. |
-| `obsidian-canvas` | JSON Canvas `.canvas` files: nodes, edges, geometry and stable IDs. |
-| `obsidian-visualize` | Choosing the visual form for a note: Canvas, `.excalidraw.md` scenes, and Pele diagrams in a `mermaid` fence. |
+| `obsidian-visualize` | Choosing the visual form and building it: JSON Canvas `.canvas` files (nodes, edges, geometry, stable IDs), `.excalidraw.md` scenes, and Pele diagrams in a `mermaid` fence. |
 | `obsidian-cli` | The official `obsidian` binary: read, create, search, move and audit. |
 | `obsidian-clipper` | Web Clipper templates, selectors and variables. |
 | `obsidian-doctor` | Plugin and Templater failure diagnosis from sanitized evidence. |
@@ -105,7 +104,7 @@ AGENTS.md                repository contract for contributors and agents
 
 - **[Yohan Koo (구요한)](https://github.com/johnfkoo951/cmds-llm-wiki)**, cmds-llm-wiki. The knowledge packages started from its commands; this repository is now their canonical source and diverges where the owner decided. No upstream file is shipped: the Paper Mode P-7 verifier `skills/ingest/scripts/verify_paper.py` is this repository's own implementation, written without his script. The upstream publishes no licence and nothing here relicenses it.
 - **[Andrej Karpathy](https://github.com/karpathy)**, the LLM Wiki pattern that cmds-llm-wiki builds on.
-- **[Steph Ango (kepano)](https://github.com/kepano/obsidian-skills)**, obsidian-skills (MIT). `obsidian-markdown`, `obsidian-bases`, `obsidian-canvas` and `obsidian-cli` started from it and were modified.
+- **[Steph Ango (kepano)](https://github.com/kepano/obsidian-skills)**, obsidian-skills (MIT). `obsidian-markdown`, `obsidian-bases`, `obsidian-cli` and the JSON Canvas reference in `obsidian-visualize` started from it and were modified.
 - **[Jonghak Seo](https://github.com/Jonghakseo/pi-extension)**, pi-extension (MIT). The inspection lint and the palette and spacing guidance in `obsidian-visualize` are adapted from it.
 - **[Obsidian](https://github.com/obsidianmd/pele)**, Pele (MIT). The Pele branch of `obsidian-visualize` follows its public compatibility and security documentation; no Pele file is shipped.
 - **[Yohan Koo (구요한)](https://pele.cmdspace.work/)**, the CMDSPACE Pele gallery. The use, avoid and size guidance and the observed pitfalls in the `obsidian-visualize` Pele catalog were consulted from it; every example there is this repository's own.
