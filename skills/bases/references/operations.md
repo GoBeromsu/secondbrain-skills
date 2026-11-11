@@ -93,7 +93,7 @@ When the app, the target vault, the renderer, or a required plugin is unavailabl
 
 Base syntax can live in a fenced `base` block inside a note, and a `.base` file can be embedded into a note with `![[Base.base]]` or `![[Base.base#View Name]]`.
 
-- The note is owned by `obsidian-markdown`; this package owns only the base syntax inside the block and the schema behind the embed. Compose that package by identity when the task actually edits a note, and report the gap instead of improvising note syntax when it is not available.
+- The note is owned by `markdown`; this package owns only the base syntax inside the block and the schema behind the embed. Compose that package by identity when the task actually edits a note, and report the gap instead of improvising note syntax when it is not available.
 - Editing a block inside a note is a note mutation: preserve the rest of the note exactly, including unrelated blocks, properties, and links.
 - Keep the `.base` extension in an embed target. A bare same-stem link is a different target and may reach a Markdown note or stay unresolved.
 - A `#View Name` selector is matched by name. Renaming or reordering views changes what existing embeds show, and the base file records nothing about who embeds it. Before renaming, find the notes that reference the view; after renaming, check them.

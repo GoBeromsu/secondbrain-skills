@@ -1,16 +1,17 @@
 # Repository contract
 
-This repository owns twenty-four independent Agent Skills, the `secondbrain-skills` collection: seven native Obsidian skills and seventeen knowledge skills, including four independently usable archival principles, `principle-skill-creating`, and the optional `secondbrain-mode` stance.
+This repository owns twenty-three independent Agent Skills, the `secondbrain-skills` collection: six native Obsidian skills and seventeen knowledge skills, including four independently usable archival principles, `principle-skill-creating`, and the optional `secondbrain-mode` stance.
 
-- Native: Markdown, Bases, visualization (JSON Canvas files, Excalidraw drawings and Pele diagrams), official CLI operations, Web Clipper, plugin/Templater diagnosis, and Headless Sync. Each `skills/obsidian-*/SKILL.md` owns exactly its named feature.
+- Native: Markdown, Bases, visualization (JSON Canvas files, Excalidraw drawings and Pele diagrams), official CLI operations, Web Clipper, and Headless Sync. Each of `markdown`, `bases`, `visualize`, `obsidian-cli`, `obsidian-clipper` and `obsidian-sync` owns exactly its named feature in `skills/<name>/SKILL.md`.
 - Knowledge: `capture`, `inbox`, `ingest`, `query`, `verify`, `audit`, `lint`, `status`, `reindex`, `refresh-context`, and `onboard`. Each `skills/<name>/SKILL.md` owns exactly its named task and carries no `obsidian-` prefix.
 - Principles: `principle-respect-des-fonds`, `principle-original-order`, `principle-hierarchical-management`, and `principle-collective-description` belong to the knowledge group. They provide contextual guidance and grant no write authorization.
 - Authoring: `principle-skill-creating` decides what a package keeps in Markdown and what it hands to templates, thin scripts and agents; read it before changing a package. `secondbrain-mode` is an optional stance for multi-package work; it dispatches nothing and every package still runs directly.
 
-There is no callable root skill, mandatory shared runtime, compatibility alias, or hidden dispatcher. A package name is one lowercase hyphenated segment naming a task (`ingest`) or a format (`obsidian-bases`), never a role or version; native packages keep the `obsidian-` prefix, knowledge packages never use it. Files inside a package are named for their subject without repeating the package or resource kind (`ingest/references/papers.md`), lowercase and hyphenated, with no dates or version suffixes. Each capability has exactly one owning package; checks stay at package format (`claude plugin validate . --strict`). Verify behavior by actually running it; the repository keeps no tests.
+There is no callable root skill, mandatory shared runtime, compatibility alias, or hidden dispatcher. A package name is one lowercase hyphenated segment naming a task (`ingest`) or a format (`bases`), never a role or version; only `obsidian-cli`, `obsidian-clipper` and `obsidian-sync` carry the `obsidian-` prefix. Files inside a package are named for their subject without repeating the package or resource kind (`ingest/references/papers.md`), lowercase and hyphenated, with no dates or version suffixes. Each capability has exactly one owning package; checks stay at package format (`claude plugin validate . --strict`). Verify behavior by actually running it; the repository keeps no tests.
 
 ## Authoring
 
+- Before any work, fetch `origin` and fast-forward the checkout to the latest `main`; never start on a stale base.
 - Keep required references, assets, and scripts inside the owning package. Compose neighboring packages by explicit identity only when the task needs them. Define each rule once at its owner and name or invoke that skill instead of copying its procedure.
 - Never write comments.
 - Make the smallest behavioral diff the task needs. Before editing and before submitting, keep a file change only if leaving it unchanged would break the requested behavior; never change a file just for wording consistency. Add no speculative abstraction, unused eval or scaffolding, or example, commentary or report decoration that only repeats a rule.

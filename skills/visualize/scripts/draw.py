@@ -69,7 +69,9 @@ def signature(els):
 
 
 GAPC, BANDGAP, PAD, GAP = 50, 160, 40, 4
-KEYS = {"top": ("direction", "frames", "nodes", "edges", "title"), "frames": ("id", "label"),
+INK, BG, STICKY = "#1e1e1e", "#ffffff", "#ffdf6b"
+ROT = ((-.574, 1.43, .144), (.426, .43, .144), (.426, 1.43, -.856))
+KEYS = {"top": ("direction", "frames", "nodes", "edges", "title", "palette", "ink", "background", "dark"), "frames": ("id", "label"),
         "nodes": ("id", "label", "shape", "color", "roughness", "strokeStyle", "frame", "icon", "group", "link"),
         "edges": ("from", "to", "head", "dashed", "label")}
 B62 = string.digits + string.ascii_letters
@@ -101,10 +103,19 @@ def meas(t, fs=20):
     return int(w + 0.999), int(fs * 1.25 * (t.count("\n") + 1))
 
 
+def mix(a, b, t):
+    return "#" + "".join("%02x" % round(int(a[i:i + 2], 16) * (1 - t) + int(b[i:i + 2], 16) * t) for i in (1, 3, 5))
+
+
+def light(c):
+    v = [int(c[i:i + 2], 16) for i in (1, 3, 5)]
+    return "#" + "".join("%02x" % max(0, min(255, round((237.15 - sum(m * x for m, x in zip(r, v))) / .86))) for r in ROT)
+
+
 def el(key, kind, typ, x, y, w, h, **k):
     s = sha(key + "|" + kind)
     d = dict(id=eid(key, kind), type=typ, x=num(x), y=num(y), width=num(w), height=num(h), angle=0,
-             strokeColor="#1e1e1e", backgroundColor="transparent", fillStyle="solid", strokeWidth=2,
+             strokeColor=INK, backgroundColor="transparent", fillStyle="solid", strokeWidth=2,
              strokeStyle="solid", roughness=0, opacity=100, groupIds=[], frameId=None, roundness=None,
              seed=int(s[:8], 16), version=1, versionNonce=int(s[8:16], 16), isDeleted=False, boundElements=[],
              updated=1, link=None, locked=False)
@@ -120,6 +131,19 @@ def txt(key, kind, x, y, t, fs, **k):
     return el(key, kind, "text", x, y, w, h, **d)
 
 
+def colors(s):
+    global INK, BG, STICKY
+    dark, pal = bool(s.get("dark")), s.get("palette") or {}
+    ink, bg = s.get("ink"), s.get("background") or ("#121212" if dark else BG)
+    for c in [ink or INK, bg] + [c for v in pal.values() for c in (v if isinstance(v, list) and len(v) == 2 else [v])]:
+        if not isinstance(c, str) or not re.fullmatch("#[0-9a-fA-F]{6}", c):
+            raise ValueError("color is #rrggbb, a palette entry one color or [fill, stroke]: %r" % (c,))
+    f = light if dark else str
+    INK, BG = f(ink) if ink else INK, f(bg)
+    PAL.update((k, tuple(map(f, v if isinstance(v, list) else (mix(v, bg, .75), v)))) for k, v in pal.items())
+    STICKY = PAL["note"][0] if "note" in pal else STICKY
+
+
 def parse(s):
     if not isinstance(s, dict):
         raise ValueError("spec must be an object")
@@ -129,6 +153,7 @@ def parse(s):
     frames, nodes, edges = s.get("frames") or [], s.get("nodes"), s.get("edges") or []
     if not nodes:
         raise ValueError("nodes required")
+    colors(s)
     fids = [f["id"] for f in frames]
     ids = [n["id"] for n in nodes]
     if len(set(fids)) != len(fids) or len(set(ids)) != len(ids):
@@ -515,7 +540,7 @@ def build(spec):
         k, (x, y, w, h) = n["id"], box[n["id"]]
         fr = fel[n["frame"]]["id"] if n.get("frame") in fel else None
         nfr[k] = fr
-        bg, st = PAL[n["color"]] if n.get("color") else (("#ffdf6b" if n["shape"] == "note" else "transparent"), "#1e1e1e")
+        bg, st = PAL[n["color"]] if n.get("color") else ((STICKY if n["shape"] == "note" else "transparent"), INK)
         rs = dict(roughness=n.get("roughness", 0), strokeStyle=n.get("strokeStyle", "solid"))
         gids = [eid(k, "icongroup")] if n.get("icon") and n["shape"] != "text" else []
         if n.get("group"):
@@ -671,11 +696,15 @@ def main(argv):
     rep = "--replace" in argv
     force = "--force" in argv
     argv = [a for a in argv if a not in ("--replace", "--force")]
-    if len(argv) != 3:
-        print("usage: draw.py <spec.json|-> <out.excalidraw.md> [--replace [--force]]", file=sys.stderr)
+    if len(argv) not in (2, 3):
+        print("usage: draw.py <spec.json|-> [<out.excalidraw.md> [--replace [--force]]]", file=sys.stderr)
         return 1
     try:
         spec = json.loads(sys.stdin.read() if argv[1] == "-" else open(argv[1], encoding="utf-8").read())
+        if len(argv) == 2:
+            colors(spec)
+            print(json.dumps(dict(ink=INK, background=BG, palette=PAL)))
+            return 0
         if os.path.islink(argv[2]):
             raise ValueError("refusing symlink: %s" % argv[2])
         if os.path.exists(argv[2]):
@@ -687,7 +716,7 @@ def main(argv):
         cr, warns = check(els, nbox, nodeel, spec.get("edges") or [])
         warns += unknown(spec)
         sc = dict(type="excalidraw", version=2, source="https://github.com/zsviczian/obsidian-excalidraw-plugin", elements=els,
-                  appState=dict(gridSize=None, viewBackgroundColor="#ffffff"), files={})
+                  appState=dict(gridSize=None, viewBackgroundColor=BG, **({"theme": "dark"} if spec.get("dark") else {})), files={})
         out = head(signature(els)) + "\n\n".join("%s ^%s" % (t["text"], t["id"]) for t in texts) + "\n\n"
         if files:
             out += "## Embedded Files\n" + "\n".join("%s: %s" % kv for kv in files.items()) + "\n\n"

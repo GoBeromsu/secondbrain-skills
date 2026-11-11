@@ -56,7 +56,7 @@ Output: coverage table per dimension, failing paths (top twenty per dimension), 
 
 ### Phase B — Consistency Clusters (batched)
 
-Each Map cluster is reviewed on its own; clusters are independent, so one parallel sub-task per cluster when available — pass paths, receive one line per finding, never page bodies.
+Each Map cluster is reviewed on its own; clusters are independent, so when the scope is too large to review in one context, split clusters across parallel sub-tasks — pass paths, receive one line per finding, never page bodies.
 
 For each cluster:
 
@@ -94,7 +94,7 @@ For each target, an abbreviated `verify` Confirmability read:
 - flag **overclaim** (`high` on a single source) and **underclaim** (`low` despite strong evidence);
 - check Bias Check presence on high-confidence pages.
 
-Audit proposes `confidence`; it never writes it, nor `verificationStatus` or `disputed`. Partition targets into batches of about twenty and run batches in parallel when available.
+Audit proposes `confidence`; it never writes it, nor `verificationStatus` or `disputed`. Partition targets into batches of about twenty; run batches in parallel only when the target set is too large to read in one context.
 
 Output: confidence calibration table (page, declared, recommended, verdict), overclaim list, underclaim list, Bias Check coverage on high-confidence pages, and the **Confirmability score** — weighted average of calibration alignment and high-confidence Bias Check coverage.
 

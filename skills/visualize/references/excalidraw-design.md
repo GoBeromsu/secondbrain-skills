@@ -39,27 +39,36 @@ Open the one that matches the design problem before choosing; each is a picture 
 | A small repeated icon set | the communication and domain-storytelling icon previews there |
 | Decision flows with coloured Yes and No exits | the decision-flow-control preview there |
 | Type scale and section pills | the system-design template preview there |
-| Hand-drawn flow with arrow-coloured edge labels | the sketchy-flow image at https://robtaylor.github.io/excalidraw-diagrams/ |
+| Hand-drawn flow with labelled edges | the sketchy-flow image at https://robtaylor.github.io/excalidraw-diagrams/ |
 | Dense node graphs on a dark canvas | the mind-map views in the README of https://github.com/zsviczian/obsidian-excalidraw-plugin |
 
-Rules that hold across them: one hue per meaning; edge labels on the arrow in the arrow's own colour; numbered section pills with a dashed rule and whitespace between phases; icons labelled and never decorative; a diamond kept neutral while its exits are coloured. A shaft that runs through a node or a label that collides with a line is the defect to look for in every gallery image, including your own.
+Rules that hold across them: one hue per meaning; edge labels on the arrow; numbered section pills with a dashed rule and whitespace between phases; icons labelled and never decorative; a diamond kept neutral while its exits are coloured. A shaft that runs through a node or a label that collides with a line is the defect to look for in every gallery image, including your own.
 
 Sketch fonts and `roughness: 1` suit informal and teaching drawings.
 
 ## Palette
 
-Six pairs, one neutral and five with a meaning; use at most four in one drawing. Pale fill with the darker stroke of the same hue stays legible on light and dark canvases. Prefer `fillStyle: "solid"`; hachure muddies small shapes.
+Six pairs, one neutral and five with a meaning; use at most four in one drawing. The meanings are fixed; the hues come from the first source that exists: a palette the user or the vault's policy names, the running app's theme, the built-in pairs. Prefer `fillStyle: "solid"`; hachure muddies small shapes.
 
-| Meaning | `backgroundColor` | `strokeColor` |
-|---|---|---|
-| Normal step, service | `#a5d8ff` | `#1971c2` |
-| Start, success, output | `#b2f2bb` | `#2f9e44` |
-| Decision, caution | `#ffec99` | `#f08c00` |
-| Error, risk | `#ffc9c9` | `#e03131` |
-| Data store, memory | `#d0bfff` | `#6741d9` |
-| External actor, neutral | `#e9ecef` | `#495057` |
+| Meaning | `draw.py` name | Theme variable | Built-in `backgroundColor` | Built-in `strokeColor` |
+|---|---|---|---|---|
+| Normal step, service | `blue` | `--color-blue` | `#a5d8ff` | `#1971c2` |
+| Start, success, output | `green` | `--color-green` | `#b2f2bb` | `#2f9e44` |
+| Decision, caution | `yellow` | `--color-yellow` | `#ffec99` | `#f08c00` |
+| Error, risk | `red` | `--color-red` | `#ffc9c9` | `#e03131` |
+| Data store, memory | `purple` | `--color-purple` | `#d0bfff` | `#6741d9` |
+| External actor, neutral | `gray` | `--text-muted` | `#e9ecef` | `#495057` |
+| Sticky note | `note` | `--color-yellow` | `#fff3bf` | `#e67700` |
 
-Text inside pale fills stays `#1e1e1e` or the stroke hue. On a dark canvas, free text uses `#e9ecef` and structural lines `#868e96`. Spend one accent color once, on the thing the reader must not miss.
+Theme colours:
+
+- Read the resolved values from `document.body` with a read-only `obsidian eval`; assigning a value to a detached canvas context's `fillStyle` returns it as `#rrggbb`. Also read `--text-normal` (`ink`), `--background-primary` (`background`) and whether the body has `theme-dark` (`dark`).
+- Pass each hue as one `palette` colour: it becomes the stroke, and the fill is that hue mixed three quarters toward the background.
+- The plugin recolours stored colours only in a scene whose own theme is dark, whatever the app's theme. `draw.py` with `dark: true` writes a dark scene and stores the values that render as the theme's colours.
+- Native `create` makes a light scene. Under a dark app give `draw.py` the hues without `ink`, `background` or `dark`; run without an output path, it prints the pairs to use.
+- When the app cannot be read, use the built-in pairs and say so.
+
+Text is `ink`, inside a fill and on an arrow alike; a hue colours strokes and fills, never text. Native `create` gives a label its shape's or arrow's stroke colour, so set labels to `ink` with `apply` afterwards. With the built-in pairs `ink` is `#1e1e1e`, and on a dark canvas free text uses `#e9ecef` and structural lines `#868e96`. Spend one accent color once, on the thing the reader must not miss.
 
 ## Type scale and spacing
 

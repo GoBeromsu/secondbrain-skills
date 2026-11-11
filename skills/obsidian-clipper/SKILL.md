@@ -1,6 +1,6 @@
 ---
 name: obsidian-clipper
-description: Authors, validates, and repairs Obsidian Web Clipper template JSON — schema fields, behaviors, triggers, typed properties, variables, selectors, filters, and template logic. Use when the user wants a Web Clipper template for a site or a content type, needs a clipping template imported, fixed, or diagnosed, asks why a clipped note is empty or missing a field, or asks how Clipper variables, selectors, filters, or logic behave. Not for Obsidian Markdown syntax, `.base` file internals, `.canvas` graph structure, or vault CLI operations — use the obsidian-markdown, obsidian-bases, obsidian-visualize, or obsidian-cli package.
+description: Authors, validates, and repairs Obsidian Web Clipper template JSON — schema fields, behaviors, triggers, typed properties, variables, selectors, filters, and template logic. Use when the user wants a Web Clipper template for a site or a content type, needs a clipping template imported, fixed, or diagnosed, asks why a clipped note is empty or missing a field, or asks how Clipper variables, selectors, filters, or logic behave. Not for Obsidian Markdown syntax, `.base` file internals, `.canvas` graph structure, or vault CLI operations — use the markdown, bases, visualize, or obsidian-cli package.
 license: MIT
 ---
 
@@ -32,9 +32,9 @@ Owned here:
 
 Not owned here:
 
-- Note body syntax — callouts, wikilinks, embeds, property formatting inside a finished note. `obsidian-markdown` owns that; name it by identity only when the task actually reaches a note.
-- `.base` structure, filters, formulas, and views. `obsidian-bases` owns those; this package consumes only a Base's property keys and their intended types.
-- `.canvas` graph structure and vault-aware CLI operations, owned by `obsidian-visualize` and `obsidian-cli`.
+- Note body syntax — callouts, wikilinks, embeds, property formatting inside a finished note. `markdown` owns that; name it by identity only when the task actually reaches a note.
+- `.base` structure, filters, formulas, and views. `bases` owns those; this package consumes only a Base's property keys and their intended types.
+- `.canvas` graph structure and vault-aware CLI operations, owned by `visualize` and `obsidian-cli`.
 - What the vault's property vocabulary should be. The target vault's written convention decides; when it states none, ask instead of inventing one.
 
 The extension, a configured vault, Interpreter, and a model provider are runtime facts. Their absence is normal and fully supported — a template is authored and statically validated without any of them.
@@ -113,7 +113,7 @@ Templates are compressed and chunked into browser sync storage, and the extensio
 
 1. Establish whether the template targets one site, a content type across sites, or acts as the general fallback.
 2. Find the destination property contract — a Base, or existing notes of this type — before inventing one.
-3. Analyze a real page. Ask for a representative URL when none was given; never work from a description of a page.
+3. Analyze a real page. When no URL was given, find a representative public page of the target kind yourself and ask for one only when none is reachable; never work from a description of a page.
 4. Pick a source per field down the ladder: schema, then meta, then preset, then selector, then prompt.
 5. Draft the JSON against the schema above, adding logic only where a field is genuinely optional.
 6. Validate statically, and report the result *as* static validation.

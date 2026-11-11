@@ -75,7 +75,7 @@ A video or audio embed renders a player, so its playable state cannot be judged 
 ![[BaseFile.base#View Name]]
 ```
 
-The `#View Name` subpath selects a view defined inside the base file, so it must match a view name that exists there. The base file's own filters, formulas, views, and summaries belong to the `obsidian-bases` skill; this reference defines only how a note embeds one.
+The `#View Name` subpath selects a view defined inside the base file, so it must match a view name that exists there. The base file's own filters, formulas, views, and summaries belong to the `bases` skill; this reference defines only how a note embeds one.
 
 ## Embed Canvas
 
@@ -85,7 +85,7 @@ The `#View Name` subpath selects a view defined inside the base file, so it must
 
 [Obsidian's embed documentation](https://help.obsidian.md/embeds) states that an embedded canvas displays the shapes only, not the text inside cards. Expect that result: it is not an unresolved link and not a defect to be fixed by rewriting the link. Open the canvas itself when the card text matters.
 
-Canvas node and edge structure belongs to the `obsidian-visualize` skill. This reference defines only the note-side link and embed, plus the readback that proves the `.canvas` file -- and not a same-named Markdown note -- was reached.
+Canvas node and edge structure belongs to the `visualize` skill. This reference defines only the note-side link and embed, plus the readback that proves the `.canvas` file -- and not a same-named Markdown note -- was reached.
 
 ## Embed Lists
 
