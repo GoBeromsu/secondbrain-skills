@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256"
      role="img" aria-labelledby="osLogoTitle osLogoDesc">
-  <title id="osLogoTitle">Obsidian Skills</title>
+  <title id="osLogoTitle">secondbrain-skills</title>
   <desc id="osLogoDesc">Nine equally sized diamond facets arranged in a three-by-three lattice on a dark
-    violet panel. The facets are the same shape and size and none is central or larger, standing for nine
+    violet panel. The facets are the same shape and size and none is central or larger, standing for
     independent Agent Skills packages with no root skill and no shared runtime.</desc>
 
   <defs>
@@ -11,7 +11,6 @@
       <stop offset="0.55" stop-color="#120e22"/>
       <stop offset="1" stop-color="#09070f"/>
     </linearGradient>
-    <!-- Resolved in the rotated lattice's own user space, so the sweep stays centred on the mark. -->
     <linearGradient id="osLogoFacet" gradientUnits="userSpaceOnUse" x1="-88" y1="-94" x2="88" y2="94">
       <stop offset="0" stop-color="#c8b8ff"/>
       <stop offset="0.40" stop-color="#8b5cf6"/>
@@ -24,11 +23,9 @@
     </radialGradient>
   </defs>
 
-  <!-- Self-contained panel: the mark stays legible on light and on dark page backgrounds. -->
   <rect x="2" y="2" width="252" height="252" rx="56" fill="url(#osLogoPanel)"/>
   <rect x="2" y="2" width="252" height="252" rx="56" fill="url(#osLogoGlow)"/>
 
-  <!-- Nine facets: one square grid rotated 45 degrees. Identical geometry per cell, by design. -->
   <g transform="translate(128 128) rotate(45)" fill="url(#osLogoFacet)">
     <rect x="-77" y="-77" width="46" height="46" rx="7"/>
     <rect x="-23" y="-77" width="46" height="46" rx="7"/>
@@ -41,7 +38,6 @@
     <rect x="31"  y="31"  width="46" height="46" rx="7"/>
   </g>
 
-  <!-- Violet hairline keeps the silhouette readable against a dark page. -->
   <rect x="2.75" y="2.75" width="250.5" height="250.5" rx="55.25"
         fill="none" stroke="#a78bfa" stroke-opacity="0.34" stroke-width="1.5"/>
 </svg>

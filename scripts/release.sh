@@ -1,5 +1,4 @@
 #!/bin/sh
-# Release: one plugin version on every manifest, then tag and publish. Skills carry no version.
 set -eu
 V=${1:?usage: scripts/release.sh <version>}; export V
 cd "$(git rev-parse --show-toplevel)"

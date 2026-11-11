@@ -1,9 +1,9 @@
 import hashlib, json, os, re, string, sys, unicodedata, uuid
 from collections import Counter
 
-PAL = {"blue": ("#a5d8ff", "#1971c2"), "green": ("#b2f2bb", "#2f9e44"), "yellow": ("#ffec99", "#f08c00"),
+PAL = {"blue": ("#a5d8ff", "#1971c2"), "green": ("#b2f2bb", "#2f9e44"), "yellow": ("#ffec99", "#d87e00"),
        "red": ("#ffc9c9", "#e03131"), "purple": ("#d0bfff", "#6741d9"), "gray": ("#e9ecef", "#495057"),
-       "note": ("#fff3bf", "#e67700")}
+       "note": ("#fff3bf", "#cf6b00")}
 SHAPES = ("rectangle", "ellipse", "diamond", "text", "note")
 HEADS = {"arrow": "arrow", "triangle": "triangle", "bar": "bar", "dot": "dot", "none": None}
 def head(sig):
@@ -77,7 +77,6 @@ KEYS = {"top": ("direction", "frames", "nodes", "edges", "title", "palette", "in
 B62 = string.digits + string.ascii_letters
 
 
-
 def sha(s):
     return hashlib.sha1(s.encode()).hexdigest()
 
@@ -103,13 +102,28 @@ def meas(t, fs=20):
     return int(w + 0.999), int(fs * 1.25 * (t.count("\n") + 1))
 
 
+def rgb(c):
+    return bytes.fromhex(c[1:])
+
+
 def mix(a, b, t):
-    return "#" + "".join("%02x" % round(int(a[i:i + 2], 16) * (1 - t) + int(b[i:i + 2], 16) * t) for i in (1, 3, 5))
+    return "#" + bytes(round(x * (1 - t) + y * t) for x, y in zip(rgb(a), rgb(b))).hex()
+
+
+def lum(c):
+    return sum(k * (((v / 255 + .055) / 1.055) ** 2.4 if v > 10 else v / 3294.6) for k, v in zip((.2126, .7152, .0722), rgb(c)))
+
+
+def seen(c, bg):
+    b = lum(bg)
+    far = "#000000" if b > .18 else "#ffffff"
+    while (max(lum(c), b) + .05) / (min(lum(c), b) + .05) < 3:
+        c = mix(c, far, .1)
+    return c
 
 
 def light(c):
-    v = [int(c[i:i + 2], 16) for i in (1, 3, 5)]
-    return "#" + "".join("%02x" % max(0, min(255, round((237.15 - sum(m * x for m, x in zip(r, v))) / .86))) for r in ROT)
+    return "#" + bytes(max(0, min(255, round((237.15 - sum(m * x for m, x in zip(r, rgb(c)))) / .86))) for r in ROT).hex()
 
 
 def el(key, kind, typ, x, y, w, h, **k):
@@ -140,7 +154,8 @@ def colors(s):
             raise ValueError("color is #rrggbb, a palette entry one color or [fill, stroke]: %r" % (c,))
     f = light if dark else str
     INK, BG = f(ink) if ink else INK, f(bg)
-    PAL.update((k, tuple(map(f, v if isinstance(v, list) else (mix(v, bg, .75), v)))) for k, v in pal.items())
+    PAL.update({k: (a, seen(b, BG)) for k, (a, b) in PAL.items()})
+    PAL.update((k, tuple(map(f, v if isinstance(v, list) else (mix(v, bg, .75), seen(v, bg))))) for k, v in pal.items())
     STICKY = PAL["note"][0] if "note" in pal else STICKY
 
 
@@ -231,7 +246,6 @@ def layout_frames(dr, frames, nodes, edges):
         for k in m:
             c[k] = y + V[k]["cs"] / 2
             y += V[k]["cs"] + GAPC
-    # classify edges and allocate lanes per gap (gap g lies right of column g)
     lanes, lab, ori = {}, {}, {}
     for i, e in enumerate(edges):
         a, b = col[e["from"]], col[e["to"]]
@@ -245,8 +259,6 @@ def layout_frames(dr, frames, nodes, edges):
         if e.get("label"):
             for g in range(col[s], col[d]):
                 lab[g] = max(lab.get(g, 0), lw)
-    # each end of an edge gets its own port on the node side and each edge its own lane,
-    # so fan-outs and fan-ins never share a trunk
     outp, inp = {}, {}
     for side, tab in ((0, outp), (1, inp)):
         by = {}

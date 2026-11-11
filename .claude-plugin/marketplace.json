@@ -1,7 +1,7 @@
 {
   "name": "secondbrain-skills",
   "version": "0.13.0",
-  "description": "Twenty-three independent secondbrain-skills packages: six native Obsidian and seventeen knowledge packages, including four archival principles. This is a public prerelease; the principles are local candidate additions, not verified runtime loads.",
+  "description": "Self-contained Agent Skills for Obsidian vaults: native Obsidian packages and knowledge packages, including archival principles. This is a public prerelease.",
   "owner": {
     "name": "beomsukoh",
     "url": "https://beomsukoh.com"
@@ -11,7 +11,7 @@
       "name": "secondbrain-skills",
       "source": "./",
       "displayName": "Obsidian Skills",
-      "description": "Twenty-three self-contained Agent Skills: six native Obsidian and seventeen knowledge packages. Four independently usable archival principles are included. This is a distribution container, not a router, dispatcher, or shared runtime.",
+      "description": "Self-contained Agent Skills for Obsidian vaults: native Obsidian packages and knowledge packages, including archival principles. This is a distribution container, not a router, dispatcher, or shared runtime.",
       "category": "knowledge-management",
       "tags": [
         "obsidian",
@@ -27,35 +27,7 @@
       "metadata": {
         "releaseStatus": "prerelease",
         "router": "none",
-        "packageCount": 6,
-        "packages": [
-          "markdown",
-          "bases",
-          "visualize",
-          "obsidian-cli",
-          "obsidian-clipper",
-          "obsidian-sync"
-        ],
-        "collection": "secondbrain-skills",
-        "knowledgePackages": [
-          "capture",
-          "inbox",
-          "ingest",
-          "query",
-          "verify",
-          "audit",
-          "lint",
-          "status",
-          "reindex",
-          "refresh-context",
-          "onboard",
-          "principle-respect-des-fonds",
-          "principle-original-order",
-          "principle-hierarchical-management",
-          "principle-collective-description",
-          "secondbrain-mode",
-          "principle-skill-creating"
-        ]
+        "collection": "secondbrain-skills"
       }
     }
   ]

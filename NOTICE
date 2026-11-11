@@ -56,13 +56,13 @@ and in the README attribution, not inside each package.
     skills/markdown/references/PROPERTIES.md      <- skills/obsidian-markdown/references/PROPERTIES.md
     skills/bases/SKILL.md                         <- skills/obsidian-bases/SKILL.md
     skills/bases/references/FUNCTIONS_REFERENCE.md <- skills/obsidian-bases/references/FUNCTIONS_REFERENCE.md
-    skills/visualize/references/canvas.md         <- skills/json-canvas/SKILL.md
-    skills/visualize/references/canvas-examples.md <- skills/json-canvas/references/EXAMPLES.md
+    skills/obsidian-visualize/references/canvas.md         <- skills/json-canvas/SKILL.md
+    skills/obsidian-visualize/references/canvas-examples.md <- skills/json-canvas/references/EXAMPLES.md
     skills/obsidian-cli/SKILL.md                           <- skills/obsidian-cli/SKILL.md
 
 One further upstream section is owned elsewhere in this repository: the Mermaid
 diagram-block section of the upstream Markdown skill is answered by
-the Pele branch of `skills/visualize/` (`references/pele*.md`). Its rules were re-derived from public
+the Pele branch of `skills/obsidian-visualize/` (`references/pele*.md`). Its rules were re-derived from public
 Mermaid and Obsidian documentation rather than copied, so it is not listed above;
 the imported section itself survives inside `skills/markdown/SKILL.md`
 and is covered by the notice in section 1.
@@ -84,7 +84,7 @@ to them:
 These are covered by this repository's root `LICENSE`; a package root holds
 only `SKILL.md`.
 
-The original parts of `skills/visualize/` are covered the same way;
+The original parts of `skills/obsidian-visualize/` are covered the same way;
 its Pele references (formerly `skills/obsidian-mermaid/`) are
 original; its adapted parts additionally carry the notice in section 6 below.
 
@@ -104,24 +104,24 @@ this repository and none of them endorses it. Exact URLs, and where applicable
 exact revisions, are recorded in each package's Git history and attribution
 section.
 
-    Obsidian Help and Obsidian developer documentation   all seven packages
+    Obsidian Help and Obsidian developer documentation   all native packages
     Mermaid documentation, and the mermaid-js/mermaid
-      diagram detectors on its development branch        skills/visualize
-    Pele documentation (pele.run) and obsidianmd/pele  skills/visualize
-    JSON Canvas 1.0 specification                        skills/visualize
+      diagram detectors on its development branch        skills/obsidian-visualize
+    Pele documentation (pele.run) and obsidianmd/pele  skills/obsidian-visualize
+    JSON Canvas 1.0 specification                        skills/obsidian-visualize
     zsviczian/obsidian-excalidraw-plugin (AGPL-3.0) and the
       Excalidraw Extras plugin (licence not verified), read
-      for API facts only; no code or prose copied       skills/visualize
+      for API facts only; no code or prose copied       skills/obsidian-visualize
     coleam00/excalidraw-diagram-skill
       (https://github.com/coleam00/excalidraw-diagram-skill),
-      no licence file; ideas re-expressed, nothing copied skills/visualize
+      no licence file; ideas re-expressed, nothing copied skills/obsidian-visualize
     Excalidraw and excalidraw/excalidraw-libraries (MIT)
       (https://github.com/excalidraw/excalidraw-libraries),
-      ideas only                                          skills/visualize
+      ideas only                                          skills/obsidian-visualize
     robtaylor
       (https://robtaylor.github.io/excalidraw-diagrams/),
       consulted for ideas; no licence verified, nothing copied
-                                                          skills/visualize
+                                                          skills/obsidian-visualize
     obsidianmd/obsidian-clipper (MIT) at
       6d56d618b00bd970aa738d6a7a61edee27783e81, and its
       obsidianmd/knap template engine                     skills/obsidian-clipper
@@ -195,9 +195,9 @@ Source: https://github.com/Jonghakseo/pi-extension
 Revision: a4a8107885d2e944d03d8ebc7d9b1cdcf8b7521f
 Upstream package: packages/skill-excalidraw/skills/excalidraw
 
-    skills/visualize/scripts/inspect.mjs                  <- scripts/excal.mjs (inspection/lint portion, adapted)
+    skills/obsidian-visualize/scripts/inspect.mjs                  <- scripts/excal.mjs (inspection/lint portion, adapted)
         upstream SHA-256 7152cf017c1da711e5e9c271629f2d99b6f4d33b0ad285e69873855837ccccd1
-    skills/visualize/references/excalidraw-design.md      <- references/style.md (palette and spacing, adapted)
+    skills/obsidian-visualize/references/excalidraw-design.md      <- references/style.md (palette and spacing, adapted)
         upstream SHA-256 b72046fc126f6e66b114d96e3c00e0691f4155fbe055b92750914e8a9ce4db10
 
 Upstream `references/skeleton.md` (SHA-256
@@ -205,7 +205,7 @@ e2a4f9549a7628ffadad87bf51f1b5d3bb4d70406b274377ff6f788583e5acd9) was adapted
 earlier and is no longer shipped. The rest of the upstream tree was not adopted.
 Modifications are recorded in the package Git history. No standalone app, font,
 binary or Obsidian plugin is copied. The following upstream grant is also
-retained verbatim in skills/visualize/references/NOTICE for independent installs:
+retained verbatim in skills/obsidian-visualize/references/NOTICE for independent installs:
 
 MIT License
 

@@ -2,7 +2,7 @@
   "name": "secondbrain-skills",
   "displayName": "Obsidian Skills",
   "version": "0.13.0",
-  "description": "Twenty-three self-contained Agent Skills: six native Obsidian packages and seventeen knowledge packages, including four archival principles. The principles are local candidate additions; historical Claude Code evidence in an isolated project scope does not verify this candidate. New runtime loads are unverified. This is a public prerelease.",
+  "description": "Self-contained Agent Skills for Obsidian vaults: native Obsidian packages and knowledge packages, including archival principles. This is a public prerelease; runtime loads are unverified.",
   "author": {
     "name": "beomsukoh",
     "url": "https://beomsukoh.com"
@@ -24,35 +24,7 @@
   "metadata": {
     "releaseStatus": "prerelease",
     "router": "none",
-    "packageCount": 6,
     "packageRoot": "./skills/",
-    "packages": [
-      "markdown",
-      "bases",
-      "visualize",
-      "obsidian-cli",
-      "obsidian-clipper",
-      "obsidian-sync"
-    ],
-    "collection": "secondbrain-skills",
-    "knowledgePackages": [
-      "capture",
-      "inbox",
-      "ingest",
-      "query",
-      "verify",
-      "audit",
-      "lint",
-      "status",
-      "reindex",
-      "refresh-context",
-      "onboard",
-      "principle-respect-des-fonds",
-      "principle-original-order",
-      "principle-hierarchical-management",
-      "principle-collective-description",
-      "secondbrain-mode",
-      "principle-skill-creating"
-    ]
+    "collection": "secondbrain-skills"
   }
 }

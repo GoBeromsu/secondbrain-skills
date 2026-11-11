@@ -75,10 +75,8 @@ LOCATOR_RE = re.compile(r"\bpp?\.[ \t]*\d|\bpages?[ \t]+\d|§[ \t]*[^\s{}(),]")
 FILE_STEP_RE = re.compile(r" - S(\d{2}) ")
 NUM_PREFIX_RE = re.compile(r"^(\d+(?:\.\d+)*\.?\)?|[ivxlcdm]+[.)]|[a-z][.)])\s+")
 SEPARATOR_CELL_RE = re.compile(r":?-{3,}:?")
-THEMATIC_BREAK_RE = re.compile(r"^[ \t]{0,3}([-*_])([ \t]*\1){2,}[ \t]*$")  # a template '---' is not content
+THEMATIC_BREAK_RE = re.compile(r"^[ \t]{0,3}([-*_])([ \t]*\1){2,}[ \t]*$")
 
-# Typographic folding for quotation matching. U+2212 MINUS SIGN is deliberately absent:
-# it stays distinct from "-" and from an absent sign.
 _TYPOGRAPHIC = str.maketrans({
     "\u2018": "'", "\u2019": "'", "\u201a": "'", "\u201b": "'", "\u2032": "'",
     "\u201c": '"', "\u201d": '"', "\u201e": '"', "\u201f": '"', "\u2033": '"',
@@ -90,8 +88,6 @@ _TYPOGRAPHIC = str.maketrans({
 })
 SIGN_CHARS = "-+\u2212\u00b1"
 
-
-# ---------------------------------------------------------------- text helpers
 
 def norm_text(text: str) -> str:
     """NFC, typographic folding and whitespace collapse; signs and digits are kept."""
@@ -243,8 +239,6 @@ def excerpt(text: str, width: int = 90) -> str:
     return text if len(text) <= width else text[:width - 1] + "…"
 
 
-# ---------------------------------------------------------------- report
-
 class Report:
     def __init__(self) -> None:
         self.root: Path | None = None
@@ -273,15 +267,13 @@ class Report:
         self.unverified.append(f"{self.where(path)}: {msg}")
 
 
-# ---------------------------------------------------------------- notes and YAML
-
 @dataclass
 class Note:
     path: Path
     fm: dict
     body: str
     text: str
-    lines: list[str] = field(default_factory=list)  # structural body lines
+    lines: list[str] = field(default_factory=list)
 
 
 def unique_key_loader():
@@ -338,8 +330,6 @@ def load_note(path: Path, rep: Report, loader) -> Note | None:
     body = "\n".join(lines[end + 1:])
     return Note(path, data, body, text, structural_lines(body))
 
-
-# ---------------------------------------------------------------- vault links
 
 @dataclass
 class Resolved:
@@ -410,13 +400,11 @@ def frontmatter_links(value) -> tuple[list[str], str | None]:
     return targets, None
 
 
-# ---------------------------------------------------------------- paper model
-
 @dataclass
 class Raw:
     path: Path
-    evidence: str            # normalized Original Content
-    leaves: list[str]        # leaf H1-H6 headings that need coverage
+    evidence: str
+    leaves: list[str]
 
 
 @dataclass
@@ -474,8 +462,6 @@ def resolve_links(paper: Paper, note: Note, targets: list[str], what: str) -> li
             found.append(res.path)
     return found
 
-
-# ---------------------------------------------------------------- hub
 
 def check_hub(paper: Paper, explicit_raw: Path | None, loader) -> None:
     hub, rep = paper.hub, paper.rep
@@ -570,8 +556,6 @@ def load_raw(path: Path, paper: Paper, loader) -> Raw | None:
     return Raw(path, evidence, leaf_headings(note.lines[start:end], titles))
 
 
-# ---------------------------------------------------------------- coverage headings
-
 def heading_key(text: str) -> tuple[str, str, str]:
     """(full key, section number, title without number) for heading matching."""
     t = re.sub(r"\[\[(?:[^\]|]*\|)?([^\]]*)\]\]", r"\1", text)
@@ -588,13 +572,11 @@ def heading_key(text: str) -> tuple[str, str, str]:
 
 
 def leaf_headings(lines: list[str], title_keys: set[str]) -> list[str]:
-    # Every level H1-H6: a heading with deeper headings under it is a parent, and only
-    # its leaves carry coverage, so a parent-only row never covers nested H4-H6 leaves.
     hs = [(lvl, text) for _, lvl, text in headings(lines)]
     leaves = []
     for k, (lvl, text) in enumerate(hs):
         if k + 1 < len(hs) and hs[k + 1][0] > lvl:
-            continue  # parent of deeper headings; its children carry coverage
+            continue
         key = heading_key(text)
         if key[0] in NON_CONTENT_HEADINGS or key[2] in NON_CONTENT_HEADINGS:
             continue
@@ -622,8 +604,6 @@ def prefix_matches(part: tuple[str, str, str], leaf: tuple[str, str, str]) -> bo
         return False
     return lr.startswith(pr) and (len(lr) == len(pr) or lr[len(pr)] == " ")
 
-
-# ---------------------------------------------------------------- hub maps
 
 def hub_section(paper: Paper, title: str) -> list[str] | None:
     found = [body for t, body in h2_sections(paper.hub.lines) if t == fold_name(title)]
@@ -688,7 +668,6 @@ def check_step_map(paper: Paper) -> None:
         if re.search(r"\bplanned\b", status, re.I):
             rep.fail(hub.path, f"Step Map S{step:02d} is still planned")
         if step == 1:
-            # S01 is the hub's own citation row: | 1 | CITATION | (hub) | compiled |
             if fold_name(name) != "citation" or atoms != "(hub)" or fold_name(status) != "compiled":
                 rep.fail(hub.path, f"Step Map S01 must be 'CITATION | (hub) | compiled', got "
                                    f"{' | '.join(cells[1:4])!r}")
@@ -728,7 +707,7 @@ def check_coverage(paper: Paper, catalog: set[Path]) -> None:
     lines = hub_section(paper, "Coverage Map")
     if lines is None:
         return
-    parts: list[tuple[str, tuple[str, str, str], str | None]] = []  # text, key, omission
+    parts: list[tuple[str, tuple[str, str, str], str | None]] = []
     for cells in table_rows(lines):
         if len(cells) < 2 or not cells[0]:
             rep.fail(hub.path, f"Coverage Map row is malformed: {' | '.join(cells)}")
@@ -759,7 +738,6 @@ def check_coverage(paper: Paper, catalog: set[Path]) -> None:
         for text, key, omission in parts:
             exact = [k for k, (_, leaf) in enumerate(leaves) if part_matches(key, leaf)]
             if len(exact) > 1:
-                # Identical Raw headings: one row cannot say which it covers, so none count.
                 rep.fail(hub.path, f"Coverage Map row '{text}' matches {len(exact)} identical Raw "
                                    f"headings; coverage is ambiguous")
                 continue
@@ -799,8 +777,6 @@ def check_index(paper: Paper, index_path: Path) -> None:
         rep.fail(index_path, f"index.md does not link the hub {rep.where(hub.path)}")
 
 
-# ---------------------------------------------------------------- atoms
-
 def locate_quote(quote: str, evidence: str) -> bool:
     """Contiguous match whose edges do not cut a word, a number or a sign off a number."""
     start = 0
@@ -832,9 +808,9 @@ def edges_ok(text: str, i: int, j: int, quote: str) -> bool:
     starts_number = quote[0].isdigit() or (quote[0] == "." and len(quote) > 1 and quote[1].isdigit())
     if starts_number and before and before in SIGN_CHARS:
         if not _wordish(text[i - 2] if i > 1 else ""):
-            return False  # the quote would drop the number's sign
+            return False
     if quote[-1].isdigit() and after in ".," and j + 1 < len(text) and text[j + 1].isdigit():
-        return False  # the quote would truncate a number
+        return False
     return True
 
 
@@ -946,8 +922,6 @@ def check_atom_body(paper: Paper, atom: Note, status, step: int | None) -> None:
         rep.fail(path, "completed atom has no quotation located in the Raw")
 
 
-# ---------------------------------------------------------------- inputs and output
-
 class InputError(Exception):
     pass
 
@@ -973,7 +947,6 @@ def find_raw(explicit: str | None, root: Path) -> Path | None:
     resolved = given.resolve()
     if not resolved.is_relative_to(root):
         raise InputError(f"--raw {explicit!r} is outside the vault")
-    # Prefer the vault-side path so a symlinked Raw compares equal to its resolved wikilink.
     absolute = Path(os.path.abspath(given))
     return absolute if absolute.is_relative_to(root) else resolved
 

@@ -1,6 +1,6 @@
 ---
-name: query
-description: Search Wiki pages, synthesize a cited answer, optionally save to 30. Queries/, and feed gaps/contradictions back into the Wiki.
+name: "query"
+description: "Search Wiki pages, synthesize a cited answer, optionally save to 30. Queries/, and feed gaps/contradictions back into the Wiki."
 license: MIT
 ---
 
