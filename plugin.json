@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "secondbrain-skills",
-  "version": "0.14.0",
+  "version": "0.15.0",
   "description": "Self-contained Agent Skills for Obsidian vaults: native Obsidian packages and knowledge packages, including archival principles. This is a public prerelease; runtime loads are unverified.",
   "author": {
     "name": "beomsukoh",
