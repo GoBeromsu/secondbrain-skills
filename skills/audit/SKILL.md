@@ -1,6 +1,6 @@
 ---
-name: audit
-description: Read-only audit of the whole Wiki or a bounded scope against eligibility, consistency and confirmability through Map clusters and prioritized sampling; scores the examined scope, queues the Top 10 verify actions, and saves the report and a log.md entry only on owner approval. Use for vault health audits, periodic knowledge review, or verify follow-up prioritization. Not for exhaustive claim verification or Wiki regeneration or repair; mechanical link and frontmatter health belongs to `lint`, single-page claim checks to `verify`.
+name: "audit"
+description: "Read-only audit of the whole Wiki or a bounded scope against eligibility, consistency and confirmability through Map clusters and prioritized sampling; scores the examined scope, queues the Top 10 verify actions, and saves the report and a log.md entry only on owner approval. Use for vault health audits, periodic knowledge review, or verify follow-up prioritization. Not for exhaustive claim verification or Wiki regeneration or repair; mechanical link and frontmatter health belongs to `lint`, single-page claim checks to `verify`."
 license: MIT
 ---
 

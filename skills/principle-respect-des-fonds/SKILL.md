@@ -1,6 +1,6 @@
 ---
-name: principle-respect-des-fonds
-description: Apply when identifying creators, evaluating primary and secondary sources, or keeping records from different creators distinct during knowledge-vault ingest. Preserve provenance and report uncertain attribution; this principle grants no write permission.
+name: "principle-respect-des-fonds"
+description: "Apply when identifying creators, evaluating primary and secondary sources, or keeping records from different creators distinct during knowledge-vault ingest. Preserve provenance and report uncertain attribution; this principle grants no write permission."
 license: MIT
 ---
 

@@ -29,8 +29,8 @@ A paper outside the six (book review, editorial, tutorial) takes the nearest typ
 
 | Strategy | When | What is written now |
 | --- | --- | --- |
-| ① parallel fan-out (default) | the runtime has subagents; a normal paper | all atoms, 5–9 atoms per batch split along axis boundaries; each batch gets the SPEC, the Raw, its atom table, special notes and a self-check duty |
-| ② single run by importance | no subagents | hub draft → core axes → remaining axes → Wiki promotion |
+| ① parallel fan-out | the runtime has subagents and the blueprint plans more than one batch of atoms | all atoms, 5–9 atoms per batch split along axis boundaries; each batch gets the SPEC, the Raw, its atom table, special notes and a self-check duty |
+| ② single run by importance | no subagents, or one batch of atoms or fewer | hub draft → core axes → remaining axes → Wiki promotion |
 | ③ progressive stub | the paper is long (over about 15,000 words) or the owner asks for "핵심만" | core axes in full; every other planned atom as `status: stub` with its Analysis Context and a one-line question; a stub is promoted later by ingesting its path |
 
 Core axes (progressive default): quantitative S02·S03·S08·S09·S12; qualitative S02·S04·S08·S09·S12; theory-concept S04·S06·S08·S09·S12; mixed-methods S06·S08·S09·S12; scale-development S06·S07·S08·S09·S12; meta-analysis S04·S08·S09·S10·S12. Under 30 atoms, shrink the batch count in proportion. A progressive run is reported as progressive, never as complete. A subagent's self-check is advisory, never the gate.

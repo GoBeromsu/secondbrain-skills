@@ -1,6 +1,6 @@
 ---
-name: verify
-description: Verifies one Wiki page against the three criteria - eligibility, consistency, confirmability - using evidence located in this session (the cited Raw's Original Content and the originals behind it), reports, and on approval writes verificationStatus, verifiedAt, verifiedBy, claimType, evidenceScope and disputed back without deleting either side of a conflict. Use for page verification, contradiction checking, confidence calibration, or resolving a disputed page. Not for general knowledge queries, vault-wide sampling (audit), or syntax and link linting (lint).
+name: "verify"
+description: "Verifies one Wiki page against the three criteria - eligibility, consistency, confirmability - using evidence located in this session (the cited Raw's Original Content and the originals behind it), reports, and on approval writes verificationStatus, verifiedAt, verifiedBy, claimType, evidenceScope and disputed back without deleting either side of a conflict. Use for page verification, contradiction checking, confidence calibration, or resolving a disputed page. Not for general knowledge queries, vault-wide sampling (audit), or syntax and link linting (lint)."
 license: MIT
 ---
 

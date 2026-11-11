@@ -48,25 +48,25 @@ Sketch fonts and `roughness: 1` suit informal and teaching drawings.
 
 ## Palette
 
-Six pairs, one neutral and five with a meaning; use at most four in one drawing. The meanings are fixed; the hues come from the first source that exists: a palette the user or the vault's policy names, the running app's theme, the built-in pairs. Prefer `fillStyle: "solid"`; hachure muddies small shapes.
+Six pairs, one neutral and five with a meaning; use at most four of the five in one drawing. The meanings are fixed; the hues come from the source the skill's Palette step selects. Prefer `fillStyle: "solid"`; hachure muddies small shapes.
 
-| Meaning | `draw.py` name | Theme variable | Built-in `backgroundColor` | Built-in `strokeColor` |
-|---|---|---|---|---|
-| Normal step, service | `blue` | `--color-blue` | `#a5d8ff` | `#1971c2` |
-| Start, success, output | `green` | `--color-green` | `#b2f2bb` | `#2f9e44` |
-| Decision, caution | `yellow` | `--color-yellow` | `#ffec99` | `#f08c00` |
-| Error, risk | `red` | `--color-red` | `#ffc9c9` | `#e03131` |
-| Data store, memory | `purple` | `--color-purple` | `#d0bfff` | `#6741d9` |
-| External actor, neutral | `gray` | `--text-muted` | `#e9ecef` | `#495057` |
-| Sticky note | `note` | `--color-yellow` | `#fff3bf` | `#e67700` |
+| Meaning | `draw.py` name | Theme variable |
+|---|---|---|
+| Normal step, service | `blue` | `--color-blue` |
+| Start, success, output | `green` | `--color-green` |
+| Decision, caution | `yellow` | `--color-yellow` |
+| Error, risk | `red` | `--color-red` |
+| Data store, memory | `purple` | `--color-purple` |
+| External actor, neutral | `gray` | `--text-muted` |
+| Sticky note | `note` | `--color-yellow` |
 
 Theme colours:
 
 - Read the resolved values from `document.body` with a read-only `obsidian eval`; assigning a value to a detached canvas context's `fillStyle` returns it as `#rrggbb`. Also read `--text-normal` (`ink`), `--background-primary` (`background`) and whether the body has `theme-dark` (`dark`).
-- Pass each hue as one `palette` colour: it becomes the stroke, and the fill is that hue mixed three quarters toward the background.
-- The plugin recolours stored colours only in a scene whose own theme is dark, whatever the app's theme. `draw.py` with `dark: true` writes a dark scene and stores the values that render as the theme's colours.
+- Pass each hue as one `palette` colour: it becomes the stroke, shifted until it stands 3:1 against the background, and the fill is that hue mixed three quarters toward the background.
+- The plugin recolours stored colours only in a scene whose own theme is dark, whatever the app's theme. `draw.py` with `dark: true` writes a dark scene and stores the values that render as the theme's colours; a saturated hue clips there and renders slightly off.
 - Native `create` makes a light scene. Under a dark app give `draw.py` the hues without `ink`, `background` or `dark`; run without an output path, it prints the pairs to use.
-- When the app cannot be read, use the built-in pairs and say so.
+- When the app cannot be read, use the built-in pairs, which `draw.py` holds and prints for an empty spec, and say so.
 
 Text is `ink`, inside a fill and on an arrow alike; a hue colours strokes and fills, never text. Native `create` gives a label its shape's or arrow's stroke colour, so set labels to `ink` with `apply` afterwards. With the built-in pairs `ink` is `#1e1e1e`, and on a dark canvas free text uses `#e9ecef` and structural lines `#868e96`. Spend one accent color once, on the thing the reader must not miss.
 
@@ -105,7 +105,7 @@ Notation: `box(id,x,y,w,h,"Label",color)` is a skeleton `rectangle` with `label`
 
 **Convergence.** Sources `(0,n*160,160,80)`. Receiver `(360,100,200,240)`. Arrows start `(160,n*160+40)`, `dx=200`, `dy=180-n*160`. Output `ellipse (680,180,160,80)` with an arrow `(560,220)`, `dx=120`.
 
-**Timeline.** Spine `l(0,0,[[0,0],[0,420]])`. Dots `ellipse 14x14` at `(-7, n*140-7)` filled `#1971c2`. Step name `t(32,n*140-14,.,20)`, grey 16 px date under it at `+28`. No boxes.
+**Timeline.** Spine `l(0,0,[[0,0],[0,420]])`. Dots `ellipse 14x14` at `(-7, n*140-7)` filled with the `blue` stroke. Step name `t(32,n*140-14,.,20)`, grey 16 px date under it at `+28`. No boxes.
 
 **Tree.** Root `t(0,0,.,24)`. Trunk `l(12,40,[[0,0],[0,200]])`. Each child: a 24 px horizontal `line` at its row and `t` 36 px further right per level; row pitch 40.
 
@@ -115,7 +115,7 @@ Notation: `box(id,x,y,w,h,"Label",color)` is a skeleton `rectangle` with `label`
 
 **Side-by-side.** Headers `t(0,0,.,28)` and `t(420,0,.,28)`. Divider dashed `line` at `x=380`, height 300. Rows `300x56` at `y=80+n*80` in both columns; color only the cells that differ.
 
-**Zones.** Dashed `rectangle (x,0,300,200)` `strokeColor #868e96` with a grey 16 px `t(x+16,12)` name. Members at `(x+50,70,200,80)`. Cross-zone arrow starts at `(250,110)`, `dx=200`.
+**Zones.** Dashed `rectangle (x,0,300,200)` in the `gray` stroke with a grey 16 px `t(x+16,12)` name. Members at `(x+50,70,200,80)`. Cross-zone arrow starts at `(250,110)`, `dx=200`.
 
 **Sequence.** Participants `box` `160x56` at `x=0/280/560`. Lifelines dashed `line` from `(x+80,56)` down 300. Messages are free `arrow`s with `points [[0,0],[dx,0]]`, `label` 16 px, `y` pitch 50, replies `strokeStyle: "dashed"`. Past five participants or fifteen messages, use Mermaid instead.
 

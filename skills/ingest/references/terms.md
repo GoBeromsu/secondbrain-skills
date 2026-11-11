@@ -35,7 +35,7 @@ Fill [term](../templates/term.md):
 - **Related Terms:** group links under labels in the page's language with the type in parentheses: broader (contains this term), narrower (a kind or variant of it), related split into what it is made of, other methods for the same problem and where it is used, and confused-with (often mixed up with it). Give each link one line saying why; state how a confused-with term differs. Never make one page both broader and related; put a relation that holds for one sense in that sense section.
 - **References:** list each Raw with its author and role, then each of the owner's notes the page draws on.
 
-When a relation or a numeric behavior is easier to see than to read (how senses derive from one another, how a parameter changes a trajectory), add a Pele diagram by `visualize` beside the text that states it.
+When a relation or a numeric behavior is easier to see than to read (how senses derive from one another, how a parameter changes a trajectory), add a Pele diagram by `obsidian-visualize` beside the text that states it.
 
 Keep a superseded definition with its date and source when adding a new one.
 

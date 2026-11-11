@@ -1,6 +1,6 @@
 ---
-name: secondbrain-mode
-description: Sets the working stance for a knowledge-vault task that spans several packages - delegate to background subagents, own their work, and finish with an independent review. Use for secondbrain-mode, 세컨드브레인 모드, or a multi-step vault task that spans capture, ingest and query. A single named task such as ingest or query runs directly without this package, and skill authoring alone belongs to principle-skill-creating.
+name: "secondbrain-mode"
+description: "Sets the working stance for a knowledge-vault task that spans several packages - delegate independent units to background subagents when that pays, own their work, and finish with an independent review. Use for secondbrain-mode, 세컨드브레인 모드, or a multi-step vault task that spans capture, ingest and query. A single named task such as ingest or query runs directly without this package, and skill authoring alone belongs to principle-skill-creating."
 license: MIT
 ---
 
@@ -26,7 +26,7 @@ Delegate reading, per-source work or edits to background subagents only when the
 
 ## Review
 
-Anything that writes to the vault or changes a skill gets an independent review subagent.
+A task that wrote to the vault or changed a skill ends with one independent review subagent over the whole change. When the runtime has no subagents, read every write back yourself and report that the review was not independent.
 
 - Give the reviewer the artifact and the governing package or principle, not your conclusion.
 - Ask for findings with path and line, ordered by severity, and what it could not check.

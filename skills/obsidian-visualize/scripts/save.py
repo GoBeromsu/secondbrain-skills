@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Save, open or close an Excalidraw drawing through the plugin and print one JSON line.
 
-Usage: save.py <vault-relative drawing> [--vault Ataraxia] [--close] [--open]
+Usage: save.py <vault-relative drawing> --vault <name> [--close] [--open]
 
 default  save every open view of the drawing (saveWithOutcome) and require `persisted`
 --close  save first, and only if every save is `persisted` detach the views; never discards edits
@@ -58,7 +58,7 @@ def live_total(vault, path):
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("drawing")
-    p.add_argument("--vault", default="Ataraxia")
+    p.add_argument("--vault", required=True)
     p.add_argument("--close", action="store_true")
     p.add_argument("--open", action="store_true")
     a = p.parse_args()

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Update the Obsidian Excalidraw plugin to the latest release and print one JSON line.
 
-Usage: update-plugin.py [--vault Ataraxia] [--plugin obsidian-excalidraw-plugin] [--timeout 60]
+Usage: update-plugin.py --vault <name> [--plugin obsidian-excalidraw-plugin] [--timeout 60]
 
 The Obsidian CLI has no plugin update command, so this drives the app's plugin manager
 through `obsidian eval`. Fallback: Settings > Community plugins > Check for updates.
@@ -28,7 +28,7 @@ def version(vault, plugin):
 
 def main():
     p = argparse.ArgumentParser()
-    p.add_argument("--vault", default="Ataraxia")
+    p.add_argument("--vault", required=True)
     p.add_argument("--plugin", default="obsidian-excalidraw-plugin")
     p.add_argument("--timeout", type=int, default=60)
     a = p.parse_args()
@@ -55,7 +55,6 @@ def main():
     if state != "1":
         print(f"update did not finish: {state}", file=sys.stderr)
         sys.exit(1)
-    # the plugin's CLI commands vanish briefly after a reload; wait until they answer
     ok = False
     end = time.time() + a.timeout
     while time.time() < end and not ok:

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Export an Excalidraw drawing to PNG through the plugin CLI and print one JSON line.
 
-Usage: export.py <vault-relative drawing> [--out ABS.png] [--vault Ataraxia]
+Usage: export.py <vault-relative drawing> [--out ABS.png] --vault <name>
        [--vault-root DIR] [--max-width 1600] [--scale 1] [--placeholder-images]
        [--source auto|live|disk]
 
@@ -40,7 +40,7 @@ def main():
     p = argparse.ArgumentParser()
     p.add_argument("drawing")
     p.add_argument("--out")
-    p.add_argument("--vault", default="Ataraxia")
+    p.add_argument("--vault", required=True)
     p.add_argument("--vault-root")
     p.add_argument("--max-width", type=int, default=1600)
     p.add_argument("--scale", type=float, default=1)
@@ -78,7 +78,6 @@ def main():
         if not res.get("ok"):
             err = res.get("error") or res
             fail(f"export failed: {json.dumps(err)[:500]}")
-        # the file may take a moment to appear to the filesystem
         if not os.path.isfile(tmp_abs):
             fail("export reported ok but no PNG was found in the vault")
         with open(tmp_abs, "rb") as f:
