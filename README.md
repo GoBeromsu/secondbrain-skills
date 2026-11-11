@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/brand/hero.svg" alt="secondbrain-skills: twenty-four independent Agent Skills for Obsidian vaults, seven native and seventeen knowledge packages" width="880">
+  <img src="assets/brand/hero.svg" alt="secondbrain-skills: independent Agent Skills for Obsidian vaults" width="880">
 </p>
 
 <p align="center">
@@ -8,7 +8,7 @@
 
 # secondbrain-skills
 
-Twenty-four Agent Skills that let an agent run an Obsidian vault as a second brain: collect a source, keep the original, compile it into a wiki, and answer from it with citations.
+Agent Skills that let an agent run an Obsidian vault as a second brain: collect a source, keep the original, compile it into a wiki, and answer from it with citations.
 
 Each package is one `SKILL.md` that owns one job. There is no root skill, no dispatcher and no shared runtime. Your agent loads the package the task needs and nothing else.
 
@@ -32,46 +32,9 @@ Then ask in plain language: *"Ingest this article."*
 - **Knowing a format is not permission.** A package writes only to an exact destination the task authorized, then reads the result back.
 - **Missing evidence is never success.** A parse is not a render, and an exit code is not a write. Each package says which level it reached.
 
-## Knowledge packages
+## Packages
 
-The loop: `capture` → `inbox` → `ingest` → `query`.
-
-| Package | What it does |
-| --- | --- |
-| `capture` | Saves selected tabs, URLs, files, conversations or agent sessions as Inbox candidates. |
-| `inbox` | Lists, previews and counts Inbox candidates, then hands a selection to `ingest`. |
-| `ingest` | Preserves one source as a Raw note and compiles Wiki pages, Maps and an index from it. |
-| `query` | Answers from existing notes with checked quotations and Obsidian deeplinks. |
-| `verify` | Reviews selected claims against their sources. |
-| `audit` | Samples a bounded scope for quality risks and states its coverage. |
-| `lint` | Checks a bounded scope for structure, citations, properties and links. |
-| `status` | Reports read-only counts, backlog and snapshot age. |
-| `reindex` | Refreshes the search index for one audited collection. |
-| `refresh-context` | Re-derives agent context snapshots from named sources. |
-| `onboard` | Sets up a new vault, or previews additive changes to an existing one. |
-
-Six more packages hold the stance that the eleven above work from.
-
-| Package | What it holds |
-| --- | --- |
-| `principle-respect-des-fonds` | Who created a source, and whether it is primary or secondary. |
-| `principle-original-order` | Keeping source sequence and verbatim content. |
-| `principle-hierarchical-management` | Placing a record from collection down to item. |
-| `principle-collective-description` | Describing a group, a Map or coverage. |
-| `principle-skill-creating` | What a skill keeps in Markdown and what it hands to templates, thin scripts and agents. |
-| `secondbrain-mode` | Optional stance for multi-package work: delegate to subagents, then review independently. |
-
-## Obsidian packages
-
-| Package | What it owns |
-| --- | --- |
-| `obsidian-markdown` | Obsidian Flavored Markdown: wikilinks, embeds, callouts, properties, tags, block references. |
-| `obsidian-bases` | `.base` database views: filters, formulas, summaries, grouping and the function reference. |
-| `obsidian-visualize` | Choosing the visual form and building it: JSON Canvas `.canvas` files (nodes, edges, geometry, stable IDs), `.excalidraw.md` scenes, and Pele diagrams in a `mermaid` fence. |
-| `obsidian-cli` | The official `obsidian` binary: read, create, search, move and audit. |
-| `obsidian-clipper` | Web Clipper templates, selectors and variables. |
-| `obsidian-doctor` | Plugin and Templater failure diagnosis from sanitized evidence. |
-| `obsidian-sync` | The headless `ob` client for Obsidian Sync. |
+`skills/` is the list: one folder per package, and each `SKILL.md` description says what the package owns and when it triggers.
 
 ## Install
 
@@ -91,7 +54,7 @@ Release: `scripts/release.sh <version>` on `main` sets that version in the four 
 
 ## What is verified
 
-The nine Obsidian packages of that release (`obsidian-mermaid` has since merged into `obsidian-visualize` as its Pele branch) were installed natively on Claude Code and on Hermes, and exercised against an isolated Obsidian 1.12.7 profile. The knowledge packages pass the local format checks only; no runtime load of them is recorded. Do not install the `v0.1.0` tag on Hermes.
+The nine Obsidian packages of that release were installed natively on Claude Code and on Hermes, and exercised against an isolated Obsidian 1.12.7 profile. The knowledge packages pass the local format checks only; no runtime load of them is recorded. Do not install the `v0.1.0` tag on Hermes.
 
 ## Repository layout
 
@@ -104,10 +67,10 @@ AGENTS.md                repository contract for contributors and agents
 
 - **[Yohan Koo (구요한)](https://github.com/johnfkoo951/cmds-llm-wiki)**, cmds-llm-wiki. The knowledge packages started from its commands; this repository is now their canonical source and diverges where the owner decided. No upstream file is shipped: the Paper Mode P-7 verifier `skills/ingest/scripts/verify_paper.py` is this repository's own implementation, written without his script. The upstream publishes no licence and nothing here relicenses it.
 - **[Andrej Karpathy](https://github.com/karpathy)**, the LLM Wiki pattern that cmds-llm-wiki builds on.
-- **[Steph Ango (kepano)](https://github.com/kepano/obsidian-skills)**, obsidian-skills (MIT). `obsidian-markdown`, `obsidian-bases`, `obsidian-cli` and the JSON Canvas reference in `obsidian-visualize` started from it and were modified.
-- **[Jonghak Seo](https://github.com/Jonghakseo/pi-extension)**, pi-extension (MIT). The inspection lint and the palette and spacing guidance in `obsidian-visualize` are adapted from it.
-- **[Obsidian](https://github.com/obsidianmd/pele)**, Pele (MIT). The Pele branch of `obsidian-visualize` follows its public compatibility and security documentation; no Pele file is shipped.
-- **[Yohan Koo (구요한)](https://pele.cmdspace.work/)**, the CMDSPACE Pele gallery. The use, avoid and size guidance and the observed pitfalls in the `obsidian-visualize` Pele catalog were consulted from it; every example there is this repository's own.
+- **[Steph Ango (kepano)](https://github.com/kepano/obsidian-skills)**, obsidian-skills (MIT). `markdown`, `bases`, `obsidian-cli` and the JSON Canvas reference in `visualize` started from it and were modified.
+- **[Jonghak Seo](https://github.com/Jonghakseo/pi-extension)**, pi-extension (MIT). The inspection lint and the palette and spacing guidance in `visualize` are adapted from it.
+- **[Obsidian](https://github.com/obsidianmd/pele)**, Pele (MIT). The Pele branch of `visualize` follows its public compatibility and security documentation; no Pele file is shipped.
+- **[Yohan Koo (구요한)](https://pele.cmdspace.work/)**, the CMDSPACE Pele gallery. The use, avoid and size guidance and the observed pitfalls in the `visualize` Pele catalog were consulted from it; every example there is this repository's own.
 - **[coleam00](https://github.com/coleam00/excalidraw-diagram-skill)**, excalidraw-diagram-skill. It has no licence file; its ideas informed the Excalidraw design guidance and are re-expressed, nothing is copied.
 - **[Zsolt Viczian](https://github.com/zsviczian/obsidian-excalidraw-plugin)**, the Excalidraw plugin for Obsidian (AGPL-3.0), and the Excalidraw Extras companion plugin, whose licence was not verified. Read for API facts only; no code or prose is copied.
 - **[Excalidraw](https://github.com/excalidraw/excalidraw-libraries)** and its excalidraw-libraries (MIT). Consulted for design ideas only.

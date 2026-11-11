@@ -56,7 +56,7 @@ Static validation, materialized readback, and rendered verification are three in
 
 Canvas work does not require touching any note. Compose a Markdown change only when the task explicitly asks for the canvas to be linked or embedded from a note; otherwise the canvas file is the whole deliverable.
 
-When it is needed, the `obsidian-markdown` package owns link and embed syntax and owns source-note readback; this reference adds only the Canvas-side constraints:
+When it is needed, the `markdown` package owns link and embed syntax and owns source-note readback; this reference adds only the Canvas-side constraints:
 
 - Keep the extension in the link target, as [Obsidian's internal-link documentation](https://help.obsidian.md/links) requires: `[[My canvas.canvas]]`, or `[[My canvas.canvas|Overview]]` with display text. A bare same-stem link may resolve to a Markdown note or stay unresolved, and either way it does not prove the `.canvas` file was reached.
 - Include the vault-relative folder path when several files share a name.

@@ -6,7 +6,7 @@ How to get from a request to a template that survives a real page, what the erro
 
 1. **Establish what the template is for.** A single site, a content type that spans sites, or a general fallback. The answer decides whether the strongest data source will be selectors, schema, or presets, and whether `triggers` should be a URL prefix, a schema type, or empty.
 2. **Find the destination contract before inventing one.** If the vault has a Base for this content type, or existing notes of this type, their property keys are the contract. See [Composing with Bases](#composing-with-bases).
-3. **Analyze a real page.** Ask for a representative URL if none was given. Do not proceed on a description of a page.
+3. **Analyze a real page.** When no URL was given, find a representative public page of the target kind yourself and ask for one only when none is reachable. Do not proceed on a description of a page.
 4. **Choose a source per field**, not per template, following the [source ladder](#the-source-ladder).
 5. **Draft the JSON** against the schema, adding logic only where a field is genuinely optional.
 6. **Statically validate** what the file alone can prove.
@@ -105,7 +105,7 @@ Rules that follow from this:
 
 A clipped note is only useful if it matches the notes it will sit beside. When the vault organizes this content type with a Base, the Base's property keys are the schema the template must satisfy.
 
-The `obsidian-bases` package owns `.base` structure, its filters, formulas, and views. Read it by that identity for anything about the file itself; do not parse or restate `.base` internals here. What this package needs from a Base is only the list of property keys it references, plus their intended types.
+The `bases` package owns `.base` structure, its filters, formulas, and views. Read it by that identity for anything about the file itself; do not parse or restate `.base` internals here. What this package needs from a Base is only the list of property keys it references, plus their intended types.
 
 Mapping, once those keys are known:
 
@@ -118,11 +118,11 @@ Mapping, once those keys are known:
 | Classification the vault controls | a constant in the template, not a page-derived value |
 | Judgment the reader supplies | present with an empty value, for manual entry |
 
-Three questions decide the property list, and they are the user's to answer, not the template author's: which keys should be filled from the page, which should be hardcoded to a constant, and which should be left empty. Guessing here produces notes that look populated and filter wrongly.
+Three questions decide the property list, and they are the user's to answer, not the template author's, unless the Base or existing notes already settle them: which keys should be filled from the page, which should be hardcoded to a constant, and which should be left empty. Guessing here produces notes that look populated and filter wrongly.
 
 When the vault has no Base and no written convention for this content type, ask rather than inventing a property vocabulary. A one-off vocabulary is a permanent inconsistency.
 
-Note body syntax — callouts, wikilinks, embeds, property formatting in a finished note — belongs to `obsidian-markdown`. This package produces the template that generates such a note; it does not own the note's syntax.
+Note body syntax — callouts, wikilinks, embeds, property formatting in a finished note — belongs to `markdown`. This package produces the template that generates such a note; it does not own the note's syntax.
 
 ## Recipes
 

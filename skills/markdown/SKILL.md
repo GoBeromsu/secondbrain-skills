@@ -1,5 +1,5 @@
 ---
-name: obsidian-markdown
+name: markdown
 description: Create and edit Obsidian Flavored Markdown (.md) with wikilinks, embeds, callouts, properties, tags, comments, highlights, math, and footnotes, preserving unrelated note content and reading the changed destination back from the source note. Use when working with .md files in an Obsidian vault, or when the user mentions wikilinks, callouts, frontmatter, tags, embeds, block references, or Obsidian notes, or asks in Korean to clean up, organize, or tidy notes such as 노트 정리 or 노트 청소. Not for .canvas graph structure, .base file internals, or vault CLI operations.
 license: MIT
 ---
@@ -21,7 +21,7 @@ Owned here:
 Not owned here:
 
 - What a note should say, where it belongs, which template frames it, what provenance it must carry, and the house style it follows. Respect applicable live vault policy and explicit task-bound choices. If no policy file exists, clarify only unresolved decisions rather than inventing conventions.
-- `.canvas` graph structure, `.base` file internals, and vault-aware CLI operations. Name the matching skill by identity -- `obsidian-visualize`, `obsidian-bases`, `obsidian-cli` -- only when the task actually reaches that artifact and that skill is loaded in the current runtime. When it is not, report the gap rather than improvising a schema or a command.
+- `.canvas` graph structure, `.base` file internals, and vault-aware CLI operations. Name the matching skill by identity -- `visualize`, `bases`, `obsidian-cli` -- only when the task actually reaches that artifact and that skill is loaded in the current runtime. When it is not, report the gap rather than improvising a schema or a command.
 
 This skill is standalone. It requires no vault plugin, mutation server, environment variable, or personal configuration. Applicable live vault policy always governs the task. Optional personal-policy tools, an Obsidian mutation server, or a vault-aware CLI compose only when selected; their absence is normal. A missing policy file does not erase explicit task-bound authorization or permit inventing house rules.
 
@@ -183,7 +183,7 @@ flowchart TD
 ```
 ````
 
-To link Mermaid nodes to Obsidian notes, add `class NodeName internal-link;`. Since Obsidian 1.15.0 Pele draws this fence; choosing the diagram family and checking that it renders belong to `obsidian-visualize`.
+To link Mermaid nodes to Obsidian notes, add `class NodeName internal-link;`. Since Obsidian 1.15.0 Pele draws this fence; choosing the diagram family and checking that it renders belong to `visualize`.
 
 ## Footnotes
 

@@ -1,10 +1,10 @@
 ---
-name: obsidian-visualize
-description: "Chooses the visual form and builds it: a JSON Canvas (.canvas), an Excalidraw drawing (.excalidraw.md), or a mermaid block drawn by Pele (Obsidian 1.15+). Use for creating, editing or validating a .canvas file (nodes, edges, groups, IDs); an architecture, data-flow, pipeline, sequence, dependency, status or concept diagram; a mind map, sketchnote or sticky notes; a flowchart, sequence, class, state, ER, gantt, journey, pie, mindmap, timeline, sankey, kanban, treemap, architecture, xychart, swimlane, gitGraph, quadrant or C4 block; a mermaid block with a parse error, raw text or empty box in Reading view or Live Preview, or fine in mermaid.live but not the vault; a `-beta` keyword question; generating, replacing, inspecting, importing, editing, exporting or rendering Excalidraw, including plugin Mermaid import; or choosing between Canvas, Excalidraw, Pele and a plain table. 캔버스·플로우차트·아키텍처도·개념도·머메이드·펠레·손그림·마인드맵·스케치노트·도구 연결도·로고·아이콘·인물 사진. Not for note prose or properties, or plugin installs: use obsidian-markdown or obsidian-cli."
+name: visualize
+description: "Chooses the visual form and builds it: a JSON Canvas (.canvas), an Excalidraw drawing (.excalidraw.md), or a mermaid block drawn by Pele (Obsidian 1.15+). Use for creating, editing or validating a .canvas file (nodes, edges, groups, IDs); an architecture, data-flow, pipeline, sequence, dependency, status or concept diagram; a mind map, sketchnote or sticky notes; a flowchart, sequence, class, state, ER, gantt, journey, pie, mindmap, timeline, sankey, kanban, treemap, architecture, xychart, swimlane, gitGraph, quadrant or C4 block; a mermaid block with a parse error, raw text or empty box in Reading view or Live Preview, or fine in mermaid.live but not the vault; a `-beta` keyword question; generating, replacing, inspecting, importing, editing, exporting or rendering Excalidraw, including plugin Mermaid import; or choosing between Canvas, Excalidraw, Pele and a plain table. 캔버스·플로우차트·아키텍처도·개념도·머메이드·펠레·손그림·마인드맵·스케치노트·도구 연결도·로고·아이콘·인물 사진. Not for note prose or properties, or plugin installs: use markdown or obsidian-cli."
 license: MIT
 ---
 
-# Obsidian Visualize
+# Visualize
 
 Pick the form the content supports, build it on the surface that fits, and look at the result before calling it done. A table that answers the question beats a diagram that decorates it.
 
@@ -33,24 +33,25 @@ Open [`references/excalidraw-design.md`](references/excalidraw-design.md) to cho
 **Write, then look:**
 
 ```
-python3 scripts/draw.py <spec.json|-> <out.excalidraw.md> [--replace]
+python3 scripts/draw.py <spec.json|-> [<out.excalidraw.md> [--replace]]
 python3 scripts/export.py <vault-relative drawing> [--out <abs path outside vault>] [--vault Ataraxia] [--max-width 1600] [--scale 1] [--placeholder-images] [--source auto|live|disk]
 ```
 
 `export.py` writes the PNG outside the vault, deletes its vault copy even on failure, and prints one JSON line with `drawing`, `png`, `width`, `height`, `bytes`. View the PNG, fix defects, rerun. The plugin documents its own CLI: `obsidian vault=<name> obsidian-excalidraw-plugin:skill` and `:schema action=<create|export|apply|read>`.
 
 1. **Probe.** `obsidian vault=<name> obsidian-excalidraw-plugin:status` and `schema action=<cmd>`. If the plugin or CLI is absent, make a new drawing with `draw.py`, the only offline writer; never install or enable a plugin to make a drawing work. Editing an existing drawing without the app is an unmet prerequisite: report it, write nothing.
-2. **Create.** Native `create` with a new `path`: skeleton elements, Lucide `icons`, frames, sticky notes, arrows bound by `start`/`end`. It never overwrites. Choose coordinates from the pattern; the reply's `data.idMap` holds the real ids.
-3. **Edit.** Fix in place, never delete and recreate: `open`, `read source=live` for the `revision`, then `apply` with `expectedRevision`. A stale revision changes nothing; re-read and rebuild.
-4. **Export and look.** `scripts/export.py` writes the image outside the vault; view it. Fix every defect listed in the design reference's render loop (an arrow over or touching a non-endpoint box or frame title counts), re-export, repeat until you would show it unqualified. An export that was not looked at is not render QA.
-5. **Clean up.** Close tabs you opened; `export.py` leaves no export in the vault.
-6. **Save.** `:apply` saves itself; any other live edit reaches disk only via `python3 scripts/save.py <drawing> [--vault <n>]`. After `draw.py` writes a file run it with `--open`; before `draw.py` rewrites an open drawing run it with `--close` (saves first, closes only if saved and clean).
+2. **Palette.** Take colours from the palette the user or the vault's policy names, else from the running app's theme, else the built-in palette; the design reference's Palette section maps them. Report which source the drawing used.
+3. **Create.** Native `create` with a new `path`: skeleton elements, Lucide `icons`, frames, sticky notes, arrows bound by `start`/`end`. It never overwrites. Choose coordinates from the pattern; the reply's `data.idMap` holds the real ids.
+4. **Edit.** Fix in place, never delete and recreate: `open`, `read source=live` for the `revision`, then `apply` with `expectedRevision`. A stale revision changes nothing; re-read and rebuild.
+5. **Export and look.** `scripts/export.py` writes the image outside the vault; view it. Fix every defect listed in the design reference's render loop (an arrow over or touching a non-endpoint box or frame title counts), re-export, repeat until you would show it unqualified. An export that was not looked at is not render QA.
+6. **Clean up.** Close tabs you opened; `export.py` leaves no export in the vault.
+7. **Save.** `:apply` saves itself; any other live edit reaches disk only via `python3 scripts/save.py <drawing> [--vault <n>]`. After `draw.py` writes a file run it with `--open`; before `draw.py` rewrites an open drawing run it with `--close` (saves first, closes only if saved and clean).
    An existing drawing may hold the owner's hand edits: change it with `:apply`, and use `draw.py --replace` only on new drawings or ones it accepts as unedited (`--force` overrides, never by default).
 
-Offline, or for a plain boxes-and-arrows graph, `scripts/draw.py` (usage above) lays out and writes the file. It writes a new file and prints one JSON line with `path`, `sha256`, `elements`, `by_type`, `crossings`, `warnings`. Non-empty `warnings` means look at the drawing. Unknown spec keys are ignored and named there. If it warns about crossings, do not rerun hoping for better: draw by hand through native `create` with chosen coordinates and a pattern from the design reference. `--replace` redoes only this script's own output; any other existing file is refused.
+Offline, or for a plain boxes-and-arrows graph, `scripts/draw.py` (usage above) lays out and writes the file. It writes a new file and prints one JSON line with `path`, `sha256`, `elements`, `by_type`, `crossings`, `warnings`. Non-empty `warnings` means look at the drawing. Unknown spec keys are ignored and named there. If it warns about crossings, do not rerun hoping for better: draw by hand through native `create` with chosen coordinates and a pattern from the design reference. `--replace` redoes only this script's own output; any other existing file is refused. With no output path it writes nothing and prints the scene colours (`ink`, `background`, `palette` as `[fill, stroke]`) to use in native `create`.
 
-- Top level: `direction` (`LR`, `TB`), `title`, `frames` `[{id,label}]`, `nodes`, `edges`.
-- Node: `id`, `label` (required), `shape` (`rectangle`, `ellipse`, `diamond`, `text`, `note`), `color` (`blue`, `green`, `yellow`, `red`, `purple`, `gray`, `note`), `frame`, `group`, `link`, `icon` (URL), `roughness` 0/1/2, `strokeStyle` `solid`/`dashed`/`dotted`.
+- Top level: `direction` (`LR`, `TB`), `title`, `frames` `[{id,label}]`, `nodes`, `edges`, `palette` `{name: "#rrggbb"}` or `{name: [fill, stroke]}`, `ink`, `background`, `dark` (`true` when the colours were read from a dark theme).
+- Node: `id`, `label` (required), `shape` (`rectangle`, `ellipse`, `diamond`, `text`, `note`), `color` (`blue`, `green`, `yellow`, `red`, `purple`, `gray`, `note`, or a `palette` name), `frame`, `group`, `link`, `icon` (URL), `roughness` 0/1/2, `strokeStyle` `solid`/`dashed`/`dotted`.
 - Edge: `from`, `to` (required), `label`, `dashed`, `head` (`arrow`, `triangle`, `bar`, `dot`, `none`).
 
 `node scripts/inspect.mjs lint <file>` checks a plain file's ids, two-way bindings and overlaps; it refuses `compressed-json`, which the plugin writes once a drawing has been opened.

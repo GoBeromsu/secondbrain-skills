@@ -166,7 +166,7 @@ Authoring a diagram grants no write permission. A write needs the task's own aut
 - Anchor the edit on unique surrounding text, replacing only the diagram block. Never reformat, re-wrap, reorder, or "clean up" anything else, including frontmatter, tags, and whitespace.
 - Never write vault notes with shell redirection or stream editors. Use the host file-editing tool or the vault-aware surface the task selected.
 - Read the file back after the write and confirm both that the fence is exactly as intended and that unrelated content is unchanged. A successful write call is not readback.
-- Compose the `obsidian-markdown` package by identity only when the task genuinely also changes note prose, links, embeds, or properties.
+- Compose the `markdown` package by identity only when the task genuinely also changes note prose, links, embeds, or properties.
 
 ## Failing without degrading meaning
 
