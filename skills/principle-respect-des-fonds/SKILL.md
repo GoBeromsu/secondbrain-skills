@@ -1,6 +1,6 @@
 ---
 name: "principle-respect-des-fonds"
-description: "Apply when identifying creators, evaluating primary and secondary sources, or keeping records from different creators distinct during knowledge-vault ingest. Preserve provenance and report uncertain attribution; this principle grants no write permission."
+description: "Guides source attribution (provenance): finding the true creator behind a republisher, telling primary from secondary sources, and keeping different creators' records distinct. Use when an article quotes a study, content is reposted or aggregated, or authorship is uncertain during knowledge-vault ingest. Reports uncertain attribution instead of guessing."
 license: MIT
 ---
 

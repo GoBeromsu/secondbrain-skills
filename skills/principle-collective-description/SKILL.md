@@ -1,6 +1,6 @@
 ---
 name: "principle-collective-description"
-description: "Apply when describing a collection, creating a Book Index or Paper hub, or explaining the coverage of multiple Raw captures. Describe aggregate context and gaps without implying complete evidence or duplicating original text."
+description: "Guides describing records as a whole: a collection, a Book Index, a Paper hub, or what several Raw captures of one source cover and miss. Use when writing a hub or index note or explaining coverage and gaps, so one excerpt is never presented as the whole source, original text is linked instead of copied, and aggregate facts are not repeated in every item. Arranging levels belongs to principle-hierarchical-management."
 license: MIT
 ---
 
