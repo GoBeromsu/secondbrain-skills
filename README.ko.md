@@ -48,11 +48,11 @@ claude plugin install secondbrain-skills@secondbrain-skills
 | Grok Build | `grok plugin marketplace add GoBeromsu/secondbrain-skills` 후 Marketplace 탭에서 설치 | Marketplace 탭 |
 | Hermes | `hermes plugins install GoBeromsu/secondbrain-skills --enable` (portable 플러그인, 스킬은 `<namespace>:<name>`) | `plugins.auto_apply: true`면 자동 |
 
-플러그인 레지스트리가 없는 런타임(Cursor, 일반 Agent Skills)은 스킬 디렉터리의 `skills/<name>/` 폴더를 읽습니다. 그 런타임이 문서화한 가져오기 방법을 쓰십시오.
+플러그인 레지스트리가 없는 런타임(Cursor, 일반 Agent Skills)은 스킬 디렉터리의 `skills/<name>/` 폴더를 읽습니다. 그 런타임이 문서화한 가져오기 방법을 쓰십시오. Aside도 여기에 속합니다. Aside는 `<account root>/skills/user/<name>/SKILL.md`를 읽습니다.
 
 ## 검증된 것
 
-그 릴리스의 Obsidian 패키지 아홉 개는 Claude Code와 Hermes에 네이티브로 설치했고, 격리된 Obsidian 1.12.7 프로필에서 실행해 봤습니다. 지식 패키지는 로컬 형식 검사만 통과했고 런타임 로드 기록은 없습니다. Hermes에는 `v0.1.0` 태그를 설치하지 마십시오.
+모든 패키지는 형식 검사 `claude plugin validate . --strict`를 통과합니다. 이는 정적 검증일 뿐입니다. 이 문서는 런타임 로드를 주장하지 않으며, 변경을 무엇에 대해 실행했는지는 그 변경의 커밋 메시지에 적습니다. Hermes에는 `v0.1.0` 태그를 설치하지 마십시오.
 
 ## 저장소 구성
 
@@ -65,10 +65,10 @@ AGENTS.md                기여자와 에이전트를 위한 저장소 계약
 
 - **[구요한 (Yohan Koo)](https://github.com/johnfkoo951/cmds-llm-wiki)**, cmds-llm-wiki. 지식 패키지는 그의 명령에서 출발했고, 지금은 이 저장소가 정본이며 소유자의 결정에 따라 달라진 부분이 있습니다. 원 저장소의 파일은 하나도 담지 않았습니다. Paper Mode P-7 검증기 `skills/ingest/scripts/verify_paper.py`는 그의 스크립트 없이 이 저장소가 직접 구현한 것입니다. 원 저장소는 라이선스를 공개하지 않았고, 여기서 그것을 재라이선스하지 않습니다.
 - **[Andrej Karpathy](https://github.com/karpathy)**, cmds-llm-wiki가 바탕으로 삼은 LLM Wiki 패턴.
-- **[Steph Ango (kepano)](https://github.com/kepano/obsidian-skills)**, obsidian-skills (MIT). `markdown`, `bases`, `obsidian-cli`, 그리고 `visualize`의 JSON Canvas 레퍼런스는 여기서 출발해 수정했습니다.
-- **[Jonghak Seo](https://github.com/Jonghakseo/pi-extension)**, pi-extension (MIT). `visualize`의 검사 린트와 팔레트·간격 지침은 여기서 가져와 고쳤습니다.
-- **[Obsidian](https://github.com/obsidianmd/pele)**, Pele (MIT). `visualize`의 Pele 분기는 공개된 호환성·보안 문서를 따릅니다. Pele 파일은 하나도 싣지 않습니다.
-- **[구요한 (Yohan Koo)](https://pele.cmdspace.work/)**, CMDSPACE Pele 갤러리. `visualize` Pele 카탈로그의 쓸 때·피할 때·크기 한도와 관찰된 함정은 이 갤러리를 참고했고, 예제는 모두 이 저장소가 직접 썼습니다.
+- **[Steph Ango (kepano)](https://github.com/kepano/obsidian-skills)**, obsidian-skills (MIT). `markdown`, `bases`, `obsidian-cli`, 그리고 `obsidian-visualize`의 JSON Canvas 레퍼런스는 여기서 출발해 수정했습니다.
+- **[Jonghak Seo](https://github.com/Jonghakseo/pi-extension)**, pi-extension (MIT). `obsidian-visualize`의 검사 린트와 팔레트·간격 지침은 여기서 가져와 고쳤습니다.
+- **[Obsidian](https://github.com/obsidianmd/pele)**, Pele (MIT). `obsidian-visualize`의 Pele 분기는 공개된 호환성·보안 문서를 따릅니다. Pele 파일은 하나도 싣지 않습니다.
+- **[구요한 (Yohan Koo)](https://pele.cmdspace.work/)**, CMDSPACE Pele 갤러리. `obsidian-visualize` Pele 카탈로그의 쓸 때·피할 때·크기 한도와 관찰된 함정은 이 갤러리를 참고했고, 예제는 모두 이 저장소가 직접 썼습니다.
 - **[coleam00](https://github.com/coleam00/excalidraw-diagram-skill)**, excalidraw-diagram-skill. 라이선스 파일이 없습니다. 그 아이디어를 Excalidraw 디자인 지침에 다시 표현했고, 복사한 것은 없습니다.
 - **[Zsolt Viczian](https://github.com/zsviczian/obsidian-excalidraw-plugin)**, Obsidian용 Excalidraw 플러그인 (AGPL-3.0)과 동반 플러그인 Excalidraw Extras(라이선스는 확인하지 못했습니다). API 사실을 확인하는 용도로만 읽었고, 코드와 문장은 복사하지 않았습니다.
 - **[Excalidraw](https://github.com/excalidraw/excalidraw-libraries)**와 excalidraw-libraries (MIT). 디자인 아이디어를 참고하는 데만 썼습니다.
