@@ -75,7 +75,7 @@ All of these are local and read-only. Complete them before requesting any networ
 - [ ] No other writer is active against the root (see below).
 - [ ] For continuous operation only: the supervisor that already exists on this host is identified by name, and its authority to add or change a process is confirmed.
 
-Missing prerequisites are a stop, not a risk to absorb. Report which one is missing.
+Complete each prerequisite you can with local reads; one you cannot complete is a stop, not a risk to absorb, so report which one is missing.
 
 ## Effects require individual authorization
 

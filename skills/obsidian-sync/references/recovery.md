@@ -4,7 +4,7 @@ Enter here when a sync run did something nobody authorized: an unexplained delet
 
 The order is fixed: **contain, preserve, classify, restore exactly, re-admit, record.** Skipping straight to a fix is what turns one lost batch into two.
 
-Diagnosing an incident authorizes nothing. Restoring notes, unlinking a pairing, reinstalling the client, changing account state, or touching a separate backup mechanism each need their own explicit authority for the exact effect. Where that authority is missing, name the proposed effect, state that it was not performed, and stop.
+Diagnosing an incident authorizes nothing. Restoring notes, unlinking a pairing, reinstalling the client, changing account state, or touching a separate backup mechanism each need their own explicit authority for the exact effect. Where that authority is missing, name the proposed effect, state that it was not performed, and do not perform it or any step that depends on it.
 
 ## 1. Contain
 
@@ -15,7 +15,7 @@ Stop every writer against the affected root before forming a theory.
 - Close the Obsidian desktop app if it has the same root open.
 - Stop any file-sync client or backup job that writes into the root.
 
-Then stop. While the scope is unknown, do **not**:
+While the scope is unknown, do **not**:
 
 - re-run `ob sync` "to see if it settles",
 - switch modes - especially not to `mirror-remote`,

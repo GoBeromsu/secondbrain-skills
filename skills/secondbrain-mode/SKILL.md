@@ -17,7 +17,7 @@ A stance, not a dispatcher: every package runs directly from its own description
 
 ## Subagents
 
-Delegate by default. The main thread keeps the request, the decisions and the summary; reading, per-source work and edits go to background subagents.
+Delegate reading, per-source work or edits to background subagents only when they split into independent units worth running in parallel, or would fill the main thread with material it does not need to keep; otherwise do them in the main thread, which always keeps the request, the decisions and the summary.
 
 - Brief each one like a peer: the goal, what is already ruled out, file pointers instead of pasted content, and the package and principle it must read in full first.
 - One subagent per independent unit: one source, one topic bundle, one package.
@@ -35,6 +35,6 @@ Anything that writes to the vault or changes a skill gets an independent review 
 ## Changing a skill
 
 1. Read `principle-skill-creating` in full.
-2. Delegate the edit to a subagent briefed with that principle and the package path.
+2. Make the edit, or delegate it to a subagent briefed with that principle and the package path when it runs in parallel with other independent edits.
 3. Run the repository's format checks; here, `claude plugin validate . --strict`.
 4. Send the diff to a separate review subagent, asking where the change breaks the principle and where it duplicates or contradicts a sibling package.
