@@ -1,6 +1,6 @@
 ---
 name: "principle-hierarchical-management"
-description: "Apply when placing ingest outputs, arranging collections and parts, or explaining a record’s broader context in a knowledge vault. Use explicit hierarchy without inventing historical order or overriding destination policy."
+description: "Guides arranging records from the broadest group down to single items with explicit links between levels. Use when placing ingest outputs, linking a chapter to its Book Index or a capture to its hub, or explaining a record's broader context in a knowledge vault. Never treats a vault folder path as the source's original order or overrides the vault's placement policy. Describing what a collection covers and misses belongs to principle-collective-description."
 license: MIT
 ---
 
