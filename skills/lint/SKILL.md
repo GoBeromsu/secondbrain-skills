@@ -1,6 +1,6 @@
 ---
 name: "lint"
-description: "Checks an explicitly bounded vault scope for mechanical health: note structure, citations, missing frontmatter properties, broken or orphan links, index.md and log.md sync, verification fields, stale pages, MOC coverage, Persona boundaries and cross-vault targets. Use for vault lint, note health, link checks, or a Map coverage repair. Not for template authoring or unrestricted whole-vault correction; sampled quality review belongs to audit, per-claim checks to verify."
+description: "Lints a bounded vault scope for mechanical health: broken or orphan links, placement drift, missing frontmatter, index.md and log.md sync, MOC coverage, stale pages and cross-vault links. Use for vault lint, note health or link checks. Quality review belongs to audit, per-claim checks to verify."
 license: MIT
 ---
 

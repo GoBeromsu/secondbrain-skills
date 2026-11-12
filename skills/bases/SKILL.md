@@ -1,6 +1,6 @@
 ---
 name: "bases"
-description: "Creates and edits Obsidian Bases (.base files): views, filters, formulas, properties and summaries. Use when working with a .base file or an embedded base code block, building a database-like view of notes, or when the user mentions Bases, table, cards, list, kanban or map views, groupBy, sort, limit, filters or formulas in Obsidian. Not for Markdown note syntax, .canvas graph structure, Dataview queries or vault CLI operations."
+description: "Creates and edits Obsidian Bases: .base files and embedded base code blocks with table, cards, list, kanban or map views, filters, formulas, properties and summaries. Use for a database-like view of notes, or groupBy, sort or limit in a base. Not for note frontmatter, Dataview queries or vault CLI operations."
 license: MIT
 ---
 

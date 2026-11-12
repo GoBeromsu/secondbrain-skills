@@ -1,6 +1,6 @@
 ---
 name: "markdown"
-description: "Creates and edits Obsidian Flavored Markdown notes (.md): wikilinks, embeds, callouts, properties, tags, comments, highlights, math and footnotes. Use when working with .md files in an Obsidian vault, when the user mentions wikilinks, callouts, frontmatter, tags, embeds, block references or Obsidian notes, or asks in Korean to clean up, organize or tidy notes such as 노트 정리 or 노트 청소. Not for .canvas graph structure, .base file internals or vault CLI operations."
+description: "Creates and edits Obsidian Flavored Markdown notes (.md): wikilinks, embeds, callouts, properties (frontmatter), tags, comments, highlights, math, footnotes and block references. Use for .md files or notes in a vault, or to clean up, organize or tidy notes (노트 정리, 노트 청소). Not for .canvas or .base internals or vault CLI operations."
 license: MIT
 ---
 

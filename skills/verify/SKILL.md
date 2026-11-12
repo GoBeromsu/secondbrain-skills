@@ -1,6 +1,6 @@
 ---
 name: "verify"
-description: "Verifies one Wiki page's claims against the evidence it cites on three criteria - eligibility, consistency, confirmability - then reports and, on approval, records verificationStatus, confidence fields and disputes without deleting either side of a conflict. Use for page verification, fact-checking a Wiki page against its Raw source, contradiction checking, confidence calibration, or resolving a disputed page. Not for general knowledge queries (query), vault-wide sampling (audit), or syntax and link linting (lint)."
+description: "Verifies one Wiki page's claims against its cited evidence and, on approval, records verificationStatus, confidence and disputes without deleting either side of a conflict. Use for fact-checking a page against its Raw source, contradiction checks, confidence calibration or a disputed page. Vault-wide sampling belongs to audit, general questions to query."
 license: MIT
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: "refresh-context"
-description: "Re-reads the mothership sources and essays the Core Context registers, diffs them against the derived agent-context snapshot, proposes the changes, and applies them after the owner says yes. Use when derived agent context must be refreshed after source changes, or when status or lint reports the snapshot as stale. Not for editing Me or policy, inventing personal context, automatic reloads, public context publication, or requiring a counterpart vault."
+description: "Refreshes the Core Context snapshot, agent context about the owner: re-reads its registered sources, diffs them and applies changes on the owner's yes. Use when the owner's role, reuse axes, philosophy or mothership sources changed, or status or lint reports the snapshot stale. Not for editing Me or vault policy; reporting its age belongs to status."
 license: MIT
 ---
 

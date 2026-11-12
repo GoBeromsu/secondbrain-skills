@@ -1,6 +1,6 @@
 ---
 name: "secondbrain-mode"
-description: "Sets the working stance for a knowledge-vault task that spans several packages - delegate independent units to background subagents when that pays, own their work, and finish with an independent review. Use for secondbrain-mode, 세컨드브레인 모드, or a multi-step vault task that spans capture, ingest and query. A single named task such as ingest or query runs directly without this package, and skill authoring alone belongs to principle-skill-creating."
+description: "Sets the working stance for a vault task spanning several packages: delegates independent units to subagents, owns their work and ends with an independent review. Use for secondbrain-mode, 세컨드브레인 모드, or a multi-step task such as capture, then ingest, then query. A single task runs directly without it."
 license: MIT
 ---
 
