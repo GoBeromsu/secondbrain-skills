@@ -13,6 +13,7 @@ license: MIT
 - Keep guidance without an executable order with the Concept it belongs to.
 - Keep related senses of one name in one Term when a shared definition covers them.
 - Separate unrelated meanings of the same name into different Terms.
-- Keep a source-specific passage or argument as an attributed claim in the Term or Concept it concerns.
+- Keep a source-specific passage or argument as an attributed claim in the Term or Concept it concerns, never as a page title.
 - Leave knowledge that fits none of these kinds in Raw and have the task that found it ask the owner before creating a page.
+- Keep the levels distinct: Raw holds evidence, each Wiki page holds exactly one Term, Concept, Entity or Guide and cites its Raws, and Maps group pages.
 - Hand page creation to `ingest` under the destination vault's live policy and the user's authorization; this principle performs no write.

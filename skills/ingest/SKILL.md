@@ -95,7 +95,7 @@ Inbox cleanup: delete the Inbox original only when the owner's request or the va
 
 For each extracted term, concept, entity and guide, update the existing page or create one: Terms with [term](templates/term.md), Concepts with [concept](templates/concept.md), Entities with [entity](templates/entity.md), Guides with [guide](templates/guide.md).
 
-Title a Concept `{Topic Name}` in the idea's original language, with translations in `aliases`.
+Title a Concept `{Topic Name}` in the idea's original language, whichever language that is, with translations in `aliases`.
 Explain in its Overview what the idea offers for the Raw's `collectionPurpose`.
 
 - New writing comes only from this source and is attributed to it.
@@ -109,7 +109,7 @@ Explain in its Overview what the idea offers for the Raw's `collectionPurpose`.
 - Title a person Entity with their source-confirmed real name in its original language and script; put handles, channel names, localized names and romanizations in `aliases`. Never infer a real name; if unconfirmed, report it without presenting an alias as a real name. An explicit live-policy naming exception wins and is reported.
 - A new Entity goes into the folder the live policy registers for its subtype, otherwise the Entity folder; an existing Entity is not moved.
 - Title and structure a Term by [terms](references/terms.md).
-- Search titles and aliases for the same referent before creating a Term, updating a match according to Step 4's classification.
+- Before creating a Term, search titles and aliases for the same referent; a match is updated, never duplicated, and a new sense becomes a section of the existing page.
 - A new Term goes into the folder the live policy registers for Terms; when none is registered, it goes into the Concept folder and the report says so. Ingest never moves or retypes an existing page.
 Write every Wiki page to [conformance](references/conformance.md).
 
