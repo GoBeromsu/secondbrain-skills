@@ -1,6 +1,6 @@
 ---
 name: "principle-original-order"
-description: "Guides preserving a source's own sequence and verbatim text as evidence: chapter order, message chronology, headings, an existing Raw body. Use when capturing ordered material, when tempted to reorder, tidy or replace captured text, or when enriching an existing Raw capture during knowledge-vault ingest. Keeps annotation apart from original content; note syntax belongs to markdown."
+description: "Guides preserving a source's own sequence and verbatim text as evidence: chapter order, message chronology, headings, an existing Raw body. Use when capturing ordered material, when tempted to reorder, tidy or replace captured text, or when enriching an existing Raw capture."
 license: MIT
 ---
 

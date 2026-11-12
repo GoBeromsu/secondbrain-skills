@@ -1,6 +1,6 @@
 ---
 name: "status"
-description: "Reports read-only vault counts, index drift, recent log.md history, property coverage, verificationStatus and confidence breakdowns, Inbox backlog, and Core Context age. Use for a management snapshot or backlog check. Not for judging purpose fulfillment, knowledge quality, search freshness, process health, or making any vault change."
+description: "Reports a read-only vault snapshot: page counts, Inbox backlog, Core Context age, index drift, recent log.md history, property coverage, verificationStatus and confidence breakdowns. Use for vault status or a backlog check. Knowledge quality belongs to audit, link and index checks to lint."
 license: MIT
 ---
 

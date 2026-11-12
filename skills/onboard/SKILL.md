@@ -1,6 +1,6 @@
 ---
 name: "onboard"
-description: "Sets up a fresh personal or knowledge vault through a short owner interview that fills template placeholders and writes Core Context, index.md and log.md; gives an existing vault a read-only diagnosis and proposal; resumes an interrupted setup. Use for first-time vault setup, onboarding an existing vault, or a zero-diff rerun. Not for moving existing notes, installing skills, Sync pairing, source ingestion or editing vault policy."
+description: "Sets up a fresh vault through an owner interview that fills template placeholders and writes Core Context, index.md and log.md, or gives an existing vault a read-only diagnosis and proposal. Use for first-time setup, resuming an interrupted setup or a zero-diff rerun. Not for moving notes or Sync pairing."
 ---
 
 # Onboard

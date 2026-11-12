@@ -1,6 +1,6 @@
 ---
 name: "query"
-description: "Answers a question from the knowledge vault's Wiki: searches index.md and Wiki pages, synthesizes a cited answer, optionally saves it as a Query note, and feeds gaps and contradictions back into the Wiki. Use when the owner asks what the vault says about a topic, wants a cited synthesis or comparison across notes, or asks what the vault does not yet cover. Not for web research, adding new sources (ingest) or checking one page's claims (verify)."
+description: "Answers a question from the vault's Wiki with citations, optionally saves it as a Query note, and feeds gaps and contradictions back into the Wiki. Use for what the vault says about a topic, a comparison across notes, or what the vault does not cover. Not for web research; one page's claims belong to verify."
 license: MIT
 ---
 

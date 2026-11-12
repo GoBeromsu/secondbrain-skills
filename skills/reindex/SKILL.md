@@ -1,6 +1,6 @@
 ---
 name: "reindex"
-description: "Refreshes the qmd search index (BM25 and embeddings) after notes change. Use when the owner requests a search-index refresh, at the end of an ingest, or after bulk edits made outside the agent. Not for creating collections, editing qmd configuration, choosing models, querying notes, or changing source files."
+description: "Refreshes the qmd search index (BM25 and embeddings) after notes change. Use for a search-index refresh, at the end of an ingest, or after bulk edits made outside the agent. Not for creating collections, changing qmd configuration or searching notes."
 license: MIT
 ---
 
