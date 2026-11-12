@@ -8,7 +8,7 @@ license: MIT
 
 ## Apply when
 
-Apply when source attribution, primary-source discovery, or separation of creators matters. This principle is independently usable without sibling packages.
+Apply when source attribution, primary-source discovery, or separation of creators matters.
 
 ## Principle
 
@@ -20,10 +20,8 @@ Identify the true creator rather than just the republisher. When a secondary art
 
 Example: an Example Newsletter summary is a Raw that links the Example Research Group report by locator; the report becomes its own Raw only when it is ingested. A Concept may synthesize both while identifying which evidence supports each claim.
 
-Read the destination’s live policy and exact task authorization. This contextual principle never authorizes a write, move, or deletion.
-
 ## Sources
 
-- [기록학 16주 완성, 06-Ⅰ 분류](https://wikidocs.net/25577), “기록조직화의 원칙들”, 출처 존중의 원칙. This package is an original English application, not a reproduction.
+- [기록학 16주 완성, 06-Ⅰ 분류](https://wikidocs.net/25577), “기록조직화의 원칙들”, 출처 존중의 원칙.
 - International Council on Archives, *ISAD(G): General International Standard Archival Description*, second edition (2000), provenance and creator context.
 - T. R. Schellenberg, *Modern Archives: Principles and Techniques* (1956), arrangement and description.

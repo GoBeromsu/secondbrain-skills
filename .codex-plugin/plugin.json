@@ -24,7 +24,7 @@
   "interface": {
     "displayName": "Obsidian Skills",
     "shortDescription": "Independent Agent Skills for Obsidian vaults: native Obsidian and knowledge packages.",
-    "longDescription": "The secondbrain-skills collection holds native Obsidian packages, knowledge task packages and independently usable archival principles; each package owns exactly its named feature and requires no sibling. This plugin is a distribution container, not a router, dispatcher, or shared runtime. This is a public prerelease; runtime loads are unverified.",
+    "longDescription": "The secondbrain-skills collection holds native Obsidian packages, knowledge task packages and independently usable principles; each package owns exactly its named feature and requires no sibling. This plugin is a distribution container, not a router, dispatcher, or shared runtime. This is a public prerelease; runtime loads are unverified.",
     "developerName": "beomsukoh",
     "category": "Productivity",
     "capabilities": [

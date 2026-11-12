@@ -116,7 +116,7 @@ State weights used and that every score covers only the examined scope. Then the
 - pages with broken `source` wikilinks (Phase A);
 - high-traffic pages (referenced from many `related`) with low confirmability.
 
-`STALE FLAG` repeats (Failure Mode 4) go first. Mechanical findings route to `lint`; missing source material routes to `ingest`.
+`STALE FLAG` repeats (Failure Mode 3) go first. Mechanical findings route to `lint`; missing source material routes to `ingest`.
 
 ### Phase E — Save report (on approval)
 
@@ -143,12 +143,11 @@ Print the summary following [report](references/report.md): Vault Health composi
 
 1. **Map out of sync** — a page names a Map in `related` but the Map does not link it, or the reverse. Leave it out of the cluster; flag it as a Map sync gap for `lint`.
 2. **Oversized cluster** — a Map with 50+ linked pages. Subdivide by tag intersection and audit each sub-cluster separately; say how it was split.
-3. **Sample bias** — an unstratified draw lands mostly on one layer. Always stratify; never plain random.
-4. **Audit storm** — the same pages flagged in two consecutive audits with no `verify` since become a `STALE FLAG` at the top of the action list.
-5. **Concurrency safety** — audit is read-only on Wiki pages; the report and `log.md` writes happen only in Phase E, serialized, after approval. Page changes wait for the `verify` the owner starts.
-6. **Confirmability vs source ground truth** — Phase C reads cited Raw only partly. A flagged page is a candidate; the definitive source check is `verify` on that page.
-7. **Action list explosion** — cap the list at ten and say how many more are in the report.
-8. **Silent coverage loss** — a cluster or group skipped for time is reported as not examined, with the reason.
+3. **Audit storm** — the same pages flagged in two consecutive audits with no `verify` since become a `STALE FLAG` at the top of the action list.
+4. **Concurrency safety** — audit is read-only on Wiki pages; the report and `log.md` writes happen only in Phase E, serialized, after approval. Page changes wait for the `verify` the owner starts.
+5. **Confirmability vs source ground truth** — Phase C reads cited Raw only partly. A flagged page is a candidate; the definitive source check is `verify` on that page.
+6. **Action list explosion** — cap the list at ten and say how many more are in the report.
+7. **Silent coverage loss** — a cluster or group skipped for time is reported as not examined, with the reason.
 
 ## Integration
 

@@ -63,6 +63,7 @@ AGENTS.md                기여자와 에이전트를 위한 저장소 계약
 
 ## 감사의 말
 
+- **[기록학 16주 완성](https://wikidocs.net/25577)**, 국제기록관리협의회(International Council on Archives)의 *ISAD(G)* 제2판(2000), T. R. 셸렌버그의 *Modern Archives*(1956). 네 기록학 원칙은 이 자료들을 바탕으로 영어로 새롭게 작성한 독자적인 응용이며 원문을 재현한 것이 아닙니다. 해당 저자나 기관의 보증을 주장하지 않습니다.
 - **[구요한 (Yohan Koo)](https://github.com/johnfkoo951/cmds-llm-wiki)**, cmds-llm-wiki. 지식 패키지는 그의 명령에서 출발했고, 지금은 이 저장소가 정본이며 소유자의 결정에 따라 달라진 부분이 있습니다. 원 저장소의 파일은 하나도 담지 않았습니다. Paper Mode P-7 검증기 `skills/ingest/scripts/verify_paper.py`는 그의 스크립트 없이 이 저장소가 직접 구현한 것입니다. 원 저장소는 라이선스를 공개하지 않았고, 여기서 그것을 재라이선스하지 않습니다.
 - **[Andrej Karpathy](https://github.com/karpathy)**, cmds-llm-wiki가 바탕으로 삼은 LLM Wiki 패턴.
 - **[Steph Ango (kepano)](https://github.com/kepano/obsidian-skills)**, obsidian-skills (MIT). `markdown`, `bases`, `obsidian-cli`, 그리고 `obsidian-visualize`의 JSON Canvas 레퍼런스는 여기서 출발해 수정했습니다.

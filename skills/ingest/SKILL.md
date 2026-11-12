@@ -56,13 +56,12 @@ Skip for `.md`, `.markdown`, `.txt`. Transcribe audio (`.mp3`, `.wav`, `.m4a`) w
 
 ## Step 4 — Analyze
 
-Read the whole source. Extract:
+Read the whole source and use `principle-wiki-types` to classify the extracted knowledge.
 
-- terms and concepts (3–8 together), candidates that may land on existing pages:
-	- a Term is a name an established field uses independently of this source, decided by [terms](references/terms.md);
-	- a Concept is an abstract idea, technique, method or pattern worth its own page that is not a Term, titled `{Topic Name}` in the idea's original language, whichever language that is (`LLM Wiki Pattern`, `비대칭 동업`), whether or not the source names it, with translations in `aliases`; one passage or argument of the source is a claim, not a Concept;
-	- a claim is never a page title: it goes into the body of the Term or Concept it is about, attributed;
-- entities (1–5): people, organizations, products, models;
+Extract:
+
+- terms and concepts (3–8 together), candidates that may land on existing pages;
+- entities (1–5);
 - practical guidance (0–3) worth a Guide;
 - key claims to track;
 - connections to existing Wiki pages.
@@ -94,7 +93,10 @@ Inbox cleanup: delete the Inbox original only when the owner's request or the va
 
 ## Step 6 — Compile Wiki pages
 
-For each extracted term, concept, entity and guide, update the existing page or create one: Terms with [term](templates/term.md), Concepts with [concept](templates/concept.md), Entities with [entity](templates/entity.md), Guides with [guide](templates/guide.md). Keep the levels distinct: Raw holds evidence, Wiki pages hold one term, concept, entity or guide each and cite their Raws, Maps group pages. A Concept page lets the owner understand and use an idea: after reading it they know what it is, why it holds, where it applies and how it connects to what they already know. The Raw keeps what was said and where, so the page explains the idea instead of replaying the source, and its Overview says what the idea offers for the Raw's `collectionPurpose`.
+For each extracted term, concept, entity and guide, update the existing page or create one: Terms with [term](templates/term.md), Concepts with [concept](templates/concept.md), Entities with [entity](templates/entity.md), Guides with [guide](templates/guide.md).
+
+Title a Concept `{Topic Name}` in the idea's original language, with translations in `aliases`.
+Explain in its Overview what the idea offers for the Raw's `collectionPurpose`.
 
 - New writing comes only from this source and is attributed to it.
 - An existing page is updated in three separate contexts, in this order:
@@ -106,7 +108,8 @@ For each extracted term, concept, entity and guide, update the existing page or 
 - An Entity exists because the analysis found it significant. Every Raw author whose real name the source confirms is also a person Entity: update the existing one or create it with this Raw in `source`, and link it from the Raw's `author`.
 - Title a person Entity with their source-confirmed real name in its original language and script; put handles, channel names, localized names and romanizations in `aliases`. Never infer a real name; if unconfirmed, report it without presenting an alias as a real name. An explicit live-policy naming exception wins and is reported.
 - A new Entity goes into the folder the live policy registers for its subtype, otherwise the Entity folder; an existing Entity is not moved.
-- Title and structure a Term by [terms](references/terms.md). Before creating one, search titles and aliases for the same referent under any of its names; a match is updated, never duplicated, and a new sense becomes a section of the existing page.
+- Title and structure a Term by [terms](references/terms.md).
+- Search titles and aliases for the same referent before creating a Term, updating a match according to Step 4's classification.
 - A new Term goes into the folder the live policy registers for Terms; when none is registered, it goes into the Concept folder and the report says so. Ingest never moves or retypes an existing page.
 Write every Wiki page to [conformance](references/conformance.md).
 
