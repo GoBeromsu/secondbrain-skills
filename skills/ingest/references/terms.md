@@ -1,15 +1,11 @@
 # Terms
 
-A Term page lets the owner understand a name a field uses: after reading it they know what the thing is, how it works and how it connects to what they already know. This file owns what becomes a Term, its title and its sections; `lint` reports existing pages against it.
+Use this reference for a Term's title and sections; `lint` reports existing pages against it.
 
-## What is a Term
+## Before writing
 
-- Make a Term for a name an established field uses independently of this source, whether self-contained jargon (`ReplicaSet`) or a shared word whose meaning varies by field (`AI Agent`).
-- Before writing, collect every sense the name has: its general-dictionary and encyclopedia senses, how vault notes already link or use it, and how the owner uses it; never take the source's field as the only one.
-- Keep related senses on one page when one definition can state what they share (AI Agent: anything that perceives its environment and acts on it, covering the reinforcement learning agent and the LLM-based agent).
-- Split unrelated meanings under one name into separate Terms (`Transformer (Machine Learning)`, `Transformer (Electrical Engineering)`).
-- Make a named individual thing (a product, service, model, dataset or organization such as `OpenClaw` or `Claude Code`) an Entity and link it from the Term as an example.
-- Keep a name only one author uses as a Concept until an independent source uses it.
+- Use `principle-wiki-types` for classification and sense grouping before writing.
+- Collect every sense the name has: its general-dictionary and encyclopedia senses, how vault notes already link or use it, and how the owner uses it; never take the source's field as the only one.
 - Give every Term `layer: terms`.
 
 ## Title
@@ -32,7 +28,7 @@ Fill [term](../templates/term.md):
 - **Senses:** add one `### {field}` section per sense only when the meaning varies by field, each with that field's definition, since when it is used that way, examples and its own typed relations; list those fields in `domain`.
 - **Literature Review:** give one `### [[Author]] (year): what it adds` entry per source, walked up to the source that establishes the claim, with bold-labelled bullets.
 - **Personal Insights:** leave the owner's own notes as they are.
-- **Related Terms:** group links under labels in the page's language with the type in parentheses: broader (contains this term), narrower (a kind or variant of it), related split into what it is made of, other methods for the same problem and where it is used, and confused-with (often mixed up with it). Give each link one line saying why; state how a confused-with term differs. Never make one page both broader and related; put a relation that holds for one sense in that sense section.
+- **Related Terms:** group links under labels in the page's language with the type in parentheses: broader (contains this term), narrower (a kind or variant of it), related split into what it is made of, other methods for the same problem and where it is used, and confused-with (often mixed up with it). Give each link one line saying why; state how a confused-with term differs. Never make one page both broader and related; put a relation that holds for one sense in that sense section. Link a related Entity from the Term as an example.
 - **References:** list each Raw with its author and role, then each of the owner's notes the page draws on.
 
 When a relation or a numeric behavior is easier to see than to read (how senses derive from one another, how a parameter changes a trajectory), add a Pele diagram by `obsidian-visualize` beside the text that states it.

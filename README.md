@@ -65,6 +65,7 @@ AGENTS.md                repository contract for contributors and agents
 
 ## Acknowledgements
 
+- **[기록학 16주 완성](https://wikidocs.net/25577)**, the International Council on Archives, *ISAD(G)*, second edition (2000), and T. R. Schellenberg, *Modern Archives* (1956). The four archival principles draw on these sources as an original English application, not a reproduction; no endorsement is claimed.
 - **[Yohan Koo (구요한)](https://github.com/johnfkoo951/cmds-llm-wiki)**, cmds-llm-wiki. The knowledge packages started from its commands; this repository is now their canonical source and diverges where the owner decided. No upstream file is shipped: the Paper Mode P-7 verifier `skills/ingest/scripts/verify_paper.py` is this repository's own implementation, written without his script. The upstream publishes no licence and nothing here relicenses it.
 - **[Andrej Karpathy](https://github.com/karpathy)**, the LLM Wiki pattern that cmds-llm-wiki builds on.
 - **[Steph Ango (kepano)](https://github.com/kepano/obsidian-skills)**, obsidian-skills (MIT). `markdown`, `bases`, `obsidian-cli` and the JSON Canvas reference in `obsidian-visualize` started from it and were modified.

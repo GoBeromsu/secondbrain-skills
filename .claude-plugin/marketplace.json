@@ -1,7 +1,7 @@
 {
   "name": "secondbrain-skills",
   "version": "0.16.0",
-  "description": "Self-contained Agent Skills for Obsidian vaults: native Obsidian packages and knowledge packages, including archival principles. This is a public prerelease.",
+  "description": "Self-contained Agent Skills for Obsidian vaults: native Obsidian packages and knowledge packages, including principles. This is a public prerelease.",
   "owner": {
     "name": "beomsukoh",
     "url": "https://beomsukoh.com"
@@ -11,7 +11,7 @@
       "name": "secondbrain-skills",
       "source": "./",
       "displayName": "Obsidian Skills",
-      "description": "Self-contained Agent Skills for Obsidian vaults: native Obsidian packages and knowledge packages, including archival principles. This is a distribution container, not a router, dispatcher, or shared runtime.",
+      "description": "Self-contained Agent Skills for Obsidian vaults: native Obsidian packages and knowledge packages, including principles. This is a distribution container, not a router, dispatcher, or shared runtime.",
       "category": "knowledge-management",
       "tags": [
         "obsidian",

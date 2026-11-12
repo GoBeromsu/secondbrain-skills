@@ -8,7 +8,7 @@ license: MIT
 
 ## Apply when
 
-Apply when individual records cannot explain the scope, structure, or history of their collection alone. This principle is independently usable without sibling packages.
+Apply when individual records cannot explain the scope, structure, or history of their collection alone.
 
 ## Principle
 
@@ -20,9 +20,7 @@ Describe the collection’s creator, scope, constituent structure, coverage, gap
 
 Example: an example report hub lists an abstract capture and a later full-text capture separately, explains their coverage, and links both while leaving each original intact.
 
-Read the destination’s live placement policy and exact task authorization. This contextual principle never authorizes a write, move, or deletion.
-
 ## Sources
 
-- [기록학 16주 완성, 06-Ⅰ 분류](https://wikidocs.net/25577), “기록조직화의 원칙들”, 집합적 기술의 원칙. This package is an original English application, not a reproduction.
+- [기록학 16주 완성, 06-Ⅰ 분류](https://wikidocs.net/25577), “기록조직화의 원칙들”, 집합적 기술의 원칙.
 - International Council on Archives, *ISAD(G): General International Standard Archival Description*, second edition (2000), information relevant to the level of description, linkage, and non-repetition.
