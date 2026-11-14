@@ -9,6 +9,7 @@
   "plugins": [
     {
       "name": "secondbrain-skills",
+      "version": "0.18.0",
       "source": "./",
       "displayName": "Obsidian Skills",
       "description": "Self-contained Agent Skills for Obsidian vaults: native Obsidian packages and knowledge packages, including principles. This is a distribution container, not a router, dispatcher, or shared runtime.",
