@@ -15,6 +15,9 @@ Boxes joined by arrows only say "these things exist". Fix the structure of the w
 | Two options, before and after | Side-by-side: two columns, a dashed divider, identical rows |
 | Layers or zones | Zones: a dashed `rectangle` per zone, its name top-left |
 | Who says what, when | Sequence: participants on top, dashed lifelines, horizontal arrows down |
+| Who does what at each stage | Swimlane: stages as columns, actors as rows, the artifact they share as the middle row |
+| A quantity over time, against events | Bars: one bar per period on a shared time axis, event markers as vertical dashed lines |
+| Sources in the order they appeared | Source timeline: the Timeline recipe with each source's preview image under its dot |
 | One topic, many branches | Mind map: centre `ellipse`, one hue per branch |
 | Screen layout | Wireframe: outer frame, grey blocks, one coloured action |
 | A phase change | Gap: extra whitespace and a dashed divider, left empty |
@@ -119,9 +122,24 @@ Notation: `box(id,x,y,w,h,"Label",color)` is a skeleton `rectangle` with `label`
 
 **Sequence.** Participants `box` `160x56` at `x=0/280/560`. Lifelines dashed `line` from `(x+80,56)` down 300. Messages are free `arrow`s with `points [[0,0],[dx,0]]`, `label` 16 px, `y` pitch 50, replies `strokeStyle: "dashed"`. Past five participants or fifteen messages, use Mermaid instead.
 
+**Swimlane.** Stage names as free `t` at `x=200+k*260`, one arrow under them spanning all columns. One row per actor at `y` pitch 130, cells `240x90`, the row name as free text at `x=0`. Give the shared artifact (a note, a ticket, a file) the middle row so the rows above and below read as the two sides writing to it. A cell an actor does not take part in stays as a dashed neutral cell holding a dash; mark the cells that need the reader's attention with one accent stroke. Things kept outside the artifact go in a last pale row under a dashed rule.
+
+**Bars.** Axis `l(x0,base,[[0,0],[n*40,0]])`; bar `k` is an unlabelled `rectangle (x0+k*40, base-v*scale, 30, v*scale)` with `roundness: null`; choose `scale` so the tallest bar is about 400 px. Dashed grid lines and 14 px tick text at round values; one dashed line in the `red` stroke for a baseline, named once. Colour bars by period, never by value. To relate two measures, stack a second bar row on the same `x` positions under the first and run each event marker as one dashed vertical `line` through both rows, its name at the top; the alignment is the argument, so it needs no caption.
+
+**Source timeline.** The Timeline recipe laid horizontally: dots on one spine, above each dot the date (16 px, the period's stroke colour), a two or three word name (18 to 20 px) and one keyword line (16 px, grey); under each dot the source's preview image at one shared width with a height cap, linked to the source. Link the name too.
+
 **Mind map.** Centre `ellipse (0,0,180,90)`. Branches `160x60` on a radius of about 300 at 45, 135, 225, 315 degrees snapped to 20, one hue each. Arrows run from the centre (`90,45`) to each branch centre.
 
 **Wireframe.** Outer `rectangle (0,0,320,560)` no fill. Grey blocks inside with 20 px margins: header `(20,20,280,56)`, image `(20,96,280,160)`, cards `(20,276,280,72)`, `(20,368,280,72)`. One blue button `(60,468,200,56)`; it is the only color.
+
+## Text budget
+
+Read the export with the labels covered, then with only the labels. If the labels alone tell the story, the drawing is a list: move the sentences to the note and let position say it.
+
+- A node label is a name or a value, with at most one qualifying line; a timeline step is a date, a name and one keyword.
+- A legend is one grey line under the section title. A box titled as reading instructions, a summary paragraph or a restated conclusion belongs in the note.
+- Section titles are numbered and short; the question a section answers goes in the note's heading.
+- When two sections share an axis, merge them into one arrangement (extra lanes, an extra row) instead of repeating the axis.
 
 ## Fidelity to the request
 
