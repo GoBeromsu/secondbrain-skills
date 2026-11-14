@@ -1,6 +1,6 @@
 ---
 name: "obsidian-visualize"
-description: "Builds an Obsidian visual: a JSON Canvas (.canvas), an Excalidraw drawing (.excalidraw.md) or a mermaid block drawn by Pele. Use to create, edit or validate a .canvas file (nodes, edges, groups, IDs); for an architecture, pipeline, sequence, state, ER or concept diagram, a gantt, journey, swimlane, quadrant or treemap chart, a mind map, sketchnote or sticky notes; for any mermaid block in a note, including one with a parse error, raw text or an empty box, or a `-beta` keyword; to edit, inspect, export or render Excalidraw; or to choose between these and a plain table. 캔버스·플로우차트·아키텍처도·개념도·머메이드·펠레·손그림·마인드맵·스케치노트·도구 연결도·로고·아이콘·인물 사진. Not for note prose (markdown) or plugin installs (obsidian-cli)."
+description: "Builds an Obsidian visual: a JSON Canvas (.canvas), an Excalidraw drawing (.excalidraw.md) or a mermaid block drawn by Pele. Use to create, edit or validate a .canvas file (nodes, edges, groups, IDs); for an architecture, pipeline, sequence, state, ER or concept diagram, a gantt, journey, swimlane, quadrant or treemap chart, a mind map, sketchnote or sticky notes; for any mermaid block in a note, including one with a parse error, raw text or an empty box, or a `-beta` keyword; to edit, inspect, export or render Excalidraw; or to choose between these and a plain table. 캔버스·플로우차트·아키텍처도·개념도·머메이드·펠레·손그림·마인드맵·스케치노트·도구 연결도·로고·아이콘·인물 사진·기사 썸네일·웹 임베드. Not for note prose (markdown) or plugin installs (obsidian-cli)."
 license: MIT
 ---
 
@@ -19,6 +19,10 @@ Pick the form the content supports, build it on the surface that fits, and look 
 If the request names a form, that form is the answer unless it cannot carry the content; say so before switching. Do not deliver a Canvas because Excalidraw looked tedious, nor an Excalidraw of note titles when the reader should click through to notes. For a Canvas, every `file` node and wikilink target must resolve in the destination vault; a plausible name is not a resolved one.
 
 Ground every box and arrow in inspected evidence (files at a pinned revision, note contents, measured values). Label declared configuration as declared. A reference image supplies visual language only, never services or numbers.
+
+A drawing carries what prose cannot: position, grouping, order and proportion. Keep each label to a keyword or a value, and put any sentence that explains, qualifies or tells the reader how to read the drawing in the note beside it. A section that needs a paragraph to be understood has the wrong arrangement, so change the arrangement.
+
+Follow-up questions on the same subject extend the same drawing as numbered sections, because one surface shows relations that separate files hide. When a new answer shares an axis with an existing section (the same stages, the same timeline), add it there as another lane or row. Start a new drawing when the subject changes.
 
 ## Canvas
 
@@ -60,7 +64,17 @@ What the CLI cannot do (elbow arrows, Mermaid-to-elements, embedded notes and pa
 
 Give every node that names a recognizable thing its image beside the label, unasked: a product, app, service or company gets its official logo or app icon, a public figure a public photo, a character its official art; a private person gets only an image already in the vault. Look first for a PNG on the thing's own site (`apple-touch-icon.png`, `icon.png`) or its GitHub organization avatar (`https://github.com/<org>.png`); keep a URL only after fetching it shows an image of that exact thing, never its maker's personal avatar or an unrelated favicon. When none is found, leave the node without one and list it as skipped with the reason; never draw a stand-in.
 
+Give every node that stands for a source the reader can open (an article, a video, a repository, a documentation page) that source's own preview image and a `link` to it, unasked: the picture makes the source recognizable at a glance and the link turns the drawing into a way back to the evidence. `python3 scripts/thumbnail.py <url>...` prints the preview image each page declares; a page that declares none, or whose preview fails to decode at export, stays text with its link. A video or page worth watching or reading in place goes in as a web embed in a closing section of its own, since an embed plays only inside Obsidian and exports as an empty frame.
+
+```
+python3 scripts/place.py <vault-relative drawing> <items.json|-> --vault <name>
+```
+
+`place.py` puts images and web embeds on an existing drawing by URL, each with its `link`; `excalidraw-plugin.md` has the item fields. Save with `save.py` afterwards.
+
 Images: an external image (logo, icon, web screenshot) stays a URL in the drawing's Embedded Files (`icon` in the spec); never download it into the vault, and tell the user it loads from a third party on first open. To check layout without the network use `export.py --placeholder-images`, otherwise a live export. If export fails with `ASSETS_UNAVAILABLE` on remote images (seen with SVG logos from `cdn.simpleicons.org`), do not retry or download them: rerun `export.py --placeholder-images` to check layout and tell the user to confirm the logos by opening the drawing in Obsidian. Only images already in the vault are referenced as vault files.
+
+A note shows a drawing by embedding the drawing itself (`![[name.excalidraw]]`). Leave no exported image in the vault unless the user asks for one: a copy goes stale on the next edit.
 
 ## Pele
 
@@ -101,3 +115,4 @@ For any change to an existing drawing, Canvas or note:
 - The form matches the table and the reason is stated.
 - Every claim traces to evidence; every `file` and wikilink target resolves.
 - A drawing was exported and looked at (D), or the report names the level it stopped at.
+- Every product and person node has its image or is listed as skipped with the reason; every source node has its link, and its preview image when one is usable; no sentence sits in the drawing that the note could carry.

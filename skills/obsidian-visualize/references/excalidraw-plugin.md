@@ -29,6 +29,7 @@ Facts observed here (plugin 2.29.2, Obsidian 1.15.1) that those texts do not sta
 - `status` reads `ready` false until a drawing view is open; `create` and `icons` work before that.
 - `create` never overwrites; fix an existing drawing with `apply` (open it, `read source=live`, pass `expectedRevision`).
 - Never edit the compressed drawing markdown by hand; opening a drawing makes the plugin re-save it compressed.
+- `create` rejects `strokeColor` inside `label`; set label colour with `apply` afterwards. `apply` takes 1 to 100 operations per request, and `read` returns at most 200 elements per page (`offset` with the first page's `revision`). `apply` rejects `width` or `height` on a `line` or `arrow` ("Linear resizing requires a trusted EA script"); delete and add the line instead.
 - A file written from outside the app may be missing from the vault for about two seconds. After writing an input JSON into the vault, confirm it is indexed (`obsidian vault=<v> file path=<json>`) before `create input=<json>`, which otherwise fails `NOT_FOUND`. Get help from `:skill` and `:schema`, not `--help`.
 
 ### Skeleton notes
@@ -50,6 +51,7 @@ Facts observed here (plugin 2.29.2, Obsidian 1.15.1) that those texts do not sta
 - **Sticky notes**: above; script form `ea.addStickyNote(x, y, text, {width, height, fontSize, textAlign})`. Observed (CLI and script).
 - **Groups**: `group` op returns a group id; `ungroup` needs `ids` and `groupId`. Documented. Icons come grouped. Observed.
 - **Images**: only an image that already lives in the vault is referenced as a vault file (`image` op, or `ea.addImage(x, y, path, scale)`). An external image (logo, icon, web screenshot) stays a URL in the drawing's Embedded Files, as `draw.py` `icon` writes it; never download it into the vault. To check layout offline, run `export.py --placeholder-images`; otherwise export live with network. Tell the user it loads from a third party on first open.
+- **Images and web embeds by URL**: `scripts/place.py` runs `ea.addImage({topX, topY, imageFile: <url>, scale: true})` and `ea.addEmbeddable(x, y, w, h, url)` in a trusted script, sets each element's `link`, and removes the script from the vault. Items: `{x, y, width, image, height?, link?}` (scaled to `width`, then down to the `height` cap) or `{x, y, width, height, embed, link?}`. Observed: JPEG, PNG and WebP preview images from article pages and PNG app icons rendered in the PNG export and stayed URLs under Embedded Files; a YouTube URL and a documentation page loaded as webviews in the live view and exported as a frame showing only the URL; an embed's `link` is its own URL. Observed failure: a GitHub generated social preview (`opengraph.githubassets.com`) was stored as `application/octet-stream`, stayed undecoded and made export fail with `ASSETS_UNAVAILABLE` until it was replaced by an image file URL from the repository.
 - **LaTeX**: `latex` op or `ea.addLaTex(x, y, tex)`; needs Extras MathJax (MathJax component 1.1.0 or newer, documented). Observed through the CLI op.
 - **Mermaid to elements**: `ea.addMermaid(source, true)` inside a trusted script, then `await ea.addElementsToView(false, true, true)`. With Extras 0.2.0 a flowchart (3 nodes, labelled edges, a back edge) became 11 editable elements and rendered readable in the PNG; it lands at the origin or cursor, so place other content away from it or move it. Without Extras it returns the string "Mermaid to Excalidraw requires the Excalidraw Extras companion plugin." Observed both. Extras bundles Pele as its parser, not the Mermaid library. `versions.mermaid` reads 3.0.0 in the installed bundle; from static reading it is a contract version, not a library version. Mermaid conversion needs Extras component 3.0.0 (documented). Other diagram kinds: documented only. Not a CLI operation: `{"op":"mermaid"}` is "Unsupported operation". Observed. Rendering a Mermaid code block in a note is a separate path owned by the Pele guidance in this package.
 - **Embedded notes, web pages, transclusions**: `ea.addIFrame(x, y, w, h, url, file, html)` creates an embeddable element for a URL, a vault file, or raw HTML. Documented. Not available through the CLI.
@@ -103,10 +105,10 @@ Look up a signature with `api surface=ea name=<method>` (observed) or `api surfa
 | Elbow arrows | no | no | yes |
 | Groups | `draw.py` | yes | yes |
 | Vault images (already in the vault) | no | `image` op | `addImage` |
-| External image by URL | `draw.py` `icon` | no | script |
+| External image by URL | `draw.py` `icon` | no | `place.py` |
 | LaTeX | no | `latex` (Extras) | `addLaTex` (Extras) |
 | Mermaid conversion | no | no | `addMermaid` (Extras) |
-| Embedded notes and pages | no | no | `addIFrame` |
+| Embedded notes and pages | no | no | `place.py` (web), `addIFrame` |
 | Element links | no | `link` field | element `link` |
 | Frontmatter keys | no | no | yes |
 | SVG and PNG export | no | `export` | `createSVG` and friends |

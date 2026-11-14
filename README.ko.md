@@ -74,6 +74,7 @@ AGENTS.md                기여자와 에이전트를 위한 저장소 계약
 - **[Zsolt Viczian](https://github.com/zsviczian/obsidian-excalidraw-plugin)**, Obsidian용 Excalidraw 플러그인 (AGPL-3.0)과 동반 플러그인 Excalidraw Extras(라이선스는 확인하지 못했습니다). API 사실을 확인하는 용도로만 읽었고, 코드와 문장은 복사하지 않았습니다.
 - **[Excalidraw](https://github.com/excalidraw/excalidraw-libraries)**와 excalidraw-libraries (MIT). 디자인 아이디어를 참고하는 데만 썼습니다.
 - **[robtaylor](https://robtaylor.github.io/excalidraw-diagrams/)**, Excalidraw 예제 모음. 아이디어를 참고했습니다. 라이선스를 주장하거나 확인하지 않았고, 복사한 것은 없습니다.
+- **[Anthropic](https://github.com/anthropics/skills/tree/main/skills/skill-creator)**, skill-creator 스킬과 [Claude Fable 5.2 프롬프팅 가이드](https://platform.claude.com/docs/ko/build-with-claude/prompt-engineering/prompting-claude-fable-5-2). `obsidian-visualize`의 출처 이미지·링크·텍스트 분량 지침을 어떻게 쓸지 참고했고, 복사한 것은 없습니다.
 
 이들의 보증이나 제휴 관계를 주장하지 않습니다. "Obsidian"은 이 스킬들이 대상으로 하는 서드파티 애플리케이션의 이름입니다.
 

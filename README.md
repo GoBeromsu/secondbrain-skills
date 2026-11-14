@@ -76,6 +76,7 @@ AGENTS.md                repository contract for contributors and agents
 - **[Zsolt Viczian](https://github.com/zsviczian/obsidian-excalidraw-plugin)**, the Excalidraw plugin for Obsidian (AGPL-3.0), and the Excalidraw Extras companion plugin, whose licence was not verified. Read for API facts only; no code or prose is copied.
 - **[Excalidraw](https://github.com/excalidraw/excalidraw-libraries)** and its excalidraw-libraries (MIT). Consulted for design ideas only.
 - **[robtaylor](https://robtaylor.github.io/excalidraw-diagrams/)**, an Excalidraw example gallery, consulted for ideas. No licence is claimed or verified; nothing is copied.
+- **[Anthropic](https://github.com/anthropics/skills/tree/main/skills/skill-creator)**, the skill-creator skill and the [Claude Fable 5.2 prompting guide](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-fable-5-2). Consulted for how the source-image, link and text-budget guidance in `obsidian-visualize` is worded; nothing is copied.
 
 No endorsement by any of them is claimed. "Obsidian" names the third-party application these skills target.
 
