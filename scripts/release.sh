@@ -5,7 +5,20 @@ cd "$(git rev-parse --show-toplevel)"
 [ "$(git branch --show-current)" = main ] || { echo "release from main only" >&2; exit 1; }
 git diff --quiet HEAD || { echo "working tree not clean" >&2; exit 1; }
 git fetch -q origin && [ "$(git rev-parse HEAD)" = "$(git rev-parse origin/main)" ] || { echo "main is not at origin/main" >&2; exit 1; }
-perl -pi -e 's/^(  "version": )".*"/$1"$ENV{V}"/' .claude-plugin/plugin.json .claude-plugin/marketplace.json .codex-plugin/plugin.json plugin.json
+perl -pi -e 's/^(  "version": )".*"/$1"$ENV{V}"/; s/^(      "version": )".*"/$1"$ENV{V}"/' .claude-plugin/plugin.json .claude-plugin/marketplace.json .codex-plugin/plugin.json plugin.json
+python3 - <<'PY'
+import json
+import os
+from pathlib import Path
+
+for path in (".claude-plugin/plugin.json", ".claude-plugin/marketplace.json", ".codex-plugin/plugin.json", "plugin.json"):
+    manifest = json.loads(Path(path).read_text())
+    versions = [manifest["version"]]
+    if path == ".claude-plugin/marketplace.json":
+        versions.extend(plugin["version"] for plugin in manifest["plugins"])
+    if any(version != os.environ["V"] for version in versions):
+        raise SystemExit(f"{path}: versions must all equal {os.environ['V']}")
+PY
 git commit -qam "release: $V"
 git tag "$V"
 git push --atomic origin main "$V"
