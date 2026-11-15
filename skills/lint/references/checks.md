@@ -61,6 +61,9 @@ git log -1 --format=%cs -- "<page>"
 # log.md latest entry
 rg -n '^## \[[0-9]{4}-[0-9]{2}-[0-9]{2}\]' "<vault>/log.md" | tail -n 1
 
+# Bare or backticked URLs (drop hits inside fences, commands, quotations, frontmatter and Raw `## Original Content`; a URL right after `(` is not matched)
+rg -n -g '*.md' '(^|[^(<\[])`?https?://[^\s)`]+' "<scope>"
+
 # Mothership deeplinks to decode and stat
 rg -o --no-filename 'obsidian://open\?vault=[^&]+&file=[^)"\s]+' "<scope>"
 ```

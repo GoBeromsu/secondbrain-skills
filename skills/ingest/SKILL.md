@@ -7,6 +7,8 @@ description: "Ingests one selected source into the wiki: a URL, file, text, pape
 
 Execute every step in order. Asking for ingest authorizes the writes this recipe names in the destination vault — Raw, Wiki pages, Maps, `index.md`, `log.md` — under the vault's live policy. It does not authorize deleting an Inbox original or any other file, committing, pushing, or writing into a mothership. [Frontmatter](references/frontmatter.md) governs every key; YAML uses 2 spaces, the body tabs, YAML wikilinks are quoted.
 
+This recipe decides what is written and where, not how a note is formed. Before the first write, load every available skill whose description covers note formatting, prose, or source description, and write the Raw source, Wiki pages and Maps by them.
+
 Read the vault's Core Context once per session before the first ingest. Use the reuse axes actually registered in its §2 (normally 5–9), never a fixed list.
 
 ## Input

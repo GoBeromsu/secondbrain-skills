@@ -1,6 +1,6 @@
 # Embeds Reference
 
-An embed is a wikilink prefixed with an exclamation mark, as in `![[Note Name]]`: the target's content is rendered inline instead of being linked. Everything that applies to link targeting applies to embeds -- see *Link targets that are not Markdown notes* and *Destination readback* in this package's `SKILL.md`.
+An embed is a wikilink prefixed with an exclamation mark, as in `![[Note Name]]`: the target's content is rendered inline instead of being linked. Everything that applies to link targeting applies to embeds -- see [links](links.md) and *Read back* in this package's `SKILL.md`.
 
 ## Link or Embed
 
@@ -33,11 +33,12 @@ Prefer embedding a specific heading or block over a whole note. A whole-note emb
 
 The pipe means "size" only for embedded images and similar sized media. In a plain link (`[[Note Name|Board]]`) the same pipe means display text, so `[[image.png|300]]` without the `!` prefix produces a link labelled `300`.
 
-## External Images
+## External Images and Video
 
 ```markdown
 ![Alt text](https://example.com/image.png)
 ![Alt text|300](https://example.com/image.png)
+![Demo](https://example.com/demo.mp4)
 ```
 
 Wrap the URL in angle brackets when it contains spaces or parentheses: `![Alt text](<https://example.com/my image.png>)`.
@@ -75,7 +76,7 @@ A video or audio embed renders a player, so its playable state cannot be judged 
 ![[BaseFile.base#View Name]]
 ```
 
-The `#View Name` subpath selects a view defined inside the base file, so it must match a view name that exists there. The base file's own filters, formulas, views, and summaries belong to the `bases` skill; this reference defines only how a note embeds one.
+The `#View Name` subpath selects a view defined inside the base file, so it must match a view name that exists there. The base file's own filters, formulas, views, and summaries are out of scope here; this reference defines only how a note embeds one.
 
 ## Embed Canvas
 
@@ -85,7 +86,7 @@ The `#View Name` subpath selects a view defined inside the base file, so it must
 
 [Obsidian's embed documentation](https://help.obsidian.md/embeds) states that an embedded canvas displays the shapes only, not the text inside cards. Expect that result: it is not an unresolved link and not a defect to be fixed by rewriting the link. Open the canvas itself when the card text matters.
 
-Canvas node and edge structure belongs to the `obsidian-visualize` skill. This reference defines only the note-side link and embed, plus the readback that proves the `.canvas` file -- and not a same-named Markdown note -- was reached.
+Canvas node and edge structure is out of scope here. This reference defines only the note-side link and embed, plus the readback that proves the `.canvas` file -- and not a same-named Markdown note -- was reached.
 
 ## Embed Lists
 
@@ -117,7 +118,7 @@ A `query` block is evaluated by the app's search at render time, so its result i
 
 ## External Media and Web Pages
 
-An image-style link to an external media URL (`![](https://...)`) renders an inline player for the services the app supports, and an `<iframe>` element embeds an arbitrary page. Both depend on network access and app settings, so confirm each one in reading view rather than assuming it rendered.
+An image-style link to an external media URL (`![](https://...)`) renders an inline player for the services the app supports. An `<iframe>` element embeds an arbitrary web page; an image or video file takes the image-style form above. Both depend on network access and app settings, so confirm each one in reading view rather than assuming it rendered.
 
 ## Paths and Ambiguity
 
