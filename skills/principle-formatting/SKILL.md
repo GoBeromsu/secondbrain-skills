@@ -1,6 +1,6 @@
 ---
 name: "principle-formatting"
-description: "Guides everything about a vault note that can be judged from its raw characters without understanding the content: Obsidian Flavored Markdown syntax (wikilinks, embeds, callouts, properties or frontmatter, tags, comments, highlights, math, footnotes, block references), which form a link takes, list indentation, code fences and emphasis markers, plus which note is the target, what stays untouched and how the result is read back. Use whenever a .md file or note in a vault is created or edited, even for a small addition and even when another workflow is the one producing the note (a source turned into a note, a translation, a summary, a research write-up, adding images or video), and to clean up, organize, tidy, restyle or review the formatting of notes. Load it in addition to whichever workflow handles the request: it works alongside that workflow and does not replace it. Not for choices of wording, argument or translation, .canvas or .base internals, or vault CLI operations."
+description: "Use when writing Markdown in an Obsidian vault: creating or editing any note."
 license: MIT
 ---
 

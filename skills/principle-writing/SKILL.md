@@ -1,6 +1,6 @@
 ---
 name: "principle-writing"
-description: "Guides the parts of a note that take understanding of its content to judge: how the prose carries meaning for a reader who was not there. Covers line-editing existing prose without changing the author's voice or meaning, keeping quotation, translation, interpretation and the writer's own words apart, marking what is observed, assumed or unverified, and choosing between a list, a paragraph and a table. Use whenever prose is written into a vault note, even when another workflow is the one producing the note: drafting, summarizing, translating, rewriting, polishing or reviewing, including writing style and tone. Load it in addition to whichever workflow handles the request: it works alongside that workflow and does not replace it. Not for syntax, link form or indentation."
+description: "Use when writing prose into a note: drafting, summarizing, translating, rewriting or reviewing."
 license: MIT
 ---
 
