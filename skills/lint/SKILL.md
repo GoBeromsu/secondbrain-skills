@@ -63,7 +63,7 @@ Every Wiki page should be reachable from at least one MOC. List uncovered pages 
 
 ### Step 8: Frontmatter Coverage
 
-미래의 나에게 보내는 편지 — the fields that tell a later reader why a note exists — plus the Exploration Gate, verification fields, Bias Check and Persona health. Report each as n/total with the complete failing path list:
+A letter to your future self — the fields that tell a later reader why a note exists — plus the Exploration Gate, verification fields, Bias Check and Persona health. Report each as n/total with the complete failing path list:
 
 - **Raw:** `collectionPurpose` (missing → "pre-v2 raw source — consider backfill"), `mainVaultRelated`, `mainVaultCmds`; a secondary Raw that reports another creator's work carries `referenced` (originals and earlier captures; never evidence that the original was read).
 - **Wiki:** `mainVaultRelated`, `mainVaultCmds` where live policy expects them; `confidence` only `high|medium|low`; `source` and `related` present.

@@ -675,7 +675,7 @@ Staff --> Notify
 Hold ..> : include Notify
 ```
 
-Keep actor and use-case ids ASCII and put the display name in quoted parentheses, `actor Reader("독자")`; a non-ASCII id fails to parse (*observed*).
+Keep actor and use-case ids ASCII and put the display name in quoted parentheses, `actor Reader("Library reader")`; a non-ASCII id fails to parse (*observed*).
 
 ### Packet
 

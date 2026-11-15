@@ -1,6 +1,6 @@
 ---
 name: "principle-writing"
-description: "Guides the parts of a note that take understanding of its content to judge: how the prose carries meaning for a reader who was not there. Covers line-editing existing prose without changing the author's voice or meaning, keeping quotation, translation, interpretation and the writer's own words apart, marking what is observed, assumed or unverified, and choosing between a list, a paragraph and a table. Use whenever prose is written into a vault note, even when another workflow is the one producing the note: drafting, summarizing, translating, rewriting, polishing or reviewing (글쓰기 스타일, 문체, 글 다듬기, 문단 다듬어 줘, 번역해서 정리, 한국어로 번역, 회의 내용 정리, 노트 다시 써줘, 노트로 정리). Load it in addition to whichever workflow handles the request: it works alongside that workflow and does not replace it. Not for syntax, link form or indentation."
+description: "Guides the parts of a note that take understanding of its content to judge: how the prose carries meaning for a reader who was not there. Covers line-editing existing prose without changing the author's voice or meaning, keeping quotation, translation, interpretation and the writer's own words apart, marking what is observed, assumed or unverified, and choosing between a list, a paragraph and a table. Use whenever prose is written into a vault note, even when another workflow is the one producing the note: drafting, summarizing, translating, rewriting, polishing or reviewing, including writing style and tone. Load it in addition to whichever workflow handles the request: it works alongside that workflow and does not replace it. Not for syntax, link form or indentation."
 license: MIT
 ---
 
@@ -14,7 +14,7 @@ A note is read later by someone who was not there when it was written, often its
 
 ## Quotation and attribution
 
-- Put quoted source text, its translation, its interpretation and the writer's own words in separate paragraphs or under short labels (`번역`, `해석`, `내 말`).
+- Put quoted source text, its translation, its interpretation and the writer's own words in separate paragraphs or under short labels (`Translation`, `Interpretation`, `My words`).
 - Keep a translation out of the blockquote that holds the original, and mark it as a translation.
 - Present a sentence as a quotation only when its source is named and contains it word for word.
 

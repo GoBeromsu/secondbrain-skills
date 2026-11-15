@@ -32,7 +32,7 @@ Completion is judged per mode. Mode A mandatory: `{your-name}`, `{Your Name}`, `
 - Freshly laid-down or cloned starting vault (placeholders present, Core Context `status: template`, no owner notes) → Interview.
 - Existing vault with owner notes → read-only diagnosis and proposal: report placeholders left, Core Context status and its §2 axes, whether `index.md` and `log.md` exist, and the settings changes you would suggest. Write nothing: no note, JSON, config or settings change, and no placeholder replacement in existing files. A missing `index.md` or `log.md` is proposed, not created; `ingest` creates `index.md` on its first run.
 
-## Interview — 필수 5 + 옵션 2 (answer-1-of-many)
+## Interview — 5 required + 2 optional (answer-1-of-many)
 
 In voice mode one question at a time, in text a batch. After each answer, confirm it back in one or two sentences.
 
@@ -71,7 +71,7 @@ Every run starts at the pre-flight and continues at the first unfinished step: t
 Read back the files written and list them. Then suggest:
 
 1. `status` — the vault at a glance.
-2. A first `ingest <URL>` — when the purpose question comes, answer with one of the §2 reuse axes ("미래의 나에게 보내는 편지", a letter to your future self).
+2. A first `ingest <URL>` — when the purpose question comes, answer with one of the §2 reuse axes (a letter to your future self).
 3. A first `query <question>`.
 4. As it grows: recurring open questions become Research Question cards in `20. Wiki/25. Questions/`; a defended claim becomes a Synthesis card.
 5. Later: `capture` and `inbox` for collecting before ingesting, `qmd` for search (`reindex`).

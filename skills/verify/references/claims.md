@@ -37,7 +37,7 @@ For a secondary claim, follow the Raw's `referenced` list to the original. `refe
 - original linked only as an Inbox candidate, or as a Book Index whose chapter is still unread (no chapter text in Raw) → the claim is unconfirmed at the original; report the candidate and recommend ingesting it; the citing Raw is not proof;
 - no `referenced` entry and no locatable original → provenance unknown; the claim can at most be attributed to the secondary author, never confirmed as the original creator's finding.
 
-A quotation inside a secondary source is not the original. Attribution that silently moves a secondary author's interpretation onto the original creator is a 정합성 (Consistency) failure, even when both texts exist.
+A quotation inside a secondary source is not the original. Attribution that silently moves a secondary author's interpretation onto the original creator is a Consistency failure, even when both texts exist.
 
 ## Evidence Scope Levels (5)
 

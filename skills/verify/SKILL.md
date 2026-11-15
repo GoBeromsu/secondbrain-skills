@@ -24,9 +24,9 @@ Scope is the named page. Other pages are read as counterparts; they are not veri
 
 ## Quality Gates
 
-1. **지식요건해당성 (Eligibility)** — subject, predicates, objects, source, evidence scope and claim type are identifiable; `claimType` and `evidenceScope` are classifiable.
-2. **정합성 (Consistency)** — no conflict against the cited Raw, the original behind it, other Wiki pages, the destination's live policy, and Core Context.
-3. **확증가능성 (Confirmability)** — `confidence` computed independently from source count, source type and counter-evidence matches the declared `confidence`.
+1. **Eligibility** — subject, predicates, objects, source, evidence scope and claim type are identifiable; `claimType` and `evidenceScope` are classifiable.
+2. **Consistency** — no conflict against the cited Raw, the original behind it, other Wiki pages, the destination's live policy, and Core Context.
+3. **Confirmability** — `confidence` computed independently from source count, source type and counter-evidence matches the declared `confidence`.
 
 Conflicts are flagged `disputed`, never deleted.
 

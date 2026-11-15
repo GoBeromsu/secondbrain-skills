@@ -50,7 +50,7 @@ Resolve from the request or the visible browser session:
 - `nextStep` — `inbox-only`, `run-inbox`, or `ingest-now`;
 - `collectionPurpose` — why this is kept and where it will be reused.
 
-Purpose gate: ask one question for the whole bundle only when neither the task nor an earlier candidate states the purpose. Save the answer verbatim. When the owner delegates ("알아서", "자동으로"), infer it from the source and the reuse axes actually registered in Core Context §2, and record both the inference and its reason in `collectionPurpose`. A purpose never triggers compilation.
+Purpose gate: ask one question for the whole bundle only when neither the task nor an earlier candidate states the purpose. Save the answer verbatim. When the owner delegates ("you decide", "automatically"), infer it from the source and the reuse axes actually registered in Core Context §2, and record both the inference and its reason in `collectionPurpose`. A purpose never triggers compilation.
 
 If the topic or target tab group is ambiguous, ask one concise question before operating the browser.
 

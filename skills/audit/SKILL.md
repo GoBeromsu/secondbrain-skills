@@ -6,7 +6,7 @@ license: MIT
 
 # Audit
 
-Whole-vault knowledge integrity audit. Audit applies the same three criteria as `verify` — 지식요건해당성 (Eligibility), 정합성 (Consistency), 확증가능성 (Confirmability) — at scale, through Map clusters and prioritized sampling. It does not verify every page; it scores the sampled scope, surfaces drift patterns and ranks the next `verify` calls. Audit is the planner; `verify` is the worker.
+Whole-vault knowledge integrity audit. Audit applies the same three criteria as `verify` — Eligibility, Consistency, Confirmability — at scale, through Map clusters and prioritized sampling. It does not verify every page; it scores the sampled scope, surfaces drift patterns and ranks the next `verify` calls. Audit is the planner; `verify` is the worker.
 
 Audit is a read-only diagnostic on the vault. It never regenerates the Wiki, rewrites a page, or sets a page property; follow-ups route to `verify`, `lint` or `ingest`. An owner goal to improve the entire Wiki becomes a ranked queue of single-page follow-ups, never blanket regeneration. The only writes are the report note and its `log.md` entry, both only after the owner approves saving. A `--no-save` or unapproved run writes nothing — no report, no log entry, no index change. Never commit or push; commit only when the owner separately asks.
 
@@ -137,7 +137,7 @@ Without approval, or with `--no-save`, write nothing.
 
 ## Output
 
-Print the summary following [report](references/report.md): Vault Health composite, then 1. Eligibility (지식요건해당성), 2. Consistency (정합성), 3. Confirmability (확증가능성) each with its score and key counts, the Top 10 `verify` queue, the report path when saved, and drift versus the last audit.
+Print the summary following [report](references/report.md): Vault Health composite, then 1. Eligibility, 2. Consistency, 3. Confirmability each with its score and key counts, the Top 10 `verify` queue, the report path when saved, and drift versus the last audit.
 
 ## Failure Modes
 

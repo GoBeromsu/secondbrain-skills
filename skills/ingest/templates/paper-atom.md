@@ -29,52 +29,52 @@ verificationStatus: unverified
 # {{surname}} {{year}} - S{{NN}} {{atom_title}}
 
 > [!info] Analysis Context
-> **Paper**: {{authors}} ({{year}}), *{{paper_title}}* — [[{{surname}} {{year}} - S00 Hub|hub]] · [[{{raw_source}}|원문]]
-> **수집 맥락**: "{{collectionPurpose_gist}}" → {{RQ_link_or_단순 수집}}
-> **위치**: Step {{N}} / 12 — {{step_name}} ({{paperType}}) · 원문 §{{section}}
-> **이 원자**: {{the_one_question}}. 인접 원자: [[{{neighbour}}]]
+> **Paper**: {{authors}} ({{year}}), *{{paper_title}}* — [[{{surname}} {{year}} - S00 Hub|hub]] · [[{{raw_source}}|Original]]
+> **Collection context**: "{{collectionPurpose_gist}}" → {{RQ_link_or_collection only}}
+> **Position**: Step {{N}} / 12 — {{step_name}} ({{paperType}}) · Original §{{section}}
+> **This atom**: {{the_one_question}}. Neighbours: [[{{neighbour}}]]
 
-<!-- A stub (progressive) keeps only the Analysis Context and one line under 쉬운 도입 stating the question. -->
+<!-- A stub (progressive) keeps only the Analysis Context and one line under Plain Introduction stating the question. -->
 
 ---
 
-## 쉬운 도입
+## Plain Introduction
 
 {{one_or_two_paragraphs_for_a_reader_new_to_the_idea}}
 
 ---
 
-## 정밀 해설
+## Close Reading
 
 {{the_authors_definition_and_argument_with_mechanisms_and_distinctions}}
 
 ---
 
-## 예시
+## Examples
 
 - {{example_from_the_original}}
-- 【분석자 주】 {{analyst_example_marked_as_not_the_authors}}
+- [Analyst note] {{analyst_example_marked_as_not_the_authors}}
 
 ---
 
-## 원문 근거
+## Source Evidence
 
 <!-- Guidance: two to six quotes per atom, not a quota. Hard: verbatim from the Raw's Original Content and a page-first locator in every header. -->
 
-> [!quote] 원문 (p.{{page}}, §{{section}})
+> [!quote] Original (p.{{page}}, §{{section}})
 > "{{verbatim_from_raw_original_content}}"
 
 ---
 
-## 개념 관계
+## Concept Relations
 
-- 논증 내 역할: {{what_breaks_without_this_atom}}
+- Role in the argument: {{what_breaks_without_this_atom}}
 - [[{{sibling_atom}}]]: {{distinction_or_link}}
 - Wiki: [[{{promoted_page}}]]
 
 ---
 
-## 내 원고 맥락
+## My Manuscript Context
 
 {{optional_reading_against_targetManuscript}}
 

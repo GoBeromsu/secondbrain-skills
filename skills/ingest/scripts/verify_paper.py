@@ -62,8 +62,8 @@ STEP_NAMES = {
         11: "CAUTIONS", **_SHARED,
     },
 }
-BODY_SECTIONS = ("쉬운 도입", "정밀 해설", "예시", "원문 근거", "개념 관계")
-RELATIONS = "개념 관계"
+BODY_SECTIONS = ("Plain Introduction", "Close Reading", "Examples", "Source Evidence", "Concept Relations")
+RELATIONS = "Concept Relations"
 NON_CONTENT_HEADINGS = {"metadata", "ingest notes", "original content"}
 
 WIKILINK_RE = re.compile(r"!?\[\[([^\[\]\n]+?)\]\]")
@@ -693,11 +693,11 @@ def check_step_map(paper: Paper) -> None:
                 rep.fail(hub.path, f"Step Map S{step:02d} skipped without a stated reason")
         elif not in_step:
             rep.fail(hub.path, f"Step Map S{step:02d} has no atoms but is not 'skipped (reason)'")
-        stated = re.search(r"stub\s*(\d+)\s*건", status)
+        stated = re.search(r"stub\s*(\d+)", status)
         if stated and int(stated.group(1)) != stubs:
-            rep.fail(hub.path, f"Step Map S{step:02d} states stub {stated.group(1)}건; folder has {stubs}")
+            rep.fail(hub.path, f"Step Map S{step:02d} states stub {stated.group(1)}; folder has {stubs}")
         elif stubs and not stated:
-            rep.fail(hub.path, f"Step Map S{step:02d} has {stubs} stub atom(s) not stated as 'stub {stubs}건'")
+            rep.fail(hub.path, f"Step Map S{step:02d} has {stubs} stub atom(s) not stated as 'stub {stubs}'")
     for step in sorted(set(range(1, 13)) - seen):
         rep.fail(hub.path, f"Step Map has no row for S{step:02d}")
 

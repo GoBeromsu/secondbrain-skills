@@ -1,6 +1,6 @@
 ---
 name: "principle-formatting"
-description: "Guides everything about a vault note that can be judged from its raw characters without understanding the content: Obsidian Flavored Markdown syntax (wikilinks, embeds, callouts, properties or frontmatter, tags, comments, highlights, math, footnotes, block references), which form a link takes, list indentation, code fences and emphasis markers, plus which note is the target, what stays untouched and how the result is read back. Use whenever a .md file or note in a vault is created or edited, even for a small addition and even when another workflow is the one producing the note (a source turned into a note, a translation, a summary, a research write-up: 노트로 정리, 노트에 남겨 줘, 그림과 영상 넣어 줘), and to clean up, organize, tidy or restyle notes (노트 정리, 노트 청소, 형식, 서식, 들여쓰기, 포맷 검토). Load it in addition to whichever workflow handles the request: it works alongside that workflow and does not replace it. Not for choices of wording, argument or translation, .canvas or .base internals, or vault CLI operations."
+description: "Guides everything about a vault note that can be judged from its raw characters without understanding the content: Obsidian Flavored Markdown syntax (wikilinks, embeds, callouts, properties or frontmatter, tags, comments, highlights, math, footnotes, block references), which form a link takes, list indentation, code fences and emphasis markers, plus which note is the target, what stays untouched and how the result is read back. Use whenever a .md file or note in a vault is created or edited, even for a small addition and even when another workflow is the one producing the note (a source turned into a note, a translation, a summary, a research write-up, adding images or video), and to clean up, organize, tidy, restyle or review the formatting of notes. Load it in addition to whichever workflow handles the request: it works alongside that workflow and does not replace it. Not for choices of wording, argument or translation, .canvas or .base internals, or vault CLI operations."
 license: MIT
 ---
 
@@ -39,7 +39,7 @@ A request that names the note and the change settles all four of these, so carry
 - Link a note in the vault as `[[Note]]` and external material as `[name of the article or site](URL)`.
 - Convert a bare or backticked URL in text you write or restyle to that form, and keep a real path or URL where a command, code, quotation or captured source text has it.
 - Link the same note once per note, at its first mention in the body, and write it as plain text after that; this holds for terms and people alike.
-- Call a person by another name with `[[Full Name|Short Name]]` (`[[홍길동|길동]]`).
+- Call a person by another name with `[[Full Name|Short Name]]` (`[[Ada Lovelace|Ada]]`).
 - Embed an external image or video by its URL in image syntax (`![Diagram](https://example.com/diagram.png)`, `![Demo](https://example.com/demo.mp4)`), not in an HTML tag, instead of downloading it into the vault; download only when the user asks.
 - Keep the extension on every target that is not a Markdown note (`[[Team Board.canvas]]`), and add enough folder path to make a shared basename unambiguous.
 
@@ -49,7 +49,7 @@ A request that names the note and the change settles all four of these, so carry
 - Indent YAML frontmatter with two spaces per level; YAML rejects a tab as indentation.
 - Leave indentation inside code blocks and quotations as the source has it.
 - Name a language on every code fence, and `text` when there is none.
-- Put a space after a closing `**` that follows punctuation and is followed directly by a letter (`**추적성(traceability)** 을 확보한다`), because that marker does not close the emphasis; leave `**용어**를` as it is.
+- Put a space after a closing `**` that follows punctuation and is followed directly by a letter (`**traceability(audit)** suffix`), because that marker does not close the emphasis; leave `**term**suffix` as it is.
 
 ## Read back
 

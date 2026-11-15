@@ -108,7 +108,7 @@ Every row failed in Obsidian 1.15.1 (installer 1.15.0) through `window.pele.rend
 | `A[Renewal (second request)]` | `Parse error ... got 'PS'` | `A["Renewal (second request)"]` |
 | `A -->\|yes (ok)\| B` | `Parse error ... got 'PS'` | `A -->\|"yes (ok)"\| B` |
 | `A[a\|b]` | `Parse error ... got 'PIPE'` | quote the label |
-| `participant X as "CI(빌드/테스트)"` | no error: the quotes print literally in the box | sequence has no quoted form: write `participant X as CI(빌드/테스트)` bare |
+| `participant X as "CI(build/test)"` | no error: the quotes print literally in the box | sequence has no quoted form: write `participant X as CI(build/test)` bare |
 | `A --> end` | `Parse error ... got 'end'` | `End`, or `[end]`, which draws |
 | `subgraph S1` with no `end` | `Parse error ... Expecting 'end'` | close every subgraph |
 | `statediagram-v2`, `sequencediagram`, `gitgraph` | `No diagram type detected` | exact case: `stateDiagram-v2`, `sequenceDiagram`, `gitGraph` |
@@ -121,7 +121,7 @@ Every row failed in Obsidian 1.15.1 (installer 1.15.0) through `window.pele.rend
 
 If the minimal block renders but yours does not, remove the config header, metadata, styling and per-point labels one at a time.
 
-Keep the user's own wording in a label, parentheses and slashes included; do not rename "CI(빌드/테스트)" to "CI 빌드·테스트" to dodge a parse error. Forms that printed the text exactly as written (screenshot or SVG text): flowchart, class and mindmap `["CI(빌드/테스트)"]`, ER relation label `: "has (many)"`, state `state "CI(빌드/테스트)" as S`, and in sequence a bare `participant X as CI(빌드/테스트)`, a bare participant id `CI(빌드/테스트)`, a bare message `A->>B: 빌드(테스트) 요청`, or entity codes `#40;` and `#41;` for the parentheses. If a form is missing for a type you need, say so to the user when you change a label.
+Keep the user's own wording in a label, parentheses and slashes included; do not rename "CI(build/test)" to "CI build-test" to dodge a parse error. Forms that printed the text exactly as written (screenshot or SVG text): flowchart, class and mindmap `["CI(build/test)"]`, ER relation label `: "has (many)"`, state `state "CI(build/test)" as S`, and in sequence a bare `participant X as CI(build/test)`, a bare participant id `CI(build/test)`, a bare message `A->>B: build(test) request`, or entity codes `#40;` and `#41;` for the parentheses. If a form is missing for a type you need, say so to the user when you change a label.
 
 Passed, and so not pitfalls: Korean labels bare or quoted, in flowchart, sequence, state, pie, mindmap, gantt, class, ER, journey, timeline and sankey; `<br>` and `<br/>`; `:`, `/`, `#`, `&` and `{}` in an unquoted flowchart label; a `mermaid` fence in a list item, a callout and a `~~~` fence; `graph` for `flowchart`; `stateDiagram` without `-v2`.
 
