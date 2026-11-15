@@ -71,9 +71,9 @@ function inspect(file) {
 	const maxX = Math.max(...boxes.map((e) => e.x + Math.abs(e.width)));
 	const maxY = Math.max(...boxes.map((e) => e.y + Math.abs(e.height ?? 0)));
 	console.log(
-		`${path.basename(file)}  요소 ${visible.length}개 (도형 ${count((e) => SHAPES.has(e.type))}, 화살표/선 ${count((e) => LINEAR.has(e.type))}, 텍스트 ${count((e) => e.type === "text")})` +
-			(boxes.length ? `  범위 x ${round(minX)}~${round(maxX)}, y ${round(minY)}~${round(maxY)}` : "") +
-			(elements.some(isSkel) ? "  [스켈레톤 포함: 플러그인에서 정규화 필요]" : ""),
+		`${path.basename(file)}  ${visible.length} elements (shapes ${count((e) => SHAPES.has(e.type))}, arrows/lines ${count((e) => LINEAR.has(e.type))}, text ${count((e) => e.type === "text")})` +
+			(boxes.length ? `  bounds x ${round(minX)}~${round(maxX)}, y ${round(minY)}~${round(maxY)}` : "") +
+			(elements.some(isSkel) ? "  [contains skeletons: the plugin must normalize them]" : ""),
 	);
 	for (const el of visible) {
 		const label = labelOf(el, byId);
@@ -103,22 +103,22 @@ function lint(file) {
 	const warns = [];
 	if (error) errors.push(error);
 	else {
-		if (data.type !== "excalidraw") errors.push(`최상위 type이 "excalidraw"가 아닙니다: ${data.type}`);
-		if (!Array.isArray(data.elements)) errors.push("최상위 elements 배열이 없습니다");
+		if (data.type !== "excalidraw") errors.push(`top-level type is not "excalidraw": ${data.type}`);
+		if (!Array.isArray(data.elements)) errors.push("top-level elements array is missing");
 		const all = Array.isArray(data.elements) ? data.elements : [];
 		const ids = new Map();
 		for (const e of all) {
-			if (!e.type) errors.push(`type 없는 요소: ${JSON.stringify(e).slice(0, 80)}`);
+			if (!e.type) errors.push(`element without type: ${JSON.stringify(e).slice(0, 80)}`);
 			if (typeof e.id !== "string" || !e.id) {
-				if (isSkel(e) && !LINEAR.has(e.type)) warns.push(`id 없는 ${e.type} 요소 (나중에 수정·연결하려면 id 권장)`);
-				if (!isSkel(e)) errors.push("id 없는 정식 요소");
+				if (isSkel(e) && !LINEAR.has(e.type)) warns.push(`${e.type} element without id (an id is recommended to edit or connect it later)`);
+				if (!isSkel(e)) errors.push("full element without id");
 				continue;
 			}
-			if (ids.has(e.id)) errors.push(`중복 id: ${e.id}`);
+			if (ids.has(e.id)) errors.push(`duplicate id: ${e.id}`);
 			ids.set(e.id, e);
 		}
 		const ref = (owner, id, what) => {
-			if (id && !ids.has(id)) errors.push(`${owner.id ?? owner.type}의 ${what}가 없는 요소를 가리킴: ${id}`);
+			if (id && !ids.has(id)) errors.push(`${what} of ${owner.id ?? owner.type} points to a missing element: ${id}`);
 		};
 		for (const e of elements) {
 			ref(e, e.containerId, "containerId");
@@ -141,12 +141,12 @@ function lint(file) {
 			if (isSkel(e) && LINEAR.has(e.type)) {
 				const [s, t] = arrowEnds(e);
 				if (typeof e.x !== "number" && !(s && t))
-					errors.push(`${e.id ?? "arrow"}: x/y도 없고 start.id·end.id도 없습니다`);
+					errors.push(`${e.id ?? "arrow"}: has neither x/y nor start.id and end.id`);
 				if (typeof e.x !== "number" && s && t) {
 					for (const id of [s, t]) {
 						const target = ids.get(id);
 						if (target && (typeof target.width !== "number" || typeof target.height !== "number"))
-							errors.push(`${e.id ?? "arrow"}: 자동 연결 대상 ${id}에 width/height가 없습니다`);
+							errors.push(`${e.id ?? "arrow"}: auto-connect target ${id} has no width/height`);
 					}
 				}
 			}
@@ -157,7 +157,7 @@ function lint(file) {
 				const needH = (fontSize * 1.25 * e.label.text.split("\n").length + 32) * scale;
 				if (needW > e.width || (typeof e.height === "number" && needH > e.height))
 					warns.push(
-						`${e.id}: 라벨 "${e.label.text.split("\n")[0]}"이 ${e.width}×${e.height}에 빠듯해 보임 (약 ${Math.round(needW)}×${Math.round(needH)}px 필요)`,
+						`${e.id}: label "${e.label.text.split("\n")[0]}" looks tight in ${e.width}×${e.height} (needs about ${Math.round(needW)}×${Math.round(needH)}px)`,
 					);
 			}
 		}
@@ -189,17 +189,17 @@ function lint(file) {
 				const ix = Math.min(a.x2, b.x2) - Math.max(a.x1, b.x1);
 				const iy = Math.min(a.y2, b.y2) - Math.max(a.y1, b.y1);
 				if (ix > 2 && iy > 2 && !contains(a, b) && !contains(b, a))
-					warns.push(`겹침: ${a.id} ↔ ${b.id} (${Math.round(ix)}×${Math.round(iy)})`);
+					warns.push(`overlap: ${a.id} ↔ ${b.id} (${Math.round(ix)}×${Math.round(iy)})`);
 			}
 		for (const e of elements) {
 			if (e.type !== "arrow") continue;
 			const [s, t] = arrowEnds(e);
-			if (!s || !t) warns.push(`${e.id ?? "arrow"}: 한쪽 이상이 도형에 연결되지 않은 화살표`);
+			if (!s || !t) warns.push(`${e.id ?? "arrow"}: arrow with at least one end not connected to a shape`);
 		}
 	}
 	for (const m of errors) console.log(`ERROR ${m}`);
 	for (const m of warns) console.log(`WARN  ${m}`);
-	console.log(errors.length || warns.length ? `오류 ${errors.length}, 경고 ${warns.length}` : "OK");
+	console.log(errors.length || warns.length ? `errors ${errors.length}, warnings ${warns.length}` : "OK");
 	process.exit(errors.length ? 1 : 0);
 }
 

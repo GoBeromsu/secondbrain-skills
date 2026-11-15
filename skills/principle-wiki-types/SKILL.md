@@ -1,13 +1,13 @@
 ---
 name: "principle-wiki-types"
-description: "Classifies Wiki knowledge as Term, Concept, Entity, Guide, a claim within a page or evidence kept in Raw. Use for page-type decisions or corrections, term인지 concept인지, 이건 무슨 페이지야. Creating the page belongs to ingest."
+description: "Classifies Wiki knowledge as Term, Concept, Entity, Guide, a claim within a page or evidence kept in Raw. Use for page-type decisions or corrections, such as whether something is a Term or a Concept, or what kind of page a note is. Creating the page belongs to ingest."
 license: MIT
 ---
 
 # Wiki page types
 
 - Classify a name with a field-shared meaning used independently of the selected source as a Term (`ReplicaSet`, `AI Agent`).
-- Classify a reusable abstract idea, technique, method or pattern without an established field name as a Concept, whether or not the source names it (`LLM Wiki Pattern`, `비대칭 동업`).
+- Classify a reusable abstract idea, technique, method or pattern without an established field name as a Concept, whether or not the source names it (`LLM Wiki Pattern`, `Asymmetric Partnership`).
 - Keep a name only one author uses as a Concept until an independent source uses it.
 - Classify a named individual person, organization, product, service, model or dataset as an Entity rather than the kind it exemplifies (`OpenClaw`, `Claude Code`).
 - Classify an executable ordered procedure as a Guide.

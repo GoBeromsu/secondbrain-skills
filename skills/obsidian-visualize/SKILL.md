@@ -1,6 +1,6 @@
 ---
 name: "obsidian-visualize"
-description: "Builds an Obsidian visual: a JSON Canvas (.canvas), an Excalidraw drawing (.excalidraw.md) or a mermaid block drawn by Pele. Use to create, edit or validate a .canvas file (nodes, edges, groups, IDs); for an architecture, pipeline, sequence, state, ER or concept diagram, a gantt, journey, swimlane, quadrant or treemap chart, a mind map, sketchnote or sticky notes; for any mermaid block in a note, including one with a parse error, raw text or an empty box, or a `-beta` keyword; to edit, inspect, export or render Excalidraw; or to choose between these and a plain table. 캔버스·플로우차트·아키텍처도·개념도·머메이드·펠레·손그림·마인드맵·스케치노트·도구 연결도·로고·아이콘·인물 사진·기사 썸네일·웹 임베드. Not for note prose (markdown) or plugin installs (obsidian-cli)."
+description: "Builds an Obsidian visual: a JSON Canvas (.canvas), an Excalidraw drawing (.excalidraw.md) or a mermaid block drawn by Pele. Use to create, edit or validate a .canvas file (nodes, edges, groups, IDs); for an architecture, pipeline, sequence, state, ER or concept diagram, a gantt, journey, swimlane, quadrant or treemap chart, a mind map, sketchnote or sticky notes; for any mermaid block in a note, including one with a parse error, raw text or an empty box, or a `-beta` keyword; to edit, inspect, export or render Excalidraw; or to choose between these and a plain table. Also for a flowchart, hand-drawn sketch, tool connection map, logo, icon, portrait photo, article thumbnail or web embed. Not for note prose (markdown) or plugin installs (obsidian-cli)."
 license: MIT
 ---
 

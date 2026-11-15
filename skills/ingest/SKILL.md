@@ -1,6 +1,6 @@
 ---
 name: "ingest"
-description: "Ingests one selected source into the wiki: a URL, file, text, paper, book (책 노트, 독서 노트, 목차 넣어줘) or Inbox candidate becomes a preserved Raw source plus Wiki pages and Maps. Use for adding a source, paper analysis (12-axis), book notes, chapter promotion and attributed Persona updates. Saving without compiling belongs to capture."
+description: "Ingests one selected source into the wiki: a URL, file, text, paper, book or Inbox candidate becomes a preserved Raw source plus Wiki pages and Maps. Use for adding a source, paper analysis (12-axis), book notes, reading notes, adding a book's table of contents, chapter promotion and attributed Persona updates. Saving without compiling belongs to capture."
 ---
 
 # Ingest
@@ -27,17 +27,17 @@ Per-material acquisition detail: [articles](references/articles.md), [videos](re
 
 Pick the Raw `category` in this order: the Inbox lane the file sits in; a `category` in Web Clipper frontmatter; inference from the content; default `Articles`. Save into the destination's Raw folder for that category.
 
-## Step 1 — Collection purpose (미래의 나에게 보내는 편지)
+## Step 1 — Collection purpose (a letter to your future self)
 
 Ask exactly one collection-purpose question before ingest, and nothing else:
 
-> 미래의 내가 이 자료를 다시 볼 때 — 왜 수집했고, 어디에 쓸 예정인지 한 줄 남겨주세요.
-> 재활용 축 참고: {Core Context §2 에 등록된 축}
+> When your future self opens this source again — why did you collect it, and where do you plan to use it? Leave one line.
+> Reuse axes for reference: {axes registered in Core Context §2}
 
 - Save the answer verbatim as `collectionPurpose`.
 - Do not ask when the task already states a valid purpose, or the capture candidate carries `collectionPurpose`; use it.
-- When the owner says "알아서 판단해줘" or "자동으로", infer the most likely axis from the source and Core Context §2, state the inference and its reason, and record that in `collectionPurpose`.
-- Batch: ask once up front — "오늘 들어온 {N}개 소스, 전체를 하나의 목적으로 묶으시겠어요, 아니면 개별로 물을까요?" — and follow the choice.
+- When the owner says "you decide" or "automatically", infer the most likely axis from the source and Core Context §2, state the inference and its reason, and record that in `collectionPurpose`.
+- Batch: ask once up front — "{N} sources came in today. Should they all share one purpose, or should I ask for each one?" — and follow the choice.
 
 ## Step 2 — Mothership connections
 

@@ -149,7 +149,7 @@ Labels follow the user's language; the user's own proper names, product names an
 
 ## When the user asks for a sketch
 
-A request for a sketch, hand-drawn look or 손그림 changes the look, not only the font. Clean boxes at default roughness are the wrong answer. Choose in this order:
+A request for a sketch or hand-drawn look changes the look, not only the font. Clean boxes at default roughness are the wrong answer. Choose in this order:
 
 - `roughness` 2 on every shape and arrow; `fillStyle` `hachure` for fills.
 - Vary shapes by meaning (ellipse, diamond, rectangle) rather than one box type.

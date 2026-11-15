@@ -55,11 +55,11 @@ List problems (unreadable notes, missing locators, root-level notes) below it. F
 
 Ask scope and purpose mode in one turn:
 
-1. **Scope** — 전부 / 카테고리만 / 선택만: all, one lane, or named notes. No answer selects nothing; the whole Inbox is never assumed.
-2. **Purpose mode** — 미래의 나에게 보내는 편지:
+1. **Scope** — all, one lane, or named notes. No answer selects nothing; the whole Inbox is never assumed.
+2. **Purpose mode** — a letter to your future self:
    - **Shared** — one `collectionPurpose` for the whole selection, applied to every note;
    - **Per-file** — `ingest` asks its Step 1 question per note;
-   - **Auto-infer** — "알아서/자동으로": `ingest` infers from the source and Core Context §2, recording the inference and its reason in `collectionPurpose`.
+   - **Auto-infer** — "you decide"/"automatically": `ingest` infers from the source and Core Context §2, recording the inference and its reason in `collectionPurpose`.
 
 A candidate that already carries `collectionPurpose`, or a purpose the task already states, is reused and not asked again; when every selected note has one, ask scope only. Never attach a purpose the owner did not give, approve or delegate.
 
@@ -69,7 +69,7 @@ Compose `ingest` once per selected note with its path, its purpose, and the dupl
 
 ### Step 6: Cleanup
 
-After the batch, check each ingest's report against disk: a Raw exists for each selected candidate, its `## Original Content` passed ingest's verbatim check against the Inbox body, and `index.md` and `log.md` were updated. Then ask "Inbox에서 처리된 파일 삭제할까요?", listing the candidates that passed.
+After the batch, check each ingest's report against disk: a Raw exists for each selected candidate, its `## Original Content` passed ingest's verbatim check against the Inbox body, and `index.md` and `log.md` were updated. Then ask "Delete the processed files from the Inbox?", listing the candidates that passed.
 
 - Delete only on an explicit yes, and only candidates whose verbatim check passed; a failed or partial ingest stays in place and is reported.
 - Before deleting a candidate, read it back once more as its before-image and confirm its Raw carries the full body verbatim and every source, history and metadata value the candidate held except `date_clipped` (`source`/`source_url`, `collectionPurpose`, `referenced`, Source Manifest, Agent Capture Notes, unknown keys); anything missing keeps that candidate in place and is reported.

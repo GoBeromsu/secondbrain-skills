@@ -1,6 +1,6 @@
 ---
 name: "obsidian-cli"
-description: "Drives a running Obsidian desktop app through the official `obsidian` CLI: reads, creates, searches, moves, renames and appends notes, sets properties, lists tasks, tags, backlinks and unresolved links, and reloads, evaluates, screenshots and inspects plugins or themes and their errors. Use for vault work from a terminal or script, or \"이 노트를 가리키는 백링크 확인해줘\", \"어떤 노트가 여기로 링크하는지 찾아줘\". Not for Markdown syntax, a third-party CLI of a similar name, headless sync or raw file edits."
+description: "Drives a running Obsidian desktop app through the official `obsidian` CLI: reads, creates, searches, moves, renames and appends notes, sets properties, lists tasks, tags, backlinks and unresolved links, and reloads, evaluates, screenshots and inspects plugins or themes and their errors. Use for vault work from a terminal or script, or \"check the backlinks pointing at this note\", \"find which notes link here\". Not for Markdown syntax, a third-party CLI of a similar name, headless sync or raw file edits."
 license: MIT
 ---
 

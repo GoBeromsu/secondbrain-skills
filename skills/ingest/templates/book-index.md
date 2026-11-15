@@ -28,7 +28,7 @@ status: ingested
 # {{book_title}}
 
 > [!info] Source
-> 원본 출처: {{preface_or_index_url}}
+> Original source: {{preface_or_index_url}}
 
 ---
 

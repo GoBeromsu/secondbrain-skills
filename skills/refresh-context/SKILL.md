@@ -6,7 +6,7 @@ license: MIT
 
 # Refresh Context
 
-[[Core Context]] is the owner's **시점 snapshot** — who they are at a point in time: §1 identity and continuity statement, §2 reuse axes, §3 frameworks, §4 philosophy, §5 mothership references. When the owner's thinking develops, or the (optional) mothership changes, the snapshot must follow. Every `ingest` purpose question and every `query` answer is tailored to it, so a stale snapshot quietly bends all later work. The sources stay the truth; this skill brings the snapshot back in line with them and nothing more.
+[[Core Context]] is the owner's **snapshot** — who they are at a point in time: §1 identity and continuity statement, §2 reuse axes, §3 frameworks, §4 philosophy, §5 mothership references. When the owner's thinking develops, or the (optional) mothership changes, the snapshot must follow. Every `ingest` purpose question and every `query` answer is tailored to it, so a stale snapshot quietly bends all later work. The sources stay the truth; this skill brings the snapshot back in line with them and nothing more.
 
 The note is usually `Core Context.md`, sometimes a derived file such as `90. Settings/Derived/agent-context.md`; use the one the vault's AGENTS file names.
 
@@ -58,7 +58,7 @@ Owner judgment on top:
 - Keep the owner's own wording where it still holds. Refreshing is not rephrasing.
 - Reuse axes are the ones registered in §2 (normally 5–9, never a fixed list) and the owner's to define; propose a change only when a source states it, and flag that later `ingest` purposes and `query` answers will shift.
 
-Ask: **"Apply this diff? (전체 / 부분 / 거부)"** — in the owner's language. 거부, or no answer, writes nothing, including no log entry.
+Ask: **"Apply this diff? (all / part / reject)"** — in the owner's language. Reject, or no answer, writes nothing, including no log entry.
 
 ## Step 5: Apply
 

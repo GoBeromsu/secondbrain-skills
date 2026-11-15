@@ -69,7 +69,7 @@ After a save or feedback write, update `index.md` (Queries catalog, Recent Queri
 
 Name the reuse axis the answer most likely feeds, chosen from the axes actually registered in [[Core Context]] §2; if none fits, say so. Close the answer, and any saved query note, with:
 
-`이 답변은 {axis}에 활용 가능합니다 — {one-sentence why}.`
+`This answer can be reused for {axis}: {one-sentence why}.`
 
 Set `reusableFor` on a saved note to that axis.
 

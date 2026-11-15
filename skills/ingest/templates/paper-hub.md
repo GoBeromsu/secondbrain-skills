@@ -29,14 +29,14 @@ status: active
 
 > [!info] Paper Hub
 > **{{authors}} ({{year}})**, *{{paper_title}}* — twelve-axis analysis anchor; atoms in the Atom Catalog, axes in the Step Map.
-> **수집 맥락**: "{{collectionPurpose_gist}}" → {{RQ_link_or_단순 수집}}
+> **Collection context**: "{{collectionPurpose_gist}}" → {{RQ_link_or_collection only}}
 
 <!-- Only when citekeyProvisional: true. -->
 > [!warning] Provisional citekey
 > `{{citekey}}` is locally generated; on registration pin the registered key to this value, never rename notes or folder.
 
 <!-- Only when the Raw was converted with quality issues. -->
-> [!warning] 변환 품질
+> [!warning] Conversion quality
 > Conversion: {{tool_and_fidelity}}. Check: {{lost_formulas_tables_footnotes}}. Page locators: {{restored_or_section_only}}.
 
 ---
@@ -50,7 +50,7 @@ status: active
 
 ---
 
-## Abstract 요약
+## Abstract Summary
 
 {{three_to_five_line_compression; the verbatim abstract stays in the Raw}}
 
@@ -58,9 +58,9 @@ status: active
 
 ## Coverage Map
 
-| 원문 섹션 | 지식 원자 |
+| Source section | Knowledge atom |
 | --- | --- |
-| Abstract | (hub Abstract 요약) |
+| Abstract | (hub Abstract Summary) |
 | §{{section}} | [[{{atom}}]] · [[{{atom}}]] |
 | References | (kept in the Raw) |
 
@@ -71,7 +71,7 @@ status: active
 | S | Step name | Atoms | Status |
 | --- | --- | --- | --- |
 | 1 | CITATION | (hub) | compiled |
-| 2 | {{step_name}} | {{n}} | {{planned|compiled|stub M건|skipped (reason)}} |
+| 2 | {{step_name}} | {{n}} | {{planned|compiled|stub M|skipped (reason)}} |
 | 3 | {{step_name}} | {{n}} | {{status}} |
 | 4 | {{step_name}} | {{n}} | {{status}} |
 | 5 | {{step_name}} | {{n}} | {{status}} |
@@ -96,7 +96,7 @@ status: active
 
 ## Target Manuscript
 
-- {{[[RQ-slug]] — what the paper contributes there (cites / evidenceFor / evidenceAgainst)}} or `none` — 단순 수집 (12-axis analysis only)
+- {{[[RQ-slug]] — what the paper contributes there (cites / evidenceFor / evidenceAgainst)}} or `none` — collection only (12-axis analysis only)
 
 ---
 

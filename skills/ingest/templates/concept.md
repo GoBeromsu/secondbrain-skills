@@ -49,7 +49,7 @@ status: active
 > Data gap: {{data_gap}}
 
 <!-- Only for layer: scale, and only when the paper develops or validates the scale. Then also add to the frontmatter, after layer: `measuredConstruct` (the construct as a quoted wikilink string) and `itemCount` (an integer); omit both otherwise. -->
-> [!warning] 저작권 주의
+> [!warning] Copyright caution
 > Do not reproduce the full item text of a commercially or restrictively licensed scale verbatim. Full items only for an openly licensed scale; otherwise an item summary plus the original source.
 
 ## Measured Construct
