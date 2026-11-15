@@ -10,6 +10,8 @@ Verify that one Wiki page meets the quality requirements of a knowledge unit. `v
 
 The claim taxonomy, evidence scopes, primary/secondary judgment and confidence meaning are in [claims](references/claims.md). Field names and values follow `ingest`'s frontmatter reference.
 
+Tracing a claim back to who first made it, and writing the result into a note, are also covered by the skills for source description and note formatting. Load them alongside this one before tracing or writing.
+
 ## Input
 
 - A page name or path; resolve it against the Wiki folders of the destination's live placement (`rg --files`, exact path, or mtime). If two pages match, ask which.

@@ -33,7 +33,7 @@
     ],
     "websiteURL": "https://github.com/Xia-Ataraxia/secondbrain-skills",
     "defaultPrompt": [
-      "Use markdown to fix the properties and callouts in this note",
+      "Fix the properties and callouts in this note",
       "Use bases to build a Base view over my project notes"
     ],
     "brandColor": "#7C3AED",

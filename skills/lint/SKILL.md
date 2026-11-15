@@ -97,6 +97,7 @@ Notes written before the current policy, or by a writer still following an older
 - **Retired keys and duplicates:** keys the live policy says not to use (for example removed provenance keys), and the same property written twice in different spellings (`date modified` beside `date_modified`), with both values.
 - **Old values carried as tags:** where live policy keeps a replaced value as a tag (for example `reference/<old type>`), a note whose replaced value is not kept.
 - **Terms:** judge each Term and Concept by `principle-wiki-types` for classification and `ingest`'s `references/terms.md` for title rules and report Term candidates, Entity candidates and Term titles that break them, each with its target title and folder, plus links to a heading inside a Term and missing Term sections. A Concept titled as a sentence-style claim is reported as a claim candidate with the Term or Concept it is about when one exists. Decide only from evidence in the note and its sources; an empty or unsourced note is reported as undecided.
+- **Link form:** every bare or backticked URL in a note body, with its line and text, as a candidate for `[name](URL)`. Skip code fences, commands, quotations, frontmatter, captured source text under a Raw note's `## Original Content` and URLs already inside a Markdown link or embed.
 
 Then group the drifted notes by the provenance fields they record (`source_extraction`, `ingest_kind`, `store`, `source_kind`, `source_locator` host or session) and report each group with its newest `date_created`. A group still gaining notes means a writer is still producing the old shape. Name it as the recorded provenance only: never infer a producer from mtime, counts or file names. Report where that writer's instructions live when a recorded field points to them, as a finding for the owner. Lint does not edit another tool's configuration.
 
@@ -114,7 +115,7 @@ Report in the conversation using [report](references/report.md):
 8. **Frontmatter Coverage** — v2 fields, Exploration Gate, verification fields, Bias Check, Persona health
 9. **Core Context**
 10. **Cross-Vault Integrity** (mothership only)
-11. **Policy Conformance** — placement, kind values, retired keys and duplicates, old values kept as tags, Term and claim candidates, and writer groups still producing the old shape
+11. **Policy Conformance** — placement, kind values, retired keys and duplicates, old values kept as tags, Term and claim candidates, bare and backticked URLs, and writer groups still producing the old shape
 12. **Not checked**
 13. **Recommendations** — top ten by impact and effort, routed to `audit`, `verify` or `refresh-context` by name where larger
 

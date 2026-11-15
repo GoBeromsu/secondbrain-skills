@@ -32,7 +32,7 @@ Owned here:
 
 Not owned here:
 
-- Note body syntax — callouts, wikilinks, embeds, property formatting inside a finished note. `markdown` owns that; name it by identity only when the task actually reaches a note.
+- Note body syntax — callouts, wikilinks, embeds, property formatting inside a finished note.
 - `.base` structure, filters, formulas, and views. `bases` owns those; this package consumes only a Base's property keys and their intended types.
 - `.canvas` graph structure and vault-aware CLI operations, owned by `obsidian-visualize` and `obsidian-cli`.
 - What the vault's property vocabulary should be. The target vault's written convention decides; when it states none, ask instead of inventing one.

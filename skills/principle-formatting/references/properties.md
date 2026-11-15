@@ -27,7 +27,7 @@ due: 2024-02-01T14:30:00
 - The block closes with a line containing exactly `---`.
 - The content between the delimiters must be valid YAML; one syntax error drops every property in the note.
 - Only one frontmatter block per note. A later `---` line in the body is a horizontal rule, not a second block.
-- Indent with spaces. A tab anywhere in the block is a YAML error.
+- Indent with spaces. A tab used as indentation is a YAML error.
 
 ## Property Types
 
@@ -75,7 +75,7 @@ sources:
   - "[[Project Alpha#Decisions]]"
 ```
 
-Non-Markdown targets keep their extension here too: `board: "[[Team Board.canvas]]"`. Links in properties participate in link resolution, so a changed property link needs the same source-context readback as a body link (see *Destination readback* in this package's `SKILL.md`).
+Non-Markdown targets keep their extension here too: `board: "[[Team Board.canvas]]"`. Links in properties participate in link resolution, so a changed property link needs the same source-context readback as a body link (see [links](links.md)).
 
 ## Default Properties
 

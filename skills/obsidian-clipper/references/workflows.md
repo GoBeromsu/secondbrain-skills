@@ -122,7 +122,7 @@ Three questions decide the property list, and they are the user's to answer, not
 
 When the vault has no Base and no written convention for this content type, ask rather than inventing a property vocabulary. A one-off vocabulary is a permanent inconsistency.
 
-Note body syntax — callouts, wikilinks, embeds, property formatting in a finished note — belongs to `markdown`. This package produces the template that generates such a note; it does not own the note's syntax.
+Note body syntax — callouts, wikilinks, embeds, property formatting in a finished note — is outside this package, which produces the template that generates such a note.
 
 ## Recipes
 

@@ -21,7 +21,7 @@ Owned here:
 Not owned here:
 
 - Which notes deserve a base, where the `.base` file belongs, which template frames it, and what provenance it carries. Respect the target vault's applicable policy and the user's exact task. If no policy file exists, use explicit task-bound choices; clarify only missing decisions rather than inventing conventions.
-- Markdown note syntax, `.canvas` graph structure, and vault CLI operations. Name the matching package by identity -- `markdown`, `obsidian-visualize`, `obsidian-cli` -- only when the task actually reaches that artifact and that package is loaded. When it is not, report the gap rather than improvising.
+- Markdown note syntax, `.canvas` graph structure, and vault CLI operations. Name the matching package by identity -- `obsidian-visualize`, `obsidian-cli` -- only when the task actually reaches that artifact and that package is loaded. When it is not, report the gap rather than improvising.
 
 This package is standalone. Authoring the format needs no vault plugin, mutation server, environment variable, or personal configuration; rendering requires the target app's Bases capability. Applicable live vault policy always governs the task. Optional personal-policy tools and a vault-aware CLI compose only when selected; their absence is normal and unselected tools stay unused.
 
@@ -432,7 +432,7 @@ Embed in Markdown files:
 
 Without a selector the first view in the `views` list is used, so reordering views changes every plain embed. With a selector, the view **name** is the key: renaming a view breaks every embed that pointed at the old name, and nothing in the base file records the dangling reference. Rename a view only after checking which notes embed it.
 
-Base syntax can also live in a fenced `base` code block inside a note. The schema is identical; only the container differs. The note is then owned by `markdown` and the block content by this package -- do not fork a second schema for blocks.
+Base syntax can also live in a fenced `base` code block inside a note. The schema is identical; only the container differs -- do not fork a second schema for blocks.
 
 ## YAML Quoting Rules
 
