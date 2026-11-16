@@ -5,7 +5,7 @@ description: "Ingests one selected source into the wiki: a URL, file, text, pape
 
 # Ingest
 
-Execute every step in order. Asking for ingest authorizes the writes this recipe names in the destination vault — Raw, Wiki pages, Maps, `index.md`, `log.md` — under the vault's live policy. It does not authorize deleting an Inbox original or any other file, committing, pushing, or writing into a mothership. [Frontmatter](references/frontmatter.md) governs every key; YAML uses 2 spaces, the body tabs, YAML wikilinks are quoted.
+Execute every step in order. Asking for ingest authorizes the writes this recipe names in the destination vault — Raw, Wiki pages, Maps, `index.md`, `log.md` — under the vault's live policy. It does not authorize deleting an Inbox original or any other file, committing, pushing, or editing the owner's own notes, sections or properties. [Frontmatter](references/frontmatter.md) governs every key; YAML uses 2 spaces, the body tabs, YAML wikilinks are quoted.
 
 This recipe decides what is written and where, not how a note is formed. Before the first write, load every available skill whose description covers note formatting, prose, or source description, and write the Raw source, Wiki pages and Maps by them.
 
@@ -39,18 +39,9 @@ Ask exactly one collection-purpose question before ingest, and nothing else:
 - When the owner says "you decide" or "automatically", infer the most likely axis from the source and Core Context §2, state the inference and its reason, and record that in `collectionPurpose`.
 - Batch: ask once up front — "{N} sources came in today. Should they all share one purpose, or should I ask for each one?" — and follow the choice.
 
-## Step 2 — Mothership connections
+## Step 2 — Connections in this vault
 
-Skip when Core Context registers no mothership. Otherwise search it read-only with the source's key concepts and the purpose (`qmd`, keyword fallback), keep the 2–5 most relevant notes (essays, MOC or hub notes, category pages, recent teaching or consulting notes when the purpose is teaching or consulting), and for each:
-
-1. use the exact path the search returned;
-2. confirm the file exists before using it, dropping any that does not;
-3. percent-encode both URI components separately: the vault name with `urllib.parse.quote(vault, safe='')` and the path with `urllib.parse.quote(path, safe='')`;
-4. write it in the `mainVaultRelated` form [raw](templates/raw.md) shows, labelled with the filename without `.md`.
-
-Notes the owner names in the task or explicitly confirms go through the same four checks and join the list. Fill `mainVaultCmds` only with a category or command reference the Core Context or mothership actually registers, copied exactly in its registered form and with the cardinality the live policy defines; leave it empty when none fits. Never invent or impose a classification. Record the stat-verified list in `mainVaultRelated` on the Raw and the relevant Wiki pages, and list it in the report. Ask no further question here. Never write into the mothership.
-
-Use `obsidian://open` unless the live policy names another form such as `obsidian://advanced-uri`.
+Search the vault read-only with the source's key concepts and the purpose (`qmd`, keyword fallback) and keep the 2–5 most relevant existing notes (the owner's essays, MOC or hub notes, category pages, recent teaching or consulting notes when the purpose is teaching or consulting). Confirm each file exists, drop any that does not, and record the rest as quoted wikilinks `"[[Note Name]]"` in `related` on the Raw and the relevant Wiki pages, adding a folder path only when the basename collides. Notes the owner names in the task join the list after the same check. Ask no further question here. Existing notes are read, never edited: the owner's notes and their properties stay untouched.
 
 ## Step 3 — Format conversion
 
@@ -150,7 +141,7 @@ Append to `log.md`, never editing earlier entries:
 
 - Source: [[{raw source filename}]]
 - **Purpose**: {collectionPurpose verbatim}
-- Mothership links: {mainVaultRelated count} — {top 1-2 paths}
+- Connections: {related count} — {top 1-2 notes}
 - Pages created: [[page1]], [[page2]], ...
 - Pages updated: [[page3]], [[page4]], ...
 ```
@@ -166,7 +157,7 @@ Check every item and fix failures:
 - every new `source`, `related` and body wikilink resolves, except `author` links to a person whose real name the source does not confirm; every confirmed author has a person Entity; no duplicate page was created, and no new Term duplicates an existing title or alias for the same referent;
 - every updated existing page still holds every valid statement, link and frontmatter value of its before-image, apart from reviewed corrections;
 - every new Wiki page has `explored: false`; every `confidence: high` page has a Bias Check with `Counter-argument:` and `Data gap:` lines;
-- every `mainVaultRelated` link resolves on the mothership filesystem with both `vault` and `file` percent-encoded, no literal placeholder remains, `mainVaultCmds` holds only a reference the mothership actually registers, copied exactly;
+- every `related` link from Step 2 resolves to an existing note and no literal placeholder remains; external URLs in bodies are `[label](URL)` and no `obsidian://` link is written;
 - every touched Wiki page passes [conformance](references/conformance.md), each item recorded present or absent in the run report;
 - every new page appears in `index.md` and the Stats counts match the folders;
 - the `log.md` entry is appended;

@@ -4,8 +4,8 @@ Every Wiki page, of any kind, is written to these rules. After writing, check ea
 
 | # | Anti-pattern | How to find it | Instead |
 | --- | --- | --- | --- |
-| 1 | A note in another vault linked as `[[path]]` | a `[[` whose target is not a file in this vault but exists in the mothership | `[title](obsidian://open?vault=<vault>&file=<path>)`, both components URL-encoded |
-| 2 | A bare `obsidian://` URL in the body or a property (`moc`, `mainVaultRelated`, any other) | `obsidian://` not preceded by `](` | the same `[title](obsidian://...)` form |
+| 1 | An `obsidian://` link, or a Markdown link or path to a note in this vault | `obsidian://` anywhere; `](` followed by a note path or `.md` | `[[Note Name]]`, with a folder path only when the basename collides |
+| 2 | A bare, angle-bracket or empty-label external URL | `https://` not inside `[label](URL)` | `[label](URL)` with a non-empty label |
 | 3 | A web URL beside a source that has a Raw | `https://` on a line that also links that source's Raw | the Raw link only; the URL lives in the Raw |
 | 4 | "According to X" before a citation that already names X | `according to`, `X writes that …` with X cited on the same line | the fact with its citation; attribute in prose only when sources disagree |
 | 5 | Acquisition or process notes | could not read or obtain, blocked, bot check, second-hand check, not verified, this run, provided sources | move to the run report; write an unknown fact once as unknown |
@@ -15,4 +15,4 @@ Every Wiki page, of any kind, is written to these rules. After writing, check ea
 | 9 | Related links without a reason | a `[[link]]` in Related Terms with no line saying why | group label plus one line per link |
 | 10 | Source replay | Details that walk the source in its order, one bullet per passage, or that mostly quote or paraphrase it | explain the idea in the page's own words: what it is, how it works, why it holds, where it applies and where it stops; quote at most a line that carries the idea |
 
-Link a note in this vault as `[[Note Name]]` and a web page as `[title](https://...)`.
+Link a note in this vault as `[[Note Name]]` and a web page as `[title](https://...)`; `lint`'s `scripts/link-lint.py` checks both.

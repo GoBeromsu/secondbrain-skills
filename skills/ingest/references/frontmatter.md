@@ -8,7 +8,7 @@ The destination's live policy wins wherever it defines a field, value or placeme
 - Wikilinks inside YAML are double-quoted: `"[[Name]]"`. Body wikilinks are bare.
 - `description` is English, one or two sentences, always double-quoted (`description: ""` when empty).
 - Dates are ISO 8601 (`YYYY-MM-DD`, time optional). An existing value keeps its form.
-- New keys are camelCase, except the snake_case date keys below and these kebab-case keys (`source-vault`, `source-attachment`, `source-format`, `conversion-tool`, `conversion-fidelity`, `superseded-by`). The snake_case date keys are exactly `date_created`, `date_modified`, `date_ingested`, `date_published` and `conversion_date`; the verification timestamps are `exploredDate` and `verifiedAt`.
+- New keys are camelCase, except the snake_case date keys below and these kebab-case keys (`source-attachment`, `source-format`, `conversion-tool`, `conversion-fidelity`, `superseded-by`). The snake_case date keys are exactly `date_created`, `date_modified`, `date_ingested`, `date_published` and `conversion_date`; the verification timestamps are `exploredDate` and `verifiedAt`.
 - Unknown applicable metadata stays unknown, never invented. An inapplicable optional key is omitted.
 - Fill every slot as a value serialized by YAML's own rules, never by pasting raw text. A person name containing `"` or `\` inside a double-quoted `"[[Name]]"` follows YAML double-quoted escaping (`\"`, `\\`). Emit lists as YAML lists, one item per existing value; never collapse several existing items into one string.
 - A Persona's `source` keeps every existing item as a separate list item and appends this Raw.
@@ -58,9 +58,7 @@ No `created_by` or `authorship` default. A vault whose live policy defines its o
 | Language | `language` | The source's language code, such as `en` or `ko`. |
 | Length | `length` | The source's size as stated or counted, such as `12 pages` or `3,400 words`. |
 | Collection purpose | `collectionPurpose` | The owner's answer verbatim, or the stated inference and its reason when the owner delegated it. |
-| Mothership vault | `source-vault` | Only when a mothership is configured. |
-| Mothership notes | `mainVaultRelated` | Stat-verified `"[label](obsidian://open?vault=<encoded vault>&file=<encoded path>)"` list, both components encoded with `urllib.parse.quote(value, safe='')`; `[]` when none. |
-| Mothership category | `mainVaultCmds` | A category or command reference the Core Context or mothership actually registers, copied exactly in its registered form and with the cardinality the live policy defines; empty when none fits. Never invented. |
+| Related notes | `related` | Quoted wikilink list of existing notes from Step 2; `[]` when none. |
 | Originals and earlier captures | `referenced` | List. A wikilink when the original or earlier capture is already a Raw or Book Index in the vault, otherwise its canonical URL. It records where a claim came from; it never proves the original was read and never authorizes fetching it. |
 | Retained document | `source-attachment` | `"[[original-filename]]"` of the binary moved into the attachments folder. |
 | Converted format | `source-format` | `pdf`, `pptx`, `docx`, `hwp`, `hwpx`, … |
@@ -86,7 +84,6 @@ No `created_by` or `authorship` default. A vault whose live policy defines its o
 | Claim classification | `claimType`, `evidenceScope` | Optional at ingest; record only when the classification is clear. `claimType`: `definition`, `empirical`, `theoretical`, `historical`, `prescriptive`, `interpretive` or `mixed`. `evidenceScope`: `single-source`, `multi-source-primary`, `multi-source-mixed`, `synthesis-only` or `user-original`. |
 | Conflict | `disputed` | Set only by `verify`; `audit` only queues it, ingest never sets it. |
 | Page state | `status` | `active`. |
-| Mothership links | `mainVaultRelated`, `mainVaultCmds` | Optional, same form as on the Raw. Any other property that links into another vault (for example a kept `moc`) uses the same `"[label](obsidian://...)"` form, never a bare URL. |
 | Persona | `personaOf`, `personaMaturity`, `personaDomains` | Persona only; ingest never changes `personaMaturity`. |
 | Paper | `paperType`, `citekey`, `doi`, `targetManuscript`; atoms add `analysisStep` (integer 2–12), `analysisStepName`, `paperHub` | Paper Mode only. |
 | Map | `topic`, `related` | Map only. |

@@ -7,10 +7,10 @@ Triggers: an explicit paper request, the papers lane or `category: Papers`, a DO
 ## P-0 — Purpose, scope and target RQ (question 1)
 
 - Read Core Context once per session; check the paper's topic against the reuse axes actually registered in its §2 and the existing Wiki domains. Clearly outside the vault's scope: stop and offer (a) accept as a new area, (b) fold into the nearest existing area, (c) Standard collection only. Never widen the domain silently.
-- One question carries both the Step 1 purpose and the target: list open research questions (`type: research-question`, status not answered or superseded) as options, plus: register a new RQ the owner states, a mothership draft (linked through `mainVaultRelated` only), none (`targetManuscript: none`, still twelve-axis), or simple collection (switch to Standard ingest and leave Paper Mode).
+- One question carries both the Step 1 purpose and the target: list open research questions (`type: research-question`, status not answered or superseded) as options, plus: register a new RQ the owner states, a draft the owner names (linked through `related` only), none (`targetManuscript: none`, still twelve-axis), or simple collection (switch to Standard ingest and leave Paper Mode).
 - Skip the purpose part when the task states a purpose or the candidate carries `collectionPurpose`. When the owner delegates ("you decide", "automatically"), infer the purpose from the source and the registered §2 axes and record the inference and its reason in `collectionPurpose`.
 - Record `collectionPurpose` (verbatim or stated inference) and `targetManuscript` (`"[[RQ-…]]"` or `none`). Link only an RQ the owner designates; never derive one from the title.
-- Step 2 runs without a question: surface RQs already waiting for this paper (citekey `{surname}{year}` stem match in RQ `cites`, then `qmd` over the Wiki, keyword fallback) and, with a mothership, its related notes read-only. Record only stat-verified and owner-confirmed `mainVaultRelated` links in the Step 2 form; `mainVaultCmds` only as a registered reference copied exactly.
+- Step 2 runs without a question: surface RQs already waiting for this paper (citekey `{surname}{year}` stem match in RQ `cites`, then `qmd` over the Wiki, keyword fallback) and the vault's related notes read-only. Record only existing, owner-confirmed notes as `related` links in the Step 2 form.
 
 ## P-1 — Type and strategy (question 2)
 
@@ -103,7 +103,7 @@ Promote reusable knowledge to Terms when the field already names it, otherwise t
 
 ## P-5 — RQ sync
 
-Only when `targetManuscript` names an owner-designated RQ: add the citekey to the RQ's `cites`, the S12 gist to `evidenceFor` or `evidenceAgainst`, and one line in its body. A mothership draft is reported through `mainVaultRelated` only; nothing is written to the mothership.
+Only when `targetManuscript` names an owner-designated RQ: add the citekey to the RQ's `cites`, the S12 gist to `evidenceFor` or `evidenceAgainst`, and one line in its body. An owner-named draft is reported through `related` only and is never edited.
 
 ## P-6 — Index and log
 
@@ -152,4 +152,4 @@ The orchestrator runs `verify_paper.py` itself; a subagent's self-check is advis
 
 ## Failure modes
 
-Summary-card atoms; under-decomposition; coverage holes; fabricated pages or passages; missing provenance; a citekey that does not match RQ `cites`; silent scope expansion; writes into a mothership; RQ not synced; atoms listed in `index.md`; atoms written without a Blueprint.
+Summary-card atoms; under-decomposition; coverage holes; fabricated pages or passages; missing provenance; a citekey that does not match RQ `cites`; silent scope expansion; edits to the owner's own notes; RQ not synced; atoms listed in `index.md`; atoms written without a Blueprint.

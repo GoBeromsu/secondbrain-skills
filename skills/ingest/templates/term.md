@@ -15,8 +15,6 @@ domain:
 source:
   - "[[{{raw_source}}]]"
 related: []
-mainVaultRelated:
-  - "[{{owner_note_title}}](obsidian://open?vault={{encoded_vault}}&file={{encoded_path}})"
 confidence: {{high|medium|low}}
 definitionStatus: {{consensus|contested|emerging}}
 layer: terms
@@ -54,7 +52,7 @@ $$
 
 ### {{reader_question_what_problem_it_solves}}
 
-{{problem_and_connection_to_owner_notes}} ([{{owner_note_title}}](obsidian://open?vault={{encoded_vault}}&file={{encoded_path}}))
+{{problem_and_connection_to_owner_notes}} ([[{{owner_note_title}}]])
 
 ## Where It Is Used
 
@@ -66,7 +64,7 @@ $$
 
 - **{{use}}:** {{one_use_in_short_sentences}} ([[{{raw_source}}|{{author_year}}]])
 - **{{owner_notes_label}}**
-	- {{owner_use}} ([{{short_label}}](obsidian://open?vault={{encoded_vault}}&file={{encoded_path}}))
+	- {{owner_use}} ([[{{short_label}}]])
 
 ## Origin
 
@@ -119,4 +117,4 @@ $$
 ## References
 
 - [[{{raw_source}}]] — [[{{author}}|{{author_short}}]] ({{year}}), {{role}}
-- [{{owner_note_title}}](obsidian://open?vault={{encoded_vault}}&file={{encoded_path}})
+- [[{{owner_note_title}}]]

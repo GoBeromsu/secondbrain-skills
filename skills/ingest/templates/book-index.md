@@ -17,12 +17,10 @@ tags:
 source: "{{preface_or_index_url}}"
 category: {{Books|live_policy_or_owner_task_category}}
 collectionPurpose: "{{owner_answer_verbatim_or_stated_inference_with_reason}}"
-source-vault: "{{mothership_vault_name}}"
-mainVaultRelated: []
-mainVaultCmds: {{registered_mothership_category_or_command_reference_in_live_policy_form_or_empty}}
+related: []
 referenced: []
 status: ingested
-# No chapter keys on the Index. Omit date_published and source-vault when inapplicable.
+# No chapter keys on the Index. Omit date_published when inapplicable.
 ---
 
 # {{book_title}}

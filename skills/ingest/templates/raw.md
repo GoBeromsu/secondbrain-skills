@@ -19,15 +19,12 @@ tags:
 source: "{{canonical_url_or_reference}}"
 category: {{Articles|Papers|Books|Transcripts|Clippings|AI Research|live_policy_registered_category}}
 collectionPurpose: "{{owner_answer_verbatim_or_stated_inference_with_reason}}"
-source-vault: "{{mothership_vault_name}}"
-mainVaultRelated: []
-mainVaultCmds: {{registered_mothership_category_or_command_reference_in_live_policy_form_or_empty}}
+related: []
 referenced: []
 status: ingested
-# Omit date_published and source-vault when inapplicable.
+# Omit date_published when inapplicable.
 # Converted document: add source-attachment, source-format, conversion-tool, conversion_date, conversion-fidelity.
 # Fill slots as YAML-serialized values: one author item per person; a name containing " or \ is escaped by YAML double-quoted rules inside "[[...]]".
-# mainVaultRelated entries: "[label](obsidian://open?vault=<encoded vault>&file=<encoded path>)".
 ---
 
 # {{title}}

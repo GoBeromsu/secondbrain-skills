@@ -19,8 +19,7 @@ tags:
 source: "{{verified_direct_chapter_url}}"
 category: {{Books|live_policy_or_owner_task_category}}
 collectionPurpose: "{{inherited_book_purpose}}"
-mainVaultRelated: []
-mainVaultCmds: {{inherited_or_empty}}
+related: []
 referenced: []
 bookIndex: "[[{{book_index}}]]"
 chapterNumber: {{integer}}
