@@ -1,6 +1,6 @@
 # Lint one-liners
 
-Starting points, not a pipeline. Replace `<scope>`, `<vault>` and `<mothership>` with live paths, always quoted. Prefer `obsidian-cli` for link questions when Obsidian is running; it resolves aliases and headings that `rg` cannot.
+Starting points, not a pipeline. Replace `<scope>` and `<vault>` with live paths, always quoted. Prefer `obsidian-cli` for link questions when Obsidian is running; it resolves aliases and headings that `rg` cannot.
 
 Filenames may contain spaces, emoji and newlines: pass paths NUL-separated (`rg --null`/`-0`, `find -print0`, `xargs -0`, `while IFS= read -r -d ''`). In ripgrep `-L` means `--follow`, not "files without match" — use `--files-without-match`.
 
@@ -25,8 +25,6 @@ rg -n '> \[!warning\] Contradiction' "<scope>"
 
 # Field presence: notes lacking the field
 rg --files-without-match '^collectionPurpose:' "<raw-scope>"
-rg --files-without-match '^mainVaultRelated:' "<raw-scope>"
-rg --files-without-match '^mainVaultCmds:' "<raw-scope>"
 rg --files-without-match '^explored:' "<wiki-scope>"
 rg --files-without-match '^verificationStatus:' "<wiki-scope>"
 rg --files-without-match '^claimType:' "<wiki-scope>"
@@ -61,11 +59,11 @@ git log -1 --format=%cs -- "<page>"
 # log.md latest entry
 rg -n '^## \[[0-9]{4}-[0-9]{2}-[0-9]{2}\]' "<vault>/log.md" | tail -n 1
 
-# Bare or backticked URLs (drop hits inside fences, commands, quotations, frontmatter and Raw `## Original Content`; a URL right after `(` is not matched)
-rg -n -g '*.md' '(^|[^(<\[])`?https?://[^\s)`]+' "<scope>"
+# Backticked URLs (drop hits inside fences, commands, quotations, frontmatter and Raw `## Original Content`)
+rg -n -g '*.md' '`https?://[^\s)`]+`' "<scope>"
 
-# Mothership deeplinks to decode and stat
-rg -o --no-filename 'obsidian://open\?vault=[^&]+&file=[^)"\s]+' "<scope>"
+# Link form (deterministic, offline); keep the output to pass as --baseline next time
+python3 "<skill-dir>/scripts/link-lint.py" --vault "<vault>" --scope "<scope>" > link-lint.tsv
 ```
 
 Link targets by key (read-only, needs PyYAML). Feed NUL-delimited paths: `rg --files -0 -g '*.md' "<scope>" | python3 links.py "<vault>"` (run the snippet from stdin or a temp file outside the vault). If `import yaml` fails, do not run the check and do not substitute a regex: report Broken Links as **Not checked — PyYAML unavailable**.
@@ -147,27 +145,6 @@ for s, hits in seen.items():
 ```
 
 Then compare each section with its folder on disk (from the live index and vault layout, not assumed names): files present in the folder but in no section are uncatalogued. Recount Stats from these folder counts, never from the old table. A link that resolves to two files with the same basename is ambiguous — report it rather than picking one.
-
-Cross-vault decode and stat (read-only), one URI per line on stdin:
-
-```python
-import sys, os
-from urllib.parse import urlsplit, parse_qs, quote
-root = sys.argv[1]           # mothership root
-vault = sys.argv[2]          # expected mothership vault name
-for line in sys.stdin:
-    uri = line.strip()
-    q = parse_qs(urlsplit(uri).query, keep_blank_values=True)
-    v, f = q.get('vault', [''])[0], q.get('file', [''])[0]
-    raw = uri.split('?', 1)[1]
-    enc_ok = f"vault={quote(v, safe='')}&file={quote(f, safe='')}" == raw
-    exists = any(os.path.isfile(os.path.join(root, f + s)) for s in ('', '.md'))
-    print(uri, 'vault-ok' if v == vault else 'vault-mismatch',
-          'encoding-ok' if enc_ok else 'encoding-bad',
-          'exists' if exists else 'missing', sep='\t')
-```
-
-Drop matches that sit inside code spans or fenced blocks. Compare each `mainVaultCmds` value (pipe alias stripped) exactly against the references the Core Context or mothership registers; never pattern-guess.
 
 Policy conformance (read-only). Build `policy.json` from the live policy by hand — never guess values: `{"lanes": {"<raw folder>": {"type": "raw-source", "category": "<value>"}}, "retired": ["<key>"], "pairs": [["date modified", "date_modified"]]}`. Then `python3 conform.py "<vault>/10. Raw Sources" policy.json`:
 

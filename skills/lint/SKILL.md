@@ -1,16 +1,16 @@
 ---
 name: "lint"
-description: "Lints a bounded vault scope for mechanical health: broken or orphan links, placement drift, missing frontmatter, index.md and log.md sync, MOC coverage, stale pages and cross-vault links. Use for vault lint, note health or link checks. Quality review belongs to audit, per-claim checks to verify."
+description: "Lints a bounded vault scope for mechanical health: broken or orphan links, placement drift, missing frontmatter, index.md and log.md sync, MOC coverage, stale pages and link form (`[label](URL)` for external, wikilinks for internal, no `obsidian://` note links). Use for vault lint, note health or link checks. Quality review belongs to audit, per-claim checks to verify."
 license: MIT
 ---
 
 # Lint
 
-LLM Wiki lint / health check: inventory against `index.md`, orphans, broken links, contradictions, stale pages, index sync, MOC coverage, frontmatter coverage (collectionPurpose, Exploration Gate, verification fields, Bias Check, Persona health), Core Context freshness and cross-vault link integrity. Lint reads structure, not meaning — whether a claim is true is `verify`, whether a cluster agrees with itself is `audit`.
+LLM Wiki lint / health check: inventory against `index.md`, orphans, broken links, contradictions, stale pages, index sync, MOC coverage, frontmatter coverage (collectionPurpose, Exploration Gate, verification fields, Bias Check, Persona health), Core Context freshness and link form. Lint reads structure, not meaning — whether a claim is true is `verify`, whether a cluster agrees with itself is `audit`.
 
 Lint is report-first. A lint run writes nothing — no note, no `index.md` edit, no `log.md` entry. Every finding comes back as a report, and the owner picks which fixes to apply.
 
-Tools: `obsidian-cli` for unresolved links and backlinks when Obsidian is running, `rg` otherwise; `qmd query` for a renamed target; `git log` only as a fallback age when `date_modified` is absent. Null-safe recipes are in [checks](references/checks.md).
+Tools: `scripts/link-lint.py` for link form (Step 10), `obsidian-cli` for unresolved links and backlinks when Obsidian is running, `rg` otherwise; `qmd query` for a renamed target; `git log` only as a fallback age when `date_modified` is absent. Null-safe recipes are in [checks](references/checks.md).
 
 ## Scope and policy
 
@@ -65,8 +65,8 @@ Every Wiki page should be reachable from at least one MOC. List uncovered pages 
 
 A letter to your future self — the fields that tell a later reader why a note exists — plus the Exploration Gate, verification fields, Bias Check and Persona health. Report each as n/total with the complete failing path list:
 
-- **Raw:** `collectionPurpose` (missing → "pre-v2 raw source — consider backfill"), `mainVaultRelated`, `mainVaultCmds`; a secondary Raw that reports another creator's work carries `referenced` (originals and earlier captures; never evidence that the original was read).
-- **Wiki:** `mainVaultRelated`, `mainVaultCmds` where live policy expects them; `confidence` only `high|medium|low`; `source` and `related` present.
+- **Raw:** `collectionPurpose` (missing → "pre-v2 raw source — consider backfill"); a secondary Raw that reports another creator's work carries `referenced` (originals and earlier captures; never evidence that the original was read).
+- **Wiki:** `confidence` only `high|medium|low`; `source` and `related` present.
 - **Attachment location:** embeds pointing outside the vault's attachments location.
 - **Exploration Gate:** `explored` on every Wiki page — missing → "add `explored: false` on next touch"; `false` is backlog, not an error; `explored: true` without `exploredBy` or `exploredDate` → incomplete review metadata.
 - **Verification fields:** `claimType`, `evidenceScope`, `verificationStatus` on every Wiki page; missing → route through `verify` when touched; `verificationStatus` outside `verified|partial|unverified|disputed`, or `verified`/`partial` without `verifiedAt` and `verifiedBy` → finding; `verificationStatus: disputed` or `disputed: true` → high-priority `verify` queue.
@@ -75,18 +75,15 @@ A letter to your future self — the fields that tell a later reader why a note 
 
 ### Step 9: Core Context Freshness
 
-Read Core Context `snapshot_date`. Compare it with the latest modification of the mothership system files it was built from. If they changed after the snapshot, or the snapshot is over 30 days old, recommend `refresh-context`.
+Read Core Context `snapshot_date`. Compare it with the latest modification of the system files it was built from. If they changed after the snapshot, or the snapshot is over 30 days old, recommend `refresh-context`.
 
-### Step 10: Cross-Vault Link Check (mothership only)
+### Step 10: Link Form
 
-Skipped when no mothership is configured. Ignore links inside code spans and fenced blocks — those are examples.
+Run `scripts/link-lint.py --vault <vault> --scope <scope>` (offline, no reachability checks) and report its findings verbatim — it, not judgment, decides. The rules: external links are `[label](URL)` (`BARE-URL`, `AUTOLINK`, `EMAIL`, `FLIPPED`, `LABEL-SPACE`, `EMPTY-LINK` fail), internal links are wikilinks (`MD-INTERNAL`), no `obsidian://` link to a note (`DEEPLINK`), a folder path inside a wikilink only when the basename collides (`PATH-WIKILINK`), and every wikilink resolves (`BROKEN`). Code, frontmatter and HTML comments are skipped.
 
-- **Writing conformance:** check every Wiki page against `ingest`'s conformance list and report each page with the items present and their lines.
+Report the full list and, using the previous report's output as `--baseline`, the new findings separately; without a previous report say so. `markdownlint` limited to MD011, MD034, MD039 and MD042 may run beside it; the script already covers those rules.
 
-- **`mainVaultRelated`:** each entry must be `[label](obsidian://open?vault=<vault>&file=<path>)` with both components encoded by `urllib.parse.quote(value, safe='')`. Flag a wrong vault name, unencoded or double-encoded components. Decode `file` and stat it under the mothership root, with and without `.md`. Report source note → missing target.
-- **`mainVaultCmds`:** each value must exactly match a reference the Core Context or mothership actually registers (compare after stripping a pipe alias). Flag unregistered, invented or reformatted values; never suggest a guessed code.
-
-For each broken one, `qmd query` the mothership read-only for a renamed equivalent and offer one to three candidates. The mothership is never written.
+Then check every Wiki page against `ingest`'s conformance list and report each page with the items present and their lines.
 
 ### Step 11: Live Policy Conformance
 
@@ -97,7 +94,7 @@ Notes written before the current policy, or by a writer still following an older
 - **Retired keys and duplicates:** keys the live policy says not to use (for example removed provenance keys), and the same property written twice in different spellings (`date modified` beside `date_modified`), with both values.
 - **Old values carried as tags:** where live policy keeps a replaced value as a tag (for example `reference/<old type>`), a note whose replaced value is not kept.
 - **Terms:** judge each Term and Concept by `principle-wiki-types` for classification and `ingest`'s `references/terms.md` for title rules and report Term candidates, Entity candidates and Term titles that break them, each with its target title and folder, plus links to a heading inside a Term and missing Term sections. A Concept titled as a sentence-style claim is reported as a claim candidate with the Term or Concept it is about when one exists. Decide only from evidence in the note and its sources; an empty or unsourced note is reported as undecided.
-- **Link form:** every bare or backticked URL in a note body, with its line and text, as a candidate for `[name](URL)`. Skip code fences, commands, quotations, frontmatter, captured source text under a Raw note's `## Original Content` and URLs already inside a Markdown link or embed.
+- **Backticked URLs:** every backticked URL in a note body, with its line and text, as a candidate for `[name](URL)`. Skip code fences, commands, quotations, frontmatter and captured source text under a Raw note's `## Original Content`.
 
 Then group the drifted notes by the provenance fields they record (`source_extraction`, `ingest_kind`, `store`, `source_kind`, `source_locator` host or session) and report each group with its newest `date_created`. A group still gaining notes means a writer is still producing the old shape. Name it as the recorded provenance only: never infer a producer from mtime, counts or file names. Report where that writer's instructions live when a recorded field points to them, as a finding for the owner. Lint does not edit another tool's configuration.
 
@@ -114,8 +111,8 @@ Report in the conversation using [report](references/report.md):
 7. **MOC Coverage**
 8. **Frontmatter Coverage** — v2 fields, Exploration Gate, verification fields, Bias Check, Persona health
 9. **Core Context**
-10. **Cross-Vault Integrity** (mothership only)
-11. **Policy Conformance** — placement, kind values, retired keys and duplicates, old values kept as tags, Term and claim candidates, bare and backticked URLs, and writer groups still producing the old shape
+10. **Link Form** — `link-lint.py` findings, all and new
+11. **Policy Conformance** — placement, kind values, retired keys and duplicates, old values kept as tags, Term and claim candidates, backticked URLs, and writer groups still producing the old shape
 12. **Not checked**
 13. **Recommendations** — top ten by impact and effort, routed to `audit`, `verify` or `refresh-context` by name where larger
 
@@ -140,6 +137,6 @@ Approving a group approves its batches; show each batch's diff before applying i
 
 Before each batch, keep a copy of every note it changes outside the vault and check that the note still matches what the report read; if it changed, re-read it and re-show the diff. Bodies stay byte-for-byte unchanged, including Raw `## Original Content`, apart from the body parts a Term or Entity reclassification names. A writer still producing the old shape keeps producing it until its owner changes its instructions, so report it again rather than re-running the fix in a loop.
 
-**Cross-vault fix mode** requires explicit opt-in for that run. It patches only `mainVaultRelated` / `mainVaultCmds` in this vault's Raw and Wiki notes, using a stat-verified target or an exactly registered reference; it never writes mothership originals. Show the diff and ask OK per batch of at most ten.
+**Link form fixes** are mechanical and need the owner's pick per rule: wrap a bare URL as `[label](URL)` with a label taken from the surrounding text or the note title (never fetched), turn `MD-INTERNAL` and note `DEEPLINK` into a wikilink to the stat-verified note, shorten `PATH-WIKILINK` to the basename, repair `BROKEN` only to a confirmed renamed target. Rerun the script after a batch; the count must fall.
 
-Never as a lint fix: delete a note, rename a note's file name or move a note other than by a policy conformance fix, remove a Contradiction callout, set `explored: true`, change `confidence` or `verificationStatus` (those belong to `verify`), invent a `collectionPurpose`, `mainVaultCmds` or other unknown value, create an author note, or migrate metadata not explicitly authorized.
+Never as a lint fix: delete a note, rename a note's file name or move a note other than by a policy conformance fix, remove a Contradiction callout, set `explored: true`, change `confidence` or `verificationStatus` (those belong to `verify`), invent a `collectionPurpose` or other unknown value, create an author note, or migrate metadata not explicitly authorized.

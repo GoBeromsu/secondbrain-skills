@@ -1,0 +1,12 @@
+BARE-URL	60.AI/bad.md	3	https://example.com/bare
+AUTOLINK	60.AI/bad.md	4	<https://example.com/auto>
+EMAIL	60.AI/bad.md	5	someone@example.org
+FLIPPED	60.AI/bad.md	6	(label)[https://example.com/flip]
+LABEL-SPACE	60.AI/bad.md	7	[ label ](https://example.com/space)
+EMPTY-LINK	60.AI/bad.md	8	[](https://example.com/empty)
+EMPTY-LINK	60.AI/bad.md	9	[label]()
+MD-INTERNAL	60.AI/bad.md	10	[Alice](70.Ent/Person/Alice.md)
+DEEPLINK	60.AI/bad.md	11	obsidian://open?vault=V&file=Alice
+PATH-WIKILINK	60.AI/bad.md	12	[[70.Ent/Person/Alice]]
+BROKEN	60.AI/bad.md	13	[[Nobody Here]]
+# violations=11

@@ -10,9 +10,9 @@ Open with the scope and the link source used (which notes counted as inbound lin
 6. **Index Issues** — per index section (Raw sources, Wiki, Queries, Maps, Personas, Paper hubs, any live section): links with missing or ambiguous targets, files catalogued nowhere, Stats table vs counts recounted per catalogued section, Recent Ingests / Recent Queries targets, `log.md` presence and latest entry vs newest ingest.
 7. **MOC Coverage** — uncovered pages with a suggested MOC; page ↔ MOC back-link gaps; MOC links to missing notes; overgrown MOCs; MOCs or hubs that do not describe their collection.
 8. **Frontmatter Coverage** — one row per field or section as n/total with failing paths: v2 fields, Exploration Gate, verification fields and the disputed queue, Bias Check, Persona health.
-9. **Core Context** — `snapshot_date`, age, mothership drift.
-10. **Cross-Vault Integrity** — `mainVaultRelated` vault mismatch, encoding errors and missing targets with up to three candidates each; `mainVaultCmds` values not registered. Omitted when no mothership is configured.
-11. **Policy Conformance** — notes in unregistered folders with the registered folder for their kind; `type`/`category`/layer/role values that differ from live policy; retired keys and duplicate property spellings with both values; replaced values not kept where live policy keeps them; bare and backticked URLs with page, line and text as `[name](URL)` candidates; drifted notes grouped by recorded provenance with each group's newest `date_created`.
+9. **Core Context** — `snapshot_date`, age, registered-source drift.
+10. **Link Form** — `link-lint.py` findings by rule with path, line and text; all, and new since the baseline.
+11. **Policy Conformance** — notes in unregistered folders with the registered folder for their kind; `type`/`category`/layer/role values that differ from live policy; retired keys and duplicate property spellings with both values; replaced values not kept where live policy keeps them; backticked URLs with page, line and text as `[name](URL)` candidates; drifted notes grouped by recorded provenance with each group's newest `date_created`.
 12. **Not checked** — steps skipped or tools unavailable, with the reason.
 13. **Recommendations** — top ten by impact and effort, each naming the fix or the skill to route to.
 
