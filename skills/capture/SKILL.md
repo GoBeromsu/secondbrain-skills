@@ -130,7 +130,7 @@ Under `## Agent Capture Notes`, add:
 
 - `inbox-only` (default): stop after writing the Inbox note and report the file path.
 - `run-inbox`: run `inbox` on the new file.
-- `ingest-now`: run `ingest` on the new file; its purpose gate reuses `collectionPurpose`, and its mothership link search (Step 2) runs there.
+- `ingest-now`: run `ingest` on the new file; its purpose gate reuses `collectionPurpose`, and its connection search (Step 2) runs there.
 
 Route beyond `inbox-only` only when the owner chose it. Never delete or move the Inbox note, and never commit, as part of capture.
 

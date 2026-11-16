@@ -29,7 +29,7 @@ For each claim, judge provenance first: who created it decides what the source c
 
 - **Primary**: the creator of the cited Raw produced the claim — their own measurement, argument or account.
 - **Secondary**: the cited Raw reports another creator's work — a newsletter citing a study, a talk quoting a paper, a post summarising a benchmark.
-- **User-original**: the claim rests on the owner's own mothership notes; it is confirmable only as "the owner holds this".
+- **User-original**: the claim rests on the owner's own notes; it is confirmable only as "the owner holds this".
 
 For a secondary claim, follow the Raw's `referenced` list to the original. `referenced` names originals and earlier captures; it never proves the original was read and never authorizes fetching it.
 
@@ -49,7 +49,7 @@ Describe how far the page's support reaches, once for the page and per claim whe
 | `multi-source-primary` | 2+ Raw, all primary, from different creators. |
 | `multi-source-mixed` | Primary + secondary (commentary, interpretation). |
 | `synthesis-only` | Derived from other Wiki pages, no direct Raw. |
-| `user-original` | Sourced from the owner's mothership notes. |
+| `user-original` | Sourced from the owner's own notes. |
 
 Count lines of evidence, not links: two Raw from the same creator, or a secondary that only repeats one primary, are one line. `multi-source-mixed` means primary **plus** secondary; secondary-only support is never `multi-source-mixed`. When support is secondary only (originals unacquired or unknown): one secondary Raw is `single-source` ("one Raw backs the page"). Two or more secondary Raw with no primary fit none of the five upstream values — `multi-source-primary` needs all primary, `multi-source-mixed` needs a primary. Upstream defines no value for this case and none is invented: leave `evidenceScope` unwritten (unknown stays unknown) and record in the report "secondary-only, originals unacquired; no upstream evidenceScope value fits".
 

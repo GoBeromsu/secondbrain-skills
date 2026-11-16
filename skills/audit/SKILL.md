@@ -47,7 +47,7 @@ Record pages in at least one Map, **audit-orphan pages** (in zero Maps), and the
 
 Pure search, no judgment. Report each check as n/total plus at most twenty failing paths.
 
-- **A.1 Frontmatter coverage.** Wiki: `claimType`, `evidenceScope`, `confidence`, `explored`, `mainVaultRelated`, `verificationStatus`, plus `source` and `related`. A `source` wikilink that does not resolve is recorded for Phase D. `explored: false` is review backlog, not a failure. Raw: `collectionPurpose` presence.
+- **A.1 Frontmatter coverage.** Wiki: `claimType`, `evidenceScope`, `confidence`, `explored`, `verificationStatus`, plus `source` and `related`. A `source` wikilink that does not resolve is recorded for Phase D. `explored: false` is review backlog, not a failure. Raw: `collectionPurpose` presence.
 - **A.2 SPO structure.** H1, `## Sources`, `## Related` present; every `confidence: high` page carries a Bias Check.
 - **A.3 Source citation density.** Pages citing no Raw note are synthesis-only; they must declare `evidenceScope: synthesis-only`. An undeclared one is a finding.
 - **A.4 Policy violations.** Count the mechanical rules the live policy states (YAML indent, body indent, unquoted wikilinks in YAML other than intentional `author` wikilinks, unquoted Mermaid labels, a page whose `layer` mismatches its folder). Repair belongs to `lint`.
@@ -151,4 +151,4 @@ Print the summary following [report](references/report.md): Vault Health composi
 
 ## Integration
 
-Audit consumes the keys `verify` writes (`claimType`, `evidenceScope`, `verificationStatus`, `disputed`); a first audit after they are introduced shows low coverage — that is the backfill baseline. `lint` owns mechanical health: broken links, orphans, frontmatter presence, `mainVaultRelated` resolution. `verify` owns per-claim review and any change to `confidence`, `explored`, `verificationStatus` or `disputed`. Run `lint` before an audit so mechanical noise does not crowd the epistemic findings; after a large `ingest`, audit only the touched Map clusters with `--moc`. The owner sets the cadence.
+Audit consumes the keys `verify` writes (`claimType`, `evidenceScope`, `verificationStatus`, `disputed`); a first audit after they are introduced shows low coverage — that is the backfill baseline. `lint` owns mechanical health: broken links, orphans, frontmatter presence, link form. `verify` owns per-claim review and any change to `confidence`, `explored`, `verificationStatus` or `disputed`. Run `lint` before an audit so mechanical noise does not crowd the epistemic findings; after a large `ingest`, audit only the touched Map clusters with `--moc`. The owner sets the cadence.

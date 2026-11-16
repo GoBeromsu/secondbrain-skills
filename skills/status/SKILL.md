@@ -27,7 +27,7 @@ Status is read-only and points at the skill that would act. Run from the vault r
    - `00. Inbox/**/*.md` → pending inbox items, all subfolders, plus how many are older than 30 days. Inbox location is the state; there is no queue field.
    A folder this vault lacks (often Questions or Paper Analyses) is reported `absent` with that reason, never as 0 and never folded into another count; a folder present but empty is 0; a count you could not take is `unknown`.
 4. **Coverage check**: `rg -l '^collectionPurpose:'` across `10. Raw Sources` → n/N (a letter to your future self). Also count purposes recorded as a delegated inference with its reason; where existing notes still carry `purpose_origin`, report its values as they are.
-5. **Cross-vault check**: `rg -l '^mainVaultRelated:'` across `20. Wiki` → n/N. Without a mothership registered in Core Context, report "not applicable", not 0%.
+5. **Deep-link check**: `rg -l 'obsidian://'` across the vault, matches inside code excluded → count of notes; the target is 0.
 6. **Exploration Gate check**: `explored` across Wiki pages → n/N present, plus the `explored: false` count as backlog and the explored ratio `true/N`. Denominator: Terms, Concepts, Entities, Guides; a Map without `explored` is missing nothing. Count pages with a Bias Check too.
 7. **Verification check**: `verificationStatus` across Wiki pages → n/N present, and the breakdown `verified`/`partial`/`unverified`/`disputed`; values outside these four are counted as invalid, not coerced. Alongside, the `confidence` breakdown `high`/`medium`/`low`/missing. Both use the same Wiki denominator as step 6.
 8. **Core Context age**: `snapshot_date` from `Core Context.md` frontmatter → date and days since. Missing date is `unknown`. Over 30 days is stale. A missing note or `status: template` means onboarding never finished.
@@ -47,7 +47,7 @@ Queries:      <n>
 Papers:       <hubs> hubs · <files> files | absent
 Inbox:        <n> pending  (>30 days: <n>)
 
-mainVaultRelated:   <n/N> = <p>%  | not applicable
+obsidian:// links:  <n> notes
 explored:           <n/N> present · true <n/N> = <p>% · false <n>
 verificationStatus: <n/N> present · verified <n> · partial <n> · unverified <n> · disputed <n> · invalid <n>
 confidence:         high <n> · medium <n> · low <n> · missing <n>
@@ -63,4 +63,4 @@ Issues (if any)
 Roots counted: <list>; absent: <list>
 ```
 
-Route each issue: index drift → `lint`; large or old Inbox → `inbox`; collectionPurpose, mainVaultRelated, explored or Bias Check gaps → `lint`; `disputed` or `unverified` pages → `verify`; Core Context > 30 days → `refresh-context`; unfinished onboarding → `onboard`; search missing known pages → `reindex`. Do not rank the vault or turn the percentages into a score.
+Route each issue: index drift → `lint`; large or old Inbox → `inbox`; collectionPurpose, deep links, explored or Bias Check gaps → `lint`; `disputed` or `unverified` pages → `verify`; Core Context > 30 days → `refresh-context`; unfinished onboarding → `onboard`; search missing known pages → `reindex`. Do not rank the vault or turn the percentages into a score.

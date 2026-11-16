@@ -42,7 +42,7 @@ Track:
 - Questions the Wiki cannot answer, and missing pages that should exist
 - Contradictions between pages
 - Claims that need source strengthening
-- Pages that need `mainVaultRelated`
+- Pages that need links to the owner's related notes
 - Pages that need `explored` or Bias Check coverage
 - Pages that are `verificationStatus: disputed` or overclaiming their `confidence`
 
@@ -61,7 +61,7 @@ When the query reveals durable improvements, update the relevant Wiki pages and 
 - new connections → `related`
 - high-confidence synthesis without counter-argument or data-gap note → `> [!note] Bias Check`
 
-Each edit to an existing page is drafted from the policy and the cited source only, then a separate preservation review compares the before-image with the proposal and reduces it to a minimal patch that keeps valid existing content; read the page back before linking to it. Changing a claim's text needs verified evidence; `explored`, `confidence` and conflict resolution stay with `verify`. No blanket regeneration. `mainVaultRelated` links follow the ingest rule (`obsidian://open?vault=<enc>&file=<enc>`, both encoded with `urllib.parse.quote(value, safe='')`); the mothership is read-only.
+Each edit to an existing page is drafted from the policy and the cited source only, then a separate preservation review compares the before-image with the proposal and reduces it to a minimal patch that keeps valid existing content; read the page back before linking to it. Changing a claim's text needs verified evidence; `explored`, `confidence` and conflict resolution stay with `verify`. No blanket regeneration. Links to notes are `[[wikilinks]]` and external links `[label](URL)`; the owner's own notes are read, never edited.
 
 After a save or feedback write, update `index.md` (Queries catalog, Recent Queries, Stats recounted from folders) and append one `log.md` entry (`## [YYYY-MM-DD] query | <title>`). A read-only answer writes nothing, including no log entry. Do not commit or push unless the owner separately asks.
 

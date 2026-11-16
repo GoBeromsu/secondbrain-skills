@@ -15,7 +15,7 @@ Composite (arithmetic mean) and the three sub-scores — Eligibility, Consistenc
 
 ## Phase A — Eligibility Sweep
 
-Coverage table per dimension: `claimType`, `evidenceScope`, `confidence`, `explored`, `mainVaultRelated`, `verificationStatus`, `source`, `related`; Raw `collectionPurpose`; H1, Sources, Related; Bias Check on high-confidence pages. Undeclared synthesis-only pages and policy violations as counts. Up to twenty failing paths per dimension; the rest counted.
+Coverage table per dimension: `claimType`, `evidenceScope`, `confidence`, `explored`, `verificationStatus`, `source`, `related`; Raw `collectionPurpose`; H1, Sources, Related; Bias Check on high-confidence pages. Undeclared synthesis-only pages and policy violations as counts. Up to twenty failing paths per dimension; the rest counted.
 
 ## Phase B — Map-Cluster Consistency
 
