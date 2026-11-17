@@ -1,6 +1,6 @@
 ---
 name: "status"
-description: "Reports a read-only vault snapshot: page counts, Inbox backlog, Core Context age, index drift, recent log.md history, property coverage, verificationStatus and confidence breakdowns. Use for vault status or a backlog check. Knowledge quality belongs to audit, link and index checks to lint."
+description: "Reports a read-only vault snapshot: page counts, Inbox backlog, Core Context age, index drift, recent wiki log history, property coverage, verificationStatus and confidence breakdowns. Use for vault status or a backlog check. Knowledge quality belongs to audit, link and index checks to lint."
 license: MIT
 ---
 
@@ -8,12 +8,12 @@ license: MIT
 
 Show the current state of the wiki at a glance.
 
-Status is read-only and points at the skill that would act. Run from the vault root, use the folder names the vault's AGENTS file declares (the ones below are the usual defaults) and the index and log it declares (`60. AI/index.md` and `60. AI/log.md` are the usual defaults), and report the roots you actually counted; a missing folder is reported missing, not zero.
+Status is read-only and points at the skill that would act. Run from the vault root, use the folder names the vault's AGENTS file declares (the ones below are the usual defaults) and the wiki index and log in [records](../ingest/references/records.md), and report the roots you actually counted; a missing folder is reported missing, not zero.
 
 ## Process
 
-1. **Stats and catalog.** Read the `60. AI/index.md` Stats table and catalog. Missing `60. AI/index.md` is reported as missing; the counts in step 3 still stand.
-2. **Recent history.** Read the last five relevant entries from `60. AI/log.md` (append-only, newest at the bottom). Git history is not a proxy for `60. AI/log.md`; a missing `60. AI/log.md` is reported as missing, not filled from commits.
+1. **Stats and catalog.** Read the wiki index Stats table and catalog. A missing wiki index is reported as missing; the counts in step 3 still stand.
+2. **Recent history.** Read the last five relevant entries from the wiki log (append-only, newest at the bottom). Git history is not a proxy for the wiki log; a missing wiki log is reported as missing, not filled from commits.
 3. **Count actual files:**
    - `10. Raw Sources/**/*.md` → raw sources
    - the Terms folder the vault registers → terms, plus `layer: terms` pages in the Concept folder
@@ -31,9 +31,9 @@ Status is read-only and points at the skill that would act. Run from the vault r
 6. **Exploration Gate check**: `explored` across Wiki pages → n/N present, plus the `explored: false` count as backlog and the explored ratio `true/N`. Denominator: Terms, Concepts, Entities, Guides; a Map without `explored` is missing nothing. Count pages with a Bias Check too.
 7. **Verification check**: `verificationStatus` across Wiki pages → n/N present, and the breakdown `verified`/`partial`/`unverified`/`disputed`; values outside these four are counted as invalid, not coerced. Alongside, the `confidence` breakdown `high`/`medium`/`low`/missing. Both use the same Wiki denominator as step 6.
 8. **Core Context age**: `snapshot_date` from `Core Context.md` frontmatter → date and days since. Missing date is `unknown`. Over 30 days is stale. A missing note or `status: template` means onboarding never finished.
-9. **Index drift**: report every count from step 3 that differs from the `60. AI/index.md` Stats table, and Recent Ingests/Queries entries naming files that no longer exist.
+9. **Index drift**: report every count from step 3 that differs from the wiki index Stats table, and Recent Ingests/Queries entries naming files that no longer exist.
 
-Status writes nothing — no index update, no `60. AI/log.md` entry, no repair, no reindex. Counts are presence, never quality. When the owner wants names, list the files in scope whose frontmatter lacks the field. Tools: `rg`, `find`.
+Status writes nothing — no index update, no wiki log entry, no repair, no reindex. Counts are presence, never quality. When the owner wants names, list the files in scope whose frontmatter lacks the field. Tools: `rg`, `find`.
 
 ## Output
 
@@ -55,7 +55,7 @@ Bias Check:         <n> pages
 
 Core Context: snapshot <date> (<d> days ago) | unknown
 ──────────────────────────
-Recent Activity (last 5 60. AI/log.md entries) | 60. AI/log.md missing
+Recent Activity (last 5 wiki log entries) | wiki log missing
 - <date> <operation> <target>
 ──────────────────────────
 Issues (if any)

@@ -19,6 +19,8 @@ from dataclasses import dataclass, field
 from datetime import date, datetime
 from pathlib import Path
 
+from records import RecordError, find_vault_root, resolve_wiki_records
+
 try:
     import yaml
 except ImportError:
@@ -761,7 +763,7 @@ def check_index(paper: Paper, index_path: Path) -> None:
     try:
         text = index_path.read_text(encoding="utf-8")
     except (OSError, UnicodeDecodeError) as exc:
-        rep.block(index_path, f"cannot read index.md: {exc}")
+        rep.block(index_path, f"cannot read the wiki index: {exc}")
         return
     listed = False
     atoms = paper.atom_paths
@@ -770,11 +772,11 @@ def check_index(paper: Paper, index_path: Path) -> None:
         if res.path == hub.path:
             listed = True
         elif res.path in atoms:
-            rep.fail(index_path, f"index.md lists atom {rep.where(res.path)} (atoms never go in the index)")
+            rep.fail(index_path, f"wiki index lists atom {rep.where(res.path)} (atoms never go in the index)")
         elif res.path is None and ({hub.path} | atoms) & set(res.candidates):
-            rep.fail(index_path, f"index.md link {res.error}")
+            rep.fail(index_path, f"wiki index link {res.error}")
     if not listed:
-        rep.fail(index_path, f"index.md does not link the hub {rep.where(hub.path)}")
+        rep.fail(index_path, f"wiki index does not link the hub {rep.where(hub.path)}")
 
 
 def locate_quote(quote: str, evidence: str) -> bool:
@@ -932,10 +934,10 @@ def find_vault(explicit: str | None, folder: Path) -> Path:
         if not root.is_dir():
             raise InputError(f"--vault {explicit!r} is not a directory")
         return root.resolve()
-    for ancestor in folder.parents:
-        if (ancestor / "index.md").is_file():
-            return ancestor
-    raise InputError("no ancestor of PAPER_FOLDER contains index.md; pass --vault VAULT")
+    try:
+        return find_vault_root(folder)
+    except RecordError as exc:
+        raise InputError(str(exc)) from exc
 
 
 def find_raw(explicit: str | None, root: Path) -> Path | None:
@@ -1008,7 +1010,7 @@ def print_report(rep: Report, folder: Path) -> int:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Mechanical P-7 review of one paper analysis folder.")
     parser.add_argument("paper_folder", help="folder holding one paper-hub and its paper-analysis atoms")
-    parser.add_argument("--vault", help="vault root (default: nearest ancestor containing index.md)")
+    parser.add_argument("--vault", help="vault root (default: nearest ancestor with .obsidian or AGENTS.md)")
     parser.add_argument("--raw", help="Raw note to use as evidence (default: the hub's source)")
     args = parser.parse_args(argv)
     if yaml is None:
@@ -1022,9 +1024,14 @@ def main(argv: list[str] | None = None) -> int:
         root = find_vault(args.vault, folder)
         if folder == root or not folder.is_relative_to(root):
             raise InputError("PAPER_FOLDER must be inside the vault")
-        index_path = root / "index.md"
+        records_file = Path(__file__).resolve().parent.parent / "references" / "records.md"
+        try:
+            located = resolve_wiki_records(root, records_file, None, None)
+        except RecordError as exc:
+            raise InputError(str(exc)) from exc
+        index_path = located.index
         if not index_path.is_file():
-            raise InputError("the vault has no index.md")
+            raise InputError(f"the vault has no wiki index at {index_path}")
         explicit_raw = find_raw(args.raw, root)
     except InputError as exc:
         print(f"BLOCKED: {exc}", file=sys.stderr)

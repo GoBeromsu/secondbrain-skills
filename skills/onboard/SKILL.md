@@ -1,6 +1,6 @@
 ---
 name: "onboard"
-description: "Sets up a fresh vault through an owner interview that fills template placeholders and writes Core Context, index.md and log.md, or gives an existing vault a read-only diagnosis and proposal. Use for first-time setup, resuming an interrupted setup or a zero-diff rerun. Not for moving notes or Sync pairing."
+description: "Sets up a fresh vault through an owner interview that fills template placeholders and writes Core Context plus the wiki index and log, or gives an existing vault a read-only diagnosis and proposal. Use for first-time setup, resuming an interrupted setup or a zero-diff rerun. Not for moving notes or Sync pairing."
 ---
 
 # Onboard
@@ -25,9 +25,9 @@ rg -m1 '^status:' "Core Context.md"
 Completion means none of the mandatory tokens is left: `{your-name}`, `{Your Name}`, `{PATH_TO_YOUR_LLM_WIKI}`, `{YYYY-MM-DD}`.
 
 - 0 files with mandatory tokens and `status: active` → already onboarded. Say so and ask whether to revisit anything (identity or axis changes belong to `refresh-context`).
-- Target missing or empty → scaffold only with the owner's explicit authorization: ask the role (`personal` or `knowledge`) and the template folder, confirm the owner may use its files and plugins, then copy only files the target lacks (`cp -R -n "$TEMPLATE/." "$VAULT"`), leaving any file already there byte-for-byte. The scaffold includes `Core Context.md` (`status: template`), `index.md` (catalog sections and Stats) and append-only `log.md`; create any of the three still missing from the template's shape. Then → Interview.
+- Target missing or empty → scaffold only with the owner's explicit authorization: ask the role (`personal` or `knowledge`) and the template folder, confirm the owner may use its files and plugins, then copy only files the target lacks (`cp -R -n "$TEMPLATE/." "$VAULT"`), leaving any file already there byte-for-byte. The scaffold includes `Core Context.md` (`status: template`) and the wiki index and log in [records](../ingest/references/records.md). After the copy, if `index.md` or `log.md` sits at the vault root and the resolved file is absent, create the parent directory and move that root file to the resolved path. If the resolved file already exists, leave the root file and report it. Create any of Core Context, the wiki index, or the wiki log still missing. Create the index and log only at the resolved path. Never write a new `index.md` or `log.md` at the vault root. Then → Interview.
 - Freshly laid-down or cloned starting vault (placeholders present, Core Context `status: template`, no owner notes) → Interview.
-- Existing vault with owner notes → read-only diagnosis and proposal: report placeholders left, Core Context status and its §2 axes, whether `index.md` and `log.md` exist, and the settings changes you would suggest. Write nothing: no note, JSON, config or settings change, and no placeholder replacement in existing files. A missing `index.md` or `log.md` is proposed, not created; `ingest` creates `index.md` on its first run.
+- Existing vault with owner notes → read-only diagnosis and proposal: report placeholders left, Core Context status and its §2 axes, whether the resolved wiki index and wiki log exist, and the settings changes you would suggest. A root `index.md` is a legacy file in that report, not the wiki index. Write nothing: no note, JSON, config or settings change, and no placeholder replacement in existing files. A missing wiki index or wiki log is proposed, not created; `ingest` creates the wiki index on its first run, only at the resolved path.
 
 ## Interview — 3 required + 2 optional (answer-1-of-many)
 
@@ -45,7 +45,7 @@ In voice mode one question at a time, in text a batch. After each answer, confir
 
 ## Fill
 
-**F1 — Placeholder replacement.** Fresh targets only; `index.md` and `log.md` carry `{your-name}` and `{YYYY-MM-DD}` too. Show the values (name, vault path, today's date in the owner's timezone). After OK, in the freshly scaffolded or starting-vault files only, replace only the literal tokens across `.md`, `.json`, `.yml`/`.yaml` and `.sh` files, `.git` excluded (`sed -i ''` on macOS): `{your-name}`, `{Your Name}`, `{PATH_TO_YOUR_LLM_WIKI}`, `{YYYY-MM-DD}`.
+**F1 — Placeholder replacement.** Fresh targets only; the wiki index and wiki log carry `{your-name}` and `{YYYY-MM-DD}` too. Show the values (name, vault path, today's date in the owner's timezone). After OK, in the freshly scaffolded or starting-vault files only, replace only the literal tokens across `.md`, `.json`, `.yml`/`.yaml` and `.sh` files, `.git` excluded (`sed -i ''` on macOS): `{your-name}`, `{Your Name}`, `{PATH_TO_YOUR_LLM_WIKI}`, `{YYYY-MM-DD}`.
 
 **F2 — Write Core Context.md.** Draft §1 identity and §2 reuse axes (plus optional §3/§4) from the interview, and §5 listing the files the owner registers as sources, or delete §5 when none. Show the draft and confirm. Then set `status: template` → `active`, `snapshot_date` to today, keep `version: "1.0"`.
 
@@ -67,6 +67,6 @@ Read back the files written and list them. Then suggest:
 4. As it grows: recurring open questions become Research Question cards in `20. Wiki/25. Questions/`; a defended claim becomes a Synthesis card.
 5. Later: `capture` and `inbox` for collecting before ingesting, `qmd` for search (`reindex`).
 
-Do not install skills, sync, migrate notes, ingest, delete files, or commit as a side effect; `log.md` and `index.md` are the vault's records and Git never replaces them. A commit happens only when the owner separately asks.
+Do not install skills, sync, migrate notes, ingest, delete files, or commit as a side effect; the wiki index and wiki log are the vault's records and Git never replaces them. A commit happens only when the owner separately asks.
 
 Tools: `rg`, `sed`, `cp`, `obsidian-cli`.

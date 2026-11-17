@@ -58,8 +58,9 @@ git log -1 --format=%cs -- "<page>"
 
 # Index catalog vs files: use the index recipe below (all sections, all roles)
 
-# log.md latest entry
-rg -n '^## \[[0-9]{4}-[0-9]{2}-[0-9]{2}\]' "<vault>/log.md" | tail -n 1
+# wiki log latest entry. Resolve the path with records.py. Do not read <vault>/log.md.
+log=$(python3 "<ingest-scripts>/records.py" --vault "<vault>" --records "<ingest-references>/records.md" | awk -F '\t' '$1=="log"{print $2}')
+rg -n '^## \[[0-9]{4}-[0-9]{2}-[0-9]{2}\]' "$log" | tail -n 1
 
 # Backticked URLs (drop hits inside fences, commands, quotations, frontmatter and Raw `## Original Content`)
 rg -n -g '*.md' '`https?://[^\s)`]+`' "<scope>"
@@ -118,11 +119,15 @@ for p in sys.stdin.buffer.read().split(b'\0'):
 
 Every other key is checked — `source`, `related`, `bookIndex`, `chapterPrev`, `chapterNext`, `paperHub`, `personaOf`, and any key the live schema adds — plus every body link. Output is `path<TAB>key<TAB>missing target`.
 
-Index catalog check (read-only): resolves every `[[...]]` in `index.md` against the vault's actual files — Raw, Wiki, Queries, Maps, Personas, Paper hubs and whatever sections the live index has — and recounts files per catalogued section. `python3 index_check.py "<vault>"`:
+Index catalog check (read-only): resolves every `[[...]]` in the wiki index against the vault's actual files — Raw, Wiki, Queries, Maps, Personas, Paper hubs and whatever sections the live index has — and recounts files per catalogued section. The index path comes from `skills/ingest/scripts/records.py`. `python3 index_check.py "<vault>"`:
 
 ```python
 import sys, os, re
+from pathlib import Path
+sys.path.insert(0, "<ingest-scripts>")
+from records import resolve_wiki_records
 vault = sys.argv[1]
+located = resolve_wiki_records(Path(vault), Path("<ingest-references>/records.md"), None, None)
 LINK = re.compile(r'\[\[([^\]|#]+)')
 names, paths = {}, set()
 for d, ds, fs in os.walk(vault):
@@ -133,7 +138,7 @@ for d, ds, fs in os.walk(vault):
         paths.update((stem, rel))
         names.setdefault(os.path.basename(stem), []).append(rel); names.setdefault(f, []).append(rel)
 section, seen = '(top)', {}
-for line in open(os.path.join(vault, 'index.md'), encoding='utf-8'):
+for line in open(located.index, encoding='utf-8'):
     h = re.match(r'#{1,6}\s+(.*)', line)
     if h: section = h.group(1).strip(); continue
     for t in LINK.findall(line):
