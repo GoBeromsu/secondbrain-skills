@@ -22,7 +22,7 @@ Status is read-only and points at the skill that would act. Run from the vault r
    - `20. Wiki/23. Guides/*.md` → guides
    - `20. Wiki/24. Maps/*.md` → Maps (MOCs)
    - `20. Wiki/25. Questions/*.md` → research questions
-   - `30. Queries/*.md` → queries
+   - `60. AI/05 Queries/*.md` → queries
    - `40. Paper Analyses/*/` → paper hubs (one citekey folder each), and `40. Paper Analyses/**/*.md` → paper files; report both
    - `00. Inbox/**/*.md` → pending inbox items, all subfolders, plus how many are older than 30 days. Inbox location is the state; there is no queue field.
    A folder this vault lacks (often Questions or Paper Analyses) is reported `absent` with that reason, never as 0 and never folded into another count; a folder present but empty is 0; a count you could not take is `unknown`.
