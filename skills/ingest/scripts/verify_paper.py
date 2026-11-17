@@ -1010,7 +1010,7 @@ def print_report(rep: Report, folder: Path) -> int:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Mechanical P-7 review of one paper analysis folder.")
     parser.add_argument("paper_folder", help="folder holding one paper-hub and its paper-analysis atoms")
-    parser.add_argument("--vault", help="vault root (default: nearest ancestor with .obsidian or AGENTS.md)")
+    parser.add_argument("--vault", help="vault root (default: nearest ancestor with .obsidian, else AGENTS.md)")
     parser.add_argument("--raw", help="Raw note to use as evidence (default: the hub's source)")
     args = parser.parse_args(argv)
     if yaml is None:
@@ -1020,8 +1020,9 @@ def main(argv: list[str] | None = None) -> int:
     try:
         if not folder.is_dir():
             raise InputError(f"PAPER_FOLDER {args.paper_folder!r} is not a directory")
-        folder = folder.resolve()
         root = find_vault(args.vault, folder)
+        folder = folder.resolve()
+        root = root.resolve()
         if folder == root or not folder.is_relative_to(root):
             raise InputError("PAPER_FOLDER must be inside the vault")
         records_file = Path(__file__).resolve().parent.parent / "references" / "records.md"

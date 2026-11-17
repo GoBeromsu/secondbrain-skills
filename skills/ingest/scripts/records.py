@@ -24,7 +24,9 @@ class WikiRecords:
     log: Path
 
 
-def parse_record_keys(text: str) -> PathOverride:
+def parse_record_keys(text: str, index_required: bool, log_required: bool) -> PathOverride:
+    if text.startswith("\ufeff"):
+        text = text[1:]
     index: str | None = None
     log: str | None = None
     seen_index = False
@@ -32,6 +34,8 @@ def parse_record_keys(text: str) -> PathOverride:
     for raw_line in text.splitlines():
         line = raw_line.strip()
         if line.startswith("wiki-index:"):
+            if not index_required:
+                continue
             if seen_index:
                 raise RecordError("wiki-index appears twice")
             seen_index = True
@@ -39,6 +43,8 @@ def parse_record_keys(text: str) -> PathOverride:
             if index == "":
                 raise RecordError("wiki-index is empty")
         elif line.startswith("wiki-log:"):
+            if not log_required:
+                continue
             if seen_log:
                 raise RecordError("wiki-log appears twice")
             seen_log = True
@@ -49,15 +55,25 @@ def parse_record_keys(text: str) -> PathOverride:
 
 
 def find_vault_root(start: Path) -> Path:
-    current = start.resolve()
-    chain: list[Path] = []
-    if current.is_dir():
-        chain.append(current)
+    current = start.expanduser()
+    if not current.is_absolute():
+        current = Path.cwd() / current
+    chain = [current]
     chain.extend(current.parents)
     for ancestor in chain:
-        if (ancestor / ".obsidian").is_dir() or (ancestor / "AGENTS.md").is_file():
-            return ancestor
+        if (ancestor / ".obsidian").is_dir():
+            return ancestor.resolve()
+    for ancestor in chain:
+        if (ancestor / "AGENTS.md").is_file():
+            return ancestor.resolve()
     raise RecordError("no ancestor contains .obsidian or AGENTS.md; pass --vault VAULT")
+
+
+def _read_text(path: Path) -> str:
+    try:
+        return path.read_text(encoding="utf-8-sig")
+    except UnicodeDecodeError as exc:
+        raise RecordError(f"cannot read {path.name} as UTF-8") from exc
 
 
 def _place(vault: Path, value: str, label: str) -> Path:
@@ -66,7 +82,12 @@ def _place(vault: Path, value: str, label: str) -> Path:
         raise RecordError(f"{label} must be a relative path inside the vault")
     if len(raw.parts) < 2:
         raise RecordError(f"{label} must not be the vault root")
-    return vault / raw
+    placed = vault / raw
+    vault_real = vault.resolve()
+    placed_real = placed.resolve()
+    if not placed_real.is_relative_to(vault_real) or placed_real.parent == vault_real:
+        raise RecordError(f"{label} must stay inside the vault and not at its root")
+    return placed
 
 
 def _choose(caller: str | None, agents: str | None, default: str) -> str:
@@ -89,13 +110,15 @@ def resolve_wiki_records(
         raise RecordError(f"vault {vault} is not a directory")
     if not records_file.is_file():
         raise RecordError(f"records file {records_file} is missing")
-    defaults = parse_record_keys(records_file.read_text(encoding="utf-8"))
+    defaults = parse_record_keys(_read_text(records_file), True, True)
     if defaults.index is None or defaults.log is None:
         raise RecordError("records file is missing wiki-index or wiki-log")
     agents = PathOverride(index=None, log=None)
     agents_path = vault / "AGENTS.md"
-    if agents_path.is_file():
-        agents = parse_record_keys(agents_path.read_text(encoding="utf-8"))
+    need_index = index_override is None
+    need_log = log_override is None
+    if agents_path.is_file() and (need_index or need_log):
+        agents = parse_record_keys(_read_text(agents_path), need_index, need_log)
     index_value = _choose(index_override, agents.index, defaults.index)
     log_value = _choose(log_override, agents.log, defaults.log)
     return WikiRecords(
