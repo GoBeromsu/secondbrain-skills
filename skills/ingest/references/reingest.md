@@ -33,7 +33,7 @@ A web-book item needs an owner-selected multi-page source with at least five cha
 
 ## Record
 
-- Every written item updates `index.md` and appends to `log.md` per Step 9, with `reingest` as the operation: `## [YYYY-MM-DD] reingest | {source title}`, naming update or reprocessing, the Raws written and the pages touched.
-- `log.md` and the Raws' `supersedes` / `superseded-by` / `referenced` links are the record of what was reprocessed. A commit message or trailer is not evidence that an item was reprocessed; a normal ingest commit is not a reprocessing record.
-- An interrupted batch is resumed from `log.md` and readback of the touched notes: finish or report each unfinished item. Never reset, check out or delete to clean up.
+- Every written item updates the wiki index and appends to the wiki log per Step 9, with `reingest` as the operation: `## [YYYY-MM-DD] reingest | {source title}`, naming update or reprocessing, the Raws written and the pages touched. Paths are in [records](records.md).
+- The wiki log and the Raws' `supersedes` / `superseded-by` / `referenced` links are the record of what was reprocessed. A commit message or trailer is not evidence that an item was reprocessed; a normal ingest commit is not a reprocessing record.
+- An interrupted batch is resumed from the wiki log and readback of the touched notes: finish or report each unfinished item. Never reset, check out or delete to clean up.
 - No commit or push. A commit only when the owner separately asks, per [git provenance](git-provenance.md).

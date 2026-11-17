@@ -8,7 +8,7 @@ license: MIT
 
 Whole-vault knowledge integrity audit. Audit applies the same three criteria as `verify` — Eligibility, Consistency, Confirmability — at scale, through Map clusters and prioritized sampling. It does not verify every page; it scores the sampled scope, surfaces drift patterns and ranks the next `verify` calls. Audit is the planner; `verify` is the worker.
 
-Audit is a read-only diagnostic on the vault. It never regenerates the Wiki, rewrites a page, or sets a page property; follow-ups route to `verify`, `lint` or `ingest`. An owner goal to improve the entire Wiki becomes a ranked queue of single-page follow-ups, never blanket regeneration. The only writes are the report note and its `log.md` entry, both only after the owner approves saving. A `--no-save` or unapproved run writes nothing — no report, no log entry, no index change. Never commit or push; commit only when the owner separately asks.
+Audit is a read-only diagnostic on the vault. It never regenerates the Wiki, rewrites a page, or sets a page property; follow-ups route to `verify`, `lint` or `ingest`. An owner goal to improve the entire Wiki becomes a ranked queue of single-page follow-ups, never blanket regeneration. The only writes are the report note and its wiki log entry, both only after the owner approves saving. A `--no-save` or unapproved run writes nothing — no report, no log entry, no index change. Never commit or push; commit only when the owner separately asks.
 
 Every finding is stated against what was actually read. Unread pages are "not examined", never "clean"; a score covers only the examined scope and says so.
 
@@ -123,7 +123,7 @@ State weights used and that every score covers only the examined scope. Then the
 Report in the conversation first, using [report](references/report.md). Unless `--no-save`, ask whether to save; only on approval:
 
 1. Save `YYYY-MM-DD-Q-vault-audit.md` at the live policy's query location, with the vault's query-result template and frontmatter (`date_created`, `date_modified` snake_case; other fields as live policy defines). Body sections follow [report](references/report.md), including `## Vault Health` and `## Drift Since Last Audit`.
-2. Append to `log.md` (append-only, never rewrite earlier entries):
+2. Append to the wiki log in [records](../ingest/references/records.md) (append-only, never rewrite earlier entries):
 
 ```markdown
 ## [YYYY-MM-DD] audit | {scope}
@@ -144,7 +144,7 @@ Print the summary following [report](references/report.md): Vault Health composi
 1. **Map out of sync** — a page names a Map in `related` but the Map does not link it, or the reverse. Leave it out of the cluster; flag it as a Map sync gap for `lint`.
 2. **Oversized cluster** — a Map with 50+ linked pages. Subdivide by tag intersection and audit each sub-cluster separately; say how it was split.
 3. **Audit storm** — the same pages flagged in two consecutive audits with no `verify` since become a `STALE FLAG` at the top of the action list.
-4. **Concurrency safety** — audit is read-only on Wiki pages; the report and `log.md` writes happen only in Phase E, serialized, after approval. Page changes wait for the `verify` the owner starts.
+4. **Concurrency safety** — audit is read-only on Wiki pages; the report and wiki log writes happen only in Phase E, serialized, after approval. Page changes wait for the `verify` the owner starts.
 5. **Confirmability vs source ground truth** — Phase C reads cited Raw only partly. A flagged page is a candidate; the definitive source check is `verify` on that page.
 6. **Action list explosion** — cap the list at ten and say how many more are in the report.
 7. **Silent coverage loss** — a cluster or group skipped for time is reported as not examined, with the reason.

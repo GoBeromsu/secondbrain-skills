@@ -5,7 +5,7 @@ description: "Ingests one selected source into the wiki: a URL, file, text, pape
 
 # Ingest
 
-Execute every step in order. Asking for ingest authorizes the writes this recipe names in the destination vault — Raw, Wiki pages, Maps, `index.md`, `log.md` — under the vault's live policy. It does not authorize deleting an Inbox original or any other file, committing, pushing, or editing the owner's own notes, sections or properties. [Frontmatter](references/frontmatter.md) governs every key; YAML uses 2 spaces, the body tabs, YAML wikilinks are quoted.
+Execute every step in order. Asking for ingest authorizes the writes this recipe names in the destination vault — Raw, Wiki pages, Maps, and the wiki index and log in [records](references/records.md) — under the vault's live policy. It does not authorize deleting an Inbox original or any other file, committing, pushing, or editing the owner's own notes, sections or properties. [Frontmatter](references/frontmatter.md) governs every key; YAML uses 2 spaces, the body tabs, YAML wikilinks are quoted.
 
 This recipe decides what is written and where, not how a note is formed. Before the first write, load every available skill whose description covers note formatting, prose, or source description, and write the Raw source, Wiki pages and Maps by them.
 
@@ -59,7 +59,7 @@ Extract:
 - key claims to track;
 - connections to existing Wiki pages.
 
-Read `index.md` and search the vault (`qmd`) for existing pages first; updating an existing page beats creating a new one. Match a source by `source` URL or reference before title. This lookup establishes identity and targets from titles, aliases, paths, `source` and index lines; existing page prose stays out of Step 6's writer.
+Read the wiki index in [records](references/records.md) and search the vault (`qmd`) for existing pages first; updating an existing page beats creating a new one. Match a source by `source` URL or reference before title. This lookup establishes identity and targets from titles, aliases, paths, `source` and index lines; existing page prose stays out of Step 6's writer.
 
 When a claim reports another creator's work, attribute it to this source's author as a secondary claim and put the original in the Raw's `referenced`: its Raw or Book Index wikilink when already in the vault, otherwise its canonical URL. Never fetch or ingest the original for this; record provenance unknown in `## Ingest Notes` when it cannot be located. A Concept resting only on secondary claims is at most `confidence: medium`. Each claim stays with its creator and the source it arrived through; never merge claims from different creators into one unattributed statement.
 
@@ -125,16 +125,16 @@ Where a Wiki page this ingest created or changed, or one mentioning an Entity it
 
 ## Step 9 — Update index and log
 
-Update `index.md`, completing all four:
+Update the wiki index in [records](references/records.md), completing all four:
 
 - each new Wiki page under its section (Terms, Concepts, Entities, Guides, Maps) as `- [[Page Name]] — one-line description`;
 - the Stats table recounted from the folders (Raw Sources, Wiki Pages, Terms, Concepts, Entities, Guides, MOCs, Queries; Terms counted by `layer: terms` when they share the Concept folder), never incremented by guess;
 - one Recent Ingests row at the top: date, Raw link, pages touched;
 - the index's modification date.
 
-Re-read `index.md` and confirm every new page appears. When the vault has no `index.md`, create it with those sections and say so in the report.
+Re-read that index and confirm every new page appears. When the resolved index is missing, create it only at the resolved path, including its parent directory, and say so. When that path is the vault root, stop and report it. Never create `index.md` at the vault root.
 
-Append to `log.md`, never editing earlier entries:
+Append to the wiki log in [records](references/records.md), never editing earlier entries:
 
 ```markdown
 ## [YYYY-MM-DD] ingest | {source title}
@@ -146,7 +146,7 @@ Append to `log.md`, never editing earlier entries:
 - Pages updated: [[page3]], [[page4]], ...
 ```
 
-Git history does not replace `index.md` or `log.md`. Ingest never commits or pushes; when the owner separately asks for a commit, its subject is `ingest: {source title}`.
+Git history does not replace the wiki index or log. Ingest never commits or pushes; when the owner separately asks for a commit, its subject is `ingest: {source title}`.
 
 ## Step 10 — Review
 
@@ -159,8 +159,8 @@ Check every item and fix failures:
 - every new Wiki page has `explored: false`; every `confidence: high` page has a Bias Check with `Counter-argument:` and `Data gap:` lines;
 - every `related` link from Step 2 resolves to an existing note and no literal placeholder remains; external URLs in bodies are `[label](URL)` and no `obsidian://` link is written;
 - every touched Wiki page passes [conformance](references/conformance.md), each item recorded present or absent in the run report;
-- every new page appears in `index.md` and the Stats counts match the folders;
-- the `log.md` entry is appended;
+- every new page appears in the wiki index and the Stats counts match the folders;
+- the wiki log entry is appended;
 - the qmd index status is known: when `reindex` reports pending or failed work, run it and report the result.
 
 Then invoke `secondbrain-skills:lint` and `secondbrain-skills:verify` on the Wiki pages this ingest created or changed, plus the new Raw for lint; each keeps its own contract.
@@ -171,11 +171,11 @@ Report: the source (title, URL); where the Raw was saved; pages created, each wi
 
 ## Paper Mode
 
-Follow [papers](references/papers.md) with [paper hub](templates/paper-hub.md) and [paper atom](templates/paper-atom.md): P-0 purpose and target RQ, P-1 paper type, P-2 Raw, P-3 hub and knowledge atoms across the twelve axes, P-4 Wiki promotion, P-5 RQ sync for an owner-designated RQ only, P-6 `index.md` (hub only) and `log.md` (`ingest-paper`), P-7 verification with `scripts/verify_paper.py` plus a read-back (a PASS is necessary, not proof of fidelity). The question budget is exactly two, P-0 and P-1: P-0 carries the Step 1 purpose question, a purpose the task already states is used without asking, and Step 2 runs without a question, recording stat-verified and owner-confirmed links only. Promote only what the paper supports, updating existing pages before creating; a shortfall against P-4's target is reported, never padded. There is no blanket Scale, RQ or Persona promotion.
+Follow [papers](references/papers.md) with [paper hub](templates/paper-hub.md) and [paper atom](templates/paper-atom.md): P-0 purpose and target RQ, P-1 paper type, P-2 Raw, P-3 hub and knowledge atoms across the twelve axes, P-4 Wiki promotion, P-5 RQ sync for an owner-designated RQ only, P-6 the wiki index (hub only) and the wiki log (`ingest-paper`), P-7 verification with `scripts/verify_paper.py` plus a read-back (a PASS is necessary, not proof of fidelity). The question budget is exactly two, P-0 and P-1: P-0 carries the Step 1 purpose question, a purpose the task already states is used without asking, and Step 2 runs without a question, recording stat-verified and owner-confirmed links only. Promote only what the paper supports, updating existing pages before creating; a shortfall against P-4's target is reported, never padded. There is no blanket Scale, RQ or Persona promotion.
 
 ## Book Mode
 
-Follow [books](references/books.md): Steps 1 and 2 once for the whole book, B-1 TOC and chapter URL pattern, B-2 Book Index, B-3 chapter stubs, B-4 a small set of book-level pages, B-5 `index.md` and one `log.md` entry; on Promotion append `## [YYYY-MM-DD] promote | {book} ch{NN}`. Never compile unread chapter content.
+Follow [books](references/books.md): Steps 1 and 2 once for the whole book, B-1 TOC and chapter URL pattern, B-2 Book Index, B-3 chapter stubs, B-4 a small set of book-level pages, B-5 the wiki index and one wiki log entry; on Promotion append `## [YYYY-MM-DD] promote | {book} ch{NN}`. Never compile unread chapter content.
 
 The Book Index and chapter stubs go into the Books Raw folder with `category: Books`, unless the live policy or the owner's task names another folder and `category` for books.
 

@@ -6,7 +6,7 @@ license: MIT
 
 # Inbox
 
-Scan `00. Inbox/` for pending candidates, preview them, and route the selected ones through `ingest`. Read Core Context once per session; its §2 reuse axes are the ones offered for purpose. Scanning, previewing and counting write nothing. Ingest owns Raw, Wiki, Maps, `index.md` and `log.md`. The only file action this skill performs itself is the Step 6 cleanup, and only after an explicit yes.
+Scan `00. Inbox/` for pending candidates, preview them, and route the selected ones through `ingest`. Read Core Context once per session; its §2 reuse axes are the ones offered for purpose. Scanning, previewing and counting write nothing. Ingest owns Raw, Wiki, Maps, and the wiki index and log in [records](../ingest/references/records.md). The only file action this skill performs itself is the Step 6 cleanup, and only after an explicit yes.
 
 Tools: `obsidian-cli` or plain file reads over the vault; `rg` over frontmatter for counts and locators; `qmd` when a locator is missing and you need a likely existing Raw.
 
@@ -65,11 +65,11 @@ A candidate that already carries `collectionPurpose`, or a purpose the task alre
 
 ### Step 5: Ingest
 
-Compose `ingest` once per selected note with its path, its purpose, and the duplicate flags from Step 2. `ingest` owns Raw placement, preserving the candidate's metadata, the 10–15 Wiki pages, Maps, the `index.md` update and the `log.md` entry, and its Step 6 review including qmd reindex status. Run notes sequentially with progress per note: `[3/7] Ingesting: {note}`; never parallelize writes to the same Raw or Map. A prepared selection is not an executed ingest. Nothing is committed or pushed; a commit happens only when the owner separately asks.
+Compose `ingest` once per selected note with its path, its purpose, and the duplicate flags from Step 2. `ingest` owns Raw placement, preserving the candidate's metadata, the 10–15 Wiki pages, Maps, the wiki index update and the wiki log entry, and its Step 6 review including qmd reindex status. Run notes sequentially with progress per note: `[3/7] Ingesting: {note}`; never parallelize writes to the same Raw or Map. A prepared selection is not an executed ingest. Nothing is committed or pushed; a commit happens only when the owner separately asks.
 
 ### Step 6: Cleanup
 
-After the batch, check each ingest's report against disk: a Raw exists for each selected candidate, its `## Original Content` passed ingest's verbatim check against the Inbox body, and `index.md` and `log.md` were updated. Then ask "Delete the processed files from the Inbox?", listing the candidates that passed.
+After the batch, check each ingest's report against disk: a Raw exists for each selected candidate, its `## Original Content` passed ingest's verbatim check against the Inbox body, and the wiki index and wiki log were updated. Then ask "Delete the processed files from the Inbox?", listing the candidates that passed.
 
 - Delete only on an explicit yes, and only candidates whose verbatim check passed; a failed or partial ingest stays in place and is reported.
 - Before deleting a candidate, read it back once more as its before-image and confirm its Raw carries the full body verbatim and every source, history and metadata value the candidate held except `date_clipped` (`source`/`source_url`, `collectionPurpose`, `referenced`, Source Manifest, Agent Capture Notes, unknown keys); anything missing keeps that candidate in place and is reported.

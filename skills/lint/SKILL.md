@@ -1,14 +1,14 @@
 ---
 name: "lint"
-description: "Lints a bounded vault scope for mechanical health: broken or orphan links, placement drift, missing frontmatter, index.md and log.md sync, MOC coverage, stale pages and link form (`[label](URL)` for external, wikilinks for internal, no `obsidian://` note links). Use for vault lint, note health or link checks. Quality review belongs to audit, per-claim checks to verify."
+description: "Lints a bounded vault scope for mechanical health: broken or orphan links, placement drift, missing frontmatter, wiki index and log sync, MOC coverage, stale pages and link form (`[label](URL)` for external, wikilinks for internal, no `obsidian://` note links). Use for vault lint, note health or link checks. Quality review belongs to audit, per-claim checks to verify."
 license: MIT
 ---
 
 # Lint
 
-LLM Wiki lint / health check: inventory against `index.md`, orphans, broken links, contradictions, stale pages, index sync, MOC coverage, frontmatter coverage (collectionPurpose, Exploration Gate, verification fields, Bias Check, Persona health), Core Context freshness and link form. Lint reads structure, not meaning — whether a claim is true is `verify`, whether a cluster agrees with itself is `audit`.
+LLM Wiki lint / health check: inventory against the wiki index in [records](../ingest/references/records.md), orphans, broken links, contradictions, stale pages, index sync, MOC coverage, frontmatter coverage (collectionPurpose, Exploration Gate, verification fields, Bias Check, Persona health), Core Context freshness and link form. Lint reads structure, not meaning — whether a claim is true is `verify`, whether a cluster agrees with itself is `audit`.
 
-Lint is report-first. A lint run writes nothing — no note, no `index.md` edit, no `log.md` entry. Every finding comes back as a report, and the owner picks which fixes to apply.
+Lint is report-first. A lint run writes nothing — no note, no wiki index edit, no wiki log entry. Every finding comes back as a report, and the owner picks which fixes to apply.
 
 Tools: `scripts/link-lint.py` for link form (Step 10), `obsidian-cli` for unresolved links and backlinks when Obsidian is running, `rg` otherwise; `qmd query` for a renamed target; `git log` only as a fallback age when `date_modified` is absent. Null-safe recipes are in [checks](references/checks.md).
 
@@ -24,7 +24,7 @@ Run every step unless the owner named a subset; a step that could not run is lis
 
 ### Step 1: Inventory
 
-Read `index.md` for the current catalog, then count actual files: Raw notes, Wiki pages by layer and role, Queries, MOCs, Personas, Paper hubs, Inbox candidates. Note whether `index.md` and `log.md` exist. Compare index entries with actual files (detail in Step 6).
+Read the wiki index for the current catalog, then count actual files: Raw notes, Wiki pages by layer and role, Queries, MOCs, Personas, Paper hubs, Inbox candidates. Note whether the wiki index and wiki log exist. Compare index entries with actual files (detail in Step 6).
 
 ### Step 2: Orphan Check
 
@@ -48,14 +48,14 @@ Pages with `confidence: low` whose `date_modified` is 30 or more days old (use `
 
 ### Step 6: Index Sync
 
-Verify `index.md` matches the actual structure:
-- every `[[...]]` in `index.md`, in every section the live index has (Raw sources, Wiki, Queries, Maps, Personas, Paper hubs, …), resolved against actual vault files by basename or path; missing or ambiguous targets reported per section;
+Verify the wiki index matches the actual structure:
+- every `[[...]]` in the wiki index, in every section the live index has (Raw sources, Wiki, Queries, Maps, Personas, Paper hubs, …), resolved against actual vault files by basename or path; missing or ambiguous targets reported per section;
 - files present on disk but catalogued in no section;
 - each catalog section against its folder;
 - the Stats table against counts recounted per catalogued section from folders, never from the old table;
 - Recent Ingests / Recent Queries pointing at existing notes.
 
-Check `log.md`: present, append-only shape (`## [YYYY-MM-DD] op | title` entries), and its latest entry date versus the newest Raw `date_ingested` — a newer ingest with no log entry is a gap. A missing `index.md` or `log.md` is a finding; git history does not replace either. Report the gaps; fixing them is an owner-picked fix.
+Check the wiki log: present, append-only shape (`## [YYYY-MM-DD] op | title` entries), and its latest entry date versus the newest Raw `date_ingested` — a newer ingest with no log entry is a gap. A missing wiki index or wiki log is a finding; git history does not replace either. Report the gaps; fixing them is an owner-picked fix.
 
 ### Step 7: MOC Coverage
 
@@ -108,7 +108,7 @@ Report in the conversation using [report](references/report.md):
 3. **Broken Links**
 4. **Contradictions**
 5. **Stale Pages**
-6. **Index Issues** — catalog, Stats, Recent sections, log.md
+6. **Index Issues** — catalog, Stats, Recent sections, wiki log
 7. **MOC Coverage**
 8. **Frontmatter Coverage** — v2 fields, Exploration Gate, verification fields, Bias Check, Persona health
 9. **Core Context**
@@ -121,7 +121,7 @@ Keep the full finding list. When a section is shortened for display, state the t
 
 ## Fixes, on request only
 
-Apply only the fixes the owner picks — add a page to a MOC, add an `index.md` catalog entry or recount Stats from folders, add a missing property whose value is known, repair a link to a confirmed renamed target, or a policy conformance fix from Step 11. Show the diff and get OK per batch of at most ten changes; read each changed note back. Existing notes keep all unrelated keys, values and formatting. After applied fixes, append one `log.md` entry (`## [YYYY-MM-DD] lint | <summary>`). Do not commit unless the owner separately asks.
+Apply only the fixes the owner picks — add a page to a MOC, add a wiki index catalog entry or recount Stats from folders, add a missing property whose value is known, repair a link to a confirmed renamed target, or a policy conformance fix from Step 11. Show the diff and get OK per batch of at most ten changes; read each changed note back. Existing notes keep all unrelated keys, values and formatting. After applied fixes, append one wiki log entry (`## [YYYY-MM-DD] lint | <summary>`). Do not commit unless the owner separately asks.
 
 **Policy conformance fixes** change only what the live policy states, with the owner's pick per group:
 

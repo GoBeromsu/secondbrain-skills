@@ -66,7 +66,7 @@ If approved, edit only the approved sections and leave the rest of the file byte
 
 ## Step 6: Log
 
-When writes were approved, append to `log.md` (append-only; never rewrite earlier entries):
+When writes were approved, append to the wiki log in [records](../ingest/references/records.md) (append-only; never rewrite earlier entries):
 
 ```markdown
 ## [YYYY-MM-DD] update | Core Context refreshed (v<old> → v<new>)

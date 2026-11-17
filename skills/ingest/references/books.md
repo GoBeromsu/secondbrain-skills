@@ -47,8 +47,8 @@ Never precompile chapter-specific pages.
 
 ## B-5 — Index and log
 
-- `index.md`: new book-level pages under their sections, Stats recounted, one Recent Ingests row noting `{N} chapters scaffolded, {M} wiki pages`.
-- `log.md`: one appended entry for the whole scaffold, noting the progressive compile plan.
+- Wiki index from [records](records.md): new book-level pages under their sections, Stats recounted, one Recent Ingests row noting `{N} chapters scaffolded, {M} wiki pages`.
+- Wiki log from the same record: one appended entry for the whole scaffold, noting the progressive compile plan.
 
 ## Promotion — a chapter the owner has read
 
@@ -58,7 +58,7 @@ Trigger: the owner runs ingest on a chapter stub or describes reading that chapt
 2. Replace only the placeholder with the verbatim chapter text; set `status: completed` for the full chapter or `reading` when only part was obtained; update `date_modified`. Every other byte stays, including Source, TOC Preview, human Reading Notes and the navigation keys. A later `reading` → `completed` needs the missing text actually obtained.
 3. Compile the chapter's Wiki pages by SKILL Step 6, updating existing pages first under its clean-context rule; Steps 7 and 8 apply.
 4. In the Book Index change only this chapter: its TOC checkbox `- [ ]` → `- [x]` and its Progress Tracking row to `| N | [[chapter]] | reading-or-completed | YYYY-MM-DD |`. All other Index bytes, human notes included, stay.
-5. Update `index.md` per Step 9 and append to `log.md`: `## [YYYY-MM-DD] promote | {book} ch{NN}`.
+5. Update the wiki index per Step 9 and append to the wiki log: `## [YYYY-MM-DD] promote | {book} ch{NN}`.
 6. Read back the chapter, the Index and every touched page, then report qmd reindex status (Step 10).
 
 ## Bibliographic acquisition

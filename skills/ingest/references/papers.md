@@ -107,7 +107,7 @@ Only when `targetManuscript` names an owner-designated RQ: add the citekey to th
 
 ## P-6 — Index and log
 
-Confirm the hub has no `planned` left and no Compile Plan callout. Add the hub only to the `index.md` Paper Analyses section (atoms never), recount Stats from the folders, add the Recent Ingests row. Append to `log.md`:
+Confirm the hub has no `planned` left and no Compile Plan callout. Add the hub only to the wiki index Paper Analyses section (atoms never), recount Stats from the folders, add the Recent Ingests row. Append to the wiki log in [records](records.md):
 
 ```markdown
 ## [YYYY-MM-DD] ingest-paper | {Surname} {Year} — {title}
@@ -128,7 +128,7 @@ Run the package's mechanical gate, from the package root, on the paper folder, t
 python3 scripts/verify_paper.py "<paper analysis folder named by citekey>" [--vault VAULT] [--raw RAW]
 ```
 
-`scripts/verify_paper.py` is this package's own verifier, written from the P-7 requirements below. It needs Python 3.9+ and PyYAML, reads only the vault, and writes nothing. The vault defaults to the nearest ancestor holding `index.md`, the Raw to the hub's `source`. Exit 0 prints `ALL PASS (mechanical)`; 1 means validation failures; 2 means a prerequisite or input could not be resolved (PyYAML missing, no single hub, unresolvable Raw, unknown `paperType`). Exit 0 is necessary, not sufficient. It checks:
+`scripts/verify_paper.py` is this package's own verifier, written from the P-7 requirements below. It needs Python 3.9+ and PyYAML, reads only the vault, and writes nothing. The vault defaults to the nearest ancestor with `.obsidian`, or with `AGENTS.md` when no `.obsidian` is found. The wiki index is the `wiki-index` line in [records](records.md), unless the vault `AGENTS.md` has its own `wiki-index` line. The Raw defaults to the hub's `source`. Exit 0 prints `ALL PASS (mechanical)`; 1 means validation failures; 2 means a prerequisite or input could not be resolved (PyYAML missing, no single hub, unresolvable Raw, unknown `paperType`, no vault anchor, missing wiki index). Exit 0 is necessary, not sufficient. It checks:
 
 1. every note's frontmatter parses as a mapping without duplicate keys or leftover `{{…}}` slots; hub and atoms carry ISO `date_created`/`date_modified` (modified not earlier), `model` and `effort`.
 2. hub `type: paper-hub`, `status: active`, `citekey`, `targetManuscript` (`none` or an RQ wikilink), a known `paperType`, no leftover `[!note] Compile Plan`; each atom `type: paper-analysis`, `paperType` and `citekey` equal to the hub's, exactly one ` - S{NN} ` filename marker equal to the integer `analysisStep` in 2–12, `analysisStepName` equal to the type's literal name above (case and whitespace folded only), `paperHub` linking the hub, `source` naming the paper's Raw, `status` `completed` or `stub`.
@@ -137,19 +137,19 @@ python3 scripts/verify_paper.py "<paper analysis folder named by citekey>" [--va
 5. every `[!quote]` is found contiguously in the Raw's `## Original Content` after NFC, curly-quote/dash/ellipsis folding and whitespace collapse — Unicode minus `−` is never folded to `-`, and no line is skipped for being short, numeric or a negation; each quote header carries a page or § locator; an empty quote fails; a completed non-S12 atom with no located quote fails.
 6. Atom Catalog links ↔ atom files both ways, with per-step counts; Coverage Map atom links ⊆ Catalog and ⊆ files; each Step Map row S01–S12 appears once, has the type's step name, an integer Atoms cell equal to the files carrying that `S{NN}`, stated stub counts, no `planned`, and `skipped (reason)` only where no atom exists.
 7. every leaf heading (H1–H6; a heading with deeper headings under it is a parent and needs no row of its own, and a parent's row never covers its leaves) of the Raw's `## Original Content` has a Coverage Map row naming an atom or a stated omission; a row matching several identical headings, or an ambiguous prefix, fails rather than counting as coverage.
-8. `index.md` links the hub and no atom.
+8. The wiki index links the hub and no atom.
 9. atoms live directly in the paper folder; a subfolder holding Markdown notes fails as unsupported, never silently skipped.
 
-Stubs, S12 atoms with no quote, and headings covered only by a stated omission are listed as not fully verified. A mechanical PASS is quantitative only; it is not semantic fidelity and not the qualitative PASS. An atom with zero located quotes or insufficient source evidence is never reported as fully verified. Then read the hub, every atom, the Raw and `index.md` back and check each item; fix and rerun on failure:
+Stubs, S12 atoms with no quote, and headings covered only by a stated omission are listed as not fully verified. A mechanical PASS is quantitative only; it is not semantic fidelity and not the qualitative PASS. An atom with zero located quotes or insufficient source evidence is never reported as fully verified. Then read the hub, every atom, the Raw and the wiki index back and check each item; fix and rerun on failure:
 
 - frontmatter parses; required keys, `model`/`effort`, `paperHub`, integer `analysisStep` 2–12 and its exact `analysisStepName`, `status` `completed` or `stub`;
 - every atom has Analysis Context, the required sections in order, and at least one sibling-atom link;
 - every quotation is found verbatim in the Raw's `## Original Content`;
 - the Atom Catalog and the actual atom files match both ways; every Coverage Map section points at an atom or a stated omission; no Step Map `planned` remains;
-- `index.md` lists the hub and no atom; the `ingest-paper` log entry exists.
+- the wiki index lists the hub and no atom; the `ingest-paper` log entry exists.
 
 The orchestrator runs `verify_paper.py` itself; a subagent's self-check is advisory. Passing shows structure and verbatim presence, not faithfulness: it does not prove an atom reads the paper correctly or covers it. Also read two long sections against their atoms (decomposition), one atom per axis including S09–S12 (exposition), and spot-check that quotes support the claims they back. Report type, strategy, atom count per axis, promoted pages, unfinished axes and the P-4 shortfall if any; then Step 10.
 
 ## Failure modes
 
-Summary-card atoms; under-decomposition; coverage holes; fabricated pages or passages; missing provenance; a citekey that does not match RQ `cites`; silent scope expansion; edits to the owner's own notes; RQ not synced; atoms listed in `index.md`; atoms written without a Blueprint.
+Summary-card atoms; under-decomposition; coverage holes; fabricated pages or passages; missing provenance; a citekey that does not match RQ `cites`; silent scope expansion; edits to the owner's own notes; RQ not synced; atoms listed in the wiki index; atoms written without a Blueprint.

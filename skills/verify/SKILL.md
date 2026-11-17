@@ -33,7 +33,7 @@ Conflicts are flagged `disputed`, never deleted.
 ## Process
 
 1. Resolve the target page.
-2. Read the target page, `index.md`, and the cited Raw Sources. Read Core Context once per session and reuse it; its reuse axes are the ones actually registered in its §2.
+2. Read the target page, the wiki index in [records](../ingest/references/records.md), and the cited Raw Sources. Read Core Context once per session and reuse it; its reuse axes are the ones actually registered in its §2.
 3. Classify `claimType` and `evidenceScope` per [claims](references/claims.md), for the page and per claim where they differ.
 4. **Eligibility.** Run every check below; each failed check is one gap.
 	- *Frontmatter completeness.* Required 7: `type`, `aliases`, `description`, `author`, `date_created`, `date_modified`, `tags`. Wiki-page layer: `source`, `related`, `confidence`, `layer`, `explored`. `claimType`, `evidenceScope` (this command writes them). Also `verificationStatus` (ingest default) and `referenced` on the Raw behind a secondary claim. Report missing fields; for `claimType` / `evidenceScope` propose values from content analysis; otherwise propose a value only when content makes it clear, never invent unknown metadata.
@@ -47,7 +47,7 @@ Conflicts are flagged `disputed`, never deleted.
 9. **Policy and purpose.** Report deviations from the destination's live placement, naming and frontmatter policy (fixing is `lint`'s job). Check the page serves a stated use through its Raw's `collectionPurpose` or `related` links and Core Context §2 axes; none → soft flag "orphaned from user purpose".
 10. **Calibrate `confidence` independently** of the declared value, per [claims](references/claims.md). Matrix: `high` = 3+ primary sources, no counter-evidence, age > 30 days, no unresolved conflicts; `medium` = 1-2 primary sources, no counter-evidence; `low` = single source, `synthesis-only`, or created < 7 days ago (`date_created`). The `high` row's age names no field upstream, so that condition is unknown: never promote to `high` on an assumed age; report "`high` pending age basis". Declared above recommended → OVERCLAIM; declared below → UNDERCLAIM, which needs multiple **primary** sources; otherwise MATCH. Where the bands overlap or leave a gap, report the applicable rows to the owner as stated uncertainty; no resolving threshold is added.
 11. **Bias Check.** For a page that is or would be `high`, or rests mostly on synthesis, judge whether `> [!note] Bias Check` names a real counter and a real data gap; if missing or generic, draft one specific to the central claim.
-12. **Report** (Output below). With `--no-write-back`, stop here and write nothing — no frontmatter, no callout, no `log.md` entry.
+12. **Report** (Output below). With `--no-write-back`, stop here and write nothing — no frontmatter, no callout, no wiki log entry.
 13. **Write-back** on the owner's approval in this conversation, wholly or in part:
 
 ```yaml
@@ -63,11 +63,11 @@ disputed: true
 - Apply approved disputed callouts, the approved `confidence` change, the drafted Bias Check, and missing frontmatter values. A claim's text changes only by an approved correction resting on verified evidence: the correction is drafted from the located source and the approved finding only, then a separate preservation review compares the before-image with the proposal, keeps valid existing content, and reduces it to a minimal patch with attribution kept; a disputed claim keeps its uncertainty stated. No blanket regeneration.
 - Set `explored: true` (with `exploredBy`, `exploredDate`) only when the owner explicitly confirms this verification counts as explored.
 - Update `date_modified` on each changed page; keep unrelated and unknown keys, values and config exactly. No incidental metadata migration.
-- Read each changed page back, then append to `log.md`: `## [YYYY-MM-DD] verify | {Page}` with the verdict, `verificationStatus`, recommended `confidence`, and disputed counterparts. `log.md` is append-only; Git history never replaces it. Never commit or push; commit only when the owner separately asks.
+- Read each changed page back, then append to the wiki log: `## [YYYY-MM-DD] verify | {Page}` with the verdict, `verificationStatus`, recommended `confidence`, and disputed counterparts. The wiki log is append-only; Git history never replaces it. Never commit or push; commit only when the owner separately asks.
 
 ## Resolution mode (`--resolve`)
 
-Only `--resolve` moves `disputed` to `verified`, or downgrades one side's `confidence`. It needs **new evidence** read in this session — a newly ingested original, a correction from the creator, a measurement under matched conditions, or owner reasoning that addresses the conflict. A prior summary, the page's `confidence`, or a preference for one side is not new evidence; without it, refuse and say what would settle it. Outcomes: keep both with the callout updated; correct one side with a dated note of what settled it; or downgrade the weaker side's `confidence`. Name the new evidence in the report and the `log.md` entry.
+Only `--resolve` moves `disputed` to `verified`, or downgrades one side's `confidence`. It needs **new evidence** read in this session — a newly ingested original, a correction from the creator, a measurement under matched conditions, or owner reasoning that addresses the conflict. A prior summary, the page's `confidence`, or a preference for one side is not new evidence; without it, refuse and say what would settle it. Outcomes: keep both with the callout updated; correct one side with a dated note of what settled it; or downgrade the weaker side's `confidence`. Name the new evidence in the report and the wiki log entry.
 
 ## Output
 
