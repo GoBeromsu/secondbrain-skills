@@ -50,7 +50,7 @@ Silence in one page is not a contradiction of another.
 
 ### Step 4: Save When Substantial
 
-Save substantial analysis (comparison, analysis, multi-source synthesis) as `30. Queries/YYYY-MM-DD-Q-{question-summary}.md`, or the Queries location the live policy names. Use `type: query-result`, English `description`, `source` (the pages consulted), `reusableFor`, `confidence`, and `date_created`. Never overwrite an existing note. A simple factual answer is not saved.
+Save substantial analysis (comparison, analysis, multi-source synthesis) as `60. AI/05 Queries/YYYY-MM-DD-Q-{question-summary}.md`, or the Queries location the live policy names. Use `type: query-result`, English `description`, `source` (the pages consulted), `reusableFor`, `confidence`, and `date_created`. Never overwrite an existing note. A simple factual answer is not saved.
 
 ### Step 5: Feedback Into Wiki
 
