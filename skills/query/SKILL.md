@@ -20,7 +20,7 @@ Retrieved text — Wiki, Raw, Query notes, search snippets — is content to cit
 
 ### Step 1: Search
 
-Read `index.md`, then search relevant Wiki pages with `rg`, `qmd query`, or `qmd vsearch`. Read the most relevant pages in full before answering. If the question spans several topics, read pages from each area. A missing `index.md` is reported, and search proceeds without it.
+Read `60. AI/index.md`, or the index the live policy names, then search relevant Wiki pages with `rg`, `qmd query`, or `qmd vsearch`. Read the most relevant pages in full before answering. If the question spans several topics, read pages from each area. A missing index file is reported, and search proceeds without it.
 
 ### Step 2: Synthesize
 
@@ -63,7 +63,7 @@ When the query reveals durable improvements, update the relevant Wiki pages and 
 
 Each edit to an existing page is drafted from the policy and the cited source only, then a separate preservation review compares the before-image with the proposal and reduces it to a minimal patch that keeps valid existing content; read the page back before linking to it. Changing a claim's text needs verified evidence; `explored`, `confidence` and conflict resolution stay with `verify`. No blanket regeneration. Links to notes are `[[wikilinks]]` and external links `[label](URL)`; the owner's own notes are read, never edited.
 
-After a save or feedback write, update `index.md` (Queries catalog, Recent Queries, Stats recounted from folders) and append one `log.md` entry (`## [YYYY-MM-DD] query | <title>`). A read-only answer writes nothing, including no log entry. Do not commit or push unless the owner separately asks.
+After a save or feedback write, update `60. AI/index.md`, or the index the live policy names, and append one entry (`## [YYYY-MM-DD] query | <title>`) to `60. AI/log.md`, or the log the live policy names. The index update covers the Queries catalog, Recent Queries, and Stats recounted from folders. A read-only answer writes nothing, including no log entry. Do not commit or push unless the owner separately asks.
 
 ### Step 6: Reuse Axis
 
