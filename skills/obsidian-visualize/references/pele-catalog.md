@@ -142,7 +142,7 @@ classDiagram
 
 The lifecycle of one thing. The `-v2` suffix is part of the keyword.
 
-**Use** for the states one thing passes through and what triggers each change. **Avoid** when the content is a sequence of actions, not states (flowchart). **Keep under** 8 states.
+**Use** for the states one thing passes through and what triggers each change, including how a UI element responds to each user action. **Avoid** when the content is a sequence of actions, not states (flowchart). **Keep under** 8 states.
 
 ```mermaid
 stateDiagram-v2
@@ -173,6 +173,25 @@ stateDiagram-v2
   note right of Loaned
     Renewal keeps the same loan
   end note
+```
+
+For a UI behavior (a statechart):
+
+- Label each edge with the user event, and add `/ effect` when the event changes what the user sees.
+- Give an in-between gesture such as dragging its own state.
+- To propose a change, draw the current and the proposed machine as two fences with the same state names.
+
+```mermaid
+stateDiagram-v2
+  direction LR
+  state "Panel collapsed" as Collapsed
+  state "Panel expanded" as Expanded
+  [*] --> Collapsed
+  Collapsed --> Expanded : click / show details
+  Expanded --> Collapsed : click / hide details
+  Collapsed --> Dragging : drag
+  Expanded --> Dragging : drag
+  Dragging --> Collapsed : drop / remember position
 ```
 
 ### Entity relationship diagram
