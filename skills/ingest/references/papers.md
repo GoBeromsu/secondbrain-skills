@@ -2,7 +2,7 @@
 
 Paper Mode compiles one Raw, one paper hub, N knowledge atoms in a per-paper folder named by citekey (`40. Paper Analyses/{citekey}/` unless the live policy places it elsewhere) and a few Wiki promotions. Success has two layers: (a) the notes cover the paper so the original need not be reopened, (b) they explain it better than the original. A paper that only needs light collection goes through Standard ingest instead (P-0 option).
 
-Triggers: an explicit paper request, the papers lane or `category: Papers`, a DOI/arXiv/journal URL, or a converted document with Abstract and References. Announce Paper Mode inside P-0; no separate question. Question budget: exactly two, P-0 and P-1.
+For a paper selected as Term evidence, preserve it by Steps 3 and 5 of [ingest](../SKILL.md). Apply Paper Mode to papers selected for analysis: an explicit paper request, the papers lane or `category: Papers`, a DOI/arXiv/journal URL, or a converted document with Abstract and References. Announce Paper Mode inside P-0; no separate question. Question budget: exactly two, P-0 and P-1.
 
 ## P-0 — Purpose, scope and target RQ (question 1)
 

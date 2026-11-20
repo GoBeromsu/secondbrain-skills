@@ -17,8 +17,7 @@ rg --files -g '<name>.md' "<vault>"
 # Inbound links to one page from the whole vault
 rg -l "\[\[<basename>(\||#|\]\])" "<vault>"
 
-# Link targets per frontmatter key and body: use the PyYAML recipe below
-# (author exemption is by key, never by quoting shape)
+# Link targets per frontmatter key: use the PyYAML recipe below; use link-lint.py for the body
 
 # Contradiction callouts
 rg -n '> \[!warning\] Contradiction' "<scope>"
@@ -98,26 +97,21 @@ for p in sys.stdin.buffer.read().split(b'\0'):
     if not p: continue
     p = p.decode()
     text = open(p, encoding='utf-8').read()
-    fm, body = {}, text
+    fm = {}
     m = re.match(r'---\n(.*?)\n---\n?', text, re.S)
     if m:
         try:
             fm = yaml.safe_load(m.group(1)) or {}
         except yaml.YAMLError as e:
             print(p, 'frontmatter', 'yaml-error', e, sep='\t'); fm = {}
-        body = text[m.end():]
-    body = re.sub(r'```.*?```', '', body, flags=re.S)
-    body = re.sub(r'`[^`\n]*`', '', body)
     for key, val in (fm.items() if isinstance(fm, dict) else []):
-        if key == 'author':      # only exemption: author scalar or list
+        if key == 'author' or (key == 'domain' and fm.get('layer') == 'terms'):
             continue
         for t in walk(val):
             if not resolves(t): print(p, key, t, sep='\t')
-    for t in LINK.findall(body):
-        if not resolves(t): print(p, 'body', t, sep='\t')
 ```
 
-Every other key is checked — `source`, `related`, `bookIndex`, `chapterPrev`, `chapterNext`, `paperHub`, `personaOf`, and any key the live schema adds — plus every body link. Output is `path<TAB>key<TAB>missing target`.
+Use the body `BROKEN` findings from `link-lint.py`. Other keys checked here include `source`, `related`, `bookIndex`, `chapterPrev`, `chapterNext`, `paperHub`, `personaOf`, and any key the live schema adds. Output is `path<TAB>key<TAB>missing target`.
 
 Index catalog check (read-only): resolves every `[[...]]` in the wiki index against the vault's actual files — Raw, Wiki, Queries, Maps, Personas, Paper hubs and whatever sections the live index has — and recounts files per catalogued section. The index path comes from `skills/ingest/scripts/records.py`. `python3 index_check.py "<vault>"`:
 

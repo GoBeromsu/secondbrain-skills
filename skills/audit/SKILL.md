@@ -48,8 +48,8 @@ Record pages in at least one Map, **audit-orphan pages** (in zero Maps), and the
 Pure search, no judgment. Report each check as n/total plus at most twenty failing paths.
 
 - **A.1 Frontmatter coverage.** Wiki: `claimType`, `evidenceScope`, `confidence`, `explored`, `verificationStatus`, plus `source` and `related`. A `source` wikilink that does not resolve is recorded for Phase D. `explored: false` is review backlog, not a failure. Raw: `collectionPurpose` presence.
-- **A.2 SPO structure.** H1, `## Sources`, `## Related` present; every `confidence: high` page carries a Bias Check.
-- **A.3 Source citation density.** Pages citing no Raw note are synthesis-only; they must declare `evidenceScope: synthesis-only`. An undeclared one is a finding.
+- **A.2 SPO structure.** H1, `## Sources`, `## Related` present; for Terms, assess the corresponding content by the [Term template](../ingest/templates/term.md) regardless of heading, with relations only where relevant; every `confidence: high` page carries a Bias Check.
+- **A.3 Source citation density.** Check Term source entries for Raws and direct evidence links; report a missing archival copy separately. Pages derived only from other Wiki pages must declare `evidenceScope: synthesis-only`.
 - **A.4 Policy violations.** Count the mechanical rules the live policy states (YAML indent, body indent, unquoted wikilinks in YAML other than intentional `author` wikilinks, unquoted Mermaid labels, a page whose `layer` mismatches its folder). Repair belongs to `lint`.
 
 Output: coverage table per dimension, failing paths (top twenty per dimension), and the **Eligibility score** — weighted percentage of pages passing frontmatter coverage, SPO presence and claim type assignability.

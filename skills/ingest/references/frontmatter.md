@@ -35,7 +35,7 @@ No `created_by` or `authorship` default. A vault whose live policy defines its o
 | Raw Source | `raw-source` | — | `ingested` | raw.md |
 | Book Index (Raw) | `raw-source` | — | `ingested` | book-index.md |
 | Book chapter (Raw) | `raw-source` | — | `stub` → `reading` → `completed` | book-chapter.md |
-| Term | `wiki-page` | `terms` | `active` | term.md, rules in terms.md |
+| Term | `wiki-page` | `terms` | `active` | [Term template](../templates/term.md) |
 | Concept | `wiki-page` | `concepts`; Paper promotions `theory`, `method` or `scale` | `active` | concept.md |
 | Entity | `wiki-page` | `entities` | `active` | entity.md |
 | Guide | `wiki-page` | `guides` | `active` | guide.md |
@@ -73,11 +73,11 @@ No `created_by` or `authorship` default. A vault whose live policy defines its o
 
 | Meaning | Key | Notes |
 | --- | --- | --- |
-| Evidence | `source` | Quoted wikilink list of Raw Sources. Add the new Raw on every update; keep earlier entries. |
+| Evidence | `source` | List of quoted Raw wikilinks; Terms may also list external addresses as specified in the Term template. Add each newly used Raw and keep earlier entries. |
 | Related knowledge | `related` | Quoted wikilink list. |
 | Confidence | `confidence` | `high` (well-sourced), `medium` (partial), `low` (speculative). A page resting only on secondary claims is not well-sourced. |
 | Reuse unit | `layer` | Per the Roles table. |
-| Field | `domain` | Term only: list of the fields of its Senses sections, such as `reinforcement learning`; omitted for self-contained jargon. |
+| Field | `domain` | Term only: fields of use; see the [Term template](../templates/term.md) for their format. |
 | Definition status | `definitionStatus` | Term only: `consensus`, `contested` or `emerging`. |
 | Exploration gate | `explored` | `false` on every new page; `true` only after a human read it or a source-backed review loop verified it, with optional `exploredBy`, `exploredDate`. |
 | Verification state | `verificationStatus` | `unverified` on every new page; `verify` sets `verified`, `partial`, `unverified` or `disputed` with `verifiedAt`, `verifiedBy`. |
@@ -93,5 +93,5 @@ No `created_by` or `authorship` default. A vault whose live policy defines its o
 New notes use the schema above. A run that touches an existing note preserves what it already holds.
 
 - Keep every existing key and value, including unknown keys and earlier identity, location and history values. Ordinary ingest changes only the keys its update names (`source`, `related`, `date_modified` and additions the preservation review accepted); it renames, re-forms, copies or removes nothing else, date keys and `author` values included, except ingest Step 8's Entity reference links.
-- Identity matching reads `source` first, and any other source address or locator the existing note already records; titles never prove sameness. Ingest requires no identity key beyond this schema.
+- Identity matching reads `source` first, and any other source address or locator the existing note already records; compare the destination URL of a Markdown link with a bare URL independent of its display label. Titles never prove sameness. Ingest requires no identity key beyond this schema.
 - Key migration runs only when the owner explicitly authorizes it for named notes. Record each note's before-image first; map a value only when its meaning is verified equivalent to the target key (`source_obtained_at` is not `date_ingested` without proof that both record the same acquisition); stop on any conflict, such as a target key already holding a different value or an ambiguous meaning, and report it. A completed migration leaves one key per meaning, with no permanent dual keys. A value still needed for identity, location or history is never dropped merely as legacy.

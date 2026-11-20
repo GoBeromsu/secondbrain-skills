@@ -1,6 +1,6 @@
 ---
 name: "ingest"
-description: "Ingests one selected source into the wiki: a URL, file, text, paper, book or Inbox candidate becomes a preserved Raw source plus Wiki pages and Maps. Use for adding a source, paper analysis (12-axis), book notes, reading notes, adding a book's table of contents, chapter promotion and attributed Persona updates. Saving without compiling belongs to capture."
+description: "Ingests one selected source into the wiki: a URL, file, text, paper, book or Inbox candidate becomes a preserved Raw source plus Wiki pages and Maps. Use for creating or updating a Term note, adding a source, paper analysis (12-axis), book notes, reading notes, adding a book's table of contents, chapter promotion and attributed Persona updates. Saving without compiling belongs to capture."
 ---
 
 # Ingest
@@ -16,8 +16,9 @@ Read the vault's Core Context once per session before the first ingest. Use the 
 - URL: fetch the content, then process.
 - File path or name: read it from the vault, checking the Inbox and its lanes first.
 - Blank or `all`: delegate selection to `inbox`.
+- Named Term request: resolve the term and its sources with the [Term template](templates/term.md); compile that Term from the preserved evidence.
 - Raw text: the argument is the source.
-- Academic paper (DOI, arXiv or journal URL, a document with Abstract and References, a file from the papers lane): Paper Mode.
+- Academic paper selected for analysis: Paper Mode. For a Term request, preserve papers used as evidence through Steps 3 and 5 and compile the requested Term.
 - Multi-page book or docs site (5+ chapters in its sidebar or TOC): Book Mode.
 - Binary or non-Markdown file: Step 3 after Steps 1 and 2.
 
@@ -61,7 +62,7 @@ Extract:
 
 Read the wiki index in [records](references/records.md) and search the vault (`qmd`) for existing pages first; updating an existing page beats creating a new one. Match a source by `source` URL or reference before title. This lookup establishes identity and targets from titles, aliases, paths, `source` and index lines; existing page prose stays out of Step 6's writer.
 
-When a claim reports another creator's work, attribute it to this source's author as a secondary claim and put the original in the Raw's `referenced`: its Raw or Book Index wikilink when already in the vault, otherwise its canonical URL. Never fetch or ingest the original for this; record provenance unknown in `## Ingest Notes` when it cannot be located. A Concept resting only on secondary claims is at most `confidence: medium`. Each claim stays with its creator and the source it arrived through; never merge claims from different creators into one unattributed statement.
+When a claim reports another creator's work, attribute it to this source's author as a secondary claim and put the original in the Raw's `referenced`: its Raw or Book Index wikilink when already in the vault, otherwise its canonical URL. For single-source ingest, record that link without fetching or ingesting the original. When the owner selects a Term for creation or research, retrieve the originals its evidence requires under the [Term template](templates/term.md) and reuse or preserve each as a distinct Raw; record provenance unknown in `## Ingest Notes` when it cannot be located. A Concept resting only on secondary claims is at most `confidence: medium`. Each claim stays with its creator and the source it arrived through; never merge claims from different creators into one unattributed statement.
 
 ## Step 5 — Save Raw Source
 
@@ -86,23 +87,22 @@ Inbox cleanup: delete the Inbox original only when the owner's request or the va
 
 ## Step 6 — Compile Wiki pages
 
-For each extracted term, concept, entity and guide, update the existing page or create one: Terms with [term](templates/term.md), Concepts with [concept](templates/concept.md), Entities with [entity](templates/entity.md), Guides with [guide](templates/guide.md).
+For a named Term request, compile the selected Term. For a source ingest, compile each extracted term, concept, entity and guide. In either case, update the existing page or create one: Terms with [term](templates/term.md), Concepts with [concept](templates/concept.md), Entities with [entity](templates/entity.md), Guides with [guide](templates/guide.md).
 
 Title a Concept `{Topic Name}` in the idea's original language, whichever language that is, with translations in `aliases`.
 Explain in its Overview what the idea offers for the Raw's `collectionPurpose`.
 
-- New writing comes only from this source and is attributed to it.
+- For single-source ingest, ground new writing only in the selected source. For a selected Term with multiple sources, give the writer the inspected Original Content of each Raw used, with source identity, access scope and locators kept distinct.
 - An existing page is updated in three separate contexts, in this order:
-	1. Writer — a fresh context given only the vault's approved policy, this run's extraction and the Raw's `## Original Content`. It never sees the existing page's prose or examples; the page's path, title, aliases, `type`, `layer` and `source` list may be passed to fix identity and target. For a Term it also receives excerpts of the owner's notes and earlier queries that vault search returns for the term, each with its path. It drafts only source-grounded additions for that page; an owner excerpt is quoted as the owner's own context, never as evidence for a fact.
-	2. Preservation reviewer — a separate context given the page's before-image and the writer's proposal. It first checks that every valid existing statement, link and frontmatter value survives, then reduces the proposal to the minimal patch: additions under the relevant sections, the Raw appended to `source`, `date_modified` updated. It drops anything the source does not support, except a connection quoting an owner excerpt by its path, and never regenerates the page.
+	1. Writer — a fresh context given only the vault's approved policy, this run's extraction and the relevant Raw source text under `## Original Content`. It never sees the existing page's prose or examples; the page's path, title, aliases, `type`, `layer` and `source` list may be passed to fix identity and target. For a Term it also receives excerpts of the owner's notes and earlier queries that vault search returns for the term, each with its path. It drafts only source-grounded additions for that page; an owner excerpt is quoted as the owner's own context, never as evidence for a fact.
+	2. Preservation reviewer — a separate context given the page's before-image and the writer's proposal. It first checks that every valid existing statement, link and frontmatter value survives, then reduces the proposal to the minimal patch: additions under the relevant sections, each newly used Raw appended to `source`, `date_modified` updated. It drops anything the source does not support, except a connection quoting an owner excerpt by its path, and never regenerates the page.
 	3. Apply the reviewed patch, read the page back and compare it with the before-image. Links to and from the page are added only after this validation (Step 8).
 - When the runtime cannot provide separate contexts, stop the update of that existing page and report it; new pages and the rest of the run continue.
 - The existing Wiki is not ground truth, and neither is one source. An existing statement changes only when the correction rests on verified evidence (a `verify` result or the owner's confirmation) and the reviewer accepted it. When this source explicitly conflicts with an existing claim, keep both, attributed, with `> [!warning] Contradiction` and the uncertainty stated. A source that is silent on a claim does not contradict it.
 - An Entity exists because the analysis found it significant. Every Raw author whose real name the source confirms is also a person Entity: update the existing one or create it with this Raw in `source`, and link it from the Raw's `author`.
 - Title a person Entity with their source-confirmed real name in its original language and script; put handles, channel names, localized names and romanizations in `aliases`. Never infer a real name; if unconfirmed, report it without presenting an alias as a real name. An explicit live-policy naming exception wins and is reported.
 - A new Entity goes into the folder the live policy registers for its subtype, otherwise the Entity folder; an existing Entity is not moved.
-- Title and structure a Term by [terms](references/terms.md).
-- Before creating a Term, search titles and aliases for the same referent; a match is updated, never duplicated, and a new sense becomes a section of the existing page.
+- Before creating a Term, search titles and aliases for the same referent; a match is updated, never duplicated, and a new related sense is incorporated into the existing page.
 - A new Term goes into the folder the live policy registers for Terms; when none is registered, it goes into the Concept folder and the report says so. Ingest never moves or retypes an existing page.
 Write every Wiki page to [conformance](references/conformance.md).
 
@@ -154,10 +154,11 @@ Check every item and fix failures:
 
 - the Raw has `## Original Content` with a substantive verbatim body (compared against the Inbox body before any deletion);
 - the Inbox original is deleted when deletion was authorized, otherwise reported as awaiting cleanup;
-- every new `source`, `related` and body wikilink resolves, except `author` links to a person whose real name the source does not confirm; every confirmed author has a person Entity; no duplicate page was created, and no new Term duplicates an existing title or alias for the same referent;
+- every new `source`, `related` and body wikilink resolves, except the Term template’s one named future related term and `author` links to a person whose real name the source does not confirm; every confirmed author has a person Entity; no duplicate page was created, and no new Term duplicates an existing title or alias for the same referent;
 - every updated existing page still holds every valid statement, link and frontmatter value of its before-image, apart from reviewed corrections;
 - every new Wiki page has `explored: false`; every `confidence: high` page has a Bias Check with `Counter-argument:` and `Data gap:` lines;
 - every `related` link from Step 2 resolves to an existing note and no literal placeholder remains; external URLs in bodies are `[label](URL)` and no `obsidian://` link is written;
+- each new or revised Term passage meets the [Term template](templates/term.md), including its claim locators and source access records;
 - every touched Wiki page passes [conformance](references/conformance.md), each item recorded present or absent in the run report;
 - every new page appears in the wiki index and the Stats counts match the folders;
 - the wiki log entry is appended;

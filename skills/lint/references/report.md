@@ -4,7 +4,7 @@ Open with the scope and the link source used (which notes counted as inbound lin
 
 1. **Stats** — Raw, Wiki by layer and role, Queries, MOCs, Personas, Inbox candidates; whether the wiki index and wiki log exist.
 2. **Orphans** — page and suggested MOC; uncompiled Raw separately.
-3. **Broken Links** — source note → missing target → likely fix (rename, create, remove). Only values under the `author` key are excluded and not counted; links under other keys are reported with their key. If PyYAML is unavailable, the section reads Not checked.
+3. **Broken Links** — source note → missing target → likely fix (rename, create, remove). Apply the Step 3 exemptions; report other unresolved metadata links with their key. If PyYAML is unavailable, the section reads Not checked.
 4. **Contradictions** — page, possibly resolved by which newer Raw.
 5. **Stale Pages** — page, `date_modified` (or git age, marked), why flagged; `explored: false` backlog count.
 6. **Index Issues** — per index section (Raw sources, Wiki, Queries, Maps, Personas, Paper hubs, any live section): links with missing or ambiguous targets, files catalogued nowhere, Stats table vs counts recounted per catalogued section, Recent Ingests / Recent Queries targets, wiki log presence and latest entry vs newest ingest.

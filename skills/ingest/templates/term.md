@@ -1,3 +1,21 @@
+# Term
+
+Use this scaffold for a named domain term the reader wants to understand and reuse. Follow the [shared frontmatter contract](../references/frontmatter.md) and the destination’s live policy.
+
+- Search titles, aliases and linked uses for the same referent. Use its established original-language name, appending the acronym in parentheses when customary. Keep translated, former and variant names in aliases. Group related senses; qualify unrelated homonyms by field. Link to the whole Term and preserve a superseded definition with its date and source.
+- Give a new Term at least five distinct subject tags and list its domains as quoted English field wikilinks. For an external address in `source` or an existing `source_url` field, use a quoted `[label](URL)`; keep existing vault sources as wikilinks.
+- Start with a definition and the finding or boundary that matters most. Explain it with a concrete example and distinguish the closest confusable idea. Keep the section order below, using only the roles the term needs. Merge overlapping material. Use a table or formula for a worked comparison; use `obsidian-visualize` for an inline Pele diagram when it clarifies a mechanism.
+- Compare studies by the question they answer. Explain what was done, who or what was measured, the unit and denominator, the result and its limits. Keep different outcomes distinct. Label hypotheses and separate original observations from replications and pooled estimates.
+- For an explicitly researched Term, retrieve the original through its DOI, publisher or author repository; reuse its Raw or preserve it under ingest. For a Term extracted from one source, attribute secondary claims to the selected source. Record what was actually inspected, including an abstract-only or partial reading.
+- Cite empirical, quantitative and historical claims at the passage, table or figure that supports them. Link the first author's surname and year directly to that location. Cite a group of related sentences or a table once when the scope is clear.
+- Use native footnotes only for a quotation, method detail or caveat that interrupts the explanation. Let Obsidian number the matching `[^key]` reference and definition. Check quoted wording against the original; a paraphrase in the reader’s language can point to the original wording in the footnote.
+- Use Personal Insights only for context found in the owner's actual notes. Quote accurately and link the note; distinguish their observation from the study outcome. Suggest a separate insight only if it stands on its own.
+- In Related Terms, aim for three named links with a nested explanation under each. Check titles and aliases: list up to two existing notes, then one relevant term still missing, as a named wikilink without creating its page. Omit ungrounded slots. Keep frontmatter `related` for existing notes.
+- List each cited work once in unnumbered References. Follow the owner's research style where known. Link an existing source note by wikilink or the first author and year to the full text; preserve coauthors, title, venue, DOI, available Raw and inspected scope. Keep the precise locator beside the claim.
+
+## Scaffold
+
+```markdown
 ---
 type: wiki-page
 aliases:
@@ -9,9 +27,9 @@ model: {{runtime_model}}
 effort: {{runtime_effort_or_default}}
 date_created: {{today}}
 date_modified: {{today}}
-tags: []
+tags: ["{{tag_1}}", "{{tag_2}}", "{{tag_3}}", "{{tag_4}}", "{{tag_5}}"]
 domain:
-  - "{{sense_field}}"
+  - "[[{{english_field_name}}]]"
 source:
   - "[[{{raw_source}}]]"
 related: []
@@ -23,98 +41,49 @@ verificationStatus: unverified
 status: active
 ---
 
-# {{full_name_in_original_language_with_acronym}}
+# {{original_term_name}}
 
 > [!abstract] TL;DR
-> {{shared_definition}} {{trade_off_that_makes_it_matter}}
+> {{definition_and_key_finding_or_limit}}
 
 ## Explanation
 
-### {{reader_question_what_it_changes}}
-
-{{short_sentences_linking_known_vault_terms_at_first_use}}
-
-$$
-{{formula}}
-$$
-
-### {{reader_question_why_it_works}}
-
-{{mechanism_from_the_primary_source}} ([[{{raw_source}}|{{author_year}}]])
-
-**{{one_sentence_to_keep}}**
-
-### {{reader_question_how_it_behaves}}
-
-| {{parameter}} | {{steps}} | {{result}} |
-| :--- | :--- | :--- |
-| {{value}} | {{trace}} | {{outcome}} |
-
-### {{reader_question_what_problem_it_solves}}
-
-{{problem_and_connection_to_owner_notes}} ([[{{owner_note_title}}]])
+{{how_it_works_with_a_concrete_example}}
 
 ## Where It Is Used
 
-| {{field_label}} | {{what_it_does_label}} |
-| :--- | :--- |
-| {{field}} | {{what_it_does_there}} |
-
-### {{field}}
-
-- **{{use}}:** {{one_use_in_short_sentences}} ([[{{raw_source}}|{{author_year}}]])
-- **{{owner_notes_label}}**
-	- {{owner_use}} ([[{{short_label}}]])
+{{where_the_term_is_used_and_what_it_means_there}}
 
 ## Origin
 
-{{paragraph_on_first_documented_use_with_primary_source}}
-
-**{{method_origin_versus_name_origin}}** {{paragraph_on_the_name_and_later_senses}}
+{{history_that_clarifies_the_term}}
 
 ## Senses
 
-### {{field}}
-
-{{definition_in_this_field}}
-
-- Since: {{when_this_sense_is_used}}
-- Examples: {{examples_linking_entities}}
-- {{Broader|Narrower|Related|Confused with}}: [[{{sense_specific_term}}]]
-
-> [!warning] Contradiction
-> {{definition_a_with_source}} / {{definition_b_with_source}}
-
-> [!note] Bias Check
-> Counter-argument: {{counter_argument}}
-> Data gap: {{data_gap}}
+{{distinct_meanings_with_field_and_example}}
 
 ## Literature Review
 
-### [[{{author}}|{{author_short}}]] ({{year}}): {{what_it_adds}}
+### {{question_the_evidence_answers}}
 
-[[{{raw_source}}]] {{summary}}
-
-- **{{aspect}}:** {{attributed_claim}}
+{{method_result_and_limit_with_claim_level_citation}}[^method]
 
 ## Personal Insights
 
+{{owner_observation_and_link_to_its_context}}
+
 ## Related Terms
 
-- **{{broader_label}} (Broader)**
-	- [[{{broader_term}}]] — {{why}}
-- **{{narrower_label}} (Narrower)**
-	- [[{{narrower_term}}]] — {{why}}
-- **{{components_label}} (Related)**
-	- [[{{component_term}}]] — {{why}}
-- **{{alternatives_label}} (Related)**
-	- [[{{alternative_method}}]] — {{why}}
-- **{{used_in_label}} (Related)**
-	- [[{{field_or_tool}}]]
-- **{{confused_with_label}} (Confused with)**
-	- [[{{often_confused_term}}]] — {{how_they_differ}}
+- [[{{existing_note}}]]
+	- {{specific_relationship}}
+- [[{{second_existing_note}}]]
+	- {{specific_relationship}}
+- [[{{named_missing_term}}]]
+	- {{specific_relationship}}
 
 ## References
 
-- [[{{raw_source}}]] — [[{{author}}|{{author_short}}]] ({{year}}), {{role}}
-- [[{{owner_note_title}}]]
+- {{linked_source_and_full_citation}} · {{inspected_scope}}
+
+[^method]: {{optional_detail_and_precise_source_locator}}
+```

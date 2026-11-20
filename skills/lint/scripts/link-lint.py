@@ -85,9 +85,33 @@ def resolves(target, names, paths):
     return any(p == t or p == t + ".md" or p.endswith("/" + t) or p.endswith("/" + t + ".md") for p in names[base])
 
 
+def planned_term_link(text, spans):
+    front = FRONT.match(text)
+    if not front or not re.search(r"""^layer:[ \t]*(?:terms|'terms'|"terms")[ \t]*(?:#.*)?$""", front[0], re.M):
+        return None
+    headings = [m for m in re.finditer(r"^#{1,6}[ \t]+.*$", text, re.M)
+                if not inside(spans, m.start(), m.end())]
+    sections = [i for i, h in enumerate(headings) if h[0].rstrip() == "## Related Terms"]
+    if len(sections) != 1:
+        return None
+    i = sections[0]
+    start = headings[i].end()
+    end = headings[i + 1].start() if i + 1 < len(headings) else len(text)
+    bullets = [m for m in re.finditer(r"^[-*+][ \t]+", text[start:end], re.M)
+               if not inside(spans, start + m.start(), start + m.end())]
+    if not bullets:
+        return None
+    pos = start + bullets[-1].end()
+    item = re.match(r"\[\[([^\[\]|#/\n]+)\]\][ \t]*\n[ \t]+[-*+][ \t]+\S", text[pos:end])
+    if item and item[1].strip():
+        return pos
+    return None
+
+
 def find(text, names, paths):
     out = []
     sp = protected(text)
+    planned = planned_term_link(text, sp)
     mdspans = [(m.start(), m.end()) for m in MDLINK.finditer(text)]
     wlspans = [(m.start(), m.end()) for m in WIKILINK.finditer(text)]
     ex = mdspans + wlspans + [(m.start(), m.end()) for m in AUTOLINK.finditer(text)] + [(m.start(), m.end()) for m in REFDEF.finditer(text)]
@@ -137,7 +161,7 @@ def find(text, names, paths):
             key = base[:-3] if base.endswith(".md") else base
             if len(names.get(key, [])) == 1 and resolves(target, names, paths):
                 out.append(("PATH-WIKILINK", m.start(), m.group(0)))
-        if not resolves(target, names, paths):
+        if m.start() != planned and not resolves(target, names, paths):
             out.append(("BROKEN", m.start(), m.group(0)))
     return sorted(out, key=lambda r: (r[1], r[0]))
 
