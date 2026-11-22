@@ -34,7 +34,7 @@ For each claim, judge provenance first: who created it decides what the source c
 For a secondary claim, follow the Raw's `referenced` list to the original. `referenced` names originals and earlier captures; it never proves the original was read and never authorizes fetching it.
 
 - original already in Raw → check the claim against the original, not the retelling, and note where the retelling drifted;
-- original linked only as an Inbox candidate, or as a Book Index whose chapter is still unread (no chapter text in Raw) → the claim is unconfirmed at the original; report the candidate and recommend ingesting it; the citing Raw is not proof;
+- original linked only as an Inbox candidate, or as a book Entity or chapter Raw whose chapter is still unread (no chapter text in Raw) → the claim is unconfirmed at the original; report the candidate and recommend ingesting it; the citing Raw is not proof;
 - no `referenced` entry and no locatable original → provenance unknown; the claim can at most be attributed to the secondary author, never confirmed as the original creator's finding.
 
 A quotation inside a secondary source is not the original. Attribution that silently moves a secondary author's interpretation onto the original creator is a Consistency failure, even when both texts exist.

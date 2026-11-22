@@ -111,7 +111,7 @@ tags:
   - ai-research
 ```
 
-`referenced` lists originals and earlier captures the material cites: a wikilink when already a Raw or Book Index in the vault, else the canonical URL. It never claims the original was read and never authorizes fetching it. `capture_status` is `captured`, `partial` or `manifest-only` truthfully. Body: `## Capture Summary`, `## Source Manifest` (# | Platform | Title | URL | Role | Capture status), `## Original Content` (one `### Source N` block per member with platform, URL, visible model/workspace and capture limitation), `## Agent Capture Notes`, `## Ingest Notes`.
+`referenced` lists originals and earlier captures the material cites: a wikilink when already a Raw or Entity in the vault, else the canonical URL. It never claims the original was read and never authorizes fetching it. `capture_status` is `captured`, `partial` or `manifest-only` truthfully. Body: `## Capture Summary`, `## Source Manifest` (# | Platform | Title | URL | Role | Capture status), `## Original Content` (one `### Source N` block per member with platform, URL, visible model/workspace and capture limitation), `## Agent Capture Notes`, `## Ingest Notes`.
 
 ### Step 4: Add Capture Notes
 

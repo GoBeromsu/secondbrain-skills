@@ -111,9 +111,9 @@ for p in sys.stdin.buffer.read().split(b'\0'):
             if not resolves(t): print(p, key, t, sep='\t')
 ```
 
-Use the body `BROKEN` findings from `link-lint.py`. Other keys checked here include `source`, `related`, `bookIndex`, `chapterPrev`, `chapterNext`, `paperHub`, `personaOf`, and any key the live schema adds. Output is `path<TAB>key<TAB>missing target`.
+Use the body `BROKEN` findings from `link-lint.py`. Other keys checked here include `source`, `related`, `book`, `chapterPrev`, `chapterNext`, `personaOf`, and any key the live schema adds. Output is `path<TAB>key<TAB>missing target`.
 
-Index catalog check (read-only): resolves every `[[...]]` in the wiki index against the vault's actual files — Raw, Wiki, Queries, Maps, Personas, Paper hubs and whatever sections the live index has — and recounts files per catalogued section. The index path comes from `skills/ingest/scripts/records.py`. `python3 index_check.py "<vault>"`:
+Index catalog check (read-only): resolves every `[[...]]` in the wiki index against the vault's actual files — Raw, Wiki, Queries, Maps, Personas and whatever sections the live index has — and recounts files per catalogued section. The index path comes from `skills/ingest/scripts/records.py`. `python3 index_check.py "<vault>"`:
 
 ```python
 import sys, os, re

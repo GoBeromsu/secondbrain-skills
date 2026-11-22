@@ -24,7 +24,7 @@ Run every step unless the owner named a subset; a step that could not run is lis
 
 ### Step 1: Inventory
 
-Read the wiki index for the current catalog, then count actual files: Raw notes, Wiki pages by layer and role, Queries, MOCs, Personas, Paper hubs, Inbox candidates. Note whether the wiki index and wiki log exist. Compare index entries with actual files (detail in Step 6).
+Read the wiki index for the current catalog, then count actual files: Raw notes, Wiki pages by layer and role, Queries, MOCs, Personas, Inbox candidates. Note whether the wiki index and wiki log exist. Compare index entries with actual files (detail in Step 6).
 
 ### Step 2: Orphan Check
 
@@ -49,7 +49,7 @@ Pages with `confidence: low` whose `date_modified` is 30 or more days old (use `
 ### Step 6: Index Sync
 
 Verify the wiki index matches the actual structure:
-- every `[[...]]` in the wiki index, in every section the live index has (Raw sources, Wiki, Queries, Maps, Personas, Paper hubs, …), resolved against actual vault files by basename or path; missing or ambiguous targets reported per section;
+- every `[[...]]` in the wiki index, in every section the live index has (Raw sources, Wiki, Queries, Maps, Personas, …), resolved against actual vault files by basename or path; missing or ambiguous targets reported per section;
 - files present on disk but catalogued in no section;
 - each catalog section against its folder;
 - the Stats table against counts recounted per catalogued section from folders, never from the old table;
@@ -59,7 +59,7 @@ Check the wiki log: present, append-only shape (`## [YYYY-MM-DD] op | title` ent
 
 ### Step 7: MOC Coverage
 
-Every Wiki page should be reachable from at least one MOC. List uncovered pages with the MOC they most likely belong to, MOC links to notes that no longer exist, page ↔ MOC back-link gaps, and MOCs whose lists have grown past easy reading. Judge placement by hierarchy: a page is read through its parent MOC, Raw evidence and compiled knowledge are different roles, a chapter belongs under its Book Index. A MOC or Paper hub that is a bare list without saying what its collection covers and lacks is a finding. Suggest placement from live policy; moves happen only as a policy conformance fix.
+Every Wiki page should be reachable from at least one MOC. List uncovered pages with the MOC they most likely belong to, MOC links to notes that no longer exist, page ↔ MOC back-link gaps, and MOCs whose lists have grown past easy reading. Judge placement by hierarchy: a page is read through its parent MOC, Raw evidence and compiled knowledge are different roles, a chapter Raw is listed in its book Entity. A MOC that is a bare list without saying what its collection covers and lacks is a finding. Suggest placement from live policy; moves happen only as a policy conformance fix.
 
 ### Step 8: Frontmatter Coverage
 
@@ -90,11 +90,12 @@ Then check every Wiki page against `ingest`'s conformance list and report each p
 
 Notes written before the current policy, or by a writer still following an older one, drift from it. Compare each note in scope with what the destination's live policy registers today, and with the saved-note format and structure `ingest` requires for its kind, live policy winning where they differ; whether its content is true belongs to `verify`. Report every gap with its path:
 
-- **Placement:** a Raw or Wiki note in a folder the live policy's tree does not register (a retired, renumbered or recreated lane), or an Entity outside the folder the live policy registers for its recorded subtype, never inferred from the name alone. Name the registered folder for the same kind.
+- **Placement:** a Raw or Wiki note in a folder the live policy's tree does not register (a retired, renumbered or recreated lane), or an Entity outside the folder the live policy registers for its recorded subtype, never inferred from the name alone. Name the registered folder for the same kind. A required-type Entity folder `ingest` created beside the registered Entity folders is reported as "unregistered, pending owner registration"; its notes are never moved.
 - **Kind values:** `type`, `category`, layer or role values that differ from the value live policy assigns to that folder or kind, or are missing.
 - **Retired keys and duplicates:** keys the live policy says not to use (for example removed provenance keys), and the same property written twice in different spellings (`date modified` beside `date_modified`), with both values.
 - **Old values carried as tags:** where live policy keeps a replaced value as a tag (for example `reference/<old type>`), a note whose replaced value is not kept.
-- **Terms:** judge each Term and Concept by `principle-wiki-types` for classification and the [Term template](../ingest/templates/term.md) for title rules and report Term candidates, Entity candidates and Term titles that break them, each with its target title and folder, plus links to a heading inside a Term, empty scaffold sections, tags and domain formatting outside the template contract, and missing source links or claim locators required by the template. Accept equivalent and legacy headings; route judgments about evidentiary support to `verify`. A Concept titled as a sentence-style claim is reported as a claim candidate with the Term or Concept it is about when one exists. Decide only from evidence in the note and its sources; an empty or unsourced note is reported as undecided.
+- **Terms:** judge each Term and Concept by `principle-knowledge-notes` for classification and the [Term template](../principle-knowledge-notes/templates/term.md) for title rules and report Term candidates, Entity candidates and Term titles that break them, each with its target title and folder, plus links to a heading inside a Term, empty scaffold sections, tags and domain formatting outside the template contract, and missing source links or claim locators required by the template. Accept equivalent and legacy headings; route judgments about evidentiary support to `verify`. A Concept titled as a sentence-style claim is reported as a claim candidate with the Term or Concept it is about when one exists. Decide only from evidence in the note and its sources; an empty or unsourced note is reported as undecided.
+- **Entities:** an existing Entity without a `## From Sources` auto zone is not a finding; `ingest` adds one on first touch. The owner zone above it belongs to the owner: never report its headings, order, empty sections or wording.
 - **Backticked URLs:** every backticked URL in a note body, with its line and text, as a candidate for `[name](URL)`. Skip code fences, commands, quotations, frontmatter and captured source text under a Raw note's `## Original Content`.
 
 Then group the drifted notes by the provenance fields they record (`source_extraction`, `ingest_kind`, `store`, `source_kind`, `source_locator` host or session) and report each group with its newest `date_created`. A group still gaining notes means a writer is still producing the old shape. Name it as the recorded provenance only: never infer a producer from mtime, counts or file names. Report where that writer's instructions live when a recorded field points to them, as a finding for the owner. Lint does not edit another tool's configuration.
@@ -126,7 +127,7 @@ Apply only the fixes the owner picks — add a page to a MOC, add a wiki index c
 **Policy conformance fixes** change only what the live policy states, with the owner's pick per group:
 
 - set `type`, `category`, layer or role to the live-policy value, keeping the replaced value where live policy says it is kept (for example the `reference/<old type>` tag, added only when absent and in the note's existing list style);
-- move a note from an unregistered folder to the registered folder for its kind without overwriting: stop on a name collision or an existing note for the same source, never merge, then update every link to the old path, as in a confirmed rename;
+- move a note from an unregistered folder to the registered folder for its kind, never from a required-type Entity folder pending owner registration, without overwriting: stop on a name collision or an existing note for the same source, never merge, then update every link to the old path, as in a confirmed rename;
 - drop a duplicate spelling of a property only when both copies are in the note and live policy names the spelling that stays; record the dropped value in the fix report;
 - drop a retired key only when live policy says to remove it from existing notes, not only from new ones;
 - retitle a Term in place: rename it to the reported title and add the old title to `aliases`, keeping its folder and `layer`;

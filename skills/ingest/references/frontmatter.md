@@ -20,7 +20,7 @@ The destination's live policy wins wherever it defines a field, value or placeme
 | `type` | role value from the table below |
 | `aliases` | list of alternative names |
 | `description` | English, double-quoted |
-| `author` | list. People are quoted wikilinks `"[[Name]]"` whether or not that note exists; a missing target is not a reason to create an Entity. Raw: the original author(s). Wiki and other agent-written pages: the author the live policy names, otherwise the writing agent's role name (`Claude`, `Codex`, …). |
+| `author` | list. People are quoted wikilinks `"[[Name]]"` whether or not that note exists; a missing target alone is not a reason to create an Entity; SKILL Step 6 decides which Raw authors get one. Raw: the original author(s). Book and paper Entities: the work's authors as quoted wikilinks, in source order. Wiki and other agent-written pages: the author the live policy names, otherwise the writing agent's role name (`Claude`, `Codex`, …). |
 | `date_created` | creation date of this note |
 | `date_modified` | last modification date of this note |
 | `tags` | list |
@@ -32,17 +32,14 @@ No `created_by` or `authorship` default. A vault whose live policy defines its o
 
 | Role | type | layer | status | Template |
 | --- | --- | --- | --- | --- |
-| Raw Source | `raw-source` | — | `ingested` | raw.md |
-| Book Index (Raw) | `raw-source` | — | `ingested` | book-index.md |
-| Book chapter (Raw) | `raw-source` | — | `stub` → `reading` → `completed` | book-chapter.md |
-| Term | `wiki-page` | `terms` | `active` | [Term template](../templates/term.md) |
-| Concept | `wiki-page` | `concepts`; Paper promotions `theory`, `method` or `scale` | `active` | concept.md |
-| Entity | `wiki-page` | `entities` | `active` | entity.md |
-| Guide | `wiki-page` | `guides` | `active` | guide.md |
+| Raw Source | `raw-source` | — | `ingested` | [raw](../templates/raw.md) |
+| Book chapter (Raw) | `raw-source` | — | `stub` → `reading` → `completed` | [book chapter](../templates/book-chapter.md) |
+| Term | `wiki-page` | `terms` | `active` | [term](../../principle-knowledge-notes/templates/term.md) |
+| Concept | `wiki-page` | `concepts`; `theory`, `method` or `scale` for a paper-derived Concept | `active` | [concept](../../principle-knowledge-notes/templates/concept.md) |
+| Entity | live policy | `entities` when typed `wiki-page` | `active` only when typed `wiki-page`; a book Entity's `status` is the owner's and never set | `type` and the wiki-page keys follow the live policy per [entity](../../principle-knowledge-notes/templates/entity.md). Required types person, organization, place, paper, book, media, product: `../../principle-knowledge-notes/templates/entity/{type}.md`; optional types: [entity](../../principle-knowledge-notes/templates/entity.md). Owner zone on top, never written by ingest; append-only `## From Sources` auto zone at the bottom. |
+| Guide | `wiki-page` | `guides` | `active` | [guide](../../principle-knowledge-notes/templates/guide.md) |
 | Map | `moc` | — | `active` | live Map template |
-| Persona | `persona` | — | — | persona.md |
-| Paper hub | `paper-hub` | — | `active` | paper-hub.md |
-| Paper atom | `paper-analysis` | — | `completed` or `stub` | paper-atom.md |
+| Persona | `persona` | — | — | [persona](../templates/persona.md) |
 
 `category` names the Raw kind: `Articles`, `Papers`, `Books`, `Transcripts`, `Clippings` or `AI Research`, plus any value the destination's live policy registers for its own Raw lanes (for example a personal `Mail` lane). It selects the Raw folder of the same kind in the destination. Never invent a value the live policy does not list.
 
@@ -59,15 +56,15 @@ No `created_by` or `authorship` default. A vault whose live policy defines its o
 | Length | `length` | The source's size as stated or counted, such as `12 pages` or `3,400 words`. |
 | Collection purpose | `collectionPurpose` | The owner's answer verbatim, or the stated inference and its reason when the owner delegated it. |
 | Related notes | `related` | Quoted wikilink list of existing notes from Step 2; `[]` when none. |
-| Originals and earlier captures | `referenced` | List. A wikilink when the original or earlier capture is already a Raw or Book Index in the vault, otherwise its canonical URL. It records where a claim came from; it never proves the original was read and never authorizes fetching it. |
+| Originals and earlier captures | `referenced` | List. A wikilink when the original or earlier capture is already a Raw or Entity in the vault, otherwise its canonical URL. It records where a claim came from; it never proves the original was read and never authorizes fetching it. |
 | Retained document | `source-attachment` | `"[[original-filename]]"` of the binary moved into the attachments folder. |
 | Converted format | `source-format` | `pdf`, `pptx`, `docx`, `hwp`, `hwpx`, … |
 | Converter | `conversion-tool` | `markitdown`, `pandoc`, `hwp5txt`, `defuddle`, `hwpx-xml`, … |
 | Conversion date | `conversion_date` | Date of the conversion. |
 | Conversion fidelity | `conversion-fidelity` | `high`, `medium` or `low`. |
 | Newer version | `supersedes` / `superseded-by` | Source Update, major change: new `-v2` Raw points back with `supersedes`; the earlier Raw gains `superseded-by`. |
-| Paper | `citekey`, `doi`, `targetManuscript` | Paper Mode Raw; same values as the hub. |
-| Book chapter | `bookIndex`, `chapterNumber`, `chapterPart`, `chapterPrev`, `chapterNext` | Chapter stubs only: quoted wikilink, integer, original-language part name, quoted wikilinks or `null` at the ends. |
+| Paper | `citekey`, `doi`, `citekeyProvisional` | Paper Raw; same `citekey` and `doi` as the paper Entity; `citekeyProvisional: true` only for a generated key. |
+| Book chapter | `book`, `chapterNumber`, `chapterPart`, `chapterPrev`, `chapterNext` | Chapter stubs only: quoted wikilink to the book Entity, integer, original-language part name, quoted wikilinks or `null` at the ends. |
 
 ## Wiki page keys
 
@@ -77,7 +74,7 @@ No `created_by` or `authorship` default. A vault whose live policy defines its o
 | Related knowledge | `related` | Quoted wikilink list. |
 | Confidence | `confidence` | `high` (well-sourced), `medium` (partial), `low` (speculative). A page resting only on secondary claims is not well-sourced. |
 | Reuse unit | `layer` | Per the Roles table. |
-| Field | `domain` | Term only: fields of use; see the [Term template](../templates/term.md) for their format. |
+| Field | `domain` | Term only: fields of use; see the [Term template](../../principle-knowledge-notes/templates/term.md) for their format. |
 | Definition status | `definitionStatus` | Term only: `consensus`, `contested` or `emerging`. |
 | Exploration gate | `explored` | `false` on every new page; `true` only after a human read it or a source-backed review loop verified it, with optional `exploredBy`, `exploredDate`. |
 | Verification state | `verificationStatus` | `unverified` on every new page; `verify` sets `verified`, `partial`, `unverified` or `disputed` with `verifiedAt`, `verifiedBy`. |
@@ -85,13 +82,13 @@ No `created_by` or `authorship` default. A vault whose live policy defines its o
 | Conflict | `disputed` | Set only by `verify`; `audit` only queues it, ingest never sets it. |
 | Page state | `status` | `active`. |
 | Persona | `personaOf`, `personaMaturity`, `personaDomains` | Persona only; ingest never changes `personaMaturity`. |
-| Paper | `paperType`, `citekey`, `doi`, `targetManuscript`; atoms add `analysisStep` (integer 2–12), `analysisStepName`, `paperHub` | Paper Mode only. |
+| Paper | `citekey`, `doi` | Paper Entity only; see [papers](papers.md). |
 | Map | `topic`, `related` | Map only. |
 
 ## Existing notes and migration
 
 New notes use the schema above. A run that touches an existing note preserves what it already holds.
 
-- Keep every existing key and value, including unknown keys and earlier identity, location and history values. Ordinary ingest changes only the keys its update names (`source`, `related`, `date_modified` and additions the preservation review accepted); it renames, re-forms, copies or removes nothing else, date keys and `author` values included, except ingest Step 8's Entity reference links.
+- Keep every existing key and value, including unknown keys and earlier identity, location and history values. Ordinary ingest changes only the keys its update names (`source`, `related`, `date_modified` and additions the preservation review accepted; on an Entity, only appends to `source`, `related` and `aliases` plus `date_modified`); it renames, re-forms, copies or removes nothing else, date keys and `author` values included, except ingest Step 8's Entity reference links.
 - Identity matching reads `source` first, and any other source address or locator the existing note already records; compare the destination URL of a Markdown link with a bare URL independent of its display label. Titles never prove sameness. Ingest requires no identity key beyond this schema.
 - Key migration runs only when the owner explicitly authorizes it for named notes. Record each note's before-image first; map a value only when its meaning is verified equivalent to the target key (`source_obtained_at` is not `date_ingested` without proof that both record the same acquisition); stop on any conflict, such as a target key already holding a different value or an ambiguous meaning, and report it. A completed migration leaves one key per meaning, with no permanent dual keys. A value still needed for identity, location or history is never dropped merely as legacy.
