@@ -60,7 +60,6 @@ Every package passes the format check, `claude plugin validate . --strict`. That
 
 ```
 skills/<name>/SKILL.md   one package; everything else sits in a subfolder beside it
-AGENTS.md                repository contract for contributors and agents
 ```
 
 ## Acknowledgements

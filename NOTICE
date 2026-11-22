@@ -90,7 +90,7 @@ The original parts of `skills/obsidian-visualize/` are covered the same way;
 its Pele references (formerly `skills/obsidian-mermaid/`) are
 original; its adapted parts additionally carry the notice in section 6 below.
 
-The repository-level files (`AGENTS.md`, `README.md`, `README.ko.md`, the plugin and marketplace manifests,
+The repository-level files (`README.md`, `README.ko.md`, the plugin and marketplace manifests,
 and this file) are likewise authored here.
 
 
