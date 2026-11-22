@@ -21,7 +21,7 @@ category: {{Books|live_policy_or_owner_task_category}}
 collectionPurpose: "{{inherited_book_purpose}}"
 related: []
 referenced: []
-bookIndex: "[[{{book_index}}]]"
+book: "[[{{book_entity}}]]"
 chapterNumber: {{integer}}
 chapterPart: "{{part_in_original_language}}"
 chapterPrev: "[[{{previous_stub}}]]"
@@ -39,7 +39,7 @@ chapterNext: "[[{{next_stub}}]]"
 ## Source
 
 - Original URL: {{verified_direct_chapter_url}}
-- Book: [[{{book_index}}]]
+- Book: [[{{book_entity}}]]
 - Previous: [[{{previous_stub}}]] · Next: [[{{next_stub}}]]
 
 ## TOC Preview

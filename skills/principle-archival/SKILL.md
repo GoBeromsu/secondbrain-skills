@@ -1,6 +1,6 @@
 ---
 name: "principle-archival"
-description: "Guides treating sources as archival records: finding the true creator behind a republisher (provenance), keeping a source's own order and verbatim text (original order), arranging records from collection to item, and describing a collection as a whole with its coverage and gaps. Use when an article quotes a study, content is reposted or authorship is uncertain, even when another workflow is tracing or recording the source, when tempted to reorder, tidy or replace captured text or to enrich an existing Raw capture, when placing newly captured notes or linking a chapter to its Book Index, or when writing a hub or index note. Load it in addition to whichever workflow handles the request: it works alongside that workflow and does not replace it."
+description: "Guides treating sources as archival records: finding the true creator behind a republisher (provenance), keeping a source's own order and verbatim text (original order), arranging records from collection to item, and describing a collection as a whole with its coverage and gaps. Use when an article quotes a study, content is reposted or authorship is uncertain, even when another workflow is tracing or recording the source, when tempted to reorder, tidy or replace captured text or to enrich an existing Raw capture, when placing newly captured notes or linking a chapter to its book, or when writing a hub or index note. Load it in addition to whichever workflow handles the request: it works alongside that workflow and does not replace it."
 license: MIT
 ---
 
@@ -41,10 +41,10 @@ Apply when a record needs collection-to-item context or newly captured notes nee
 - Arrange and describe from the broadest group down to the single item, with an explicit link between levels.
 - Read the destination's live placement policy before assigning a path.
 - Keep Raw captures distinct from compiled pages and analysis.
-- Link a chapter to its Book Index and a capture to its hub so a reader can recover the larger context.
+- Link a chapter Raw to its book Entity and a capture to its hub so a reader can recover the larger context.
 - Use the creator's actual hierarchy when it is known; a vault's folder path is an adaptation, not proof of original order.
 
-Example: a Book Index links its ordered chapter captures, and the author's Entity page is compiled knowledge, not a substitute for the text.
+Example: a book Entity lists its ordered chapter captures, and that Entity is compiled knowledge, not a substitute for the text.
 
 ## Collective description: what the whole is
 

@@ -7,7 +7,7 @@ Open with the scope and the link source used (which notes counted as inbound lin
 3. **Broken Links** — source note → missing target → likely fix (rename, create, remove). Apply the Step 3 exemptions; report other unresolved metadata links with their key. If PyYAML is unavailable, the section reads Not checked.
 4. **Contradictions** — page, possibly resolved by which newer Raw.
 5. **Stale Pages** — page, `date_modified` (or git age, marked), why flagged; `explored: false` backlog count.
-6. **Index Issues** — per index section (Raw sources, Wiki, Queries, Maps, Personas, Paper hubs, any live section): links with missing or ambiguous targets, files catalogued nowhere, Stats table vs counts recounted per catalogued section, Recent Ingests / Recent Queries targets, wiki log presence and latest entry vs newest ingest.
+6. **Index Issues** — per index section (Raw sources, Wiki, Queries, Maps, Personas, any live section): links with missing or ambiguous targets, files catalogued nowhere, Stats table vs counts recounted per catalogued section, Recent Ingests / Recent Queries targets, wiki log presence and latest entry vs newest ingest.
 7. **MOC Coverage** — uncovered pages with a suggested MOC; page ↔ MOC back-link gaps; MOC links to missing notes; overgrown MOCs; MOCs or hubs that do not describe their collection.
 8. **Frontmatter Coverage** — one row per field or section as n/total with failing paths: v2 fields, Exploration Gate, verification fields and the disputed queue, Bias Check, Persona health.
 9. **Core Context** — `snapshot_date`, age, registered-source drift.

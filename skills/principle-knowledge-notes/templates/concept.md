@@ -59,7 +59,7 @@ status: active
 
 ## Development
 
-- Original: {{developer_year}} — [[{{paper_hub_or_raw_source}}]]
+- Original: {{developer_year}} — [[{{paper_entity_or_raw_source}}]]
 - Revisions and short forms: {{version_history}}
 
 ## Items
@@ -74,7 +74,7 @@ Reliability and validity are sample-dependent: one row per study here, never in 
 
 | Study | Sample | α / ω | Fit (CFA) | Notes |
 | --- | --- | --- | --- | --- |
-| [[{{surname}} {{year}} - S00 Hub]] | {{n_and_group}} | {{reliability}} | {{cfi_tli_rmsea}} | {{invariance_etc}} |
+| [[{{paper_entity}}]] | {{n_and_group}} | {{reliability}} | {{cfi_tli_rmsea}} | {{invariance_etc}} |
 
 ## Translations and Short Forms
 
@@ -84,9 +84,6 @@ Reliability and validity are sample-dependent: one row per study here, never in 
 
 - {{validated_groups_cultural_translation_self_report_bias}}
 
-## Paper Analyses
-
-- [[{{surname}} {{year}} - S07 {{atom_title}}]] — {{backlink_to_atom_covering_the_scale}}
 <!-- End of the scale-only block. -->
 
 ---
