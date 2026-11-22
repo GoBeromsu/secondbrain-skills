@@ -58,7 +58,6 @@ claude plugin install secondbrain-skills@secondbrain-skills
 
 ```
 skills/<name>/SKILL.md   패키지 하나. 나머지는 모두 옆의 하위 폴더에 둡니다
-AGENTS.md                기여자와 에이전트를 위한 저장소 계약
 ```
 
 ## 감사의 말
