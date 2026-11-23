@@ -30,10 +30,10 @@ Use [Conventional Commits](https://www.conventionalcommits.org/): `feat(ingest):
 
 ## Art
 
-Renders in `assets/` come from [`scripts/art/library.py`](scripts/art/library.py), a procedural Blender scene with no external assets:
+The banner and icon come from [`scripts/art/showcase.py`](scripts/art/showcase.py), a procedural Blender scene with no external assets (`scripts/art/library.py` keeps earlier studies):
 
 ```sh
-blender -b -P scripts/art/library.py -- nightsky out.png 128
+blender -b -P scripts/art/showcase.py -- out.png 192
 ```
 
 Record any new or changed image in the asset ledger with how it was made.

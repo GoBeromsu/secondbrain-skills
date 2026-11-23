@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/brand/splash.jpg" alt="A Blender render: under a starry night sky with constellations, a flock of open books flies up from a reading desk toward the moon" width="100%">
+  <img src="assets/brand/splash.jpg" alt="A Blender render: from a candlelit desk on a moonlit stone terrace, open books fly out over the balustrade under the Milky Way and constellations" width="100%">
 </p>
 
 <p align="center">
@@ -166,4 +166,4 @@ This library stands on other people's shelves: kepano's obsidian-skills, Yohan K
 
 ## License
 
-[MIT](LICENSE). Upstream grants are reproduced in [NOTICE](NOTICE). All art in `assets/` is original work recorded in the [asset ledger](assets/asset-ledger.json). The banner is rendered in Blender Cycles from [`scripts/art/library.py`](scripts/art/library.py), a procedural scene with no external assets; none of the art is a screenshot.
+[MIT](LICENSE). Upstream grants are reproduced in [NOTICE](NOTICE). All art in `assets/` is original work recorded in the [asset ledger](assets/asset-ledger.json). The banner is rendered in Blender Cycles from [`scripts/art/showcase.py`](scripts/art/showcase.py), a procedural scene with no external assets; none of the art is a screenshot.

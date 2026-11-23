@@ -50,7 +50,7 @@
         "height": 1024
       },
       "creator": "secondbrain-skills contributors (GoBeromsu)",
-      "origin": "square crop of the `scripts/art/library.py -- nightsky` render (Blender 5.3 Cycles, procedural scene, no external assets)",
+      "origin": "square crop of the `scripts/art/showcase.py` render (Blender 5.3 Cycles, procedural, no external assets) after the same post-processing",
       "upstream_source": null,
       "rights": {
         "holder": "Copyright (c) 2026 Obsidian Skills contributors",
@@ -68,7 +68,7 @@
         "external_references": [],
         "only_namespace_uri": null
       },
-      "depicts": "Square crop of the same render: open books flying through a starry sky under constellations.",
+      "depicts": "Square crop of the same render: open books and loose pages flying over the terrace under the stars.",
       "claims": "decorative; asserts nothing about behavior, support, or verification",
       "not_a_screenshot": true
     },
@@ -81,7 +81,7 @@
         "height": 1200
       },
       "creator": "secondbrain-skills contributors (GoBeromsu)",
-      "origin": "rendered in Blender 5.3 Cycles from `scripts/art/library.py -- nightsky` (procedural scene, no external assets), then composited with the wordmark in a browser",
+      "origin": "rendered in Blender 5.3 Cycles from `scripts/art/showcase.py` (procedural geometry, materials and sky; no external assets), finished with bloom, vignette and grain in ImageMagick, then composited with the wordmark in a browser",
       "upstream_source": null,
       "rights": {
         "holder": "Copyright (c) 2026 Obsidian Skills contributors",
@@ -99,7 +99,7 @@
         "external_references": [],
         "only_namespace_uri": null
       },
-      "depicts": "A starry night with the Milky Way and constellations drawn between bright stars: a flock of open books and loose pages flies up from a reading desk on a balcony, leaving a trail of stardust over dark hills, toward a small moon. Wordmark, tagline and a render credit are set at the top left and bottom right.",
+      "depicts": "A moonlit stone terrace at night: from a reading desk with a candle lantern, open books with fanned, printed pages and loose leaves fly out over the balustrade toward the moon, under the Milky Way and constellations drawn between bright stars, above layered mountain ridges. Wordmark, tagline and a render credit are set at the top left and bottom right.",
       "claims": "decorative; asserts nothing about behavior, support, or verification",
       "not_a_screenshot": true
     },
@@ -112,7 +112,7 @@
         "height": 640
       },
       "creator": "secondbrain-skills contributors (GoBeromsu)",
-      "origin": "rendered in Blender 5.3 Cycles from `scripts/art/library.py -- nightsky` (procedural scene, no external assets), then composited with the wordmark in a browser",
+      "origin": "rendered in Blender 5.3 Cycles from `scripts/art/showcase.py` (procedural geometry, materials and sky; no external assets), finished with bloom, vignette and grain in ImageMagick, then composited with the wordmark in a browser",
       "upstream_source": null,
       "rights": {
         "holder": "Copyright (c) 2026 Obsidian Skills contributors",
@@ -130,7 +130,7 @@
         "external_references": [],
         "only_namespace_uri": null
       },
-      "depicts": "A starry night with the Milky Way and constellations drawn between bright stars: a flock of open books and loose pages flies up from a reading desk on a balcony, leaving a trail of stardust over dark hills, toward a small moon.",
+      "depicts": "A moonlit stone terrace at night: from a reading desk with a candle lantern, open books with fanned, printed pages and loose leaves fly out over the balustrade toward the moon, under the Milky Way and constellations drawn between bright stars, above layered mountain ridges.",
       "claims": "decorative; asserts nothing about behavior, support, or verification",
       "not_a_screenshot": true
     },

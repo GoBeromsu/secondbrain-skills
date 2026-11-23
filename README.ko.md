@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/brand/splash.jpg" alt="별자리가 이어진 밤하늘 아래, 책상에서 날아오른 책들이 달을 향해 떼 지어 나는 Blender 렌더" width="100%">
+  <img src="assets/brand/splash.jpg" alt="달빛 비치는 돌 테라스의 촛불 켠 책상에서, 은하수와 별자리 아래로 펼친 책들이 난간 너머 날아가는 Blender 렌더" width="100%">
 </p>
 
 <p align="center">
@@ -166,4 +166,4 @@ portable 플러그인이며 스킬은 `<namespace>:<name>`으로 불리고, `plu
 
 ## 라이선스
 
-[MIT](LICENSE). 원 저작물의 허가 고지는 [NOTICE](NOTICE)에 있습니다. `assets/`의 그림은 모두 직접 제작한 원본으로 [에셋 원장](assets/asset-ledger.json)에 기록되어 있습니다. 배너는 외부 에셋 없이 절차적으로 만든 Blender 장면 [`scripts/art/library.py`](scripts/art/library.py)를 Cycles로 렌더링한 것이며, 스크린샷은 하나도 없습니다.
+[MIT](LICENSE). 원 저작물의 허가 고지는 [NOTICE](NOTICE)에 있습니다. `assets/`의 그림은 모두 직접 제작한 원본으로 [에셋 원장](assets/asset-ledger.json)에 기록되어 있습니다. 배너는 외부 에셋 없이 절차적으로 만든 Blender 장면 [`scripts/art/showcase.py`](scripts/art/showcase.py)를 Cycles로 렌더링한 것이며, 스크린샷은 하나도 없습니다.
