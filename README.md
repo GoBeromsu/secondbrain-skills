@@ -16,7 +16,9 @@
   <a href="#quick-start">Quick start</a> · <a href="#how-it-works">How it works</a> · <a href="#packages">Packages</a> · <a href="#install">Install</a> · <a href="CONTRIBUTING.md">Contributing</a> · <a href="ACKNOWLEDGEMENTS.md">Acknowledgements</a>
 </p>
 
-**secondbrain-skills** lets an agent run an Obsidian vault the way a librarian runs a library. Sources come in through the book drop, the original goes into the archive untouched, a catalogue of wiki pages is compiled from it, and questions are answered in the reading room with citations back to the shelf.
+**secondbrain-skills** lets an agent run an Obsidian vault the way a librarian runs a library, and then connects it. Sources come in through the book drop and the original goes into the archive untouched. Every page compiled from it is linked to the pages, people and works it touches, until scattered notes read as one constellation. Questions are answered by following those links, with citations back to the shelf.
+
+A second brain is not a pile of notes; it is the connections between them. That is what these skills build and keep.
 
 Each package is one `SKILL.md` that owns one job. There is no root skill, no dispatcher and no shared runtime: your agent loads the package the task needs and nothing else.
 
@@ -35,7 +37,7 @@ Other runtimes are under [Install](#install).
 ## How it works
 
 <p align="center">
-  <img src="assets/demo/workflow.svg" alt="Four library stations: Book drop (capture, inbox), Archive (ingest keeps the Raw source verbatim), Catalogue (wiki pages, Entities and Maps) and Reading room (query with citations), with a Shelf care loop of lint, audit, verify, status and reindex" width="100%">
+  <img src="assets/demo/workflow.svg" alt="Four stations: Book drop (capture, inbox), Archive (ingest keeps the Raw source verbatim), Constellation (wiki pages, Entities and Maps linked into one network) and Reading room (query answers by following the links, with citations), with a Shelf care loop of lint, audit, verify, status and reindex" width="100%">
 </p>
 
 | Principle | What it means in practice |
