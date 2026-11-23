@@ -503,6 +503,88 @@ def baluster(x, y, stone):
         o.data.materials.append(stone)
 
 
+# ------------------------------------------------------------------ connections
+def connect(flock, leaves, cam, bright, at, source=None):
+    """The books become stars: a glint in front of each book and fine straight links between them,
+    drawn at a constant on-screen width, with the lead book linked on into a constellation."""
+    rc = random.Random(5)
+    nodes = [p + (cam - p).normalized() * 0.22 for p in flock] + [p + (cam - p).normalized() * 0.08 for p in leaves]
+    n_books = len(flock)
+    # minimum spanning tree plus a few extra short links, so it reads as a network, not a chain
+    inside, edges = {0}, set()
+    while len(inside) < len(nodes):
+        i, j = min(((i, j) for i in inside for j in range(len(nodes)) if j not in inside), key=lambda e: (nodes[e[0]] - nodes[e[1]]).length)
+        edges.add(tuple(sorted((i, j))))
+        inside.add(j)
+    for i in range(len(nodes)):
+        for j in sorted(range(len(nodes)), key=lambda j: (nodes[j] - nodes[i]).length)[1:4]:
+            if rc.random() < 0.6 and (nodes[j] - nodes[i]).length < 3.5:
+                edges.add(tuple(sorted((i, j))))
+    # carry the network on into the sky: the farthest book links to the nearest bright stars
+    lead = max(range(n_books), key=lambda i: (nodes[i] - cam).length)
+    sky = sorted(bright, key=lambda b: (b[0] - cam).normalized().angle((nodes[lead] - cam).normalized()))[:3]
+    sky_pts = [b[0] for b in sky]
+    cu = bpy.data.curves.new("links", "CURVE")
+    cu.dimensions = "3D"
+    cu.bevel_depth = 1.0
+    cu.bevel_resolution = 2
+
+    def seg(a, b):
+        sp = cu.splines.new("POLY")
+        sp.points.add(1)
+        for k, q in enumerate((a, b)):
+            sp.points[k].co = (*q, 1)
+            sp.points[k].radius = (q - cam).length * 0.00026
+    for i, j in edges:
+        seg(nodes[i], nodes[j])
+    if source is not None:
+        first = min(range(n_books), key=lambda i: (nodes[i] - source).length)
+        seg(source, nodes[first])
+        nodes.append(source)
+    prev = nodes[lead]
+    for q in sky_pts:
+        seg(prev, q)
+        prev = q
+    lo = link("links", cu)
+    lm = emissive("link_light", (1.0, 0.78, 0.50), 3.2)
+    lo.data.materials.append(lm)
+    lo.visible_shadow = False
+    # glints: a bright core and a soft halo at every book-node and at the stars it reaches
+    core = emissive("node_core", (1.0, 0.90, 0.72), 30.0)
+    hm = bpy.data.materials.new("node_halo")
+    hm.use_nodes = True
+    hn = hm.node_tree
+    hn.nodes.remove(hn.nodes["Principled BSDF"])
+    lw = node(hn, "ShaderNodeLayerWeight", Blend=0.5)
+    em = node(hn, "ShaderNodeEmission", Color=(1.0, 0.72, 0.40, 1))
+    hn.links.new(mathn(hn, "MULTIPLY", mathn(hn, "POWER", mathn(hn, "SUBTRACT", 1.0, lw.outputs["Facing"]), 5.0), 1.6), em.inputs["Strength"])
+    tr = hn.nodes.new("ShaderNodeBsdfTransparent")
+    add = hn.nodes.new("ShaderNodeAddShader")
+    hn.links.new(tr.outputs[0], add.inputs[0])
+    hn.links.new(em.outputs[0], add.inputs[1])
+    hn.links.new(add.outputs[0], hn.nodes["Material Output"].inputs["Surface"])
+    bc, bh = bmesh.new(), bmesh.new()
+    for k, q in enumerate(nodes):
+        d = (q - cam).length
+        s = 1.0 if k < n_books else 0.6
+        bmesh.ops.create_icosphere(bc, subdivisions=2, radius=d * 0.0011 * s, matrix=Matrix.Translation(q))
+        bmesh.ops.create_icosphere(bh, subdivisions=3, radius=d * 0.008 * s, matrix=Matrix.Translation(q))
+    for nm, bmx, m in (("node_cores", bc, core), ("node_halos", bh, hm)):
+        me = bpy.data.meshes.new(nm)
+        bmx.to_mesh(me)
+        bmx.free()
+        o = link(nm, me)
+        o.data.materials.append(m)
+        o.visible_shadow = False
+    # a little light from each node onto its book
+    for q in nodes[:n_books]:
+        ld = bpy.data.lights.new("nodelight", "POINT")
+        ld.energy = 1.2
+        ld.color = (1.0, 0.75, 0.45)
+        ld.shadow_soft_size = 0.05
+        link("nodelight", ld).location = q
+
+
 # ------------------------------------------------------------------ scene
 def build():
     sc = reset()
@@ -589,6 +671,7 @@ def build():
     so.rotation_euler = (math.radians(62), 0, math.radians(200))
 
     # books in flight: from the desk over the balustrade toward the moon
+    flock, leaves = [], []
     n = 11
     for k in range(n):
         tt = k / (n - 1)
@@ -598,11 +681,14 @@ def build():
         p = at(u, v, depth)
         rot = (math.radians(rnd.uniform(-30, 10)), math.radians(rnd.uniform(-20, 20)), math.radians(rnd.uniform(-50, 50)))
         cd = rnd.uniform(4, 22)
+        flock.append(p)
         book(f"fly{k}", p, rot, rnd.uniform(1.4, 1.8), covers[k % len(covers)], paper, gold, rnd, cd, cd + rnd.uniform(18, 38), bend=-0.35)
     for k in range(9):
         tt = rnd.uniform(0.02, 0.75)
         p = at(0.27 + 0.6 * tt + rnd.uniform(-0.07, 0.07), 0.42 + 0.4 * tt + rnd.uniform(-0.08, 0.08), 2.3 + 9 * tt ** 1.4)
         loose_page(f"loose{k}", p, (rnd.uniform(0, 6), rnd.uniform(0, 6), rnd.uniform(0, 6)), 1.5, paper, rnd)
+        leaves.append(p)
+    connect(flock, leaves, cam, bright, at, Vector((-1.05, 0.85, top + 0.06)))
     # warm bounce from the lantern side onto the nearest books
     fill = bpy.data.lights.new("lanternfill", "AREA")
     fill.energy = 38

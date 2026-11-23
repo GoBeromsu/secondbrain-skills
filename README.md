@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/brand/splash.jpg" alt="A Blender render: from a candlelit desk on a moonlit stone terrace, open books fly out over the balustrade under the Milky Way and constellations" width="100%">
+  <img src="assets/brand/splash.jpg" alt="A Blender render: from a candlelit desk on a moonlit stone terrace, open books fly out under the Milky Way, linked to one another by fine lines of light that run on into a constellation" width="100%">
 </p>
 
 <p align="center">
