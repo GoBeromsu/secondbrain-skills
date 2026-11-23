@@ -19,6 +19,7 @@ for path in (".claude-plugin/plugin.json", ".claude-plugin/marketplace.json", ".
     if any(version != os.environ["V"] for version in versions):
         raise SystemExit(f"{path}: versions must all equal {os.environ['V']}")
 PY
+python3 scripts/validate.py
 git commit -qam "release: $V"
 git tag "$V"
 git push --atomic origin main "$V"
