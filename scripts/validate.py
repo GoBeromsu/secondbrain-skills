@@ -26,7 +26,7 @@ VERSIONED = MANIFESTS[:4]
 NAME = "secondbrain-skills"
 NAME_RX = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 IMAGE_EXT = {".svg", ".png", ".jpg", ".jpeg", ".gif", ".webp"}
-READMES = ["README.md", "README.ko.md", "CODE_OF_CONDUCT.md"]
+READMES = ["README.md", "README.ko.md", "CODE_OF_CONDUCT.md", "CONTRIBUTING.md", "SECURITY.md", "ACKNOWLEDGEMENTS.md"]
 ICON = "assets/icon.png"
 
 errors: list[str] = []
@@ -199,7 +199,7 @@ def check_icon():
 
 
 def check_scripts():
-    for py in sorted((ROOT / "skills").glob("*/scripts/*.py")) + sorted((ROOT / "scripts").glob("*.py")):
+    for py in sorted((ROOT / "skills").glob("*/scripts/*.py")) + sorted((ROOT / "scripts").rglob("*.py")):
         try:
             py_compile.compile(str(py), doraise=True, cfile=None)
         except py_compile.PyCompileError as e:
