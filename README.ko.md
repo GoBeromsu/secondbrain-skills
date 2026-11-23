@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/brand/splash.jpg" alt="어두운 도서관 책상 위, 펼친 책의 페이지에서 빛의 실이 피어올라 빛나는 뇌를 이루는 Blender 렌더" width="100%">
+  <img src="assets/brand/splash.jpg" alt="어두운 도서관 책상 위, 펼친 여러 권의 책에서 빛의 실이 피어올라 서로 이어진 별자리를 이루는 Blender 렌더" width="100%">
 </p>
 
 <p align="center">

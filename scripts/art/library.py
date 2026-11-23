@@ -1,5 +1,7 @@
 """Procedural Blender scenes for secondbrain-skills art. No external assets.
 
+The splash: threads of light rise from several open books into a constellation of linked stars.
+
 Run:  blender -b -P scripts/art/library.py -- <scene> <out.png> [samples] [resolution %]
 Scenes: splash (README banner, 2400x1200), icon (1024 square); hero, icon_book, drop, archive,
 catalogue and reading are earlier studies kept for reuse.
@@ -577,128 +579,7 @@ def scene_reading():
 
 
 
-# ---------------------------------------------------------------- splash: a brain of light rising from a book
-def brain_shell(center, size, rnd):
-    """Brain in side profile: long axis along world x, hemispheres offset in y, plus a cerebellum."""
-    objs = []
-    tex = bpy.data.textures.new("gyri", "MARBLE")
-    tex.marble_type = "SHARPER"
-    tex.noise_scale = 0.03
-    tex.turbulence = 9.0
-    tex.noise_depth = 4
-    L, W, H = size.x / 2, size.y / 4, size.z / 2
-
-    def shape(v):
-        u = v.x  # -1 back .. +1 front
-        z = v.z
-        if z < 0:
-            z *= 0.55
-            if -0.35 < u < 0.55:  # temporal lobe
-                z -= 0.32 * math.cos((u - 0.1) / 0.45 * math.pi / 2) * (-v.z)
-        z *= 1.0 - 0.12 * max(0.0, u)
-        z += 0.10 * max(0.0, -u) * (1 + v.z) * 0.5
-        y = v.y * (1.0 - 0.10 * abs(u))
-        return Vector((u * L, y * W, z * H))
-
-    for side in (-1, 1):
-        bm = bmesh.new()
-        bmesh.ops.create_icosphere(bm, subdivisions=6, radius=1.0)
-        for v in bm.verts:
-            v.co = shape(v.co)
-        me = bpy.data.meshes.new(f"hemisphere{side}")
-        bm.to_mesh(me)
-        bm.free()
-        o = link_obj(f"hemisphere{side}", me)
-        o.location = (center.x, center.y + side * W * 1.04, center.z)
-        d = o.modifiers.new("gyri", "DISPLACE")
-        d.texture = tex
-        d.strength = size.x * 0.03
-        d.mid_level = 0.5
-        for poly in me.polygons:
-            poly.use_smooth = True
-        objs.append(o)
-    bm = bmesh.new()
-    bmesh.ops.create_icosphere(bm, subdivisions=5, radius=1.0)
-    for v in bm.verts:
-        v.co = Vector((v.co.x * L * 0.33, v.co.y * W * 1.7, v.co.z * H * 0.32))
-    me = bpy.data.meshes.new("cerebellum")
-    bm.to_mesh(me)
-    bm.free()
-    cb = link_obj("cerebellum", me)
-    cb.location = (center.x - L * 0.62, center.y, center.z - H * 0.42)
-    tex2 = bpy.data.textures.new("folia", "WOOD")
-    tex2.wood_type = "BANDNOISE"
-    tex2.noise_scale = 0.02
-    d = cb.modifiers.new("folia", "DISPLACE")
-    d.texture = tex2
-    d.strength = size.x * 0.01
-    for poly in me.polygons:
-        poly.use_smooth = True
-    objs.append(cb)
-    return objs
-
-
-def shell_material():
-    m = bpy.data.materials.new("shell")
-    m.use_nodes = True
-    nt = m.node_tree
-    out = nt.nodes["Material Output"]
-    p = nt.nodes["Principled BSDF"]
-    p.inputs["Base Color"].default_value = (0.03, 0.02, 0.035, 1)
-    p.inputs["Coat Weight"].default_value = 0.6
-    p.inputs["Roughness"].default_value = 0.35
-    geo = nt.nodes.new("ShaderNodeNewGeometry")
-    ramp = nt.nodes.new("ShaderNodeValToRGB")
-    ramp.color_ramp.elements[0].position = 0.50
-    ramp.color_ramp.elements[0].color = (0, 0, 0, 1)
-    ramp.color_ramp.elements[1].position = 0.56
-    ramp.color_ramp.elements[1].color = (1.0, 0.45, 0.12, 1)
-    nt.links.new(geo.outputs["Pointiness"], ramp.inputs["Fac"])
-    nt.links.new(ramp.outputs["Color"], p.inputs["Emission Color"])
-    p.inputs["Emission Strength"].default_value = 3.2
-    fres = nt.nodes.new("ShaderNodeLayerWeight")
-    fres.inputs["Blend"].default_value = 0.35
-    rim = nt.nodes.new("ShaderNodeEmission")
-    rim.inputs["Color"].default_value = (0.42, 0.30, 1.0, 1)
-    rim.inputs["Strength"].default_value = 0.8
-    mixr = nt.nodes.new("ShaderNodeMixShader")
-    nt.links.new(fres.outputs["Facing"], mixr.inputs[0])
-    nt.links.new(p.outputs[0], mixr.inputs[1])
-    nt.links.new(rim.outputs[0], mixr.inputs[2])
-    tr = nt.nodes.new("ShaderNodeBsdfTransparent")
-    mixa = nt.nodes.new("ShaderNodeMixShader")
-    mixa.inputs[0].default_value = 0.3
-    nt.links.new(tr.outputs[0], mixa.inputs[1])
-    nt.links.new(mixr.outputs[0], mixa.inputs[2])
-    nt.links.new(mixa.outputs[0], out.inputs["Surface"])
-    return m
-
-
-def filament_hair(obj, material, count=2600, length=0.05):
-    mod = obj.modifiers.new("filaments", "PARTICLE_SYSTEM")
-    ps = mod.particle_system.settings
-    ps.type = "HAIR"
-    ps.count = count
-    ps.hair_length = length
-    ps.use_advanced_hair = True
-    ps.normal_factor = 1.0
-    ps.factor_random = 0.6
-    ps.child_type = "INTERPOLATED"
-    ps.child_percent = 4
-    ps.rendered_child_count = 12
-    ps.child_length = 0.9
-    ps.kink = "WAVE"
-    ps.kink_amplitude = length * 0.25
-    ps.kink_frequency = 3.0
-    ps.roughness_endpoint = length * 0.3
-    ps.root_radius = 1.0
-    ps.tip_radius = 0.0
-    ps.radius_scale = 0.00035
-    obj.data.materials.append(material)
-    ps.material_slot = material.name
-    return ps
-
-
+# ---------------------------------------------------------------- splash: open books feeding a constellation of linked stars
 def splash(res=(2400, 1200), close=False):
     sc = reset()
     sc.render.resolution_x, sc.render.resolution_y = res
@@ -752,60 +633,113 @@ def splash(res=(2400, 1200), close=False):
         hw = 0.112
         loc = (bx + hw * math.cos(ry), by, top + 0.04 - hw * math.sin(ry))
         paper_sheet(f"lift{k}", loc, (0, ry, 0), (0.224, 0.31), lift)
-    # brain of light above the book
-    c = Vector((bx, by + 0.02, top + 0.40))
-    size = Vector((0.46, 0.34, 0.30))
-    shells = brain_shell(c, size, rnd)
-    sm = shell_material()
-    fil = mat("filament", (1, 0.7, 0.4), emit=(1.0, 0.55, 0.22), strength=2.2)
-    fpaths = []
-    for o in shells:
-        o.data.materials.append(sm)
-        dg = bpy.context.evaluated_depsgraph_get()
-        ev = o.evaluated_get(dg).to_mesh()
-        verts = [(o.matrix_world @ v.co, (o.matrix_world.to_3x3() @ v.normal).normalized()) for v in ev.vertices]
-        o.evaluated_get(dg).to_mesh_clear()
-        for co, n in rnd.sample(verts, 520):
-            l = rnd.uniform(0.004, 0.018)
-            side = Vector((rnd.gauss(0, 1), rnd.gauss(0, 1), rnd.gauss(0, 1))) * 0.25
-            a = co
-            b = co + (n + side) * l * 0.5
-            cpt = co + (n + side * 1.6 + Vector((0, 0, 0.35))) * l
-            fpaths.append([a, b, cpt])
-    curve_obj("filaments", fpaths, 0.00018, fil)
-    # streams of light rising from the pages into the brain
-    stream_m = mat("stream", (1, 0.7, 0.4), emit=(1.0, 0.56, 0.24), strength=2.6)
-    violet_m = mat("stream_v", (0.7, 0.6, 1), emit=(0.50, 0.36, 1.0), strength=2.4)
-    paths_g, paths_v = [], []
-    for k in range(110):
-        sx = bx + rnd.uniform(-0.2, 0.2)
-        sy = by + rnd.uniform(-0.14, 0.14)
-        p0 = Vector((sx, sy, top + 0.04))
-        ang = rnd.uniform(0, math.tau)
-        rr = rnd.uniform(0.0, 1.0) ** 0.5
-        p3 = c + Vector((math.cos(ang) * size.x * 0.22 * rr, math.sin(ang) * size.y * 0.2 * rr, -size.z * rnd.uniform(0.05, 0.25)))
-        twist = Vector((rnd.uniform(-1, 1), rnd.uniform(-1, 1), 0)) * 0.06
-        p1 = p0.lerp(p3, 0.33) + twist + Vector((0, 0, 0.02))
-        p2 = p0.lerp(p3, 0.66) - twist * 0.6
-        (paths_v if rnd.random() < 0.22 else paths_g).append([p0, p1, p2, p3])
-    curve_obj("streams", paths_g, 0.00022, stream_m)
-    curve_obj("streams_v", paths_v, 0.00022, violet_m)
-    # sparks: tiny nodes around the brain
-    spark = mat("spark", (1, 0.9, 0.7), emit=(1.0, 0.8, 0.5), strength=40)
-    bm = bmesh.new()
+    # more open books around the first one, each a source the constellation draws from
+    def open_book(x, y, rz, s, cover_color, name):
+        cm = mat(f"cover_{name}", cover_color, rough=0.55, bump=(420, 0.25))
+        R = lambda dx, dy: (x + dx * math.cos(rz) - dy * math.sin(rz), y + dx * math.sin(rz) + dy * math.cos(rz))
+        for side in (-1, 1):
+            ang = side * math.radians(8)
+            px, py = R(side * 0.122 * s, 0)
+            box(f"{name}_board{side}", (0.24 * s, 0.34 * s, 0.006), (px, py, top + 0.004), cm, bevel=0.002, rot=(0, ang, rz))
+            px, py = R(side * 0.118 * s, 0)
+            box(f"{name}_pages{side}", (0.23 * s, 0.325 * s, 0.026 * s), (px, py, top + 0.006 + 0.013 * s), paper, bevel=0.005, rot=(0, ang, rz))
+        return Vector((x, y, top + 0.02 + 0.026 * s)), s
+    sources = [(Vector((bx, by, top + 0.04)), 1.0)]
+    sources.append(open_book(bx + 0.42, by + 0.34, math.radians(-28), 0.74, (0.08, 0.16, 0.30), "bookB"))
+    sources.append(open_book(bx - 0.48, by + 0.26, math.radians(22), 0.72, (0.10, 0.22, 0.12), "bookC"))
+    sources.append(open_book(bx + 0.18, by + 0.55, math.radians(6), 0.62, (0.36, 0.22, 0.08), "bookD"))
+    # the constellation: stars linked by their nearest neighbours, loosely a two-lobed cloud
+    c = Vector((bx + 0.0, by + 0.30, top + 0.46))
+    size = Vector((0.52, 0.30, 0.30))
+    pts = brain_points(c, size, 90, rnd)
+    pts = [Vector((p.x, c.y + (p.y - c.y) * 0.7, p.z)) for p in pts]
+    edges = set()
+    for i, p in enumerate(pts):
+        for j in sorted(range(len(pts)), key=lambda j: (pts[j] - p).length)[1:4]:
+            if (pts[j] - p).length < 0.16:
+                edges.add(tuple(sorted((i, j))))
+    degree = [0] * len(pts)
+    for i, j in edges:
+        degree[i] += 1
+        degree[j] += 1
+    link_m = mat("link", (0.8, 0.7, 1), emit=(0.58, 0.46, 1.0), strength=2.6)
+    curve_obj("links", [[pts[i], pts[j]] for i, j in edges], 0.0005, link_m)
     import mathutils
-    for k in range(200):
-        v = Vector((rnd.gauss(0, 1), rnd.gauss(0, 1), rnd.gauss(0, 1))).normalized()
-        r = rnd.uniform(1.0, 1.9)
-        q = c + Vector((v.x * size.x * 0.6 * r, v.y * size.y * 0.6 * r, v.z * size.z * 0.9 * r))
-        bmesh.ops.create_icosphere(bm, subdivisions=1, radius=rnd.uniform(0.0008, 0.0025), matrix=mathutils.Matrix.Translation(q))
-    me = bpy.data.meshes.new("sparks")
+    star_m = mat("star", (1, 0.92, 0.8), emit=(1.0, 0.84, 0.60), strength=22)
+    halo_m = mat("halo", (1, 0.8, 0.5), emit=(1.0, 0.66, 0.32), strength=4)
+    bm = bmesh.new()
+    bh = bmesh.new()
+    for i, p in enumerate(pts):
+        r = 0.0022 + 0.0011 * degree[i] + rnd.uniform(0, 0.0015)
+        bmesh.ops.create_icosphere(bm, subdivisions=2, radius=r, matrix=mathutils.Matrix.Translation(p))
+        if degree[i] >= 6 or rnd.random() < 0.06:
+            bmesh.ops.create_icosphere(bh, subdivisions=3, radius=r * 5.0, matrix=mathutils.Matrix.Translation(p))
+    for k in range(160):  # faint unlinked stars give the cloud depth
+        v = Vector((rnd.gauss(0, 1), rnd.gauss(0, 1), rnd.gauss(0, 1)))
+        q = c + Vector((v.x * size.x * 0.55, v.y * size.y * 0.45, v.z * size.z * 0.5))
+        bmesh.ops.create_icosphere(bm, subdivisions=1, radius=rnd.uniform(0.0007, 0.0016), matrix=mathutils.Matrix.Translation(q))
+    for nm, bmx, m in (("stars", bm, star_m), ("halos", bh, halo_m)):
+        me = bpy.data.meshes.new(nm)
+        bmx.to_mesh(me)
+        bmx.free()
+        o = link_obj(nm, me)
+        o.data.materials.append(m)
+        for poly in me.polygons:
+            poly.use_smooth = True
+    # soft halos: emission that fades by facing so they read as glow, not spheres
+    nt = halo_m.node_tree
+    pr = nt.nodes["Principled BSDF"]
+    lw = nt.nodes.new("ShaderNodeLayerWeight")
+    lw.inputs["Blend"].default_value = 0.5
+    em = nt.nodes.new("ShaderNodeEmission")
+    em.inputs["Color"].default_value = (1.0, 0.62, 0.3, 1)
+    inv = nt.nodes.new("ShaderNodeMath")
+    inv.operation = "POWER"
+    inv.inputs[1].default_value = 3.0
+    oneminus = nt.nodes.new("ShaderNodeMath")
+    oneminus.operation = "SUBTRACT"
+    oneminus.inputs[0].default_value = 1.0
+    nt.links.new(lw.outputs["Facing"], oneminus.inputs[1])
+    nt.links.new(oneminus.outputs[0], inv.inputs[0])  # 1 - facing: 0 at the silhouette, 1 at the centre
+    inv.inputs[1].default_value = 4.0
+    mul = nt.nodes.new("ShaderNodeMath")
+    mul.operation = "MULTIPLY"
+    mul.inputs[1].default_value = 0.9
+    nt.links.new(inv.outputs[0], mul.inputs[0])
+    nt.links.new(mul.outputs[0], em.inputs["Strength"])
+    tr = nt.nodes.new("ShaderNodeBsdfTransparent")
+    add = nt.nodes.new("ShaderNodeAddShader")
+    nt.links.new(tr.outputs[0], add.inputs[0])
+    nt.links.new(em.outputs[0], add.inputs[1])
+    nt.links.new(add.outputs[0], nt.nodes["Material Output"].inputs["Surface"])
+    for o in bpy.data.objects:
+        if o.name == "halos":
+            o.visible_shadow = False
+    # threads of light rising from every open book into the lowest stars
+    stream_m = mat("stream", (1, 0.7, 0.4), emit=(1.0, 0.56, 0.24), strength=2.2)
+    low = sorted(range(len(pts)), key=lambda i: pts[i].z)[:30]
+    paths = []
+    for src, s in sources:
+        near = sorted(range(len(pts)), key=lambda i: abs(pts[i].x - src.x) + abs(pts[i].y - src.y) * 0.5 + (pts[i].z - c.z) * 0.8)[:10]
+        for k in range(int(14 * s)):
+            p0 = src + Vector((rnd.uniform(-0.16, 0.16) * s, rnd.uniform(-0.10, 0.10) * s, 0.0))
+            p3 = pts[rnd.choice(near)]
+            twist = Vector((rnd.uniform(-1, 1), rnd.uniform(-1, 1), 0)) * 0.05
+            p1 = p0.lerp(p3, 0.3) + twist + Vector((0, 0, 0.04))
+            p2 = p0.lerp(p3, 0.7) - twist * 0.5
+            paths.append([p0, p1, p2, p3])
+    curve_obj("streams", paths, 0.0002, stream_m)
+    # dust: faint motes drifting through the scene
+    spark = mat("spark", (1, 0.9, 0.7), emit=(1.0, 0.8, 0.5), strength=14)
+    bm = bmesh.new()
+    for k in range(260):
+        q = c + Vector((rnd.uniform(-1.3, 1.3), rnd.uniform(-0.6, 0.8), rnd.uniform(-0.7, 0.6)))
+        bmesh.ops.create_icosphere(bm, subdivisions=1, radius=rnd.uniform(0.0006, 0.0018), matrix=mathutils.Matrix.Translation(q))
+    me = bpy.data.meshes.new("dust")
     bm.to_mesh(me)
     bm.free()
-    so = link_obj("sparks", me)
-    so.data.materials.append(spark)
-    # glow from the brain lights the desk and pages
-    light("POINT", (c.x, c.y, c.z - 0.12), 14, (1.0, 0.60, 0.30), size=0.2)
+    link_obj("dust", me).data.materials.append(spark)
+    light("POINT", (c.x, c.y, c.z - 0.1), 18, (1.0, 0.66, 0.38), size=0.4)
     light("POINT", (bx, by, top + 0.15), 1.5, (1.0, 0.7, 0.4), size=0.1)
     # high window: cold moonlight shafts through dust
     sp = light("SPOT", (-2.6, 2.4, 3.8), 800, (0.55, 0.66, 1.0), size=0.25, spot=math.radians(18))
@@ -820,8 +754,8 @@ def splash(res=(2400, 1200), close=False):
     volume_box((7, 6, 4.2), (0, 0.8, 2.1), density=float(__import__("os").environ.get("FOG", "0.006")), color=(1.0, 0.92, 0.85))
     sc.view_settings.look = "AgX - Punchy"
     if close:
-        cam_loc = Vector((bx - 0.25, by - 1.25, top + 0.42))
-        camera(cam_loc, (bx, by, top + 0.27), lens=50, dof=(cam_loc - c).length, fstop=2.0)
+        cam_loc = Vector((bx - 0.2, by - 1.75, top + 0.40))
+        camera(cam_loc, (bx + 0.02, by + 0.2, top + 0.30), lens=50, dof=(cam_loc - c).length, fstop=2.2)
         return sc
     cam_loc = Vector((bx - 0.95, by - 2.35, top + 0.62))
     camera(cam_loc, (bx - 0.40, by + 0.2, top + 0.28), lens=50, dof=(cam_loc - c).length, fstop=1.4)
