@@ -11,38 +11,15 @@
   "assets": [
     {
       "path": "assets/brand/logo.svg",
-      "role": "Canonical project mark for small-size branding (icon use). Not referenced by a manifest or README in this checkout; the hero banner redraws the same lattice inline.",
+      "role": "Canonical project mark for small-size branding; the source drawing for assets/icon.png.",
       "media_type": "image/svg+xml",
-      "dimensions": { "width": 256, "height": 256, "viewBox": "0 0 256 256" },
-      "creator": "Obsidian Skills contributors (Xia-Ataraxia)",
-      "origin": "original work authored in this repository; drawn from primitive SVG shapes, not traced, derived, or imported from any third-party file",
-      "upstream_source": null,
-      "rights": {
-        "holder": "Copyright (c) 2026 Obsidian Skills contributors",
-        "license": "MIT",
-        "license_file": "LICENSE",
-        "third_party_attribution_required": false,
-        "redistribution": "permitted under MIT with the repository notice"
+      "dimensions": {
+        "width": 256,
+        "height": 256,
+        "viewBox": "0 0 256 256"
       },
-      "contents": {
-        "embedded_raster": false,
-        "embedded_fonts": false,
-        "text_elements": false,
-        "font_stack": null,
-        "scripts": false,
-        "external_references": [],
-        "only_namespace_uri": "http://www.w3.org/2000/svg"
-      },
-      "depicts": "Nine equally sized diamond facets in a three-by-three lattice on a dark violet panel; no facet is central or larger, standing for independent packages with no root skill.",
-      "claims": "decorative mark only; asserts nothing about behavior, support, or verification"
-    },
-    {
-      "path": "assets/brand/hero.svg",
-      "role": "README banner, referenced by README.md and README.ko.md.",
-      "media_type": "image/svg+xml",
-      "dimensions": { "width": 1280, "height": 400, "viewBox": "0 0 1280 400" },
-      "creator": "Obsidian Skills contributors (Xia-Ataraxia)",
-      "origin": "original work authored in this repository; reuses the same nine-facet lattice as assets/brand/logo.svg and nine abstract glyphs drawn here, with no third-party icon set",
+      "creator": "secondbrain-skills contributors (GoBeromsu)",
+      "origin": "original work authored in this repository; drawn from primitive SVG shapes and paths, not traced, derived, or imported from any third-party file",
       "upstream_source": null,
       "rights": {
         "holder": "Copyright (c) 2026 Obsidian Skills contributors",
@@ -55,12 +32,73 @@
         "embedded_raster": false,
         "embedded_fonts": false,
         "text_elements": true,
-        "font_stack": "ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif — referenced by name; no font file is embedded or redistributed",
+        "font_stack": null,
         "scripts": false,
         "external_references": [],
         "only_namespace_uri": "http://www.w3.org/2000/svg"
       },
-      "depicts": "Wordmark \"secondbrain-skills\", the line \"Independent Agent Skills for Obsidian vaults\", and nine equal tiles each holding one abstract glyph.",
+      "depicts": "An open book on a dark ink panel with a brain-shaped constellation of linked notes rising from its pages along two dashed threads: a library that becomes a second brain.",
+      "claims": "decorative mark only; asserts nothing about behavior, support, or verification"
+    },
+    {
+      "path": "assets/icon.png",
+      "role": "Plugin listing icon, found by `claude plugin validate` at assets/icon.png.",
+      "media_type": "image/png",
+      "dimensions": {
+        "width": 1024,
+        "height": 1024
+      },
+      "creator": "secondbrain-skills contributors (GoBeromsu)",
+      "origin": "rasterised from assets/brand/logo.svg in this repository with rsvg-convert; no third-party pixels",
+      "upstream_source": null,
+      "rights": {
+        "holder": "Copyright (c) 2026 Obsidian Skills contributors",
+        "license": "MIT",
+        "license_file": "LICENSE",
+        "third_party_attribution_required": false,
+        "redistribution": "permitted under MIT with the repository notice"
+      },
+      "contents": {
+        "embedded_raster": true,
+        "embedded_fonts": false,
+        "text_elements": false,
+        "font_stack": null,
+        "scripts": false,
+        "external_references": [],
+        "only_namespace_uri": null
+      },
+      "depicts": "An open book on a dark ink panel with a brain-shaped constellation of linked notes rising from its pages along two dashed threads: a library that becomes a second brain.",
+      "claims": "decorative mark only; asserts nothing about behavior, support, or verification"
+    },
+    {
+      "path": "assets/brand/hero.svg",
+      "role": "README banner, referenced by README.md and README.ko.md.",
+      "media_type": "image/svg+xml",
+      "dimensions": {
+        "width": 1280,
+        "height": 400,
+        "viewBox": "0 0 1280 400"
+      },
+      "creator": "secondbrain-skills contributors (GoBeromsu)",
+      "origin": "original work authored in this repository; a bookshelf of plain rectangles and a deterministic node constellation drawn here, with no third-party icon set",
+      "upstream_source": null,
+      "rights": {
+        "holder": "Copyright (c) 2026 Obsidian Skills contributors",
+        "license": "MIT",
+        "license_file": "LICENSE",
+        "third_party_attribution_required": false,
+        "redistribution": "permitted under MIT with the repository notice"
+      },
+      "contents": {
+        "embedded_raster": false,
+        "embedded_fonts": false,
+        "text_elements": true,
+        "font_stack": "ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif and ui-serif, 'Iowan Old Style', Palatino, Georgia, serif — referenced by name; no font file is embedded or redistributed",
+        "scripts": false,
+        "external_references": [],
+        "only_namespace_uri": "http://www.w3.org/2000/svg"
+      },
+      "depicts": "Wordmark \"secondbrain-skills\", the line \"A library your agent can keep.\", a two-shelf library bookcase and, above it, a brain-shaped constellation of linked notes tied to the books by dashed threads.",
       "claims": "names no package, count, version or release status; asserts no marketplace availability and no verified runtime support",
       "not_a_screenshot": true
     },
@@ -68,9 +106,13 @@
       "path": "assets/demo/workflow.svg",
       "role": "README workflow illustration, referenced by README.md and README.ko.md.",
       "media_type": "image/svg+xml",
-      "dimensions": { "width": 1200, "height": 540, "viewBox": "0 0 1200 540" },
-      "creator": "Obsidian Skills contributors (Xia-Ataraxia)",
-      "origin": "original work authored in this repository; a drawn three-panel diagram over a synthetic example, not a capture or trace of any application window",
+      "dimensions": {
+        "width": 1200,
+        "height": 600,
+        "viewBox": "0 0 1200 600"
+      },
+      "creator": "secondbrain-skills contributors (GoBeromsu)",
+      "origin": "original work authored in this repository; a drawn four-station diagram with library icons made from primitive shapes, not a capture or trace of any application window",
       "upstream_source": null,
       "rights": {
         "holder": "Copyright (c) 2026 Obsidian Skills contributors",
@@ -83,13 +125,13 @@
         "embedded_raster": false,
         "embedded_fonts": false,
         "text_elements": true,
-        "font_stack": "system-ui, sans-serif — referenced by name; no font file is embedded or redistributed",
+        "font_stack": "ui-sans-serif, system-ui, sans-serif and ui-monospace, SFMono-Regular, Menlo, Consolas, monospace — referenced by name; no font file is embedded or redistributed",
         "scripts": false,
         "external_references": [],
         "only_namespace_uri": "http://www.w3.org/2000/svg"
       },
-      "depicts": "Three panels — inspect a synthetic field note, select the independent format owner, verify structure and read the exact result back — over a synthetic research example with no private note content.",
-      "claims": "illustration of the intended workflow; the in-image footer states it is not a screenshot and not a live-render verification claim",
+      "depicts": "Four library stations — Book drop (capture, inbox), Archive (ingest keeps the Raw source verbatim), Catalogue (wiki pages, Entities and Maps) and Reading room (query with citations) — and a Shelf care loop of lint, audit, verify, status and reindex.",
+      "claims": "illustration of the intended workflow; the in-image footer states it is not a screenshot and not a claim that anything ran",
       "not_a_screenshot": true
     }
   ],

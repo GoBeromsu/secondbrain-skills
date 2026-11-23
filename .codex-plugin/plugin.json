@@ -6,8 +6,8 @@
     "name": "beomsukoh",
     "url": "https://beomsukoh.com"
   },
-  "homepage": "https://github.com/Xia-Ataraxia/secondbrain-skills",
-  "repository": "https://github.com/Xia-Ataraxia/secondbrain-skills",
+  "homepage": "https://github.com/GoBeromsu/secondbrain-skills",
+  "repository": "https://github.com/GoBeromsu/secondbrain-skills",
   "license": "MIT",
   "keywords": [
     "obsidian",
@@ -31,7 +31,7 @@
       "Read",
       "Write"
     ],
-    "websiteURL": "https://github.com/Xia-Ataraxia/secondbrain-skills",
+    "websiteURL": "https://github.com/GoBeromsu/secondbrain-skills",
     "defaultPrompt": [
       "Fix the properties and callouts in this note",
       "Use bases to build a Base view over my project notes"
