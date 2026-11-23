@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/brand/splash.jpg" alt="달빛 비치는 돌 테라스의 촛불 켠 책상에서, 은하수와 별자리 아래로 펼친 책들이 난간 너머 날아가는 Blender 렌더" width="100%">
+  <img src="assets/brand/splash.jpg" alt="달빛 비치는 돌 테라스의 촛불 켠 책상에서 펼친 책들이 은하수 아래로 날아가고, 가는 빛의 선이 책들을 서로 이어 별자리로 이어지는 Blender 렌더" width="100%">
 </p>
 
 <p align="center">
