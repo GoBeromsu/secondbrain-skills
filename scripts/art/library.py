@@ -1,10 +1,10 @@
 """Procedural Blender scenes for secondbrain-skills art. No external assets.
 
-The splash: threads of light rise from several open books into a constellation of linked stars.
+The README banner (nightsky): open books fly up from a desk into a starry sky drawn with constellations.
 
 Run:  blender -b -P scripts/art/library.py -- <scene> <out.png> [samples] [resolution %]
-Scenes: splash (README banner, 2400x1200), icon (1024 square); hero, icon_book, drop, archive,
-catalogue and reading are earlier studies kept for reuse.
+Scenes: nightsky (README banner, 2400x1200; the icon is a square crop of it); splash, icon, hero,
+icon_book, drop, archive, catalogue and reading are earlier studies kept for reuse.
 Env: FOG=<density> sets the volumetric haze (the published renders use 0.014);
 HIDE=<prefix,...> hides objects by name prefix for debugging.
 Blender 5.x, Cycles. Every mesh, material and light is built here from primitives.
@@ -762,7 +762,222 @@ def splash(res=(2400, 1200), close=False):
     return sc
 
 
+# ---------------------------------------------------------------- nightsky: books flying up into a starry sky
+def night_world(sc):
+    w = sc.world
+    nt = w.node_tree
+    bg = nt.nodes["Background"]
+    tc = nt.nodes.new("ShaderNodeTexCoord")
+    sep = nt.nodes.new("ShaderNodeSeparateXYZ")
+    nt.links.new(tc.outputs["Window"], sep.inputs[0])
+    ramp = nt.nodes.new("ShaderNodeValToRGB")
+    e = ramp.color_ramp.elements
+    e[0].position, e[0].color = 0.0, (0.050, 0.032, 0.060, 1)
+    e[1].position, e[1].color = 1.0, (0.002, 0.003, 0.014, 1)
+    mid = e.new(0.38)
+    mid.color = (0.012, 0.012, 0.040, 1)
+    nt.links.new(sep.outputs["Y"], ramp.inputs["Fac"])
+    # milky way: a soft noisy band across the window, added on top of the gradient
+    lin = nt.nodes.new("ShaderNodeMath"); lin.operation = "MULTIPLY_ADD"
+    lin.inputs[1].default_value = -0.55; lin.inputs[2].default_value = 0.0
+    nt.links.new(sep.outputs["X"], lin.inputs[0])
+    lin2 = nt.nodes.new("ShaderNodeMath"); lin2.operation = "ADD"
+    nt.links.new(lin.outputs[0], lin2.inputs[0]); nt.links.new(sep.outputs["Y"], lin2.inputs[1])
+    off = nt.nodes.new("ShaderNodeMath"); off.operation = "SUBTRACT"; off.inputs[1].default_value = 0.42
+    nt.links.new(lin2.outputs[0], off.inputs[0])
+    sq = nt.nodes.new("ShaderNodeMath"); sq.operation = "MULTIPLY"
+    nt.links.new(off.outputs[0], sq.inputs[0]); nt.links.new(off.outputs[0], sq.inputs[1])
+    g = nt.nodes.new("ShaderNodeMath"); g.operation = "MULTIPLY"; g.inputs[1].default_value = -60.0
+    nt.links.new(sq.outputs[0], g.inputs[0])
+    ex = nt.nodes.new("ShaderNodeMath"); ex.operation = "EXPONENT"
+    nt.links.new(g.outputs[0], ex.inputs[0])
+    noise = nt.nodes.new("ShaderNodeTexNoise"); noise.inputs["Scale"].default_value = 6.0; noise.inputs["Detail"].default_value = 10
+    nt.links.new(tc.outputs["Window"], noise.inputs["Vector"])
+    nm = nt.nodes.new("ShaderNodeMath"); nm.operation = "MULTIPLY"
+    nt.links.new(ex.outputs[0], nm.inputs[0]); nt.links.new(noise.outputs["Fac"], nm.inputs[1])
+    band = nt.nodes.new("ShaderNodeMix"); band.data_type = "RGBA"; band.blend_type = "ADD"
+    nt.links.new(nm.outputs[0], band.inputs["Factor"])
+    nt.links.new(ramp.outputs["Color"], band.inputs["A"])
+    band.inputs["B"].default_value = (0.10, 0.08, 0.20, 1)
+    nt.links.new(band.outputs["Result"], bg.inputs["Color"])
+    bg.inputs["Strength"].default_value = 1.0
+
+
+def star_field(rnd, center, radius, n, band_axis):
+    import mathutils
+    bm_s = bmesh.new()
+    bright = []
+    band_axis = band_axis.normalized()
+    k = 0
+    while k < n:
+        v = Vector((rnd.gauss(0, 1), rnd.gauss(0, 1), rnd.gauss(0, 1))).normalized()
+        if v.y < 0.15 or v.z < -0.05:
+            continue
+        # the milky-way band: keep every star near the band, a third of the rest
+        near_band = abs(v.dot(band_axis)) < 0.16
+        if not near_band and rnd.random() > 0.35:
+            continue
+        p = center + v * radius
+        mag = rnd.random() ** 6
+        r = 0.006 + 0.030 * mag
+        bmesh.ops.create_icosphere(bm_s, subdivisions=1, radius=r, matrix=mathutils.Matrix.Translation(p))
+        if mag > 0.25:
+            bright.append(p)
+        k += 1
+    me = bpy.data.meshes.new("starfield")
+    bm_s.to_mesh(me)
+    bm_s.free()
+    o = link_obj("starfield", me)
+    o.data.materials.append(mat("starlight", (1, 0.95, 0.9), emit=(0.95, 0.92, 1.0), strength=18))
+    o.visible_shadow = False
+    return bright
+
+
+def constellation(rnd, stars, anchor, count, name):
+    import mathutils
+    near = [p for p in sorted(stars, key=lambda p: (p - anchor).length)[:count] if (p - anchor).length < 4.5]
+    if len(near) < 3:
+        return
+    inside, edges = {0}, set()
+    while len(inside) < len(near):
+        i, j = min(((i, j) for i in inside for j in range(len(near)) if j not in inside), key=lambda e: (near[e[0]] - near[e[1]]).length)
+        edges.add((i, j))
+        inside.add(j)
+    if count > 6:
+        a, b = sorted(range(len(near)), key=lambda k: rnd.random())[:2]
+        edges.add((a, b))
+    curve_obj(name, [[near[i], near[j]] for i, j in edges], 0.012, mat(name + "_m", (0.8, 0.7, 1), emit=(0.62, 0.52, 1.0), strength=1.6))
+    bm = bmesh.new()
+    for p in near:
+        bmesh.ops.create_icosphere(bm, subdivisions=2, radius=0.07, matrix=mathutils.Matrix.Translation(p))
+    me = bpy.data.meshes.new(name + "_stars")
+    bm.to_mesh(me)
+    bm.free()
+    link_obj(name + "_stars", me).data.materials.append(mat(name + "_sm", (1, 0.9, 0.7), emit=(1.0, 0.86, 0.62), strength=30))
+
+
+def flying_book(name, loc, rot, s, cover_color, open_deg, paper, gilt):
+    root = bpy.data.objects.new(name, None)
+    bpy.context.collection.objects.link(root)
+    alpha = math.radians((180 - open_deg) / 2)
+    cm = mat(name + "_cover", cover_color, rough=0.5, bump=(420, 0.25))
+    w, l = 0.22 * s, 0.31 * s
+    for side in (-1, 1):
+        d = Vector((side * math.cos(alpha), 0, math.sin(alpha)))
+        nrm = Vector((-side * math.sin(alpha), 0, math.cos(alpha)))
+        b = box(f"{name}_board{side}", (w, l, 0.006 * s), d * (w / 2), cm, bevel=0.002, rot=(0, -side * alpha, 0))
+        pg = box(f"{name}_pages{side}", (w * 0.95, l * 0.95, 0.022 * s), d * (w * 0.48) + nrm * (0.014 * s), paper, bevel=0.004, rot=(0, -side * alpha, 0))
+        band = box(f"{name}_band{side}", (w * 0.08, l * 1.002, 0.0065 * s), d * (w * 0.85), gilt, rot=(0, -side * alpha, 0))
+        for o in (b, pg, band):
+            o.parent = root
+    spine = box(f"{name}_spine", (0.02 * s, l, 0.01 * s), (0, 0, -0.004 * s), cm, bevel=0.003)
+    spine.parent = root
+    root.location = loc
+    root.rotation_euler = rot
+    return root
+
+
+def nightsky(res=(2400, 1200), close=False):
+    sc = reset()
+    sc.render.resolution_x, sc.render.resolution_y = res
+    rnd = random.Random(8)
+    night_world(sc)
+    paper = mat("paper", (0.86, 0.80, 0.68), rough=0.75, bump=(900, 0.05))
+    gilt = mat("gilt", (0.83, 0.62, 0.30), rough=0.28, metal=1.0)
+    # a balcony reading desk, bottom left: where the books take off
+    top = 0.79
+    desk_m = wood_mat("desk", (0.13, 0.055, 0.025), 3)
+    box("desk", (2.0, 0.9, 0.06), (-1.15, 0.6, top - 0.03), desk_m, bevel=0.012)
+    # distant hills as a dark silhouette on the horizon
+    hb = bmesh.new()
+    xs = [x * 0.5 for x in range(-120, 121)]
+    hv = []
+    for x in xs:
+        h = 1.2 + 0.7 * math.sin(x * 0.11) + 0.4 * math.sin(x * 0.37 + 1.3) + 0.15 * math.sin(x * 1.1)
+        hv.append((hb.verts.new((x * 0.6, 24, -4)), hb.verts.new((x * 0.6, 24, h))))
+    for (a0, a1), (b0, b1) in zip(hv, hv[1:]):
+        hb.faces.new((a0, b0, b1, a1))
+    hme = bpy.data.meshes.new("hills")
+    hb.to_mesh(hme)
+    hb.free()
+    link_obj("hills", hme).data.materials.append(mat("hillm", (0.004, 0.004, 0.008), 0.9))
+    for k, (h, c) in enumerate(((0.05, (0.06, 0.16, 0.12)), (0.04, (0.42, 0.20, 0.08)))):
+        box(f"stackc{k}", (0.28, 0.20, h), (-1.55, 0.55, top + 0.025 + k * 0.05), mat(f"sc{k}", c, 0.55, bump=(380, 0.2)), bevel=0.003, rot=(0, 0, 0.2 - k * 0.3))
+    flying_book("deskbook", (-0.95, 0.45, top + 0.01), (0, 0, 0.25), 1.0, (0.30, 0.05, 0.05), 170, paper, gilt)
+    # brass desk lamp glow
+    lamp = mat("lampglow", (1, 0.8, 0.6), emit=(1.0, 0.62, 0.30), strength=40)
+    bpy.ops.mesh.primitive_uv_sphere_add(radius=0.035, location=(-1.75, 0.85, top + 0.42))
+    bpy.context.object.data.materials.append(lamp)
+    bpy.ops.mesh.primitive_cone_add(radius1=0.12, radius2=0.03, depth=0.12, location=(-1.75, 0.85, top + 0.47), end_fill_type="NOTHING")
+    sh = bpy.context.object
+    sh.data.materials.append(mat("shade", (0.10, 0.25, 0.14), 0.3))
+    sh.modifiers.new("solid", "SOLIDIFY").thickness = 0.003
+    bpy.ops.mesh.primitive_cylinder_add(radius=0.006, depth=0.45, location=(-1.75, 0.85, top + 0.22))
+    bpy.context.object.data.materials.append(gilt)
+    light("POINT", (-1.75, 0.85, top + 0.38), 30, (1.0, 0.62, 0.32), size=0.05)
+    # books in flight, laid out in screen space: from the desk (bottom left) up toward the stars (top right)
+    cam_loc = Vector((-0.75, -2.2, 1.0))
+    target = Vector((0.9, 3.0, 2.2))
+    fwd = (target - cam_loc).normalized()
+    right = fwd.cross(Vector((0, 0, 1))).normalized()
+    up = right.cross(fwd).normalized()
+    tan_h, tan_v = 18 / 24, 9 / 24
+
+    def at(u, v, depth):
+        return cam_loc + (fwd + right * ((u - 0.5) * 2 * tan_h) + up * ((v - 0.5) * 2 * tan_v)) * depth
+
+    cols = [(0.42, 0.04, 0.04), (0.05, 0.12, 0.34), (0.05, 0.26, 0.14), (0.60, 0.38, 0.10), (0.30, 0.12, 0.38), (0.12, 0.24, 0.30), (0.50, 0.42, 0.28)]
+    n = 12
+    A = at(0.30, 0.30, 2.6)
+    B = at(0.86, 0.80, 8.0)
+    for k in range(n):
+        tt = k / (n - 1)
+        u = 0.30 + 0.58 * tt + 0.07 * math.sin(tt * 9.0) + rnd.uniform(-0.04, 0.04)
+        v = 0.32 + 0.50 * tt + 0.06 * math.cos(tt * 7.0) + rnd.uniform(-0.04, 0.04)
+        depth = 2.4 + 6.0 * tt ** 1.3 + rnd.uniform(-0.3, 0.3)
+        p = at(u, v, depth)
+        rot = (math.radians(rnd.uniform(-35, 15)), math.radians(rnd.uniform(-25, 25)), math.radians(rnd.uniform(-60, 60)))
+        flying_book(f"fly{k}", p, rot, rnd.uniform(1.1, 1.4), cols[k % len(cols)], rnd.uniform(70, 140), paper, gilt)
+    # stardust left behind along the flight path
+    import mathutils
+    dust = bmesh.new()
+    for k in range(140):
+        tt = rnd.random()
+        p = at(0.30 + 0.58 * tt + 0.07 * math.sin(tt * 9.0) + rnd.gauss(0, 0.03), 0.32 + 0.50 * tt + 0.06 * math.cos(tt * 7.0) + rnd.gauss(0, 0.03), 2.4 + 6.0 * tt ** 1.3)
+        bmesh.ops.create_icosphere(dust, subdivisions=1, radius=rnd.uniform(0.003, 0.009) * (1 + tt), matrix=mathutils.Matrix.Translation(p))
+    dme = bpy.data.meshes.new("stardust")
+    dust.to_mesh(dme)
+    dust.free()
+    link_obj("stardust", dme).data.materials.append(mat("stardust_m", (1, 0.85, 0.6), emit=(1.0, 0.78, 0.45), strength=25))
+    # loose pages drifting between them
+    for k in range(10):
+        tt = rnd.uniform(0.05, 0.8)
+        p = at(0.30 + 0.55 * tt + rnd.uniform(-0.08, 0.08), 0.32 + 0.48 * tt + rnd.uniform(-0.08, 0.08), 2.4 + 6 * tt)
+        paper_sheet(f"loose{k}", p, (rnd.uniform(0, 3), rnd.uniform(0, 3), rnd.uniform(0, 3)), (0.21, 0.29), paper)
+    # sky: star field with a milky-way band, a moon, and constellations drawn between bright stars
+    bright = star_field(rnd, cam_loc, 40.0, 4200, Vector((0.55, -0.25, 0.8)))
+    for k, (u, v, cnt) in enumerate(((0.60, 0.86, 7), (0.80, 0.62, 6), (0.95, 0.88, 6), (0.42, 0.93, 5))):
+        constellation(rnd, bright, cam_loc + (at(u, v, 1.0) - cam_loc).normalized() * 40.0, cnt, f"const{k}")
+    moon = mat("moon", (1, 0.98, 0.92), emit=(0.95, 0.94, 1.0), strength=4)
+    bpy.ops.mesh.primitive_uv_sphere_add(radius=0.55, location=tuple(cam_loc + (at(0.74, 0.80, 1.0) - cam_loc).normalized() * 38.0))
+    bpy.context.object.data.materials.append(moon)
+    sun = light("SUN", (0, 0, 10), 1.6, (0.62, 0.70, 1.0))
+    sun.rotation_euler = (math.radians(55), 0, math.radians(150))
+    sun.data.angle = math.radians(1.0)
+    # warm uplight from the desk lamp side, so the nearest books catch it
+    fill = light("AREA", (-1.6, 0.2, 0.6), 180, (1.0, 0.62, 0.32), size=1.5)
+    fill.rotation_euler = (Vector((0.8, 2.5, 2.2)) - Vector((-1.6, 0.2, 0.6))).to_track_quat("-Z", "Y").to_euler()
+    sc.view_settings.look = "AgX - Punchy"
+    if close:
+        camera(cam_loc + Vector((0.6, 1.2, 0.6)), (1.0, 3.5, 2.6), lens=35, dof=3.6, fstop=8)
+        return sc
+    camera(cam_loc, (0.9, 3.0, 2.2), lens=24, dof=3.0, fstop=8)
+    return sc
+
+
 SCENES = {
+    "nightsky": lambda: nightsky(),  # README banner
+    "nightsky_icon": lambda: nightsky((1024, 1024), close=True),
     "splash": lambda: splash((2400, 1200)),
     "splash_wide": lambda: splash((2560, 1067)),
     "hero": lambda: hero(),

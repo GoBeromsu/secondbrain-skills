@@ -50,7 +50,7 @@
         "height": 1024
       },
       "creator": "secondbrain-skills contributors (GoBeromsu)",
-      "origin": "rendered in Blender 5.3 Cycles from `scripts/art/library.py -- icon` (procedural scene, no external assets), then cropped square",
+      "origin": "square crop of the `scripts/art/library.py -- nightsky` render (Blender 5.3 Cycles, procedural scene, no external assets)",
       "upstream_source": null,
       "rights": {
         "holder": "Copyright (c) 2026 Obsidian Skills contributors",
@@ -68,7 +68,7 @@
         "external_references": [],
         "only_namespace_uri": null
       },
-      "depicts": "Closer view of the same scene: open books whose threads of light rise into a linked constellation of stars.",
+      "depicts": "Square crop of the same render: open books flying through a starry sky under constellations.",
       "claims": "decorative; asserts nothing about behavior, support, or verification",
       "not_a_screenshot": true
     },
@@ -81,7 +81,7 @@
         "height": 1200
       },
       "creator": "secondbrain-skills contributors (GoBeromsu)",
-      "origin": "rendered in Blender 5.3 Cycles from `scripts/art/library.py -- splash` (procedural scene, no external assets), then composited with the wordmark in a browser",
+      "origin": "rendered in Blender 5.3 Cycles from `scripts/art/library.py -- nightsky` (procedural scene, no external assets), then composited with the wordmark in a browser",
       "upstream_source": null,
       "rights": {
         "holder": "Copyright (c) 2026 Obsidian Skills contributors",
@@ -99,7 +99,7 @@
         "external_references": [],
         "only_namespace_uri": null
       },
-      "depicts": "A reading desk in a dark library at night: threads of warm light rise from the pages of several open books and join a constellation of stars linked by thin lines, with a stack of hardcover books and out-of-focus shelves and pendant lamps behind. Wordmark, tagline and a render credit are set at the top left and bottom right.",
+      "depicts": "A starry night with the Milky Way and constellations drawn between bright stars: a flock of open books and loose pages flies up from a reading desk on a balcony, leaving a trail of stardust over dark hills, toward a small moon. Wordmark, tagline and a render credit are set at the top left and bottom right.",
       "claims": "decorative; asserts nothing about behavior, support, or verification",
       "not_a_screenshot": true
     },
@@ -112,7 +112,7 @@
         "height": 640
       },
       "creator": "secondbrain-skills contributors (GoBeromsu)",
-      "origin": "rendered in Blender 5.3 Cycles from `scripts/art/library.py -- splash` (procedural scene, no external assets), then composited with the wordmark in a browser",
+      "origin": "rendered in Blender 5.3 Cycles from `scripts/art/library.py -- nightsky` (procedural scene, no external assets), then composited with the wordmark in a browser",
       "upstream_source": null,
       "rights": {
         "holder": "Copyright (c) 2026 Obsidian Skills contributors",
@@ -130,7 +130,7 @@
         "external_references": [],
         "only_namespace_uri": null
       },
-      "depicts": "A reading desk in a dark library at night: threads of warm light rise from the pages of several open books and join a constellation of stars linked by thin lines, with a stack of hardcover books and out-of-focus shelves and pendant lamps behind.",
+      "depicts": "A starry night with the Milky Way and constellations drawn between bright stars: a flock of open books and loose pages flies up from a reading desk on a balcony, leaving a trail of stardust over dark hills, toward a small moon.",
       "claims": "decorative; asserts nothing about behavior, support, or verification",
       "not_a_screenshot": true
     },

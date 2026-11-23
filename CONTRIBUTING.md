@@ -33,7 +33,7 @@ Use [Conventional Commits](https://www.conventionalcommits.org/): `feat(ingest):
 Renders in `assets/` come from [`scripts/art/library.py`](scripts/art/library.py), a procedural Blender scene with no external assets:
 
 ```sh
-blender -b -P scripts/art/library.py -- splash out.png 256
+blender -b -P scripts/art/library.py -- nightsky out.png 128
 ```
 
 Record any new or changed image in the asset ledger with how it was made.
