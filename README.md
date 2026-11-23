@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/brand/splash.jpg" alt="A Blender render: on a reading desk in a dark library, threads of light rise from several open books and join a constellation of linked stars" width="100%">
+  <img src="assets/brand/splash.jpg" alt="A Blender render: under a starry night sky with constellations, a flock of open books flies up from a reading desk toward the moon" width="100%">
 </p>
 
 <p align="center">

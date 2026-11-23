@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/brand/splash.jpg" alt="어두운 도서관 책상 위, 펼친 여러 권의 책에서 빛의 실이 피어올라 서로 이어진 별자리를 이루는 Blender 렌더" width="100%">
+  <img src="assets/brand/splash.jpg" alt="별자리가 이어진 밤하늘 아래, 책상에서 날아오른 책들이 달을 향해 떼 지어 나는 Blender 렌더" width="100%">
 </p>
 
 <p align="center">
