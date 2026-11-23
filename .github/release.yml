@@ -1,0 +1,14 @@
+changelog:
+  exclude:
+    labels: [ignore-for-release]
+  categories:
+    - title: Breaking changes
+      labels: [breaking]
+    - title: New packages and features
+      labels: [enhancement, feature]
+    - title: Fixes
+      labels: [bug, fix]
+    - title: Docs and art
+      labels: [documentation]
+    - title: Other changes
+      labels: ["*"]

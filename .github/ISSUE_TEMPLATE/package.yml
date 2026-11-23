@@ -1,0 +1,21 @@
+name: Package idea or change
+description: Propose a new package, or a change to what an existing package owns.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: job
+    attributes:
+      label: The one job
+      description: Which single job should the package own? Which existing package currently does, if any?
+    validations: { required: true }
+  - type: textarea
+    id: trigger
+    attributes:
+      label: When should it trigger?
+      description: Example requests a user would type.
+    validations: { required: true }
+  - type: textarea
+    id: boundary
+    attributes:
+      label: What it must not do
+      description: Neighbouring jobs that belong to another package.

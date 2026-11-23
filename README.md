@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/brand/hero.svg" alt="secondbrain-skills: a library bookshelf under a brain-shaped constellation of linked notes. A library your agent can keep." width="100%">
+  <img src="assets/brand/splash.jpg" alt="A Blender render: on a reading desk in a dark library, threads of light rise from the pages of an open book into a glowing brain" width="100%">
 </p>
 
 <p align="center">
@@ -13,7 +13,7 @@
 <p align="center">
   <b>English</b> · <a href="README.ko.md">한국어</a>
   <br>
-  <a href="#quick-start">Quick start</a> · <a href="#how-it-works">How it works</a> · <a href="#packages">Packages</a> · <a href="#install">Install</a> · <a href="#contributing">Contributing</a> · <a href="#acknowledgements">Acknowledgements</a>
+  <a href="#quick-start">Quick start</a> · <a href="#how-it-works">How it works</a> · <a href="#packages">Packages</a> · <a href="#install">Install</a> · <a href="CONTRIBUTING.md">Contributing</a> · <a href="ACKNOWLEDGEMENTS.md">Acknowledgements</a>
 </p>
 
 **secondbrain-skills** lets an agent run an Obsidian vault the way a librarian runs a library. Sources come in through the book drop, the original goes into the archive untouched, a catalogue of wiki pages is compiled from it, and questions are answered in the reading room with citations back to the shelf.
@@ -27,9 +27,8 @@ claude plugin marketplace add GoBeromsu/secondbrain-skills
 claude plugin install secondbrain-skills@secondbrain-skills
 ```
 
-Then ask in plain language:
-
-> *"Capture these tabs."* · *"Ingest this article."* · *"What does my vault say about spaced repetition?"* · *"Lint the AI folder."*
+> [!TIP]
+> Then ask in plain language: *"Capture these tabs."* · *"Ingest this article."* · *"What does my vault say about spaced repetition?"* · *"Lint the AI folder."*
 
 Other runtimes are under [Install](#install).
 
@@ -152,38 +151,19 @@ Every push and pull request runs [`validate`](.github/workflows/validate.yml) in
 | Every image is recorded in the [asset ledger](assets/asset-ledger.json); SVGs carry no scripts or external references; the icon is a square PNG | `scripts/validate.py` |
 | Bundled scripts compile, and `link-lint.py` reproduces its [eval](evals/lint-links) | `scripts/validate.py` |
 
-Run the same checks locally with `python3 scripts/validate.py`. These are static checks: they claim no runtime load. What a change was run against is named in that change's commit message.
+Run the same checks locally with `python3 scripts/validate.py`.
+
+> [!NOTE]
+> These are static checks: they claim no runtime load. What a change was run against is named in that change's commit message.
 
 Releases: `scripts/release.sh <version>` on `main` sets the version in every manifest (skills carry none), runs the validator, tags, pushes and publishes the prerelease.
 
-## Contributing
+## Contributing and credits
 
-Issues and pull requests are welcome. Keep one job per package, keep judgment in Markdown rather than scripts, and run `python3 scripts/validate.py` before you push.
+Issues and pull requests are welcome: start with [CONTRIBUTING.md](CONTRIBUTING.md), and report security problems privately as described in [SECURITY.md](SECURITY.md). Everyone taking part follows the [Code of Conduct](CODE_OF_CONDUCT.md).
 
-Everyone taking part is expected to follow the [Code of Conduct](CODE_OF_CONDUCT.md) (Contributor Covenant 2.1).
-
-## Acknowledgements
-
-This library stands on other people's shelves. Nothing below implies endorsement; full upstream notices are in [NOTICE](NOTICE).
-
-| Source | Used in | How |
-| --- | --- | --- |
-| [Steph Ango (kepano), obsidian-skills](https://github.com/kepano/obsidian-skills) · MIT | `principle-formatting`, `bases`, `obsidian-cli`, JSON Canvas reference in `obsidian-visualize` | Started from it and modified |
-| [Yohan Koo (구요한), cmds-llm-wiki](https://github.com/johnfkoo951/cmds-llm-wiki) · no licence published | the knowledge packages | Started from its commands; this repository is now their canonical source and diverges where the owner decided. No upstream file is shipped and nothing is relicensed |
-| [Andrej Karpathy](https://github.com/karpathy) | the knowledge packages | The LLM Wiki pattern that cmds-llm-wiki builds on |
-| [기록학 16주 완성](https://wikidocs.net/25577), ICA *ISAD(G)* 2nd ed. (2000), T. R. Schellenberg *Modern Archives* (1956) | `principle-archival` | An original English application, not a reproduction |
-| [Jonghak Seo, pi-extension](https://github.com/Jonghakseo/pi-extension) · MIT | `obsidian-visualize` | Inspection lint, palette and spacing guidance adapted |
-| [Obsidian, Pele](https://github.com/obsidianmd/pele) · MIT | `obsidian-visualize` | The Pele branch follows its public compatibility and security docs; no Pele file is shipped |
-| [Yohan Koo (구요한), CMDSPACE Pele gallery](https://pele.cmdspace.work/) | `obsidian-visualize` | Use, avoid and size guidance and observed pitfalls consulted; every example is this repository's own |
-| [coleam00, excalidraw-diagram-skill](https://github.com/coleam00/excalidraw-diagram-skill) · no licence file | `obsidian-visualize` | Ideas re-expressed in the Excalidraw design guidance; nothing copied |
-| [Zsolt Viczian, Excalidraw plugin](https://github.com/zsviczian/obsidian-excalidraw-plugin) · AGPL-3.0, and Excalidraw Extras · licence not verified | `obsidian-visualize` | Read for API facts only; no code or prose copied |
-| [Excalidraw, excalidraw-libraries](https://github.com/excalidraw/excalidraw-libraries) · MIT | `obsidian-visualize` | Design ideas only |
-| [robtaylor, Excalidraw example gallery](https://robtaylor.github.io/excalidraw-diagrams/) · licence not verified | `obsidian-visualize` | Ideas only; nothing copied |
-| [Anthropic, skill-creator](https://github.com/anthropics/skills/tree/main/skills/skill-creator) and the [Claude Fable 5.2 prompting guide](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-fable-5-2) | `obsidian-visualize`, `principle-archival`, `principle-formatting`, `principle-writing` | How source-image, link and text-budget guidance is worded; nothing copied |
-| [GMU Writing Center](https://writingcenter.gmu.edu/writing-resources/general-writing-practices/cohesion-and-coherence), [Purdue OWL](https://owl.purdue.edu/owl/subject_specific_writing/professional_technical_writing/audience_analysis/index.html), [Manchester Academic Phrasebank](https://www.phrasebank.manchester.ac.uk/using-cautious-language/), Google [Technical Writing One](https://developers.google.com/tech-writing/one/words) and [developer style guide](https://developers.google.com/style/lists) | `principle-writing` | Consulted; every line is this repository's own |
-
-"Obsidian" names the third-party application these skills target; no affiliation is claimed.
+This library stands on other people's shelves: kepano's obsidian-skills, Yohan Koo's cmds-llm-wiki, Andrej Karpathy's LLM Wiki pattern and more. Who contributed what, under which licence, is in [ACKNOWLEDGEMENTS.md](ACKNOWLEDGEMENTS.md); upstream notices are in [NOTICE](NOTICE).
 
 ## License
 
-[MIT](LICENSE). Upstream grants are reproduced in [NOTICE](NOTICE). All art in `assets/` is original work recorded in the [asset ledger](assets/asset-ledger.json); none of it is a screenshot.
+[MIT](LICENSE). Upstream grants are reproduced in [NOTICE](NOTICE). All art in `assets/` is original work recorded in the [asset ledger](assets/asset-ledger.json). The banner is rendered in Blender Cycles from [`scripts/art/library.py`](scripts/art/library.py), a procedural scene with no external assets; none of the art is a screenshot.

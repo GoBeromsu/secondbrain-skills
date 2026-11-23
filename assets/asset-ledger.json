@@ -5,13 +5,14 @@
   "policy": [
     "No upstream image, icon set, clip-art, texture, font file, or application screenshot is redistributed here. A permissive license on a surrounding repository is not a rights record for an image taken from it.",
     "Each asset below is original vector work authored for this repository and is covered by the repository LICENSE (MIT).",
-    "Illustrations are drawn diagrams. None of them is a screenshot of the Obsidian application, and none of them is evidence that anything rendered in a running app.",
-    "\"Obsidian\" names the third-party application these skills target. No vendor logo, product icon, or UI asset is included, and no affiliation or endorsement is claimed."
+    "Illustrations and renders are made for this repository. None of them is a screenshot of the Obsidian application, and none of them is evidence that anything rendered in a running app.",
+    "\"Obsidian\" names the third-party application these skills target. No vendor logo, product icon, or UI asset is included, and no affiliation or endorsement is claimed.",
+    "Raster renders are produced by scripts/art/library.py in Blender (Cycles) from primitives, procedural textures and procedural materials only: no HDRI, image texture, scanned model or downloaded asset is used. Typography in the composites is set in the operating system's fonts at export time; no font file is redistributed."
   ],
   "assets": [
     {
       "path": "assets/brand/logo.svg",
-      "role": "Canonical project mark for small-size branding; the source drawing for assets/icon.png.",
+      "role": "Flat vector mark for small-size or monochrome use. Not referenced by a manifest or README.",
       "media_type": "image/svg+xml",
       "dimensions": {
         "width": 256,
@@ -49,7 +50,7 @@
         "height": 1024
       },
       "creator": "secondbrain-skills contributors (GoBeromsu)",
-      "origin": "rasterised from assets/brand/logo.svg in this repository with rsvg-convert; no third-party pixels",
+      "origin": "rendered in Blender 5.3 Cycles from `scripts/art/library.py -- icon` (procedural scene, no external assets)",
       "upstream_source": null,
       "rights": {
         "holder": "Copyright (c) 2026 Obsidian Skills contributors",
@@ -67,20 +68,20 @@
         "external_references": [],
         "only_namespace_uri": null
       },
-      "depicts": "An open book on a dark ink panel with a brain-shaped constellation of linked notes rising from its pages along two dashed threads: a library that becomes a second brain.",
-      "claims": "decorative mark only; asserts nothing about behavior, support, or verification"
+      "depicts": "Close view of the same scene: a glowing brain of light threads rising from an open book.",
+      "claims": "decorative; asserts nothing about behavior, support, or verification",
+      "not_a_screenshot": true
     },
     {
-      "path": "assets/brand/hero.svg",
+      "path": "assets/brand/splash.jpg",
       "role": "README banner, referenced by README.md and README.ko.md.",
-      "media_type": "image/svg+xml",
+      "media_type": "image/jpeg",
       "dimensions": {
-        "width": 1280,
-        "height": 400,
-        "viewBox": "0 0 1280 400"
+        "width": 2400,
+        "height": 1200
       },
       "creator": "secondbrain-skills contributors (GoBeromsu)",
-      "origin": "original work authored in this repository; a bookshelf of plain rectangles and a deterministic node constellation drawn here, with no third-party icon set",
+      "origin": "rendered in Blender 5.3 Cycles from `scripts/art/library.py -- splash` (procedural scene, no external assets), then composited with the wordmark in a browser",
       "upstream_source": null,
       "rights": {
         "holder": "Copyright (c) 2026 Obsidian Skills contributors",
@@ -90,16 +91,47 @@
         "redistribution": "permitted under MIT with the repository notice"
       },
       "contents": {
-        "embedded_raster": false,
+        "embedded_raster": true,
         "embedded_fonts": false,
         "text_elements": true,
-        "font_stack": "ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif and ui-serif, 'Iowan Old Style', Palatino, Georgia, serif — referenced by name; no font file is embedded or redistributed",
+        "font_stack": "-apple-system / SF Pro and New York (macOS system fonts), rasterised at export; no font file redistributed",
         "scripts": false,
         "external_references": [],
-        "only_namespace_uri": "http://www.w3.org/2000/svg"
+        "only_namespace_uri": null
       },
-      "depicts": "Wordmark \"secondbrain-skills\", the line \"A library your agent can keep.\", a two-shelf library bookcase and, above it, a brain-shaped constellation of linked notes tied to the books by dashed threads.",
-      "claims": "names no package, count, version or release status; asserts no marketplace availability and no verified runtime support",
+      "depicts": "A reading desk in a dark library at night: threads of warm light rise from the turning pages of an open book into a glowing brain, with a stack of hardcover books and out-of-focus shelves and pendant lamps behind. Wordmark, tagline and a render credit are set at the top left and bottom right.",
+      "claims": "decorative; asserts nothing about behavior, support, or verification",
+      "not_a_screenshot": true
+    },
+    {
+      "path": "assets/brand/social-preview.jpg",
+      "role": "GitHub repository social preview (Settings → Social preview).",
+      "media_type": "image/jpeg",
+      "dimensions": {
+        "width": 1280,
+        "height": 640
+      },
+      "creator": "secondbrain-skills contributors (GoBeromsu)",
+      "origin": "rendered in Blender 5.3 Cycles from `scripts/art/library.py -- splash` (procedural scene, no external assets), then composited with the wordmark in a browser",
+      "upstream_source": null,
+      "rights": {
+        "holder": "Copyright (c) 2026 Obsidian Skills contributors",
+        "license": "MIT",
+        "license_file": "LICENSE",
+        "third_party_attribution_required": false,
+        "redistribution": "permitted under MIT with the repository notice"
+      },
+      "contents": {
+        "embedded_raster": true,
+        "embedded_fonts": false,
+        "text_elements": true,
+        "font_stack": "-apple-system / SF Pro and New York (macOS system fonts), rasterised at export; no font file redistributed",
+        "scripts": false,
+        "external_references": [],
+        "only_namespace_uri": null
+      },
+      "depicts": "A reading desk in a dark library at night: threads of warm light rise from the turning pages of an open book into a glowing brain, with a stack of hardcover books and out-of-focus shelves and pendant lamps behind.",
+      "claims": "decorative; asserts nothing about behavior, support, or verification",
       "not_a_screenshot": true
     },
     {
