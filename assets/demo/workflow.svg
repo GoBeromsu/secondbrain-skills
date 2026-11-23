@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600" role="img" aria-labelledby="t d">
 <title id="t">From source to shelf</title>
-<desc id="d">Four library stations: the book drop (capture, inbox), the archive (Raw source kept verbatim), the catalogue (wiki pages, entities and maps) and the reading room (answers with citations), with a shelf-care loop of lint, audit, verify, status and reindex underneath.</desc>
+<desc id="d">Four stations: the book drop (capture, inbox), the archive (Raw source kept verbatim), the constellation (wiki pages, entities and maps linked into one network) and the reading room (answers that follow the links, with citations), with a shelf-care loop of lint, audit, verify, status and reindex underneath.</desc>
 <defs>
 <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1d1936"/><stop offset="1" stop-color="#141224"/></linearGradient>
 <radialGradient id="lamp" cx=".85" cy=".1" r=".6"><stop offset="0" stop-color="#f0b85a" stop-opacity=".16"/><stop offset="1" stop-color="#f0b85a" stop-opacity="0"/></radialGradient>
@@ -11,7 +11,7 @@
 <rect width="1200" height="600" rx="28" fill="url(#lamp)"/>
 <g font-family="ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif">
 <text x="56" y="64" font-size="13" letter-spacing="3.5" fill="#f0b85a" font-weight="600">HOW THE LIBRARY RUNS</text>
-<text x="56" y="108" font-size="34" font-weight="800" fill="#f4ead5" letter-spacing="-.5">From source to shelf to answer.</text>
+<text x="56" y="108" font-size="34" font-weight="800" fill="#f4ead5" letter-spacing="-.5">From source to constellation to answer.</text>
 <rect x="56" y="146" width="250" height="292" rx="18" fill="#221d40" stroke="#f4ead5" stroke-opacity=".14"/>
 <g transform="translate(80 170)" fill="none" stroke="#f0b85a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
 <rect x="6" y="26" width="52" height="30" rx="6"/>
@@ -45,20 +45,27 @@
 <line x1="592" y1="292.0" x2="616" y2="292.0" stroke="#f0b85a" stroke-width="2.5" marker-end="url(#arr)"/>
 <rect x="620" y="146" width="250" height="292" rx="18" fill="#221d40" stroke="#f4ead5" stroke-opacity=".14"/>
 <g transform="translate(644 170)" fill="none" stroke="#f0b85a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-<path d="M4 56 H60"/>
-<rect x="8" y="22" width="9" height="34" rx="1.5"/>
-<rect x="20" y="16" width="9" height="40" rx="1.5"/>
-<rect x="32" y="26" width="9" height="30" rx="1.5"/>
-<path d="M46 56 L52 22 L60 24 L54 56"/>
-<path d="M4 8 H60" stroke-dasharray="2 5"/>
+<path d="M8 44 L22 20" stroke-width="2"/>
+<path d="M22 20 L38 34" stroke-width="2"/>
+<path d="M38 34 L54 12" stroke-width="2"/>
+<path d="M38 34 L50 54" stroke-width="2"/>
+<path d="M50 54 L28 56" stroke-width="2"/>
+<path d="M28 56 L8 44" stroke-width="2"/>
+<path d="M22 20 L54 12" stroke-width="2"/>
+<circle cx="8" cy="44" r="4.5" fill="#f0b85a" stroke="none"/>
+<circle cx="22" cy="20" r="4.5" fill="#f0b85a" stroke="none"/>
+<circle cx="38" cy="34" r="4.5" fill="#f0b85a" stroke="none"/>
+<circle cx="54" cy="12" r="4.5" fill="#f0b85a" stroke="none"/>
+<circle cx="50" cy="54" r="4.5" fill="#f0b85a" stroke="none"/>
+<circle cx="28" cy="56" r="4.5" fill="#f0b85a" stroke="none"/>
 </g>
 <text x="846" y="190" text-anchor="end" font-size="13" letter-spacing="2" fill="#a78bfa" font-weight="700">03</text>
-<text x="644" y="276" font-size="24" font-weight="750" fill="#f4ead5">Catalogue</text>
+<text x="644" y="276" font-size="24" font-weight="750" fill="#f4ead5">Constellation</text>
 <rect x="644" y="292" width="176" height="26" rx="13" fill="#a78bfa" fill-opacity=".16" stroke="#a78bfa" stroke-opacity=".45"/>
 <text x="654" y="310" font-size="13.5" fill="#d9ccff" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">ingest · principles</text>
-<text x="644" y="354" font-size="16" fill="#c9c2e6">Wiki pages, Entities</text>
-<text x="644" y="378" font-size="16" fill="#c9c2e6">and Maps are compiled</text>
-<text x="644" y="402" font-size="16" fill="#c9c2e6">and linked.</text>
+<text x="644" y="354" font-size="16" fill="#c9c2e6">Pages, Entities and</text>
+<text x="644" y="378" font-size="16" fill="#c9c2e6">Maps are linked until</text>
+<text x="644" y="402" font-size="16" fill="#c9c2e6">notes read as one.</text>
 <line x1="874" y1="292.0" x2="898" y2="292.0" stroke="#f0b85a" stroke-width="2.5" marker-end="url(#arr)"/>
 <rect x="902" y="146" width="250" height="292" rx="18" fill="#221d40" stroke="#f4ead5" stroke-opacity=".14"/>
 <g transform="translate(926 170)" fill="none" stroke="#f0b85a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
@@ -71,8 +78,8 @@
 <text x="926" y="276" font-size="24" font-weight="750" fill="#f4ead5">Reading room</text>
 <rect x="926" y="292" width="61" height="26" rx="13" fill="#a78bfa" fill-opacity=".16" stroke="#a78bfa" stroke-opacity=".45"/>
 <text x="936" y="310" font-size="13.5" fill="#d9ccff" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">query</text>
-<text x="926" y="354" font-size="16" fill="#c9c2e6">Answers come from the</text>
-<text x="926" y="378" font-size="16" fill="#c9c2e6">wiki, with citations</text>
+<text x="926" y="354" font-size="16" fill="#c9c2e6">Answers follow the</text>
+<text x="926" y="378" font-size="16" fill="#c9c2e6">links, with citations</text>
 <text x="926" y="402" font-size="16" fill="#c9c2e6">back to the source.</text>
 <path d="M1027.0 442 V501 H856" fill="none" stroke="#a78bfa" stroke-width="2" stroke-dasharray="5 6" marker-end="url(#arrv)"/>
 <line x1="745.0" y1="482" x2="745.0" y2="446" stroke="#a78bfa" stroke-width="2" stroke-dasharray="5 6" marker-end="url(#arrv)"/>

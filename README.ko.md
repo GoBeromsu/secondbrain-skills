@@ -16,7 +16,9 @@
   <a href="#빠른-시작">빠른 시작</a> · <a href="#동작-방식">동작 방식</a> · <a href="#패키지">패키지</a> · <a href="#설치">설치</a> · <a href="CONTRIBUTING.md">기여하기</a> · <a href="ACKNOWLEDGEMENTS.md#감사의-말">감사의 말</a>
 </p>
 
-**secondbrain-skills**는 사서가 도서관을 꾸리듯 에이전트가 Obsidian 볼트를 꾸리게 해 주는 Agent Skill 모음입니다. 자료는 반납함으로 들어오고, 원문은 손대지 않은 채 서고에 보존되며, 그 원문으로 위키라는 목록을 엮고, 질문에는 열람실에서 서가의 출처를 달아 답합니다.
+**secondbrain-skills**는 사서가 도서관을 꾸리듯 에이전트가 Obsidian 볼트를 꾸리고, 그 안의 지식을 서로 잇게 해 주는 Agent Skill 모음입니다. 자료는 반납함으로 들어오고 원문은 손대지 않은 채 서고에 보존됩니다. 그 원문으로 엮은 페이지는 관련된 페이지, 인물, 저작과 하나하나 연결되어, 흩어진 노트가 하나의 별자리처럼 읽히게 됩니다. 질문에는 그 연결을 따라가며 서가의 출처를 달아 답합니다.
+
+세컨드 브레인은 노트 더미가 아니라 노트 사이의 연결입니다. 이 스킬들은 그 연결을 만들고 지킵니다.
 
 패키지 하나는 한 가지 일을 맡는 `SKILL.md` 하나입니다. 루트 스킬도, 디스패처도, 공유 런타임도 없습니다. 에이전트는 그 작업에 필요한 패키지만 불러옵니다.
 
@@ -35,7 +37,7 @@ claude plugin install secondbrain-skills@secondbrain-skills
 ## 동작 방식
 
 <p align="center">
-  <img src="assets/demo/workflow.svg" alt="도서관의 네 구역: 반납함(capture, inbox), 서고(ingest가 Raw 원문을 그대로 보존), 목록(위키 페이지, Entity, Map), 열람실(query가 출처를 달아 답함)과 서가 관리 순환(lint, audit, verify, status, reindex)" width="100%">
+  <img src="assets/demo/workflow.svg" alt="네 구역: 반납함(capture, inbox), 서고(ingest가 Raw 원문을 그대로 보존), 별자리(위키 페이지, Entity, Map이 하나의 네트워크로 연결), 열람실(query가 연결을 따라가며 출처를 달아 답함)과 서가 관리 순환(lint, audit, verify, status, reindex)" width="100%">
 </p>
 
 | 원칙 | 실제로 뜻하는 것 |
