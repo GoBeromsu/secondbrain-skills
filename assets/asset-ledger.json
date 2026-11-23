@@ -50,7 +50,7 @@
         "height": 1024
       },
       "creator": "secondbrain-skills contributors (GoBeromsu)",
-      "origin": "rendered in Blender 5.3 Cycles from `scripts/art/library.py -- icon` (procedural scene, no external assets)",
+      "origin": "rendered in Blender 5.3 Cycles from `scripts/art/library.py -- icon` (procedural scene, no external assets), then cropped square",
       "upstream_source": null,
       "rights": {
         "holder": "Copyright (c) 2026 Obsidian Skills contributors",
@@ -68,7 +68,7 @@
         "external_references": [],
         "only_namespace_uri": null
       },
-      "depicts": "Close view of the same scene: a glowing brain of light threads rising from an open book.",
+      "depicts": "Closer view of the same scene: open books whose threads of light rise into a linked constellation of stars.",
       "claims": "decorative; asserts nothing about behavior, support, or verification",
       "not_a_screenshot": true
     },
@@ -99,7 +99,7 @@
         "external_references": [],
         "only_namespace_uri": null
       },
-      "depicts": "A reading desk in a dark library at night: threads of warm light rise from the turning pages of an open book into a glowing brain, with a stack of hardcover books and out-of-focus shelves and pendant lamps behind. Wordmark, tagline and a render credit are set at the top left and bottom right.",
+      "depicts": "A reading desk in a dark library at night: threads of warm light rise from the pages of several open books and join a constellation of stars linked by thin lines, with a stack of hardcover books and out-of-focus shelves and pendant lamps behind. Wordmark, tagline and a render credit are set at the top left and bottom right.",
       "claims": "decorative; asserts nothing about behavior, support, or verification",
       "not_a_screenshot": true
     },
@@ -130,7 +130,7 @@
         "external_references": [],
         "only_namespace_uri": null
       },
-      "depicts": "A reading desk in a dark library at night: threads of warm light rise from the turning pages of an open book into a glowing brain, with a stack of hardcover books and out-of-focus shelves and pendant lamps behind.",
+      "depicts": "A reading desk in a dark library at night: threads of warm light rise from the pages of several open books and join a constellation of stars linked by thin lines, with a stack of hardcover books and out-of-focus shelves and pendant lamps behind.",
       "claims": "decorative; asserts nothing about behavior, support, or verification",
       "not_a_screenshot": true
     },
