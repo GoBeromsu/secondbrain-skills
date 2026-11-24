@@ -10,9 +10,9 @@ This principle owns two things: which kind a piece of knowledge is, and the shap
 
 ## Kinds
 
-- Classify a name with a field-shared meaning used independently of the selected source as a Term (`ReplicaSet`, `AI Agent`).
+- Classify a name as a Term only when it is a real term of a field: it appears with the same meaning in that field's dictionaries, textbooks, standards, glossaries or peer-reviewed literature, independently of the selected source and of any one coiner (`ReplicaSet`, `AI Agent`, `Ikigai`).
+- Classify a model, framework or method that one author named as a Concept, however widely it is cited (`Golden Circle`, `PARA`). Reuse that still attributes the name to its coiner is popularity, not independence.
 - Classify a reusable abstract idea, technique, method or pattern without an established field name as a Concept, whether or not the source names it (`LLM Wiki Pattern`, `Asymmetric Partnership`).
-- Keep a name only one author uses as a Concept until an independent source uses it.
 - Classify an executable ordered procedure as a Guide. Keep guidance without an executable order with the Concept it belongs to.
 - Classify a named individual as an Entity rather than the kind it exemplifies (`Claude Code`, not `coding agent`). A kind is never an Entity: a flower species or a genre is a Term or Concept even when the vault files it near Entities.
 - Keep related senses of one name in one Term when a shared definition covers them (`AI Agent`: anything that perceives its environment and acts on it, covering the reinforcement learning agent and the LLM-based agent).
