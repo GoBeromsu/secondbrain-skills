@@ -33,7 +33,8 @@ rg --files-without-match '^evidenceScope:' "<wiki-scope>"
 rg -n '^confidence:' "<wiki-scope>" | rg -v 'confidence: "?(high|medium|low)"?$'
 rg -n '^verificationStatus:' "<wiki-scope>" | rg -v 'verificationStatus: "?(verified|partial|unverified|disputed)"?$'
 
-rg -n '^status:' "<scope>" | rg -v 'status: "?(todo|inprogress|done|stop)"?$'
+# Restrict this to notes with a lifecycle; use the values allowed by live policy.
+rg -n '^status:' "<lifecycle-scope>" | rg -v 'status: "?(todo|inprogress|done|stop)"?$'
 
 # Disputed queue
 rg -l '^(verificationStatus: "?disputed"?|disputed: true)$' "<wiki-scope>"

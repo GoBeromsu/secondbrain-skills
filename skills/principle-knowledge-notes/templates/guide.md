@@ -17,7 +17,7 @@ confidence: {{high|medium|low}}
 layer: guides
 explored: false
 verificationStatus: unverified
-status: active
+
 # Fill slots as YAML-serialized values: lists stay lists (one item per existing source); a value containing " or \ is escaped by YAML double-quoted rules.
 ---
 

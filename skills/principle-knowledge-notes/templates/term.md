@@ -42,7 +42,7 @@ definitionStatus: {{consensus|contested|emerging}}
 layer: terms
 explored: false
 verificationStatus: unverified
-status: active
+
 ---
 
 # {{original_term_name}}

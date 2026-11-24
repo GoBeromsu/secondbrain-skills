@@ -62,3 +62,5 @@ An Entity is the owner's note about something in their life. The agent adds to i
 | Entity, required type | `templates/entity/{type}.md` |
 
 When the destination vault registers its own template for a kind or type, the vault's template wins for frontmatter keys and owner headings; the auto-zone and approval rules above still apply. Raw, book chapter and Persona templates belong to `ingest`.
+
+- Omit `status` unless the note tracks a lifecycle; never add it by default.
