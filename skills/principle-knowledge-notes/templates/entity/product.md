@@ -2,7 +2,7 @@
 
 Use for named software, services, libraries, agents, models and datasets. The product is the Entity; its README or release snapshot is source evidence.
 
-Follow [Entity maintenance](../entity.md#maintenance) within the requested write scope and the [live frontmatter schema](../../../ingest/references/frontmatter.md). Fill known values, preserve existing provenance, and report unknown required fields. A new template alone does not authorize converting an existing note.
+Follow [Entity maintenance](../entity.md#maintenance) within the requested write scope and the destination's live frontmatter schema. Fill known values, preserve existing provenance, and report unknown required fields. A new template alone does not authorize converting an existing note.
 
 Write without first-person framing. Link existing canonical notes where the relationship matters; keep an unconfirmed target as plain text. Use readable date labels such as `[[2026-09-04|2026년 9월 4일]]`, retaining the full filename when citing a longer dated note. Calendar links follow the vault's date policy.
 

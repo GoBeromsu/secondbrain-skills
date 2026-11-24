@@ -16,7 +16,7 @@ Keep a before-image on updates. Preserve original records, meaningful historical
 - **Revise:** have a separate preservation reviewer compare the proposed synthesis with its evidence and before-image. Metadata corrections stay within the requested scope; preserve creation date, identity and provenance. Rewriting generated prose does not reclassify `authorship`. Verification fields belong to the verification workflow.
 - **Append:** leave owner headings empty on creation and never rephrase their contents. Keep earlier auto-zone lines; add dated facts with their Raw, `### Sources` and `### Related`. Frontmatter permits only additions to `source`, `related`, `aliases` and an updated `date_modified`. Put newly observed type-specific values in the auto zone. If it is absent, append it on first touch; its absence is not a defect.
 
-The live policy decides `type`, folder and metadata keys. Use its existing key for each meaning, fill source-backed values on creation, and omit unsupported optional fields. When it uses `wiki-page`, apply the full [Wiki page field set](../../ingest/references/frontmatter.md#wiki-page-keys).
+The live policy decides `type`, folder and metadata keys. Use its existing key for each meaning, fill source-backed values on creation, and omit unsupported optional fields. When it uses `wiki-page`, apply the full Wiki page field set of that frontmatter contract.
 
 ## Scaffold
 
