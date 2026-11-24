@@ -17,7 +17,7 @@ confidence: {{high|medium|low}}
 layer: {{concepts|theory|method|scale}}
 explored: false
 verificationStatus: unverified
-status: active
+
 ---
 
 # {{concept}}

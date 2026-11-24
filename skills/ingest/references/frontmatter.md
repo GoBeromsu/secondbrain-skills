@@ -32,13 +32,13 @@ No `created_by` or `authorship` default. A vault whose live policy defines its o
 
 | Role | type | layer | status | Template |
 | --- | --- | --- | --- | --- |
-| Raw Source | `raw-source` | — | `ingested` | [raw](../templates/raw.md) |
+| Raw Source | `raw-source` | — | — | [raw](../templates/raw.md) |
 | Book chapter (Raw) | `raw-source` | — | `stub` → `reading` → `completed` | [book chapter](../templates/book-chapter.md) |
-| Term | `wiki-page` | `terms` | `active` | [term](../../principle-knowledge-notes/templates/term.md) |
-| Concept | `wiki-page` | `concepts`; `theory`, `method` or `scale` for a paper-derived Concept | `active` | [concept](../../principle-knowledge-notes/templates/concept.md) |
-| Entity | live policy | `entities` when typed `wiki-page` | `active` only when typed `wiki-page`; a book Entity's `status` is the owner's and never set | `type` and the wiki-page keys follow the live policy per [entity](../../principle-knowledge-notes/templates/entity.md). Required types person, organization, place, paper, book, media, product: `../../principle-knowledge-notes/templates/entity/{type}.md`; optional types: [entity](../../principle-knowledge-notes/templates/entity.md). Owner zone on top, never written by ingest; append-only `## From Sources` auto zone at the bottom. |
-| Guide | `wiki-page` | `guides` | `active` | [guide](../../principle-knowledge-notes/templates/guide.md) |
-| Map | `moc` | — | `active` | live Map template |
+| Term | `wiki-page` | `terms` | — | [term](../../principle-knowledge-notes/templates/term.md) |
+| Concept | `wiki-page` | `concepts`; `theory`, `method` or `scale` for a paper-derived Concept | — | [concept](../../principle-knowledge-notes/templates/concept.md) |
+| Entity | live policy | `entities` when typed `wiki-page` | a book Entity's reading status is the owner's and never set by ingest | `type` and the wiki-page keys follow the live policy per [entity](../../principle-knowledge-notes/templates/entity.md). Required types person, organization, place, paper, book, media, product: `../../principle-knowledge-notes/templates/entity/{type}.md`; optional types: [entity](../../principle-knowledge-notes/templates/entity.md). Owner zone on top, never written by ingest; append-only `## From Sources` auto zone at the bottom. |
+| Guide | `wiki-page` | `guides` | — | [guide](../../principle-knowledge-notes/templates/guide.md) |
+| Map | `moc` | — | — | live Map template |
 | Persona | `persona` | — | — | [persona](../templates/persona.md) |
 
 `category` names the Raw kind: `Articles`, `Papers`, `Books`, `Transcripts`, `Clippings` or `AI Research`, plus any value the destination's live policy registers for its own Raw lanes (for example a personal `Mail` lane). It selects the Raw folder of the same kind in the destination. Never invent a value the live policy does not list.
@@ -49,7 +49,7 @@ No `created_by` or `authorship` default. A vault whose live policy defines its o
 | --- | --- | --- |
 | Original address or reference | `source` | Canonical URL or reference. A capture bundle with several member URLs keeps them as a list. |
 | Kind | `category` | One of the six values above or a value the live policy registers. |
-| Processing state | `status` | `ingested`; chapter stubs per the Roles table. |
+| Chapter acquisition state | `status` | Only for the book-chapter acquisition workflow, where live policy allows it. |
 | Acquisition date | `date_ingested` | When the source was taken into the vault; for a chapter stub, the scaffold date. |
 | Publication date | `date_published` | The original's own date when known (Web Clipper `published`). |
 | Language | `language` | The source's language code, such as `en` or `ko`. |
@@ -80,7 +80,6 @@ No `created_by` or `authorship` default. A vault whose live policy defines its o
 | Verification state | `verificationStatus` | `unverified` on every new page; `verify` sets `verified`, `partial`, `unverified` or `disputed` with `verifiedAt`, `verifiedBy`. |
 | Claim classification | `claimType`, `evidenceScope` | Optional at ingest; record only when the classification is clear. `claimType`: `definition`, `empirical`, `theoretical`, `historical`, `prescriptive`, `interpretive` or `mixed`. `evidenceScope`: `single-source`, `multi-source-primary`, `multi-source-mixed`, `synthesis-only` or `user-original`. |
 | Conflict | `disputed` | Set only by `verify`; `audit` only queues it, ingest never sets it. |
-| Page state | `status` | `active`. |
 | Persona | `personaOf`, `personaMaturity`, `personaDomains` | Persona only; ingest never changes `personaMaturity`. |
 | Paper | `citekey`, `doi` | Paper Entity only; see [papers](papers.md). |
 | Map | `topic`, `related` | Map only. |
