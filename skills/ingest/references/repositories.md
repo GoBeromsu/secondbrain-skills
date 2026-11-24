@@ -1,19 +1,26 @@
 # Repositories
 
-Put the canonical repository URL in `source` and record the exact commit sha actually read in `## Ingest Notes`.
-`## Original Content` for a file (README etc.) comes from the raw file at that pinned commit, `raw.githubusercontent.com/{owner}/{repo}/{sha}/…`, never a rendered-page scrape. Scrape signs that fail fidelity: headings merged into text, missing code fences, escaped underscores, `camo.githubusercontent.com` URLs.
-A branch name without a read sha is not a pinned source; an inventory is not the content of its listed files.
-`author` lists the maintainers as `"[[Name]]"` only when the repository states them; `date_published` is the commit or release date when known; `date_ingested` is today.
+A repository is a Product. What the owner keeps is why they need the tool and what it does for their work; a copy of its README answers neither, and the README stays available at its URL. So a repository ingest saves no Raw. It creates or updates the repository's Product Entity with the Product template of `principle-knowledge-notes`.
 
-Repository Raw filename:
-- Default: `{repo}.md`, keeping GitHub's spelling.
-- Name already taken in the vault (another repository or any note, case-insensitive): `{repo} ({owner}).md` for every repository sharing that name. No date suffix.
-- `aliases` holds `owner/repo`.
+How the Steps change:
 
-Keep README, source quotations, file inventory, license evidence and selected change range distinguishable.
-Record not found (deleted, renamed, wrong path), inaccessible (private, rate limit, network) and partial (files or range not read) in `## Ingest Notes` and the report.
-Retain original code attribution; do not copy implementation into another product without verified rights.
+- **Step 1** matters most here. The collection purpose is the reason the page exists and becomes the centre of its TL;DR and Personal Insights. A star, a fork or a feed event is not a purpose; without one from the owner or the task, ask.
+- **Step 2** widens to every owner record that mentions the tool, as the Product template's gathering rules describe.
+- **Step 5** is skipped: no Raw, no `## Original Content`, no Raw pre-flight. An Inbox file that only holds the repository's README or link is the candidate, not evidence to preserve; Inbox cleanup follows its usual authorization.
+- **Step 6** writes the Product page. Other Terms, Concepts and Guides are compiled only when the owner's purpose calls for them, each citing the repository link and commit instead of a Raw.
+- **Step 9** records the Product page where a Raw link would go.
 
-An owner-selected tool to keep is different from an automatic repository candidate: use the owner's stated reason and the vault's tool template/placement; a GitHub event is not that selection. Create no personal catalog note as a side effect.
-Do not execute repository scripts, install dependencies or fetch unrelated branches.
-Synthesis cites exact file and commit anchors.
+Reading the repository:
+
+- Read files at one commit through `raw.githubusercontent.com/{owner}/{repo}/{sha}/…`, not a rendered-page scrape, and name the sha and the files read in References and the footnotes that rely on them. A branch name without a read sha is not a pinned source; a file inventory is not the content of its files.
+- Beyond the README, read what the owner's purpose depends on: the documentation of that feature, the license file, release notes for the version in use.
+- Record not found (deleted, renamed, wrong path), inaccessible (private, rate limit, network) and partial (files or range not read) in the References scope paragraph and the report.
+- Do not execute repository scripts, install dependencies or fetch unrelated branches. Quote only what a claim needs, with attribution; do not copy implementation into another product without verified rights.
+
+Naming and identity:
+
+- Title the page with the product's name in the spelling its maker uses. When a different referent already holds that name, use `{name} ({owner}).md`.
+- `aliases` holds `owner/repo`; `source` holds the canonical repository URL as a labeled link, with the other pages read.
+- Maintainers become `"[[Name]]"` person links only when the repository states them.
+
+A repository Raw the vault already holds stays as it is and may be cited as a source; it is not deleted, moved or rewritten by this recipe.

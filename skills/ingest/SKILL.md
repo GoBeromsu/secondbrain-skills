@@ -1,6 +1,6 @@
 ---
 name: "ingest"
-description: "Ingests one selected source into the wiki: a URL, file, text, paper, book or Inbox candidate becomes a preserved Raw source plus Wiki pages, Entity updates and Maps. Use for creating or updating a Term note, adding a source, ingesting a paper by DOI or citekey, reading a book chapter, adding a book's table of contents, adding source facts to a person, organization, paper, book, media or product Entity, and attributed Persona updates. Saving without compiling belongs to capture."
+description: "Ingests one selected source into the wiki: a URL, file, text, paper, book or Inbox candidate becomes a preserved Raw source plus Wiki pages, Entity updates and Maps. A repository becomes a Product Entity about why the owner needs the tool, with no Raw. Use for creating or updating a Term note, adding a source, ingesting a paper by DOI or citekey, reading a book chapter, adding a book's table of contents, adding source facts to a person, organization, paper, book, media or product Entity, and attributed Persona updates. Saving without compiling belongs to capture."
 ---
 
 # Ingest
@@ -18,6 +18,7 @@ Read the vault's Core Context once per session before the first ingest. Use the 
 - Blank or `all`: delegate selection to `inbox`.
 - Named Term request: resolve the term and its sources with the [Term template](../principle-knowledge-notes/templates/term.md); compile that Term from the preserved evidence.
 - Raw text: the argument is the source.
+- Repository URL or README: [repositories](references/repositories.md). A repository becomes a Product Entity and saves no Raw.
 - Academic paper (DOI, arXiv or journal URL, citekey, or a PDF with Abstract and References): the Steps below with [papers](references/papers.md). For a Term request, preserve papers used as evidence through Steps 3 and 5 and compile the requested Term.
 - Book, book chapter, or multi-page docs site (5+ chapters in its sidebar or TOC): the Steps below with [books](references/books.md).
 - Binary or non-Markdown file: Step 3 after Steps 1 and 2.
@@ -66,7 +67,7 @@ When a claim reports another creator's work, attribute it to this source's autho
 
 ## Step 5 — Save Raw Source
 
-Use [raw](templates/raw.md), filename `{Title}.md` (`{Title} (YYYY-MM-DD).md` when that name is taken); an Inbox candidate keeps its existing name so links to it resolve. The Raw keeps the source's own order and structure; nothing is reordered, regrouped or normalized.
+Use [raw](templates/raw.md), filename `{Title}.md` (`{Title} (YYYY-MM-DD).md` when that name is taken). The Raw keeps the source's own order and structure; nothing is reordered, regrouped or normalized.
 
 - Preserve the original verbatim under `## Original Content` — no summaries, no "redacted for brevity", however long. Keep image lines `![alt](url)`, video and media URLs, quote blocks, citation lists and code blocks.
 - Keep each image as its original `![alt](url)`; do not download it.
@@ -115,8 +116,6 @@ Target: 10–15 Wiki pages touched per ingest when the source is substantial, cr
 ## Step 7 — Persona accumulation
 
 When the source's author or primary speaker matches an existing Persona card, append to it as [persona](templates/persona.md) shows. Never create a Persona during ingest.
-
-For a GitHub file, `## Original Content` comes from the raw file at a pinned commit (`raw.githubusercontent.com/{owner}/{repo}/{sha}/…`), never a rendered-page scrape.
 
 ## Step 8 — Connect
 
