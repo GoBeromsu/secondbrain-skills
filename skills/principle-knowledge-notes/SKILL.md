@@ -57,3 +57,11 @@ An Entity connects an identifiable thing to the owner's context. Its selected te
 The destination's registered template wins unless the owner requests a scoped change. Raw, book chapter and Persona templates belong to `ingest`.
 
 - Omit `status` unless the note tracks a lifecycle; never add it by default.
+
+## Every page
+
+Three things hold for a page written from any of these templates.
+
+- **Draw what prose makes the reader reconstruct.** When the subject has structure (stages of a pipeline, a change of state, which part calls which, containment, a branch between paths), use `obsidian-visualize` to put an inline Pele diagram beside the paragraph it illustrates, with each box and arrow grounded in the sources read. This is a judgment per page, not a quota: a subject one sentence or a table already carries gets no diagram.
+- **The page is not a research log.** The reader wants the subject and the owner's judgment, so nothing on the page recounts how it was researched: which documents were read, at which commit or branch, what was skipped, not run or not re-verified. That account goes in the report to the owner. Sources appear as citations (frontmatter `source`, footnote locators, References), and a limit of the evidence is stated as a fact about the evidence ("the maker's retrospective, not independent research"), not as what the writer did. Describe what a thing does rather than naming the source file that does it; a path or command belongs on the page only when the owner would type or open it themselves.
+- **The TL;DR is plain text.** It is the part read first and often the only part, and wikilinks, URLs and footnote markers break it up for the eye. Write it as sentences with at most one bold phrase; name a note or product in plain words there, and let the sections below carry the links and footnotes for the same claims.

@@ -12,9 +12,9 @@ How the Steps change:
 
 Reading the repository:
 
-- Read files at one commit through `raw.githubusercontent.com/{owner}/{repo}/{sha}/…`, not a rendered-page scrape, and name the sha and the files read in References and the footnotes that rely on them. A branch name without a read sha is not a pinned source; a file inventory is not the content of its files.
+- Read files at one commit through `raw.githubusercontent.com/{owner}/{repo}/{sha}/…`, not a rendered-page scrape, and cite each file by that pinned URL in `source` and References. The URL carries the commit; the page's prose and footnotes do not repeat the sha, the branch or a list of files read. A branch name without a read sha is not a pinned source; a file inventory is not the content of its files.
 - Beyond the README, read what the owner's purpose depends on: the documentation of that feature, the license file, release notes for the version in use.
-- Record not found (deleted, renamed, wrong path), inaccessible (private, rate limit, network) and partial (files or range not read) in the References scope paragraph and the report.
+- Report not found (deleted, renamed, wrong path), inaccessible (private, rate limit, network) and partial (files or range not read) to the owner. On the page, only a fact the reader needs survives, such as that the repository is gone.
 - Do not execute repository scripts, install dependencies or fetch unrelated branches. Quote only what a claim needs, with attribution; do not copy implementation into another product without verified rights.
 
 Naming and identity:
