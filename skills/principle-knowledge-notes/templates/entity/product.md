@@ -1,48 +1,52 @@
 # Product Entity
 
-Use this scaffold for software, a service, a model or a dataset. The two-zone and frontmatter rules in the [common Entity template](../entity.md) apply.
+Use for named software, services, libraries, agents, models and datasets. The product is the Entity; its README or release snapshot is source evidence.
 
-- Title it with the product's own name; put former names and common abbreviations in `aliases`. A version gets its own Entity only when sources treat it as a separate product.
-- Record `maker`, `url` and `repository` only from the source. The maker is its own Entity; the idea or technique the product implements is a Term or Concept, never this page.
-- The owner zone holds how the owner uses it and their notes. Features, releases and changes a source states go to the auto zone as dated lines.
+Follow [Entity maintenance](../entity.md#maintenance) within the requested write scope and the destination's live frontmatter schema. Fill known values, preserve existing provenance, and report unknown required fields. A new template alone does not authorize converting an existing note.
+
+Write without first-person framing. Link existing canonical notes where the relationship matters; keep an unconfirmed target as plain text. Use readable date labels such as `[[2026-09-04|2026년 9월 4일]]`, retaining the full filename when citing a longer dated note. Calendar links follow the vault's date policy.
 
 ## Scaffold
 
 ```markdown
 ---
-type: {{live_policy_type}}
+type: {{live_policy_product_type}}
 aliases: []
-description: "{{english_one_or_two_sentences}}"
+description: "{{short_english_description}}"
 author:
-  - "{{live_policy_author_or_agent_role}}"
-model: {{runtime_model}}
+  - "{{known_note_writer_under_live_policy}}"
+model: "{{runtime_reported_name_or_id}}"
 effort: {{runtime_effort_or_default}}
-date_created: {{today}}
+date_created: {{original_creation_date_or_today_for_new_note}}
 date_modified: {{today}}
 tags: []
-maker: "[[{{organization_or_person}}]]"
-url: "{{url}}"
-repository: "{{url}}"
 source:
-  - "[[{{raw_source}}]]"
+  - "{{existing_source_wikilink_or_labeled_external_link}}"
 related: []
+# Apply the live schema's full wiki-page fields when it uses that type.
+# Add maker, url and repository only when sourced; use [] for unavailable lists.
 ---
 
-# {{name}}
+# {{product_name}}
 
-## Usage
+> [!abstract] TL;DR
+> {{What it is, the problem it solves, and its relevance to the recorded work.}}
 
-## Notes
+## Origin
 
-## From Sources
+{{Who made it, their relevant background, and the problem they said prompted it. Cite the creator's account; distinguish unknown motivation from the product's stated purpose.}}[^origin]
 
-- {{YYYY-MM-DD}} {{fact_or_mention}} — [[{{raw_source}}]]
+## Explanation
 
-### Sources
+{{Explain the mechanism through a concrete example and its limits. Link relevant Terms or Concepts without redefining them. Scope changing features or prices to the inspected date/version; for repository evidence, name the commit and files read.}}
 
-- [[{{raw_source}}]]
+## Personal Insights
 
-### Related
+{{Connect actual use, friction, reconsideration and project decisions to their original records. Preserve changes of view; identify new interpretation. Explain what makes the product useful or unsuitable without a chronological mentions list.}}
 
-- [[{{related_page}}]]
+## References
+
+- {{External work or archived Raw: author/publisher, title, available date and source link. List each work once; cite personal records beside the experience they support.}}
+
+[^origin]: {{Precise locator, quotation or evidence qualification. Keep supporting detail here; a recent edit does not verify other claims.}}
 ```

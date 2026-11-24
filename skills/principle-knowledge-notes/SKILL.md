@@ -33,7 +33,7 @@ Seven Entity types are required; each has its own template under `templates/enti
 | `paper` | one scholarly work, identified by DOI and citekey | [paper](templates/entity/paper.md) |
 | `book` | one book work and edition | [book](templates/entity/book.md) |
 | `media` | a publisher that keeps putting things out: a YouTube channel, podcast, newsletter, blog | [media](templates/entity/media.md) |
-| `product` | software, a service, a model or a dataset | [product](templates/entity/product.md) |
+| `product` | named software, a service, a library, an agent, a model or a dataset | [product](templates/entity/product.md) |
 
 - One video, episode, issue or post is a Raw source, not an Entity; the `media` Entity that published it lists it.
 - Any other named individual (an event, a movie, an album, a game title) is an optional type and uses the [common Entity template](templates/entity.md).
@@ -42,14 +42,7 @@ Seven Entity types are required; each has its own template under `templates/enti
 
 ## Entity pages belong to the owner
 
-An Entity is the owner's note about something in their life. The agent adds to it; it never takes it over.
-
-- **Two zones.** Every Entity template has an owner zone on top and an auto zone at the bottom, starting at `## From Sources`.
-	- The owner zone holds the type's headings, left empty for the owner. Never write, reorder or rephrase anything there.
-	- The auto zone holds source-grounded additions: dated facts and mentions, each with its Raw, plus `### Sources` and `### Related`. Add only; never edit or remove an earlier line.
-	- When the live policy names its own section for agent-written Entity content (for example `## Wiki`), that section is the auto zone, kept in its existing sub-structure under the same append-only rules.
-	- In frontmatter, keep every owner key and value. Append to `source`, `related` and `aliases`, and update `date_modified`.
-- An existing Entity with neither heading gets `## From Sources` appended at the end of its body the first time an addition lands. Existing Entities are never converted, moved or retyped in bulk, and a missing auto zone is not a defect.
+An Entity connects an identifiable thing to the owner's context. Its selected template defines the writing area and update mode in [Entity maintenance](templates/entity.md#maintenance). Keep source records and protected owner writing intact.
 
 ## Templates
 
@@ -61,6 +54,6 @@ An Entity is the owner's note about something in their life. The agent adds to i
 | Entity, optional type | [entity](templates/entity.md) |
 | Entity, required type | `templates/entity/{type}.md` |
 
-When the destination vault registers its own template for a kind or type, the vault's template wins for frontmatter keys and owner headings; the auto-zone and approval rules above still apply. Raw, book chapter and Persona templates belong to `ingest`.
+The destination's registered template wins unless the owner requests a scoped change. Raw, book chapter and Persona templates belong to `ingest`.
 
 - Omit `status` unless the note tracks a lifecycle; never add it by default.

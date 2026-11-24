@@ -26,7 +26,7 @@ Read the wiki index in [records](../ingest/references/records.md). A path the li
 
 Answer from compiled Wiki pages first, not raw-source sprawl. Cite with `[[wikilinks]]` in saved notes and name the source pages in the chat response; reach a Raw through the Wiki page that compiled it.
 
-Read `verificationStatus` and `confidence` of each cited page together, and state each claim accordingly:
+Read `verificationStatus` and `confidence` together with each claim's recorded review scope, and state each claim accordingly:
 
 - `verified` + `high`: assert directly
 - `partial`, or `confidence` `medium` or lower: hedge
@@ -57,11 +57,11 @@ Save substantial analysis (comparison, analysis, multi-source synthesis) as `60.
 When the query reveals durable improvements, update the relevant Wiki pages and MOCs:
 
 - missing cross-references → add them
-- outdated information → `> [!note] Update`
+- outdated information → a verified correction in the form the page's template specifies
 - new connections → `related`
 - high-confidence synthesis without counter-argument or data-gap note → `> [!note] Bias Check`
 
-Each edit to an existing page is drafted from the policy and the cited source only, then a separate preservation review compares the before-image with the proposal and reduces it to a minimal patch that keeps valid existing content; read the page back before linking to it. Changing a claim's text needs verified evidence; `explored`, `confidence` and conflict resolution stay with `verify`. No blanket regeneration. Links to notes are `[[wikilinks]]` and external links `[label](URL)`; the owner's own notes are read, never edited.
+Each edit to an existing page is drafted from the policy and the cited source only, then a separate preservation review compares the before-image with the proposal and reduces it to a minimal patch that keeps valid existing content; read the page back before linking to it. Changing a claim's text needs verified evidence; `explored`, `confidence` and conflict resolution stay with `verify`. Entity feedback follows the maintenance mode `principle-knowledge-notes` defines for its template. No blanket regeneration. Links to notes are `[[wikilinks]]` and external links `[label](URL)`; source records and protected owner prose stay untouched.
 
 After a save or feedback write, update the wiki index in [records](../ingest/references/records.md) (Queries catalog, Recent Queries, Stats recounted from folders) and append one entry (`## [YYYY-MM-DD] query | <title>`) to the wiki log in that same record. A path the live policy names for this run replaces either file. A read-only answer writes nothing, including no log entry. Do not commit or push unless the owner separately asks.
 
