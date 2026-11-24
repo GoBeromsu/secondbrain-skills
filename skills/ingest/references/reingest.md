@@ -22,7 +22,7 @@ Two different cases. Decide which one applies before writing anything, and say w
 ## Reprocessing
 
 1. Never rewrite an existing Raw body or its human notes. A better extraction of the same version becomes a new Raw through Step 5 whose `referenced` points at the earlier Raw, with the reason in `## Ingest Notes`; the earlier Raw stays.
-2. Wiki updates use the existing Raw (or the new extraction) as the source and follow Step 6's clean-context writer and preservation review. Valid existing content stays; nothing is regenerated wholesale.
+2. Wiki updates use the existing Raw (or the new extraction) as the source and follow Step 6's update process for the selected template, preserving valid content and source history.
 3. Changing only metadata of existing notes is not reprocessing; it needs explicit migration authorization.
 
 ## Batches

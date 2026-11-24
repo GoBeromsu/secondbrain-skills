@@ -36,7 +36,7 @@ No `created_by` or `authorship` default. A vault whose live policy defines its o
 | Book chapter (Raw) | `raw-source` | — | `stub` → `reading` → `completed` | [book chapter](../templates/book-chapter.md) |
 | Term | `wiki-page` | `terms` | — | [term](../../principle-knowledge-notes/templates/term.md) |
 | Concept | `wiki-page` | `concepts`; `theory`, `method` or `scale` for a paper-derived Concept | — | [concept](../../principle-knowledge-notes/templates/concept.md) |
-| Entity | live policy | `entities` when typed `wiki-page` | a book Entity's reading status is the owner's and never set by ingest | `type` and the wiki-page keys follow the live policy per [entity](../../principle-knowledge-notes/templates/entity.md). Required types person, organization, place, paper, book, media, product: `../../principle-knowledge-notes/templates/entity/{type}.md`; optional types: [entity](../../principle-knowledge-notes/templates/entity.md). Owner zone on top, never written by ingest; append-only `## From Sources` auto zone at the bottom. |
+| Entity | live policy | `entities` when typed `wiki-page` | a book Entity's reading status is the owner's and never set by ingest | Use its [type template](../../principle-knowledge-notes/SKILL.md#templates) and [maintenance rules](../../principle-knowledge-notes/templates/entity.md#maintenance). |
 | Guide | `wiki-page` | `guides` | — | [guide](../../principle-knowledge-notes/templates/guide.md) |
 | Map | `moc` | — | — | live Map template |
 | Persona | `persona` | — | — | [persona](../templates/persona.md) |
@@ -70,7 +70,7 @@ No `created_by` or `authorship` default. A vault whose live policy defines its o
 
 | Meaning | Key | Notes |
 | --- | --- | --- |
-| Evidence | `source` | List of quoted Raw wikilinks; Terms may also list external addresses as specified in the Term template. Add each newly used Raw and keep earlier entries. |
+| Evidence | `source` | Quoted Raw wikilinks, plus other inspected evidence allowed by the selected template and live policy. Append newly used sources and keep earlier entries. |
 | Related knowledge | `related` | Quoted wikilink list. |
 | Confidence | `confidence` | `high` (well-sourced), `medium` (partial), `low` (speculative). A page resting only on secondary claims is not well-sourced. |
 | Reuse unit | `layer` | Per the Roles table. |
@@ -88,6 +88,6 @@ No `created_by` or `authorship` default. A vault whose live policy defines its o
 
 New notes use the schema above. A run that touches an existing note preserves what it already holds.
 
-- Keep every existing key and value, including unknown keys and earlier identity, location and history values. Ordinary ingest changes only the keys its update names (`source`, `related`, `date_modified` and additions the preservation review accepted; on an Entity, only appends to `source`, `related` and `aliases` plus `date_modified`); it renames, re-forms, copies or removes nothing else, date keys and `author` values included, except ingest Step 8's Entity reference links.
+- Keep every existing key and value, including unknown keys and earlier identity, location and history values. Ordinary ingest changes only the keys its update names (`source`, `related`, `date_modified` and additions the preservation review accepted; Entity metadata follows its [maintenance mode](../../principle-knowledge-notes/templates/entity.md#maintenance)); it renames, re-forms, copies or removes nothing else, date keys and `author` values included, except ingest Step 8's Entity reference links.
 - Identity matching reads `source` first, and any other source address or locator the existing note already records; compare the destination URL of a Markdown link with a bare URL independent of its display label. Titles never prove sameness. Ingest requires no identity key beyond this schema.
 - Key migration runs only when the owner explicitly authorizes it for named notes. Record each note's before-image first; map a value only when its meaning is verified equivalent to the target key (`source_obtained_at` is not `date_ingested` without proof that both record the same acquisition); stop on any conflict, such as a target key already holding a different value or an ambiguous meaning, and report it. A completed migration leaves one key per meaning, with no permanent dual keys. A value still needed for identity, location or history is never dropped merely as legacy.
