@@ -22,12 +22,14 @@ When the vault holds no owner record, or the maker states no origin, write that 
 
 Write without first-person framing, in the language the live policy sets for pages. Link existing canonical notes where the relationship matters; keep an unconfirmed target as plain text. Give links readable labels: a date as `[[2026-09-04|the date written out in the page's language]]`, a long dated note by a label that says what it is. Calendar links follow the vault's date policy.
 
-- **TL;DR** says what the product is and, in bold, why it matters to the owner's work. Footnote the claims it rests on.
+- **TL;DR** says what the product is and, in bold, why it matters to the owner's work, in plain text: no links and no footnote markers. The sections below source the same claims.
 - **Origin** names who made it, when, their relevant background and the problem they said prompted it, then separates that account from what the product is today.
-- **Explanation** opens with one concrete worked example and follows the mechanism the owner depends on. Bold the one reading a newcomer usually gets wrong. Scope changing features, prices and versions to the date or commit inspected, and point to the vault's own investigation notes with their stated limits.
+- **Explanation** opens with one concrete worked example and follows the mechanism the owner depends on. Bold the one reading a newcomer usually gets wrong. Date changing features, prices and versions, and point to the vault's own investigation notes with their stated limits. The mechanism is where a diagram most often earns its place.
 - **Personal Insights** is organised under `###` headings named for a theme or judgment, never as a dated list of mentions. Each paragraph cites the records it draws on, quotes the owner's own sentence where that sentence carries the judgment, and keeps an earlier view beside the later one that replaced it. A conclusion the page draws that no record states is labelled as interpretation.
-- **Footnotes** carry each sourced claim's locator (section title, file and commit, heading in a vault note) and the limit of that evidence. Use one named footnote per source passage and reuse it.
-- **References** lists each external work once with a nested line giving its publication date, or that none is shown, and what was confirmed in it. Close with one paragraph: when the external sources were read, what was reviewed, and what was not re-verified.
+- **Footnotes** carry each sourced claim's locator (document and section, heading in a vault note) and, where it changes how the claim should be read, the limit of that evidence as a fact about the evidence ("the maker's retrospective, not independent research"; "the thread does not say whether the fix shipped", not "whether it shipped was not checked"). Use one named footnote per source passage and reuse it.
+- **References** lists each external work once with a nested line giving its publication date, or that none is shown, and what it establishes.
+
+For a repository, a pinned link already carries its commit in the URL: label it plainly (`README`, `LICENSE`) and keep the sha out of prose and footnotes. That the vault holds no owner record of use is a fact about the owner and stays on the page.
 
 ## Scaffold
 
@@ -54,7 +56,7 @@ related: []
 # {{product_name}}
 
 > [!abstract] TL;DR
-> {{What it is and the problem it solves.}} **{{Why it matters to the owner's work.}}**[^mechanism][^use]
+> {{What it is and the problem it solves.}} **{{Why it matters to the owner's work.}}**
 
 ## Origin
 
@@ -64,7 +66,9 @@ related: []
 
 ## Explanation
 
-{{A concrete worked example, then the mechanism the owner depends on and its limits, scoped to the inspected date, version or commit.}}[^mechanism]
+{{A concrete worked example, then the mechanism the owner depends on and its limits, with changing facts dated.}}[^mechanism]
+
+{{An inline Pele diagram when the mechanism has structure worth drawing; otherwise omit.}}
 
 ## Personal Insights
 
@@ -75,11 +79,9 @@ related: []
 ## References
 
 - {{Author or publisher}}. [{{Title}}]({{url}}).
-	- {{Publication date or that none is shown. What was confirmed there.}}
+	- {{Publication date or that none is shown. What it establishes.}}
 
-{{When the external sources were read, what was reviewed, and what was not re-verified.}}
-
-[^origin]: {{Locator. What this evidence does not establish.}}
-[^mechanism]: {{Locator. What this evidence does not establish.}}
+[^origin]: {{Locator. The limit of this evidence, if it changes how to read the claim.}}
+[^mechanism]: {{Locator. The limit of this evidence, if it changes how to read the claim.}}
 [^use]: {{Vault note and heading. What the record alone does not confirm.}}
 ```
