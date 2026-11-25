@@ -1,6 +1,6 @@
 # Books
 
-A book is one book Entity plus N chapter Raws, filled progressively as chapters are actually read. The book Entity's `## From Sources` auto zone is the hub: it lists the chapter Raws, reading progress and the pages derived from them. Knowledge is compiled when read, not when scraped; a stub is a navigable future-compile target, never evidence that the chapter was read.
+A book is one book Entity plus N chapter Raws, filled progressively as chapters are actually read. The book Entity is the hub: its `## Chapters`, `## Reading Progress` and `## Derived` sections list the chapter Raws, reading progress and the pages derived from them. Knowledge is compiled when read, not when scraped; a stub is a navigable future-compile target, never evidence that the chapter was read.
 
 ## Steps 1 and 2
 
@@ -28,7 +28,7 @@ Chapter stubs go into the Books Raw folder with `category: Books`, unless the li
 
 Compile only what the TOC and preface support, through SKILL Step 6:
 
-- the book Entity (native title) from [book](../../principle-knowledge-notes/templates/entity/book.md), created or updated by SKILL Step 6's Entity rules; its auto zone lists every chapter stub as `- [[stub filename]] — {TOC one-liner}`, grouped under the source's parts, and the author's reading paths verbatim when given;
+- the book Entity (native title) from [book](../../entity/assets/book.md), created or updated by SKILL Step 6's Entity rules; its `## Chapters` section lists every chapter stub as `- [[stub filename]] — {TOC one-liner}`, grouped under the source's parts, and the author's reading paths verbatim when given;
 - a person Entity for each author whose real name the source confirms, by SKILL Step 6;
 - optional Entity for a companion site;
 - 1–3 Terms or Concepts the preface names as anchors of the whole book;
@@ -49,7 +49,7 @@ Trigger: the owner runs ingest on a chapter stub or describes reading that chapt
 1. Fetch the chapter from the stub's `source`. Only `status: stub` whose Original Content is still exactly the placeholder is promotable.
 2. Replace only the placeholder with the verbatim chapter text; set `status: completed` for the full chapter or `reading` when only part was obtained; update `date_modified`. Every other byte stays, including Source, TOC Preview, human Reading Notes and the navigation keys. A later `reading` → `completed` needs the missing text actually obtained.
 3. Compile the chapter's Wiki pages by SKILL Step 6, updating existing pages first under its clean-context rule; Steps 7 and 8 apply.
-4. In the book Entity's auto zone append `- YYYY-MM-DD chNN reading|completed — [[chapter Raw]]` under `### Reading Progress`, and each page compiled from the chapter under `### Derived`. The owner zone and earlier auto-zone lines stay.
+4. In the book Entity append `- [[YYYY-MM-DD]] chNN reading|completed — [[chapter Raw]]` under `## Reading Progress`, and each page compiled from the chapter under `## Derived`. Owner sentences and earlier progress lines stay.
 5. Update the wiki index per Step 9 and append to the wiki log: `## [YYYY-MM-DD] promote | {book} ch{NN}`.
 6. Read back the chapter, the book Entity and every touched page, then report qmd reindex status (Step 10).
 
@@ -61,7 +61,7 @@ When the TOC is missing, open `https://www.aladin.co.kr/shop/wproduct.aspx?ISBN=
 For a title or ISBN alone, search Yes24 first and then Aladin.
 For classic or historical texts, distinguish the recognized local title, the original-language title, the translator and the edition.
 
-Record ISBN-13, TOC and cover in the book Entity's auto zone. Label every recorded field by origin: observed storefront metadata, OCR or inferred summary, or user-supplied reading context.
+Record ISBN-13, TOC and cover in the book Entity's `## Bibliographic Record`, `## Table of Contents` and `cover_url`. Label every recorded field by origin: observed storefront metadata, OCR or inferred summary, or user-supplied reading context.
 A storefront blurb is not a finished summary, and a three-line summary is not catalog fact.
 A storefront blurb or empty TOC is unfinished bibliographic work, not a finished book note.
 
@@ -70,7 +70,7 @@ A storefront blurb or empty TOC is unfinished bibliographic work, not a finished
 Search for the existing work and edition with verified bibliographic data (ISBN, author, translator, publisher, edition) before creating a note.
 A translated or alternate title alone does not establish a different work, and differing editions are never merged silently.
 Discovering another title is not a reason to rename an existing note; a requested move needs a supported, link-preserving surface.
-The destination vault's registered book template wins for frontmatter keys and owner headings, otherwise the [book](../../principle-knowledge-notes/templates/entity/book.md) Entity template; the live policy decides naming and placement. Never invent a schema beyond either.
+The destination vault's registered book template wins for frontmatter keys and headings (never an append-only zone), otherwise the [book](../../entity/assets/book.md) Entity template; the live policy decides naming and placement. Never invent a schema beyond either.
 
 ## Selected chapters
 
@@ -81,6 +81,6 @@ A complete TOC is not a complete book, and a selected chapter is not whole-book 
 
 ## Human reading
 
-The book Entity's owner zone holds the owner's reading: thinking, reactions, dated personal bullets, anecdotes, highlights and next steps. Ingest never writes, reorders or rephrases it.
+Reading notes the owner wrote on a book Entity (thinking, reactions, dated personal bullets, anecdotes, highlights, next steps) stay word for word under `principle-preserve-voice`; ingest never rewrites, reorders or rephrases them.
 Quotes stay quotes and first-person notes stay first-person.
-Agent suggestions and verified links go only into the auto zone, as appended lines.
+Agent suggestions and verified links go into the template's own sections, never into an owner sentence.

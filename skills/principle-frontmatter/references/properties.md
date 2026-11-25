@@ -75,7 +75,7 @@ sources:
   - "[[Project Alpha#Decisions]]"
 ```
 
-Non-Markdown targets keep their extension here too: `board: "[[Team Board.canvas]]"`. Links in properties participate in link resolution, so a changed property link needs the same source-context readback as a body link (see [links](links.md)).
+Non-Markdown targets keep their extension here too: `board: "[[Team Board.canvas]]"`. Links in properties participate in link resolution, so a changed property link needs the same source-context readback as a body link (see [links](../../principle-link-form/references/links.md)).
 
 ## Default Properties
 

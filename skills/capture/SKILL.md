@@ -77,6 +77,8 @@ Keep chronology within a conversation and the owner's order across members.
 
 ### Step 3: Create Inbox Note
 
+Open `principle-resolve-target`, `principle-original-order`, `principle-provenance`, `principle-frontmatter`, `principle-link-form` and `principle-markdown-blocks` (each at `../<leaf>/SKILL.md`) before writing, and `principle-read-back` right after: read the note back before Step 4 and before any route in Step 5.
+
 Use the destination's AI Research Capture template as the shape; without one, use the frontmatter and body below. Write a new note; never overwrite or reorder an existing candidate. A later capture on the same topic is a new note that lists the earlier one in `referenced`.
 
 Frontmatter:
@@ -136,7 +138,7 @@ Route beyond `inbox-only` only when the owner chose it. Never delete or move the
 
 ## Verification
 
-Read the written note back before reporting:
+Open `principle-read-back`, then read the written note back before reporting:
 
 1. The `.md` file exists at the new dated path in the AI Research or Clippings lane (or the live policy's equivalent).
 2. `## Original Content` is non-empty and holds only acquired text, or the note is explicitly `captureMode: manifest-only`.
@@ -145,4 +147,4 @@ Read the written note back before reporting:
 5. `collectionPurpose` is set.
 6. If the next step was ingest, `ingest` preserved the Raw Source; the Inbox original stays unless the owner separately authorizes its deletion.
 
-Report the path, members with capture status, omissions, the purpose, and the route taken.
+Report the path, members with capture status, omissions, the purpose, the route taken, and each principle leaf that changed a decision and what it changed.

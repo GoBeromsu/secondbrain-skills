@@ -5,7 +5,7 @@ A paper goes through the ordinary Steps of [ingest](../SKILL.md). This file adds
 ## Original retrieval
 
 - Retrieve the original through its DOI, publisher or author repository; reuse its Raw when the vault already holds one, otherwise preserve it under Steps 3 and 5 with `category: Papers`.
-- For an explicitly researched Term, retrieve each original its evidence requires the same way. For a Term extracted from one source, attribute secondary claims to the selected source and record the original in `referenced` without fetching it.
+- For an explicitly researched Term, retrieve each original its evidence requires; preserve it as a Raw only when the owner handed it over, and otherwise reuse its existing Raw or cite it as `[label](URL)`. For a Term extracted from one source, attribute secondary claims to the selected source and record the original in `referenced` without fetching it.
 - Record what was actually inspected in `## Ingest Notes`, including an abstract-only or partial reading. A paywalled or unobtainable full text stays unread; never compile it from the abstract as if read.
 
 ## Citekey and DOI
@@ -16,7 +16,7 @@ A paper goes through the ordinary Steps of [ingest](../SKILL.md). This file adds
 
 ## Paper Entity
 
-- The paper Entity is the paper's hub: create it from [paper](../../principle-knowledge-notes/templates/entity/paper.md) or update the existing one by Step 6's Entity rules, writing only to its `## From Sources` auto zone.
-- Its auto zone lists the paper's Raw, the Terms, Concepts and Guides compiled from it, and dated source-grounded facts, each citing the Raw.
+- The paper Entity is the paper's hub: create it from [paper](../../entity/assets/paper.md) or update the existing one by Step 6's Entity rules.
+- It cites the paper's Raw in `source` and References, and lists the Terms, Concepts and Guides compiled from it under `## Derived`.
 - Every author whose real name the paper confirms is a person Entity by Step 6; a journal, lab or dataset is an Entity of its required type only when the analysis finds it significant.
 - Compile Terms and Concepts only for what the paper supports, updating existing pages before creating; a shortfall is reported, never padded.

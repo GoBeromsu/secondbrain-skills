@@ -8,7 +8,9 @@ The destination's live policy wins wherever it defines a field, value or placeme
 - Wikilinks inside YAML are double-quoted: `"[[Name]]"`. Body wikilinks are bare.
 - `description` is English, one or two sentences, always double-quoted (`description: ""` when empty).
 - Dates are ISO 8601 (`YYYY-MM-DD`, time optional). An existing value keeps its form.
-- New keys are camelCase, except the snake_case date keys below and these kebab-case keys (`source-attachment`, `source-format`, `conversion-tool`, `conversion-fidelity`, `superseded-by`). The snake_case date keys are exactly `date_created`, `date_modified`, `date_ingested`, `date_published` and `conversion_date`; the verification timestamps are `exploredDate` and `verifiedAt`.
+- On a wiki page (Term, Concept, Guide, Entity) keys appear in alphabetical order, as the vault's linter sorts them; `principle-frontmatter` holds the rule.
+- External URLs on a wiki page sit only under `url` (the canonical homepage) or a snake_case `*_url` key (`blog_url`, `cover_url`, `feed_url`, `instagram_url`, `linkedin_url`, `repository_url`, `source_url`, `x_url`, `youtube_url`) as plain URLs; every other web reference goes in the body as `[label](URL)`.
+- New keys are camelCase, except the `*_url` keys above, the snake_case date keys below and these kebab-case keys (`source-attachment`, `source-format`, `conversion-tool`, `conversion-fidelity`, `superseded-by`). The snake_case date keys are exactly `date_created`, `date_modified`, `date_ingested`, `date_published` and `conversion_date`; the verification timestamps are `exploredDate` and `verifiedAt`.
 - Unknown applicable metadata stays unknown, never invented. An inapplicable optional key is omitted.
 - Fill every slot as a value serialized by YAML's own rules, never by pasting raw text. A person name containing `"` or `\` inside a double-quoted `"[[Name]]"` follows YAML double-quoted escaping (`\"`, `\\`). Emit lists as YAML lists, one item per existing value; never collapse several existing items into one string.
 - A Persona's `source` keeps every existing item as a separate list item and appends this Raw.
@@ -24,7 +26,7 @@ The destination's live policy wins wherever it defines a field, value or placeme
 | `date_created` | creation date of this note |
 | `date_modified` | last modification date of this note |
 | `tags` | list |
-| `model`, `effort` | directly after `author` on every agent-written content page: the runtime-reported model id (a list when several contributed) and reasoning effort, `default` when unreported. Never fabricate a model. |
+| `model`, `effort` | on every agent-written content page (directly after `author` on a Raw; in alphabetical place on a wiki page): the runtime-reported model id (a list when several contributed) and reasoning effort, `default` when unreported. Never fabricate a model. |
 
 No `created_by` or `authorship` default. A vault whose live policy defines its own provenance keys (for example `created_by`) gets exactly those values from that policy; never infer them.
 
@@ -34,10 +36,10 @@ No `created_by` or `authorship` default. A vault whose live policy defines its o
 | --- | --- | --- | --- | --- |
 | Raw Source | `raw-source` | — | — | [raw](../templates/raw.md) |
 | Book chapter (Raw) | `raw-source` | — | `stub` → `reading` → `completed` | [book chapter](../templates/book-chapter.md) |
-| Term | `wiki-page` | `terms` | — | [term](../../principle-knowledge-notes/templates/term.md) |
-| Concept | `wiki-page` | `concepts`; `theory`, `method` or `scale` for a paper-derived Concept | — | [concept](../../principle-knowledge-notes/templates/concept.md) |
-| Entity | live policy | `entities` when typed `wiki-page` | a book Entity's reading status is the owner's and never set by ingest | Use its type template and Entity maintenance rules from `principle-knowledge-notes`. |
-| Guide | `wiki-page` | `guides` | — | [guide](../../principle-knowledge-notes/templates/guide.md) |
+| Term | `wiki-page` | `terms` | — | [term](../../term/assets/term.md) |
+| Concept | `wiki-page` | `concepts`; `theory`, `method` or `scale` for a paper-derived Concept | — | [concept](../../concept/assets/concept.md) |
+| Entity | live policy | `entities` when typed `wiki-page` | a book Entity's reading status is the owner's and never set by ingest | Its type template in `../../entity/assets/` and the rules in `entity`. |
+| Guide | `wiki-page` | `guides` | — | [guide](../templates/guide.md) |
 | Map | `moc` | — | — | live Map template |
 | Persona | `persona` | — | — | [persona](../templates/persona.md) |
 
@@ -74,7 +76,7 @@ No `created_by` or `authorship` default. A vault whose live policy defines its o
 | Related knowledge | `related` | Quoted wikilink list. |
 | Confidence | `confidence` | `high` (well-sourced), `medium` (partial), `low` (speculative). A page resting only on secondary claims is not well-sourced. |
 | Reuse unit | `layer` | Per the Roles table. |
-| Field | `domain` | Term only: fields of use; see the [Term template](../../principle-knowledge-notes/templates/term.md) for their format. |
+| Field | `domain` | Term only: fields of use; see the [Term template](../../term/assets/term.md) for their format. |
 | Definition status | `definitionStatus` | Term only: `consensus`, `contested` or `emerging`. |
 | Exploration gate | `explored` | `false` on every new page; `true` only after a human read it or a source-backed review loop verified it, with optional `exploredBy`, `exploredDate`. |
 | Verification state | `verificationStatus` | `unverified` on every new page; `verify` sets `verified`, `partial`, `unverified` or `disputed` with `verifiedAt`, `verifiedBy`. |
@@ -88,6 +90,6 @@ No `created_by` or `authorship` default. A vault whose live policy defines its o
 
 New notes use the schema above. A run that touches an existing note preserves what it already holds.
 
-- Keep every existing key and value, including unknown keys and earlier identity, location and history values. Ordinary ingest changes only the keys its update names (`source`, `related`, `date_modified` and additions the preservation review accepted; Entity metadata follows the maintenance mode `principle-knowledge-notes` defines for its template); it renames, re-forms, copies or removes nothing else, date keys and `author` values included, except ingest Step 8's Entity reference links.
+- Keep every existing key and value, including unknown keys and earlier identity, location and history values. Ordinary ingest changes only the keys its update names (`source`, `related`, `date_modified` and additions the preservation review accepted; Entity metadata follows `principle-revise-and-consolidate`, which also moves a legacy URL key such as `youtube` or `x` to its `*_url` key); it renames, re-forms, copies or removes nothing else, date keys and `author` values included, except ingest Step 8's Entity reference links.
 - Identity matching reads `source` first, and any other source address or locator the existing note already records; compare the destination URL of a Markdown link with a bare URL independent of its display label. Titles never prove sameness. Ingest requires no identity key beyond this schema.
 - Key migration runs only when the owner explicitly authorizes it for named notes. Record each note's before-image first; map a value only when its meaning is verified equivalent to the target key (`source_obtained_at` is not `date_ingested` without proof that both record the same acquisition); stop on any conflict, such as a target key already holding a different value or an ambiguous meaning, and report it. A completed migration leaves one key per meaning, with no permanent dual keys. A value still needed for identity, location or history is never dropped merely as legacy.
