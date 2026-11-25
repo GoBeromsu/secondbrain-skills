@@ -71,18 +71,48 @@ def regular_file(path):
         return False
 
 
-def ignore_evidence_files(directory, names):
-    ignored = []
-    for name in names:
-        mode = os.lstat(os.path.join(directory, name)).st_mode
-        if name == ".obsidian" or not (stat.S_ISREG(mode) or stat.S_ISDIR(mode) or stat.S_ISLNK(mode)):
-            ignored.append(name)
-    return ignored
+DIRECTORY_FLAGS = os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW
+
+
+def copy_evidence_dir(fd, dest):
+    os.mkdir(dest)
+    for name in os.listdir(fd):
+        if name == ".obsidian":
+            continue
+        mode = os.lstat(name, dir_fd=fd).st_mode
+        target = os.path.join(dest, name)
+        if stat.S_ISDIR(mode):
+            child = os.open(name, DIRECTORY_FLAGS, dir_fd=fd)
+            try:
+                copy_evidence_dir(child, target)
+            finally:
+                os.close(child)
+        elif stat.S_ISREG(mode):
+            source = os.open(name, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK, dir_fd=fd)
+            with os.fdopen(source, "rb") as f:
+                info = os.fstat(f.fileno())
+                if stat.S_ISREG(info.st_mode) and info.st_nlink == 1:
+                    with open(target, "xb") as out:
+                        shutil.copyfileobj(f, out)
 
 
 def copy_evidence(src, dest):
-    if not os.path.islink(src) and os.path.isdir(src):
-        shutil.copytree(src, dest, symlinks=True, ignore=ignore_evidence_files)
+    """Reject linked ancestors and anchor all source reads to no-follow directory descriptors."""
+    fd = os.open(os.sep, DIRECTORY_FLAGS)
+    try:
+        for name in os.path.abspath(src).split(os.sep)[1:]:
+            try:
+                if not stat.S_ISDIR(os.lstat(name, dir_fd=fd).st_mode):
+                    return False
+                child = os.open(name, DIRECTORY_FLAGS, dir_fd=fd)
+            except (FileNotFoundError, NotADirectoryError):
+                return False
+            os.close(fd)
+            fd = child
+        copy_evidence_dir(fd, dest)
+        return True
+    finally:
+        os.close(fd)
 
 
 def walk(root):
@@ -592,14 +622,17 @@ def old_plugin(spec, ws):
 
 
 def sandbox_profile(tmp):
-    """macOS sandbox: no writes under ~/Documents (the owner's vaults and this repo) except evals/results,
-    and no way to launch Obsidian. Claude's own state (~/.claude) and the temp vault stay writable."""
+    """Only the disposable vault and Claude's own state are writable by the worker."""
     path = os.path.join(tmp, "eval.sb")
+    vault = os.path.join(os.path.realpath(tmp), "vault")
+    claude = os.path.expanduser("~/.claude")
+    results = os.path.realpath(os.path.join(HERE, "results"))
     with open(path, "w") as f:
-        f.write('(version 1)\n(allow default)\n(deny file-write* (subpath "%s"))\n'
-                '(allow file-write* (subpath "%s"))\n'
+        f.write('(version 1)\n(allow default)\n(deny file-write*)\n'
+                '(allow file-write* (subpath %s) (subpath %s))\n'
+                '(deny file-write* (subpath %s))\n'
                 '(deny process-exec (subpath "/Applications/Obsidian.app") (literal "/usr/bin/open"))\n'
-                % (os.path.expanduser("~/Documents"), os.path.join(HERE, "results")))
+                % tuple(json.dumps(p, ensure_ascii=False) for p in (vault, claude, results)))
     return path
 
 
@@ -610,12 +643,34 @@ def copy_subagents(transcript, vault, dest):
             sid = json.loads(f.readline())["session_id"]
     except (OSError, ValueError, KeyError):
         return
-    roots = [os.environ.get("CLAUDE_CONFIG_DIR"), os.path.expanduser("~/.claude")]
-    for root in filter(None, roots):
-        src = os.path.join(root, "projects", re.sub(r"[^A-Za-z0-9]", "-", vault), sid, "subagents")
-        if not os.path.islink(src) and os.path.isdir(src):
-            copy_evidence(src, dest)
-            return
+    if not isinstance(sid, str) or not re.fullmatch(r"[A-Za-z0-9-]+", sid):
+        return
+    projects = os.path.expanduser("~/.claude/projects")
+    src = os.path.join(projects, re.sub(r"[^A-Za-z0-9]", "-", vault), sid, "subagents")
+    copy_evidence(src, dest)
+
+
+def self_test():
+    with tempfile.TemporaryDirectory(prefix="sb-evidence-test-") as tmp:
+        root = os.path.realpath(tmp)
+        real = os.path.join(root, "real", "subagents")
+        os.makedirs(real)
+        os.symlink(os.path.dirname(real), os.path.join(root, "linked"))
+        dest = os.path.join(root, "captured")
+        if copy_evidence(os.path.join(root, "linked", "subagents"), dest) or os.path.lexists(dest):
+            raise AssertionError("capture followed a symlinked ancestor")
+        print("PASS: symlinked ancestor rejected")
+        with open(os.path.join(real, "regular.jsonl"), "wb") as f:
+            f.write(b"evidence\n")
+        os.symlink("regular.jsonl", os.path.join(real, "link.jsonl"))
+        os.mkfifo(os.path.join(real, "pipe.jsonl"))
+        copy_evidence(real, dest)
+        if os.listdir(dest) != ["regular.jsonl"]:
+            raise AssertionError("capture did not skip symlinked file and FIFO")
+        with open(os.path.join(dest, "regular.jsonl"), "rb") as f:
+            if f.read() != b"evidence\n":
+                raise AssertionError("regular evidence changed during capture")
+        print("PASS: symlinked file and FIFO skipped; regular evidence preserved")
 
 
 def load_subagents(d):
@@ -667,16 +722,18 @@ def run_case(spec, case, config, ws, it, model, timeout, plugin, skill_dir):
            "--output-format", "stream-json", "--verbose", "--model", model,
            "--setting-sources", "project,local", "--strict-mcp-config", "--plugin-dir", plugin,
            "--permission-mode", "bypassPermissions", "--disallowedTools", "Bash(obsidian:*)"]
-    env = {k: v for k, v in os.environ.items() if k != "CLAUDECODE"}
+    env = {k: v for k, v in os.environ.items() if k not in {"CLAUDECODE", "CLAUDE_CONFIG_DIR"}}
     env["PATH"] = stub + os.pathsep + env.get("PATH", "")
     t0 = time.time()
-    with open(os.path.join(out, "transcript.jsonl"), "w") as tf:
-        try:
-            p = subprocess.run(cmd, cwd=vault, env=env, stdout=tf, stderr=subprocess.STDOUT, timeout=timeout)
-            status = "exit %d" % p.returncode
-        except subprocess.TimeoutExpired:
-            status = "timeout after %ds" % timeout
+    try:
+        p = subprocess.run(cmd, cwd=vault, env=env, stdout=subprocess.PIPE,
+                           stderr=subprocess.STDOUT, timeout=timeout)
+        status, transcript = "exit %d" % p.returncode, p.stdout
+    except subprocess.TimeoutExpired as exc:
+        status, transcript = "timeout after %ds" % timeout, exc.stdout or b""
     elapsed = time.time() - t0
+    with open(os.path.join(out, "transcript.jsonl"), "xb") as tf:
+        tf.write(transcript)
     copy_evidence(vault, os.path.join(out, "vault-full"))
     copy_subagents(os.path.join(out, "transcript.jsonl"), vault, os.path.join(out, "subagents"))
     shutil.rmtree(tmp, ignore_errors=True)
@@ -749,7 +806,8 @@ def grade(spec, case, config, ws, it, elapsed=None):
 
 def main(argv=None):
     ap = argparse.ArgumentParser()
-    ap.add_argument("skill")
+    ap.add_argument("skill", nargs="?")
+    ap.add_argument("--self-test", action="store_true")
     ap.add_argument("--config", choices=["new", "old", "both"], default="both")
     ap.add_argument("--iteration", type=int, default=1)
     ap.add_argument("--cases", help="comma-separated eval ids")
@@ -758,6 +816,11 @@ def main(argv=None):
     ap.add_argument("--timeout", type=int, default=1800)
     ap.add_argument("--grade-only", action="store_true")
     a = ap.parse_args(argv)
+    if a.self_test:
+        self_test()
+        return 0
+    if not a.skill:
+        ap.error("skill is required unless --self-test is used")
     with open(os.path.join(HERE, a.skill, "evals.json"), encoding="utf-8") as f:
         spec = json.load(f)
     validate(spec)
