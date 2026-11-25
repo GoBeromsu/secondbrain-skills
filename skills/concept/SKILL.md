@@ -1,6 +1,6 @@
 ---
 name: "concept"
-description: "Apply when the user explores a new methodology, framework, conceptual model, technique or pattern (not a named product or a field term), or an idea one author named, that the vault's wiki has no page or alias for: research it and write or update its Concept page in the wiki from the Concept template. Also use whenever the owner asks to explain, capture or update an idea, method or framework as a note. Material the owner hands over to ingest or keep belongs to ingest, even when it is about a method."
+description: "Apply when the user explores a new methodology, framework, conceptual model, technique or pattern (not a named product or a field term), or an idea one author named, that the vault's wiki has no page or alias for: research it and write or update its Concept page in the wiki from the Concept template. Also use whenever the owner asks to explain, create or update an idea, method or framework note. Material the owner hands over to compile belongs to ingest, even when it is about a method; a request to save it without compiling belongs to capture."
 license: MIT
 ---
 

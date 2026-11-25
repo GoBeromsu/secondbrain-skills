@@ -93,11 +93,10 @@ The `claude` shim for skill-creator's scripts adds `--setting-sources project,lo
 | Skill | Final iteration | `with_skill` | 0.28.1 `old_skill` |
 | --- | --- | --- | --- |
 | term | 14 | 26/27 | 12/27 |
-| concept | 13 | 19/19 | 10/19 |
-| entity | 14 | 21/21 | 6/21 |
-| secondbrain-mode | 14 | 58/60 | 38/60 |
+| concept | 15 | 19/19 | 10/19 |
+| entity | 15 | 21/21 | 6/21 |
+| secondbrain-mode | 15 | 53/60 | 35/60 |
 
 Totals pool graded rows across cases. The baseline uses 0.28.1 `principle-knowledge-notes` for term, concept and entity and the whole 0.28.1 skill tree for mode. Each final iteration has a skill-creator `benchmark.json` and a static `review.html` in its workspace under `evals/results/`.
 
 Final whole-plugin trigger run (`trigger_run.py`, default Claude config with `CLAUDE_CONFIG_DIR` unset, 3 runs per query): term 20/20, concept 20/20, entity 20/20, and secondbrain-mode 13/13 for non-auto-invocation, not activation or lifecycle. No runs failed and no `principle-*` or `secondbrain-mode` Skill-tool invocations were observed.
-

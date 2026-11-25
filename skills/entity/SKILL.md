@@ -1,6 +1,6 @@
 ---
 name: "entity"
-description: "Apply when the user shows interest in a specific named thing (not a kind or a method): a product, tool, library or model, a person, an organization, a place, a book, a paper, or a channel, podcast or newsletter. Research it and write or update its Entity page in the wiki from the template for its type. Also use whenever the owner asks to add, record or update a person, company, product, book, paper or place note, or brings news about one. Material the owner hands over to ingest or keep, such as a paper's PDF or an article, belongs to ingest."
+description: "Apply when the user shows interest in a specific named thing (not a kind or a method): a product, tool, library or model, a person, an organization, a place, a book, a paper, or a channel, podcast or newsletter. Research it and write or update its Entity page in the wiki from the template for its type. Also use whenever the owner asks to add, record or update a person, company, product, book, paper or place note, or brings news about one. Material the owner hands over to compile, such as a paper's PDF or an article, belongs to ingest; a request to save it without compiling belongs to capture."
 license: MIT
 ---
 
