@@ -67,9 +67,21 @@ rg -n -g '*.md' '`https?://[^\s)`]+`' "<scope>"
 
 # Link form (deterministic, offline); keep the output to pass as --baseline next time
 python3 "<skill-dir>/scripts/link-lint.py" --vault "<vault>" --scope "<scope>" > link-lint.tsv
+
+# Frontmatter and structure (Step 12). Wiki folder(s) and lifecycle types come from live policy.
+# Obsidian already running with this vault open; exit 3 means it is not, so use the next line.
+python3 "<skill-dir>/scripts/obsidian-lint.py" --vault "<vault>" --scope "<scope>" \
+  --wiki "<wiki-folder>" --lifecycle "<type>,<type>" > policy-lint.tsv
+python3 "<skill-dir>/scripts/link-lint.py" --vault "<vault>" --scope "<scope>" --checks policy \
+  --wiki "<wiki-folder>" --lifecycle "<type>,<type>" > policy-lint.tsv
+
+# Links to missing headings, ambiguous links, duplicate headings. Needs .git or .marksman.toml at the vault root.
+python3 "<skill-dir>/scripts/marksman-lint.py" --vault "<vault>" --scope "<scope>" > marksman-lint.tsv
 ```
 
-Link targets by key (read-only, needs PyYAML). Feed NUL-delimited paths: `rg --files -0 -g '*.md' "<scope>" | python3 links.py "<vault>"` (run the snippet from stdin or a temp file outside the vault). If `import yaml` fails, do not run the check and do not substitute a regex: report Broken Links as **Not checked — PyYAML unavailable**.
+`obsidian eval` needs an IIFE (`code='(()=>{...})()'`, async allowed); `obsidian-lint.py` builds it from `obsidian-lint.js` and passes its arguments in a temp file outside the vault. Run Obsidian CLI commands only through `obsidian-lint.py`: it checks that Obsidian is already running with this vault open before it calls the CLI, and a bare `obsidian` command can launch the app. Its `# properties` line gives the vault-wide counts of `status` and the retired keys.
+
+Link targets by key (read-only, needs PyYAML). Feed NUL-delimited paths: `rg --files -0 -g '*.md' "<scope>" | python3 links.py "<vault>"` (run the snippet from stdin or a temp file outside the vault). If `import yaml` fails, do not run the check and do not substitute a regex: report frontmatter links as **Not checked — PyYAML unavailable**; body links still come from `link-lint.py`.
 
 ```python
 import sys, os, re
