@@ -20,11 +20,11 @@ This vault is an eval fixture. Its folder names differ from any real vault on pu
 | source | `Sources/` | Raw sources. Saved only when the owner hands over material and asks to ingest or save it. |
 | work | `Projects/` | The owner's work notes. Agents only turn the first mention of a term that has a page into a wikilink. |
 
-Wiki subfolders: `Maps/` for MOCs, `People/`, `Organizations/` and `Products/` for Entities, `Terms/`, `Concepts/`.
+Wiki subfolders: `Maps/` for MOCs, `People/`, `Organizations/` and `Products/` for Entities, `Terms/`, `Concepts/`, `Guides/`.
 
 ## Pages
 
-- An Entity page has `layer: entities`. Terms have `layer: terms`, Concepts `layer: concepts`, MOCs `type: moc`.
+- An Entity page has `layer: entities`. Terms have `layer: terms`, Concepts `layer: concepts`, Guides `layer: guides`, MOCs `type: moc`.
 - The owner's permanent notes live in `Notes/`. Impressions the owner wrote about a person move there as `{date_created} {Name}.md`, with `authorship: user` and `related` linking the person.
 
 ## Lifecycle

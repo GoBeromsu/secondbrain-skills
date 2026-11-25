@@ -1,0 +1,311 @@
+{
+  "skill_name": "entity",
+  "fixture": "evals/fixture-vault",
+  "baseline_skill": "principle-knowledge-notes",
+  "wiki": "Knowledge/",
+  "evals": [
+    {
+      "id": 1,
+      "eval_name": "new-product-work-note",
+      "prompt": "Projects/Lumen Notes Import Plan.md 보다가 궁금해졌는데, Readwise Reader 는 어떤 앱이야? 하이라이트를 Lumen 으로 넘길 수 있을지 알고 싶어.",
+      "expected_output": "Creates Knowledge/Products/Readwise Reader.md from assets/product.md (url plain, other URLs under *_url, Lumen Notes wikilinked), turns only the first mention in the work note into a wikilink; reports `Wiki: created [[Readwise Reader]]`.",
+      "files": [
+        "evals/fixture-vault"
+      ],
+      "targets": {
+        "page": {
+          "glob": "Knowledge/Products/*.md",
+          "name_regex": "(?i)^readwise reader",
+          "state": "created"
+        }
+      },
+      "expectations": [
+        {
+          "text": "The product page exists in its Entity folder",
+          "check": "exists",
+          "file": "@page"
+        },
+        {
+          "text": "Entity frontmatter has layer: entities and no status key",
+          "check": "frontmatter",
+          "file": "@page",
+          "equals": {
+            "layer": "entities"
+          },
+          "absent": [
+            "status"
+          ]
+        },
+        {
+          "text": "Entity body uses only assets/product.md sections, in template order, with the TL;DR callout and Origin, Explanation, References",
+          "check": "headings",
+          "file": "@page",
+          "template": "skills/entity/assets/product.md",
+          "required": [
+            "## Origin",
+            "## Explanation",
+            "## References"
+          ],
+          "callouts": [
+            "> [!abstract] TL;DR"
+          ]
+        },
+        {
+          "text": "Product frontmatter carries the homepage as a plain `url`",
+          "check": "frontmatter",
+          "file": "@page",
+          "contains": {
+            "url": "^https?://\\S+$"
+          }
+        },
+        {
+          "text": "The ## References section carries at least one source link ([label](URL) or a vault wikilink)",
+          "check": "section_line",
+          "file": "@page",
+          "heading": "## References",
+          "regex": "\\[[^\\]]+\\]\\(https?://[^)\\s]+\\)|\\[\\[[^\\]]+\\]\\]"
+        },
+        {
+          "text": "Projects/Lumen Notes Import Plan.md changes only by turning the first mention of Readwise Reader into a link to the created page, display text unchanged",
+          "check": "first_mention_link",
+          "file": "Projects/Lumen Notes Import Plan.md",
+          "term_regex": "(?i)Readwise Reader",
+          "target": "@page"
+        },
+        {
+          "text": "No other work note changes",
+          "check": "unchanged",
+          "files": [
+            "Projects/Lumen Notes Trial.md",
+            "Projects/2026-11-24 Weekly Review.md"
+          ]
+        },
+        {
+          "text": "link-lint --checks all reports nothing on the written wiki pages: alphabetical keys, external URLs only as plain values of *_url keys, no raw URL in the body, vault entity names as [[wikilinks]], no status, no body ---, no auto zone (unresolved links to pages still missing are allowed)",
+          "check": "lint_clean",
+          "files": "@changed_wiki",
+          "ignore": [
+            "BROKEN"
+          ]
+        },
+        {
+          "text": "Web pages read stay links: no Raw file is created under Sources/",
+          "check": "no_new_under",
+          "prefix": "Sources/"
+        },
+        {
+          "text": "Every write lands in the folder the fixture Guideline gives its role (Knowledge/) plus the work note under discussion",
+          "check": "changed_only_within",
+          "prefixes": [
+            "Knowledge/"
+          ],
+          "allow": [
+            "Projects/Lumen Notes Import Plan.md"
+          ]
+        },
+        {
+          "text": "The answer has one `Wiki:` line as its last line that names [[Readwise Reader...]] as created, and its created/updated pages are exactly the wiki pages written",
+          "check": "footer_matches",
+          "require": {
+            "created": [
+              "(?i)^Readwise Reader"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "eval_name": "person-update-impressions",
+      "prompt": "Jane Doe 가 Northwind Labs CTO 가 됐대. Sources 에 [[2026-11-25 Northwind Labs leadership update]] 로 저장해 뒀어. 그 사람 페이지 업데이트해줘.",
+      "expected_output": "Adds a dated `## Updates` line citing the Raw, moves the owner's impressions verbatim to Notes/2026-10-02 Jane Doe.md (authorship: user, related [[Jane Doe]]), links it back from the person page, sets authorship: mixed; reports `Wiki: updated [[Jane Doe]]`.",
+      "files": [
+        "evals/fixture-vault"
+      ],
+      "targets": {
+        "note": {
+          "glob": "Notes/2026-10-02 Jane Doe.md",
+          "state": "created"
+        }
+      },
+      "expectations": [
+        {
+          "text": "A dated line under ## Updates states the CTO appointment and links [[2026-11-25 Northwind Labs leadership update]]",
+          "check": "section_line",
+          "file": "Knowledge/People/Jane Doe.md",
+          "heading": "## Updates",
+          "regex": "(?i)^- \\[\\[2026-11-2[56]\\]\\] (?![^\\n]*\\b(?:not|never|denied|rumou?red)\\b)(?=[^\\n]*(?:\\b(?:appoint(?:ed|ment)|promot(?:ed|ion)|named|became|becomes|took over|assumed)\\b|임명|선임|취임|승진|[가이] (?:됐|되었)))(?=[^\\n]*(?:\\b(?:CTO|Chief Technology Officer)\\b|최고기술책임자))[^\\n]*\\[\\[(?:Sources/)?2026-11-25 Northwind Labs leadership update(?:\\|[^\\]]*)?\\]\\]"
+        },
+        {
+          "text": "Exactly one impressions note is created, at Notes/2026-10-02 Jane Doe.md ({date_created} {Name})",
+          "check": "count_created",
+          "glob": "Notes/*",
+          "name_regex": "^2026-10-02 Jane Doe\\.md$",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "text": "The owner's impression sentences move byte-exact from the person page body to the impressions note body",
+          "check": "moved_verbatim",
+          "sentences": "I met Jane at a meetup in October. She explained the product more clearly than its own website does, and I want to follow what she ships next.",
+          "from": "Knowledge/People/Jane Doe.md",
+          "to": "@note"
+        },
+        {
+          "text": "The impressions note has authorship: user and related [[Jane Doe]]",
+          "check": "frontmatter",
+          "file": "@note",
+          "equals": {
+            "authorship": "user"
+          },
+          "contains": {
+            "related": "^\\[\\[Jane Doe\\]\\]$"
+          }
+        },
+        {
+          "text": "The person page links the impressions note in related, is authorship: mixed, keeps layer: entities and has no status",
+          "check": "frontmatter",
+          "file": "Knowledge/People/Jane Doe.md",
+          "equals": {
+            "authorship": "mixed",
+            "layer": "entities"
+          },
+          "contains": {
+            "related": "^\\[\\[2026-10-02 Jane Doe\\]\\]$"
+          },
+          "absent": [
+            "status"
+          ]
+        },
+        {
+          "text": "Person body uses only assets/person.md sections, in template order, with the TL;DR callout and Updates (no Impressions section)",
+          "check": "headings",
+          "file": "Knowledge/People/Jane Doe.md",
+          "template": "skills/entity/assets/person.md",
+          "required": [
+            "## Updates"
+          ],
+          "callouts": [
+            "> [!abstract] TL;DR"
+          ]
+        },
+        {
+          "text": "Raw sources stay byte-identical",
+          "check": "unchanged",
+          "files": [
+            "Sources/*"
+          ]
+        },
+        {
+          "text": "link-lint --checks all reports nothing on the written wiki pages: alphabetical keys, external URLs only as plain values of *_url keys, no raw URL in the body, vault entity names as [[wikilinks]], no status, no body ---, no auto zone (unresolved links to pages still missing are allowed)",
+          "check": "lint_clean",
+          "files": "@changed_wiki",
+          "ignore": [
+            "BROKEN"
+          ]
+        },
+        {
+          "text": "Writes stay under Knowledge/ except the exact impressions note Notes/2026-10-02 Jane Doe.md",
+          "check": "changed_only_within",
+          "prefixes": [
+            "Knowledge/"
+          ],
+          "allow": [
+            "Notes/2026-10-02 Jane Doe.md"
+          ]
+        },
+        {
+          "text": "The answer has one `Wiki:` line as its last line that names [[Jane Doe...]] as updated, and its created/updated pages are exactly the wiki pages written",
+          "check": "footer_matches",
+          "require": {
+            "updated": [
+              "(?i)^Jane Doe"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "trigger_evals": [
+    {
+      "query": "Logseq 이라는 앱 들어봤어? Lumen Notes 랑 비교하면 어떤 앱인지 궁금해",
+      "should_trigger": true
+    },
+    {
+      "query": "Who is Tiago Forte? I keep seeing his name everywhere - add him to my people notes",
+      "should_trigger": true
+    },
+    {
+      "query": "Readwise Reader is on my radar for highlight management. what is it, who makes it, and how does its sync work?",
+      "should_trigger": true
+    },
+    {
+      "query": "Anthropic 이라는 회사 어떤 곳인지 조직 페이지 하나 만들어줘",
+      "should_trigger": true
+    },
+    {
+      "query": "Jane Doe got promoted to CTO at Northwind Labs this week - update her page",
+      "should_trigger": true
+    },
+    {
+      "query": "The book 'How to Take Smart Notes' by Sönke Ahrens - record it in my vault, I'm starting it this week",
+      "should_trigger": true
+    },
+    {
+      "query": "Lex Fridman 팟캐스트 채널 페이지 만들어줘, 자주 듣거든",
+      "should_trigger": true
+    },
+    {
+      "query": "add the paper 'Attention Is All You Need' (Vaswani et al., 2017) to my vault as a paper note, doi 10.48550/arXiv.1706.03762",
+      "should_trigger": true
+    },
+    {
+      "query": "what's Playwright MCP and how does it actually drive the browser? i want to use it for a scraping side project",
+      "should_trigger": true
+    },
+    {
+      "query": "성수동 '대림창고' 카페 가봤는데 장소 노트 남겨줘",
+      "should_trigger": true
+    },
+    {
+      "query": "what's the difference between a library and a framework in software, conceptually?",
+      "should_trigger": false
+    },
+    {
+      "query": "Explain the idea of local-first software and its seven ideals",
+      "should_trigger": false
+    },
+    {
+      "query": "'RAG' 가 무슨 뜻이야? 용어 정리해줘",
+      "should_trigger": false
+    },
+    {
+      "query": "here's the PDF of the Attention Is All You Need paper (~/Downloads/1706.03762.pdf) - ingest it and keep the full text as a Raw",
+      "should_trigger": false
+    },
+    {
+      "query": "Write a Playwright test that logs into our staging site and checks the dashboard loads",
+      "should_trigger": false
+    },
+    {
+      "query": "what did i write last year about Notion vs Obsidian in my notes?",
+      "should_trigger": false
+    },
+    {
+      "query": "Is it still true that my Lumen Notes page says the app is free? check it against its sources",
+      "should_trigger": false
+    },
+    {
+      "query": "Fix the broken links in my People folder",
+      "should_trigger": false
+    },
+    {
+      "query": "Draft a short email to Jane Doe congratulating her on the CTO promotion",
+      "should_trigger": false
+    },
+    {
+      "query": "노트 앱 처음 쓰는 대학생한테 추천할 만한 거 3개만 골라줘, 이유랑 같이",
+      "should_trigger": false
+    }
+  ]
+}

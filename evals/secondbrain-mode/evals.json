@@ -1,0 +1,667 @@
+{
+  "skill_name": "secondbrain-mode",
+  "fixture": "evals/fixture-vault",
+  "baseline_skill": "ingest",
+  "mode": true,
+  "wiki": "Knowledge/",
+  "evals": [
+    {
+      "id": 1,
+      "eval_name": "unknown-word-to-term",
+      "prompt": "What does 'idempotent' mean? Our reviewer linked https://developer.mozilla.org/en-US/docs/Glossary/Idempotent and said my retry endpoint isn't idempotent.",
+      "expected_output": "Answers the question; a term subagent writes Knowledge/Terms/Idempoten*.md; the MDN link stays a [label](URL) link; last line `Wiki: created [[Idempotence]]`.",
+      "files": [
+        "evals/fixture-vault"
+      ],
+      "targets": {
+        "page": {
+          "glob": "Knowledge/Terms/*.md",
+          "name_regex": "(?i)^idempoten",
+          "state": "created"
+        }
+      },
+      "expectations": [
+        {
+          "text": "The trigger is routed to the term skill in a finished background subagent that opened term/SKILL.md and did the writes; the main thread writes nothing to the wiki",
+          "check": "routed",
+          "skill": "term",
+          "writes": true
+        },
+        {
+          "text": "The answer body (all but the last line) carries no narration of wiki work",
+          "check": "answer_no_wiki_prose",
+          "forbid": [
+            "\\b(is|was|are|were|now|been|got) (written|created|updated|saved|filed|added|ingested|fixed|corrected|linked(?=[^.\\n]{0,35}\\b(?:the|your) (?:wiki|vault)\\b))\\b",
+            "\\b(I|I've|I have|we've)\\s+(just\\s+)?(wrote|written|created|updated|saved|filed|added|recorded|ingested|fixed|corrected|changed|moved|linked|cited)\\b",
+            "\\b(page|note|Raw)s?\\b[^.\\n]{0,40}\\b(in|to|into) (your|the) (wiki|vault)\\b",
+            "(만들었(?!나)|만들고|생성했|작성했|업데이트했|갱신했|저장했|반영했|기록했|보존했|추가했|고치고|고쳐 ?(뒀|놓았|놨)|수정했|수정하고|달았|붙였|바꾸었|(?<!재귀적으로 )바꾸고|옮겼|넣었|(?<!안 )걸었|남겼|적었|실었|정리해 ?뒀|남겨 ?뒀|써 ?뒀|쓰지 못했|마쳤)",
+            "(ingest|인제스트)[^.\\n]{0,20}(끝났|완료)",
+            "sub-?agent",
+            "서브 ?에이전트",
+            "in the background",
+            "백그라운드",
+            "(?:위키(?:에|로)|볼트(?:에|로))[^.\\n]{0,35}(?:저장하고|바꿨|만들어 ?두었)"
+          ]
+        },
+        {
+          "text": "The Term page exists in Knowledge/Terms/",
+          "check": "exists",
+          "file": "@page"
+        },
+        {
+          "text": "link-lint --checks all reports nothing on the written wiki pages: alphabetical keys, external URLs only as plain values of *_url keys, no raw URL in the body, vault entity names as [[wikilinks]], no status, no body ---, no auto zone (unresolved links to pages still missing are allowed)",
+          "check": "lint_clean",
+          "files": "@changed_wiki",
+          "ignore": [
+            "BROKEN"
+          ]
+        },
+        {
+          "text": "Web pages read stay links: no Raw file is created under Sources/",
+          "check": "no_new_under",
+          "prefix": "Sources/"
+        },
+        {
+          "text": "Every write lands in the folder the fixture Guideline gives its role (Knowledge/)",
+          "check": "changed_only_within",
+          "prefixes": [
+            "Knowledge/"
+          ],
+          "allow": []
+        },
+        {
+          "text": "The answer has one `Wiki:` line as its last line that names [[Idempoten...]] as created, and its created/updated pages are exactly the wiki pages written",
+          "check": "footer_matches",
+          "require": {
+            "created": [
+              "(?i)^Idempoten"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "eval_name": "methodology-to-concept",
+      "prompt": "I want to try the Zettelkasten method for my research notes this winter. How does it actually work, and what's the core idea behind it?",
+      "expected_output": "Answers; a concept subagent writes Knowledge/Concepts/Zettelkasten*.md; last line `Wiki: created [[Zettelkasten]]`.",
+      "files": [
+        "evals/fixture-vault"
+      ],
+      "targets": {
+        "page": {
+          "glob": "Knowledge/Concepts/*.md",
+          "name_regex": "(?i)zettelkasten",
+          "state": "created"
+        }
+      },
+      "expectations": [
+        {
+          "text": "The trigger is routed to the concept skill in a finished background subagent that opened concept/SKILL.md and did the writes; the main thread writes nothing to the wiki",
+          "check": "routed",
+          "skill": "concept",
+          "writes": true
+        },
+        {
+          "text": "The answer body (all but the last line) carries no narration of wiki work",
+          "check": "answer_no_wiki_prose",
+          "forbid": [
+            "\\b(is|was|are|were|now|been|got) (written|created|updated|saved|filed|added|ingested|fixed|corrected|linked(?=[^.\\n]{0,35}\\b(?:the|your) (?:wiki|vault)\\b))\\b",
+            "\\b(I|I've|I have|we've)\\s+(just\\s+)?(wrote|written|created|updated|saved|filed|added|recorded|ingested|fixed|corrected|changed|moved|linked|cited)\\b",
+            "\\b(page|note|Raw)s?\\b[^.\\n]{0,40}\\b(in|to|into) (your|the) (wiki|vault)\\b",
+            "(만들었(?!나)|만들고|생성했|작성했|업데이트했|갱신했|저장했|반영했|기록했|보존했|추가했|고치고|고쳐 ?(뒀|놓았|놨)|수정했|수정하고|달았|붙였|바꾸었|(?<!재귀적으로 )바꾸고|옮겼|넣었|(?<!안 )걸었|남겼|적었|실었|정리해 ?뒀|남겨 ?뒀|써 ?뒀|쓰지 못했|마쳤)",
+            "(ingest|인제스트)[^.\\n]{0,20}(끝났|완료)",
+            "sub-?agent",
+            "서브 ?에이전트",
+            "in the background",
+            "백그라운드",
+            "(?:위키(?:에|로)|볼트(?:에|로))[^.\\n]{0,35}(?:저장하고|바꿨|만들어 ?두었)"
+          ]
+        },
+        {
+          "text": "The Concept page exists in Knowledge/Concepts/",
+          "check": "exists",
+          "file": "@page"
+        },
+        {
+          "text": "link-lint --checks all reports nothing on the written wiki pages: alphabetical keys, external URLs only as plain values of *_url keys, no raw URL in the body, vault entity names as [[wikilinks]], no status, no body ---, no auto zone (unresolved links to pages still missing are allowed)",
+          "check": "lint_clean",
+          "files": "@changed_wiki",
+          "ignore": [
+            "BROKEN"
+          ]
+        },
+        {
+          "text": "Web pages read stay links: no Raw file is created under Sources/",
+          "check": "no_new_under",
+          "prefix": "Sources/"
+        },
+        {
+          "text": "Every write lands in the folder the fixture Guideline gives its role (Knowledge/)",
+          "check": "changed_only_within",
+          "prefixes": [
+            "Knowledge/"
+          ],
+          "allow": []
+        },
+        {
+          "text": "The answer has one `Wiki:` line as its last line that names [[Zettelkasten...]] as created, and its created/updated pages are exactly the wiki pages written",
+          "check": "footer_matches",
+          "require": {
+            "created": [
+              "(?i)^Zettelkasten"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "eval_name": "product-to-entity",
+      "prompt": "Logseq 라는 앱 들어봤어? Lumen Notes 랑 비교하면 어떤 앱인지 궁금해.",
+      "expected_output": "Answers; an entity subagent writes Knowledge/Products/Logseq.md with [[Lumen Notes]] linked; last line `Wiki: created [[Logseq]]`.",
+      "files": [
+        "evals/fixture-vault"
+      ],
+      "targets": {
+        "page": {
+          "glob": "Knowledge/Products/*.md",
+          "name_regex": "(?i)^logseq",
+          "state": "created"
+        }
+      },
+      "expectations": [
+        {
+          "text": "The trigger is routed to the entity skill in a finished background subagent that opened entity/SKILL.md and did the writes; the main thread writes nothing to the wiki",
+          "check": "routed",
+          "skill": "entity",
+          "writes": true
+        },
+        {
+          "text": "The answer body (all but the last line) carries no narration of wiki work",
+          "check": "answer_no_wiki_prose",
+          "forbid": [
+            "\\b(is|was|are|were|now|been|got) (written|created|updated|saved|filed|added|ingested|fixed|corrected|linked(?=[^.\\n]{0,35}\\b(?:the|your) (?:wiki|vault)\\b))\\b",
+            "\\b(I|I've|I have|we've)\\s+(just\\s+)?(wrote|written|created|updated|saved|filed|added|recorded|ingested|fixed|corrected|changed|moved|linked|cited)\\b",
+            "\\b(page|note|Raw)s?\\b[^.\\n]{0,40}\\b(in|to|into) (your|the) (wiki|vault)\\b",
+            "(만들었(?!나)|만들고|생성했|작성했|업데이트했|갱신했|저장했|반영했|기록했|보존했|추가했|고치고|고쳐 ?(뒀|놓았|놨)|수정했|수정하고|달았|붙였|바꾸었|(?<!재귀적으로 )바꾸고|옮겼|넣었|(?<!안 )걸었|남겼|적었|실었|정리해 ?뒀|남겨 ?뒀|써 ?뒀|쓰지 못했|마쳤)",
+            "(ingest|인제스트)[^.\\n]{0,20}(끝났|완료)",
+            "sub-?agent",
+            "서브 ?에이전트",
+            "in the background",
+            "백그라운드",
+            "(?:위키(?:에|로)|볼트(?:에|로))[^.\\n]{0,35}(?:저장하고|바꿨|만들어 ?두었)"
+          ]
+        },
+        {
+          "text": "The Product page exists in Knowledge/Products/",
+          "check": "exists",
+          "file": "@page"
+        },
+        {
+          "text": "link-lint --checks all reports nothing on the written wiki pages: alphabetical keys, external URLs only as plain values of *_url keys, no raw URL in the body, vault entity names as [[wikilinks]], no status, no body ---, no auto zone (unresolved links to pages still missing are allowed)",
+          "check": "lint_clean",
+          "files": "@changed_wiki",
+          "ignore": [
+            "BROKEN"
+          ]
+        },
+        {
+          "text": "Web pages read stay links: no Raw file is created under Sources/",
+          "check": "no_new_under",
+          "prefix": "Sources/"
+        },
+        {
+          "text": "Every write lands in the folder the fixture Guideline gives its role (Knowledge/)",
+          "check": "changed_only_within",
+          "prefixes": [
+            "Knowledge/"
+          ],
+          "allow": []
+        },
+        {
+          "text": "The answer has one `Wiki:` line as its last line that names [[Logseq...]] as created, and its created/updated pages are exactly the wiki pages written",
+          "check": "footer_matches",
+          "require": {
+            "created": [
+              "(?i)^Logseq"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "eval_name": "article-handover-to-ingest",
+      "prompt": "이 글 ingest 해줘. 모으는 목적: Lumen Notes 평가 프로젝트.\n\nLumen Notes 1.0 is out — Northwind Labs blog, 2026-11-26 (https://lumen.example.com/blog/1-0)\n\nToday Northwind Labs ships Lumen Notes 1.0. The headline feature is block references: you can link to a single paragraph in another note, and that paragraph shows how many notes cite it. Jane Doe, now our CTO, says block references were the most requested feature of the beta. After a 30-day trial, Lumen Notes 1.0 costs $8 a month.",
+      "expected_output": "An ingest subagent saves the article as a Raw in Sources/, compiles it into the wiki and updates Tools MOC; last line `Wiki: created ..., updated ...`.",
+      "files": [
+        "evals/fixture-vault"
+      ],
+      "targets": {},
+      "expectations": [
+        {
+          "text": "The trigger is routed to the ingest skill in a finished background subagent that opened ingest/SKILL.md and did the writes; the main thread writes nothing to the wiki",
+          "check": "routed",
+          "skill": "ingest",
+          "writes": true
+        },
+        {
+          "text": "The answer body (all but the last line) carries no narration of wiki work",
+          "check": "answer_no_wiki_prose",
+          "forbid": [
+            "\\b(is|was|are|were|now|been|got) (written|created|updated|saved|filed|added|ingested|fixed|corrected|linked(?=[^.\\n]{0,35}\\b(?:the|your) (?:wiki|vault)\\b))\\b",
+            "\\b(I|I've|I have|we've)\\s+(just\\s+)?(wrote|written|created|updated|saved|filed|added|recorded|ingested|fixed|corrected|changed|moved|linked|cited)\\b",
+            "\\b(page|note|Raw)s?\\b[^.\\n]{0,40}\\b(in|to|into) (your|the) (wiki|vault)\\b",
+            "(만들었(?!나)|만들고|생성했|작성했|업데이트했|갱신했|저장했|반영했|기록했|보존했|추가했|고치고|고쳐 ?(뒀|놓았|놨)|수정했|수정하고|달았|붙였|바꾸었|(?<!재귀적으로 )바꾸고|옮겼|넣었|(?<!안 )걸었|남겼|적었|실었|정리해 ?뒀|남겨 ?뒀|써 ?뒀|쓰지 못했|마쳤)",
+            "(ingest|인제스트)[^.\\n]{0,20}(끝났|완료)",
+            "sub-?agent",
+            "서브 ?에이전트",
+            "in the background",
+            "백그라운드",
+            "(?:위키(?:에|로)|볼트(?:에|로))[^.\\n]{0,35}(?:저장하고|바꿨|만들어 ?두었)"
+          ]
+        },
+        {
+          "text": "The handed-over article is saved as a Raw in Sources/",
+          "check": "count_created",
+          "glob": "Sources/*.md",
+          "min": 1
+        },
+        {
+          "text": "The related MOC (Knowledge/Maps/Tools MOC.md) is updated with a link to a page this ingest created",
+          "check": "links_new_page",
+          "file": "Knowledge/Maps/Tools MOC.md"
+        },
+        {
+          "text": "Both configured wiki records are updated (Knowledge/index.md and Knowledge/log.md)",
+          "check": "records_updated",
+          "files": [
+            "Knowledge/index.md",
+            "Knowledge/log.md"
+          ]
+        },
+        {
+          "text": "link-lint --checks all reports nothing on the written wiki pages: alphabetical keys, external URLs only as plain values of *_url keys, no raw URL in the body, vault entity names as [[wikilinks]], no status, no body ---, no auto zone (unresolved links to pages still missing are allowed)",
+          "check": "lint_clean",
+          "files": "@changed_wiki",
+          "ignore": [
+            "BROKEN"
+          ]
+        },
+        {
+          "text": "Raw sources stay byte-identical",
+          "check": "unchanged",
+          "files": [
+            "Sources/*"
+          ]
+        },
+        {
+          "text": "Every write lands in the folder the fixture Guideline gives its role (Knowledge/, Sources/, Notes/2026-10-02 Jane Doe.md)",
+          "check": "changed_only_within",
+          "prefixes": [
+            "Knowledge/",
+            "Sources/",
+            "Notes/2026-10-02 Jane Doe.md"
+          ],
+          "allow": []
+        },
+        {
+          "text": "The answer's last line is the only `Wiki:` line and its created/updated pages are exactly the wiki pages written",
+          "check": "footer_matches"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "eval_name": "past-study-to-query",
+      "prompt": "전에 spaced repetition 공부해서 정리해 둔 게 있었는데, 핵심이 뭐였지?",
+      "expected_output": "A query subagent reads Knowledge/Concepts/Spaced Repetition.md and the answer gives its cited content; nothing written outside the wiki; a Wiki line only if a page was written.",
+      "files": [
+        "evals/fixture-vault"
+      ],
+      "targets": {},
+      "expectations": [
+        {
+          "text": "The trigger is routed to the query skill in a finished background subagent that opened query/SKILL.md; the main thread writes nothing to the wiki",
+          "check": "routed",
+          "skill": "query",
+          "writes": false
+        },
+        {
+          "text": "The answer body (all but the last line) carries no narration of wiki work",
+          "check": "answer_no_wiki_prose",
+          "forbid": [
+            "\\b(is|was|are|were|now|been|got) (written|created|updated|saved|filed|added|ingested|fixed|corrected|linked(?=[^.\\n]{0,35}\\b(?:the|your) (?:wiki|vault)\\b))\\b",
+            "\\b(I|I've|I have|we've)\\s+(just\\s+)?(wrote|written|created|updated|saved|filed|added|recorded|ingested|fixed|corrected|changed|moved|linked|cited)\\b",
+            "\\b(page|note|Raw)s?\\b[^.\\n]{0,40}\\b(in|to|into) (your|the) (wiki|vault)\\b",
+            "(만들었(?!나)|만들고|생성했|작성했|업데이트했|갱신했|저장했|반영했|기록했|보존했|추가했|고치고|고쳐 ?(뒀|놓았|놨)|수정했|수정하고|달았|붙였|바꾸었|(?<!재귀적으로 )바꾸고|옮겼|넣었|(?<!안 )걸었|남겼|적었|실었|정리해 ?뒀|남겨 ?뒀|써 ?뒀|쓰지 못했|마쳤)",
+            "(ingest|인제스트)[^.\\n]{0,20}(끝났|완료)",
+            "sub-?agent",
+            "서브 ?에이전트",
+            "in the background",
+            "백그라운드",
+            "(?:위키(?:에|로)|볼트(?:에|로))[^.\\n]{0,35}(?:저장하고|바꿨|만들어 ?두었)"
+          ]
+        },
+        {
+          "text": "The answer cites the existing page [[Spaced Repetition]]",
+          "check": "answer_line",
+          "regex": "\\[\\[Spaced Repetition"
+        },
+        {
+          "text": "The answer gives the page's content: reviews spaced so material returns just before it would be forgotten",
+          "check": "answer_line",
+          "regex": "(?i)(forgotten|forget|잊(기|어버리기|히기|혀지기|어버릴)? ?(직전|전에|바로 전))"
+        },
+        {
+          "text": "Web pages read stay links: no Raw file is created under Sources/",
+          "check": "no_new_under",
+          "prefix": "Sources/"
+        },
+        {
+          "text": "Every write lands in the folder the fixture Guideline gives its role (Knowledge/)",
+          "check": "changed_only_within",
+          "prefixes": [
+            "Knowledge/"
+          ],
+          "allow": []
+        },
+        {
+          "text": "A `Wiki:` last line appears exactly when wiki pages were written, and then names exactly those pages",
+          "check": "footer_matches",
+          "optional": true
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "eval_name": "doubt-to-verify",
+      "prompt": "Lumen Notes 페이지에 Jane Doe 가 디자인 리드라고 돼 있던데, 그거 아직 맞아? 출처 다시 확인해 봐.",
+      "expected_output": "A background verify subagent checks the claim against the Raws (the 2026-11-25 leadership update makes her CTO). The source-check request authorizes no writes, and there is no Wiki line.",
+      "files": [
+        "evals/fixture-vault"
+      ],
+      "targets": {},
+      "expectations": [
+        {
+          "text": "The trigger is routed to the verify skill in a finished background subagent that opened verify/SKILL.md; the main thread writes nothing to the wiki",
+          "check": "routed",
+          "skill": "verify",
+          "writes": false
+        },
+        {
+          "text": "The answer body (all but the last line) carries no narration of wiki work",
+          "check": "answer_no_wiki_prose",
+          "forbid": [
+            "\\b(is|was|are|were|now|been|got) (written|created|updated|saved|filed|added|ingested|fixed|corrected|linked(?=[^.\\n]{0,35}\\b(?:the|your) (?:wiki|vault)\\b))\\b",
+            "\\b(I|I've|I have|we've)\\s+(just\\s+)?(wrote|written|created|updated|saved|filed|added|recorded|ingested|fixed|corrected|changed|moved|linked|cited)\\b",
+            "\\b(page|note|Raw)s?\\b[^.\\n]{0,40}\\b(in|to|into) (your|the) (wiki|vault)\\b",
+            "(만들었(?!나)|만들고|생성했|작성했|업데이트했|갱신했|저장했|반영했|기록했|보존했|추가했|고치고|고쳐 ?(뒀|놓았|놨)|수정했|수정하고|달았|붙였|바꾸었|(?<!재귀적으로 )바꾸고|옮겼|넣었|(?<!안 )걸었|남겼|적었|실었|정리해 ?뒀|남겨 ?뒀|써 ?뒀|쓰지 못했|마쳤)",
+            "(ingest|인제스트)[^.\\n]{0,20}(끝났|완료)",
+            "sub-?agent",
+            "서브 ?에이전트",
+            "in the background",
+            "백그라운드",
+            "(?:위키(?:에|로)|볼트(?:에|로))[^.\\n]{0,35}(?:저장하고|바꿨|만들어 ?두었)"
+          ]
+        },
+        {
+          "text": "The answer concludes from the 2026-11-25 leadership update that Jane Doe is now CTO",
+          "check": "answer_line",
+          "regex": "(?i)(CTO|Chief Technology Officer|최고기술책임자)"
+        },
+        {
+          "text": "The answer cites the newer source (the 2026-11-25 leadership update)",
+          "check": "answer_line",
+          "regex": "(?i)(2026-11-25|11-25|leadership update|리더십)"
+        },
+        {
+          "text": "The entire vault stays byte-identical: no creates, edits or deletions",
+          "check": "no_changes_under",
+          "prefix": ""
+        },
+        {
+          "text": "The report-only answer has no Wiki line",
+          "check": "answer_no_wiki_line"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "eval_name": "solved-howto-guide",
+      "prompt": "(Earlier in this conversation)\nMe: Lumen Notes 에서 노트 이름을 바꾸면 다른 노트에 걸린 링크가 깨져. 어떻게 해?\nYou: Settings → Links 에서 'Update links on rename' 을 켜고, 이미 깨진 링크는 Command palette 의 'Find broken links' 로 찾은 다음 각 항목에서 'Relink' 로 새 이름에 다시 연결해 보세요.\n\nMe (now): 해봤는데 됐어! 'Update links on rename' 켜고, 'Find broken links' 로 찾은 깨진 링크 12개를 'Relink' 로 다 고쳤어. 이름 하나 더 바꿔 봤는데 이번엔 링크가 그대로 살아 있어. 고마워.",
+      "expected_output": "The How-to solved and confirmed in the conversation becomes a Guide page (layer: guides) in Knowledge/Guides/ from the ingest guide template, with no Raw and no MOC; last line `Wiki: created [[...]]`.",
+      "files": [
+        "evals/fixture-vault"
+      ],
+      "targets": {
+        "guide": {
+          "glob": "Knowledge/Guides/*.md",
+          "name_regex": "",
+          "state": "created"
+        }
+      },
+      "expectations": [
+        {
+          "text": "The guide is written by ingest in a finished background subagent that opened ingest/SKILL.md and wrote it; the main thread writes nothing to the wiki",
+          "check": "routed",
+          "skill": "ingest",
+          "writes": true
+        },
+        {
+          "text": "The answer body (all but the last line) carries no narration of wiki work",
+          "check": "answer_no_wiki_prose",
+          "forbid": [
+            "\\b(is|was|are|were|now|been|got) (written|created|updated|saved|filed|added|ingested|fixed|corrected|linked(?=[^.\\n]{0,35}\\b(?:the|your) (?:wiki|vault)\\b))\\b",
+            "\\b(I|I've|I have|we've)\\s+(just\\s+)?(wrote|written|created|updated|saved|filed|added|recorded|ingested|fixed|corrected|changed|moved|linked|cited)\\b",
+            "\\b(page|note|Raw)s?\\b[^.\\n]{0,40}\\b(in|to|into) (your|the) (wiki|vault)\\b",
+            "(만들었(?!나)|만들고|생성했|작성했|업데이트했|갱신했|저장했|반영했|기록했|보존했|추가했|고치고|고쳐 ?(뒀|놓았|놨)|수정했|수정하고|달았|붙였|바꾸었|(?<!재귀적으로 )바꾸고|옮겼|넣었|(?<!안 )걸었|남겼|적었|실었|정리해 ?뒀|남겨 ?뒀|써 ?뒀|쓰지 못했|마쳤)",
+            "(ingest|인제스트)[^.\\n]{0,20}(끝났|완료)",
+            "sub-?agent",
+            "서브 ?에이전트",
+            "in the background",
+            "백그라운드",
+            "(?:위키(?:에|로)|볼트(?:에|로))[^.\\n]{0,35}(?:저장하고|바꿨|만들어 ?두었)"
+          ]
+        },
+        {
+          "text": "A Guide page (layer: guides) is created in Knowledge/Guides/",
+          "check": "count_created",
+          "glob": "Knowledge/Guides/*.md",
+          "frontmatter_equals": {
+            "layer": "guides"
+          },
+          "min": 1
+        },
+        {
+          "text": "The Guide uses only the guide template sections, in order, with Key Insight, Overview and Details",
+          "check": "headings",
+          "file": "@guide",
+          "template": "skills/ingest/templates/guide.md",
+          "required": [
+            "## Overview",
+            "## Details"
+          ],
+          "callouts": [
+            "> [!tip] Key Insight"
+          ]
+        },
+        {
+          "text": "The Guide's Procedure contains the confirmed steps: 'Update links on rename', 'Find broken links' and 'Relink'",
+          "check": "section_line",
+          "file": "@guide",
+          "heading": "### Procedure",
+          "patterns": [
+            "\\bUpdate links on rename\\b",
+            "\\bFind broken links\\b",
+            "\\bRelink\\b"
+          ]
+        },
+        {
+          "text": "A chat-only Guide touches no Map (MOC)",
+          "check": "unchanged",
+          "files": [
+            "Knowledge/Maps/*"
+          ]
+        },
+        {
+          "text": "Web pages read stay links: no Raw file is created under Sources/",
+          "check": "no_new_under",
+          "prefix": "Sources/"
+        },
+        {
+          "text": "link-lint --checks all reports nothing on the written wiki pages: alphabetical keys, external URLs only as plain values of *_url keys, no raw URL in the body, vault entity names as [[wikilinks]], no status, no body ---, no auto zone (unresolved links to pages still missing are allowed)",
+          "check": "lint_clean",
+          "files": "@changed_wiki",
+          "ignore": [
+            "BROKEN"
+          ]
+        },
+        {
+          "text": "Every write lands in the folder the fixture Guideline gives its role (Knowledge/)",
+          "check": "changed_only_within",
+          "prefixes": [
+            "Knowledge/"
+          ],
+          "allow": []
+        },
+        {
+          "text": "The answer's last line is the only `Wiki:` line, names the Guide as created, and its pages are exactly the wiki pages written",
+          "check": "footer_matches",
+          "require": {
+            "created": [
+              "."
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "eval_name": "unsolved-howto-no-guide",
+      "prompt": "Lumen Notes 에서 transclusion 한 노트를 plain text 로 export 하는 방법 알아? 'Export as Markdown' 이랑 'Flatten embeds' 둘 다 해봤는데 embed 가 그대로 남아. 아직 못 풀었어.",
+      "expected_output": "No Guide page is created for the unsolved How-to; an unknown word may still go to term; Wiki line only if something was written.",
+      "files": [
+        "evals/fixture-vault"
+      ],
+      "targets": {},
+      "expectations": [
+        {
+          "text": "No Guide page (layer: guides) is created for the unsolved How-to",
+          "check": "count_created",
+          "glob": "*",
+          "frontmatter_equals": {
+            "layer": "guides"
+          },
+          "max": 0
+        },
+        {
+          "text": "Nothing is created, modified or deleted in the Guides folder",
+          "check": "no_changes_under",
+          "prefix": "Knowledge/Guides/"
+        },
+        {
+          "text": "The answer body (all but the last line) carries no narration of wiki work",
+          "check": "answer_no_wiki_prose",
+          "forbid": [
+            "\\b(is|was|are|were|now|been|got) (written|created|updated|saved|filed|added|ingested|fixed|corrected|linked(?=[^.\\n]{0,35}\\b(?:the|your) (?:wiki|vault)\\b))\\b",
+            "\\b(I|I've|I have|we've)\\s+(just\\s+)?(wrote|written|created|updated|saved|filed|added|recorded|ingested|fixed|corrected|changed|moved|linked|cited)\\b",
+            "\\b(page|note|Raw)s?\\b[^.\\n]{0,40}\\b(in|to|into) (your|the) (wiki|vault)\\b",
+            "(만들었(?!나)|만들고|생성했|작성했|업데이트했|갱신했|저장했|반영했|기록했|보존했|추가했|고치고|고쳐 ?(뒀|놓았|놨)|수정했|수정하고|달았|붙였|바꾸었|(?<!재귀적으로 )바꾸고|옮겼|넣었|(?<!안 )걸었|남겼|적었|실었|정리해 ?뒀|남겨 ?뒀|써 ?뒀|쓰지 못했|마쳤)",
+            "(ingest|인제스트)[^.\\n]{0,20}(끝났|완료)",
+            "sub-?agent",
+            "서브 ?에이전트",
+            "in the background",
+            "백그라운드",
+            "(?:위키(?:에|로)|볼트(?:에|로))[^.\\n]{0,35}(?:저장하고|바꿨|만들어 ?두었)"
+          ]
+        },
+        {
+          "text": "Web pages read stay links: no Raw file is created under Sources/",
+          "check": "no_new_under",
+          "prefix": "Sources/"
+        },
+        {
+          "text": "link-lint --checks all reports nothing on the written wiki pages: alphabetical keys, external URLs only as plain values of *_url keys, no raw URL in the body, vault entity names as [[wikilinks]], no status, no body ---, no auto zone (unresolved links to pages still missing are allowed)",
+          "check": "lint_clean",
+          "files": "@changed_wiki",
+          "ignore": [
+            "BROKEN"
+          ]
+        },
+        {
+          "text": "Every write lands in the folder the fixture Guideline gives its role (Knowledge/)",
+          "check": "changed_only_within",
+          "prefixes": [
+            "Knowledge/"
+          ],
+          "allow": []
+        },
+        {
+          "text": "A `Wiki:` last line appears exactly when wiki pages were written, and then names exactly those pages",
+          "check": "footer_matches",
+          "optional": true
+        }
+      ]
+    }
+  ],
+  "trigger_evals": [
+    {
+      "query": "/secondbrain-mode",
+      "should_trigger": true
+    },
+    {
+      "query": "turn on secondbrain mode for the rest of this session",
+      "should_trigger": true
+    },
+    {
+      "query": "secondbrain mode 켜줘. 이제부터 대화하면서 모르는 단어 나오면 위키에 써 줘",
+      "should_trigger": true
+    },
+    {
+      "query": "secondbrain mode off - stop writing to the wiki for now",
+      "should_trigger": true
+    },
+    {
+      "query": "세컨드브레인 모드 꺼줘",
+      "should_trigger": true
+    },
+    {
+      "query": "enable secondbrain mode, then explain what a monad is",
+      "should_trigger": true
+    },
+    {
+      "query": "what's a monad in functional programming?",
+      "should_trigger": false
+    },
+    {
+      "query": "ingest this article into my vault: 'Lumen Notes 1.0 is out...'",
+      "should_trigger": false
+    },
+    {
+      "query": "turn on dark mode in Obsidian and make the sidebar narrower",
+      "should_trigger": false
+    },
+    {
+      "query": "secondbrain-skills 플러그인 지금 버전이 몇이야?",
+      "should_trigger": false
+    },
+    {
+      "query": "what does my second brain say about spaced repetition?",
+      "should_trigger": false
+    },
+    {
+      "query": "help me design a 'second brain' system in Notion for my team's onboarding docs",
+      "should_trigger": false
+    },
+    {
+      "query": "lint my vault and list the broken links",
+      "should_trigger": false
+    },
+    {
+      "query": "Who is Tiago Forte? add him to my people notes",
+      "should_trigger": false
+    }
+  ]
+}
