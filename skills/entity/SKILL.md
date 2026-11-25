@@ -1,6 +1,6 @@
 ---
 name: "entity"
-description: "Apply when the user shows interest in a specific named thing (not a kind or a method): a product, tool, library or model, a person, an organization, a place, a book, a paper, or a channel, podcast or newsletter. Research it and write or update its Entity page in the wiki from the template for its type. Also use whenever the owner asks to add, record or update a person, company, product, book, paper or place note, or brings news about one."
+description: "Apply when the user shows interest in a specific named thing (not a kind or a method): a product, tool, library or model, a person, an organization, a place, a book, a paper, or a channel, podcast or newsletter. Research it and write or update its Entity page in the wiki from the template for its type. Also use whenever the owner asks to add, record or update a person, company, product, book, paper or place note, or brings news about one. Material the owner hands over to ingest or keep, such as a paper's PDF or an article, belongs to ingest."
 license: MIT
 ---
 
@@ -61,7 +61,8 @@ Format:
 - When the live policy types Entities `wiki-page`, a new page also gets the wiki-page fields of the [frontmatter contract](../ingest/references/frontmatter.md): `layer: entities`, `explored: false`, `confidence` and `verificationStatus: unverified`. An existing page keeps its own `explored`, `confidence` and `verificationStatus` values.
 - A template the vault registers for the type wins for frontmatter keys and headings, except that it never brings back an append-only zone (`## Wiki`, `## From Sources`).
 - External URLs in frontmatter only under `*_url` keys as plain URLs (`blog_url`, `instagram_url`, `linkedin_url`, `x_url`, `youtube_url`, and `feed_url` and `source_url` as the vault's properties already define them); the canonical homepage, or a product's repository, stays `url`. `source` lists vault notes as quoted wikilinks. When updating a page with older keys (`youtube`, `x`, `linkedin`, `website`, `feedUrl`, `repository`), move a value to its `*_url` or `url` key only when it is a URL with the same meaning; a bare handle or a conflicting value stays and is reported ([updating](../ingest/references/updating.md)).
-- Every entity name with a page in the vault is a `[[wikilink]]` in the body and a quoted wikilink in frontmatter (`organization: "[[Imperial College London]]"`).
+- Every entity name with a page in the vault is a `[[wikilink]]` in the body and a quoted wikilink in frontmatter (`organization: "[[Imperial College London]]"`). Quoted words stay as written, so when such a name appears only inside a quotation, link it once in your own prose beside the quotation.
+- At read-back, check that each existing vault entity is linked once in the body, at its first eligible prose mention. Never alter quoted or preserved text.
 - Body external links are `[label](URL)`; no raw URL. No list of channels or profiles in the body; those are frontmatter keys.
 - English section headings in the template's order. No `---` in the body and no `status` key.
 
@@ -86,8 +87,10 @@ Sections:
 
 ## Step 5 — Link the work note
 
-When the conversation is about a note in the work area, turn the first mention of the entity in that one note into `[[Entity]]` (or `[[Entity|original text]]`) and change nothing else. Open `principle-preserve-unrequested`.
+When the conversation is about a note in the work area, turn the first mention of the entity in that one note into `[[Entity]]` (or `[[Entity|original text]]`) and change nothing else. The note the conversation is about is one the user named or is working in; a note found only by searching the vault is not it, and no other name in it is linked. Open `principle-preserve-unrequested`.
 
 ## Step 6 — Read back and report
 
-Open `principle-read-back` and read back every note written. Report each principle leaf that changed a decision and what it changed, then one line: `Wiki: created [[X]], updated [[Y]]`, with any failure on the same line, plus any type folder created and any optional-type candidate awaiting the owner's approval.
+Open `principle-read-back` and read back every note written. Before the closing Wiki line, report each principle leaf that changed a decision and what it changed, any impressions note moved out, any type folder created, and any optional-type candidate awaiting approval. The final line is `Wiki: created [[X]], updated [[Y]]`, listing only wiki pages that actually changed, with any failure on the same line. Classify each page once by whether it existed before the task: fixing a page just created does not also make it updated, and a work-note link or a separate impressions note outside the wiki does not belong in this line.
+
+Put all source links or a Sources list before the Wiki line, not after it. Nothing follows that line.

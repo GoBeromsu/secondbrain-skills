@@ -123,13 +123,13 @@ When the source's author or primary speaker matches an existing Persona card, ap
 
 ## Step 8 — Connect
 
-Open `principle-link-form`, `principle-collective-description` for a Map, and `principle-read-back`. After Step 6's readback, check each target against `principle-vault-roles` and `principle-resolve-target`: body links go only into wiki pages, and this ingest's Raw takes only the frontmatter Entity links below. Then add `[[wikilinks]]` between all related pages, create or update the relevant Map (MOC), and leave no orphan: every new page is linked from at least one other page.
+Open `principle-link-form`, `principle-collective-description` for a Map, and `principle-read-back`. After Step 6's readback, check each target against `principle-vault-roles` and `principle-resolve-target`: body links go only into wiki pages, and this ingest's Raw takes only the frontmatter Entity links below. Then add `[[wikilinks]]` between related wiki pages (a work-area note is not one: there only `principle-vault-roles`' first-mention rule applies, in the one note the conversation is about), create or update the relevant Map (MOC), and leave no orphan: every new page is linked from at least one other page.
 
-Where a Wiki page this ingest created or changed, or a Wiki page mentioning an Entity it created, names an existing Entity's title or alias in plain text and context confirms the same referent, link the first mention (`[[Entity|original text]]`) unless the page already links that Entity, then read the page back. In an Entity, never alter a sentence the owner wrote to add a link. In those pages and this ingest's Raw, a frontmatter value under a key the schema or live policy defines as an Entity reference likewise links to the existing same-vault Entity it names, only when identity is confirmed and the key's meaning stays unchanged. Raw `## Original Content`, quotes, code, URLs, other frontmatter and existing links stay unchanged; an ambiguous mention or value is reported as a candidate, not linked.
+Where a Wiki page this ingest created or changed, or a Wiki page mentioning an Entity it created, names an existing Entity's title or alias and context confirms the same referent, link it once at its first eligible prose mention (`[[Entity|original text]]`). Do not add a duplicate where the body already links that Entity. Read the page back. In those pages and this ingest's Raw, a frontmatter value under a key the schema or live policy defines as an Entity reference likewise links to the existing same-vault Entity it names, only when identity is confirmed and the key's meaning stays unchanged. Raw `## Original Content`, quotes, preserved owner sentences, code, URLs, other frontmatter and existing links stay unchanged; an ambiguous mention or value is reported as a candidate, not linked.
 
 ## Step 9 — Update index and log
 
-Update the wiki index in [records](references/records.md), completing all four:
+Resolve the index and log in [records](references/records.md), then check each against the wiki area in the live policy. A bundled default outside that area is not a valid target: skip that record and report the missing mapping instead of creating a folder or guessing a replacement. Update the index only at a valid destination, completing all four:
 
 - each new Wiki page under its section (Terms, Concepts, Entities, Guides, Maps) as `- [[Page Name]] — one-line description`;
 - the Stats table recounted from the folders (Raw Sources, Wiki Pages, Terms, Concepts, Entities, Guides, MOCs, Queries; Terms counted by `layer: terms` when they share the Concept folder), never incremented by guess;
@@ -138,7 +138,7 @@ Update the wiki index in [records](references/records.md), completing all four:
 
 Re-read that index and confirm every new page appears. When the resolved index is missing, create it only at the resolved path, including its parent directory, and say so. When that path is the vault root, stop and report it. Never create `index.md` at the vault root.
 
-Append to the wiki log in [records](references/records.md), never editing earlier entries:
+Append to the wiki log only at a valid destination, never editing earlier entries:
 
 ```markdown
 ## [YYYY-MM-DD] ingest | {source title}
@@ -163,10 +163,11 @@ Check every item and fix failures:
 - every updated existing page still holds every valid statement, link and frontmatter value of its before-image, apart from reviewed corrections;
 - every new Term, Concept and Guide, and every new Entity the live policy types `wiki-page`, has `explored: false`; every `confidence: high` page has a Bias Check with `Counter-argument:` and `Data gap:` lines;
 - every `related` link from Step 2 resolves to an existing note and no literal placeholder remains; external URLs in bodies are `[label](URL)` and no `obsidian://` link is written;
+- every touched Wiki page links each confirmed existing Entity once in the body, at its first eligible prose mention; quoted and preserved text stays unchanged;
 - each new or revised Term passage meets the [Term template](../term/assets/term.md) and the rules in `term`, including its claim locators and source access records;
 - every touched Wiki page passes [conformance](references/conformance.md), each item recorded present or absent in the run report;
-- every new page appears in the wiki index and the Stats counts match the folders;
-- the wiki log entry is appended;
+- when the index destination is valid, every new page appears there and the Stats counts match the folders;
+- when the log destination is valid, its entry is appended;
 - the qmd index status is known: when `reindex` reports pending or failed work, run it and report the result.
 
 Then invoke `secondbrain-skills:lint` and `secondbrain-skills:verify` on the Wiki pages this ingest created or changed, plus the new Raw for lint; each keeps its own contract.

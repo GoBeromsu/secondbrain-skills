@@ -1,6 +1,6 @@
 ---
 name: "concept"
-description: "Apply when the user explores a new methodology, framework, conceptual model, technique or pattern (not a named product or a field term), or an idea one author named, that the vault's wiki has no page or alias for: research it and write or update its Concept page in the wiki from the Concept template. Also use whenever the owner asks to explain, capture or update an idea, method or framework as a note."
+description: "Apply when the user explores a new methodology, framework, conceptual model, technique or pattern (not a named product or a field term), or an idea one author named, that the vault's wiki has no page or alias for: research it and write or update its Concept page in the wiki from the Concept template. Also use whenever the owner asks to explain, capture or update an idea, method or framework as a note. Material the owner hands over to ingest or keep belongs to ingest, even when it is about a method."
 license: MIT
 ---
 
@@ -41,7 +41,7 @@ Format:
 
 - Frontmatter keys in alphabetical order; about five subject tags. `layer` is `concepts`, or `theory`, `method` or `scale` for a paper-derived Concept.
 - `source` lists vault notes as quoted wikilinks. An external URL in frontmatter goes only under a `*_url` key as a plain URL; every other web reference is a `[label](URL)` in the body. No raw URL anywhere in the body.
-- An entity with a page in the vault is a `[[wikilink]]` in the body and a quoted wikilink in frontmatter.
+- An entity with a page in the vault is a `[[wikilink]]` in the body and a quoted wikilink in frontmatter. Quoted words stay as written, so when such a name appears only inside a quotation, link it once in your own prose beside the quotation.
 - A template the vault registers for this kind wins for frontmatter keys and headings.
 - English section headings, in the template's order. No `---` in the body and no `status` key.
 
@@ -59,8 +59,8 @@ Content:
 
 ## Step 5 — Link the work note
 
-When the conversation is about a note in the work area, turn the first mention of the concept in that one note into `[[Concept]]` (or `[[Concept|original text]]`) and change nothing else. Open `principle-preserve-unrequested`.
+When the conversation is about a note in the work area, turn the first mention of the concept in that one note into `[[Concept]]` (or `[[Concept|original text]]`) and change nothing else. The note the conversation is about is one the user named or is working in; a note found only by searching the vault is not it, and no other name in it is linked. Open `principle-preserve-unrequested`.
 
 ## Step 6 — Read back and report
 
-Open `principle-read-back` and read back every note written. Report each principle leaf that changed a decision and what it changed, then one line: `Wiki: created [[X]], updated [[Y]]`, with any failure on the same line.
+Open `principle-read-back` and read back every note written. Report candidates and each principle leaf that changed a decision and what it changed before the closing Wiki line. The final line is `Wiki: created [[X]], updated [[Y]]`, with any failure on the same line.

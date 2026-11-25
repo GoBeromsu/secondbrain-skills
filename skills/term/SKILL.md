@@ -46,7 +46,8 @@ Format:
 
 - Frontmatter keys in alphabetical order; about five subject tags; `domain` as quoted English field wikilinks.
 - `source` lists vault notes as quoted wikilinks. An external URL in frontmatter goes only under a `*_url` key as a plain URL; every other web reference is a `[label](URL)` in the body. No raw URL anywhere in the body.
-- An entity with a page in the vault is a `[[wikilink]]` in the body and a quoted wikilink in frontmatter.
+- An entity with a page in the vault is a `[[wikilink]]` in the body and a quoted wikilink in frontmatter. Quoted words stay as written, so when such a name appears only inside a quotation, link it once in your own prose beside the quotation.
+- At read-back, check that each existing vault entity is linked once in the body, at its first eligible prose mention. Never alter quoted or preserved text. If an entity is named only in an inline quotation or preserved passage, use a linked attribution in your own prose beside it (for example, `[[Northwind Labs]]' announcement says "…"`). Check references and footnotes too: link the first eligible entity mention there when it has no earlier prose link, and link existing Raw notes by wikilink rather than citing bare filenames.
 - A template the vault registers for this kind wins for frontmatter keys and headings.
 - English section headings, in the template's order, using only the sections the term needs. No `---` in the body and no `status` key.
 
@@ -61,8 +62,8 @@ Content:
 
 ## Step 5 — Link the work note
 
-When the conversation is about a note in the work area, turn the first mention of the term in that one note into `[[Term]]` (or `[[Term|original text]]`) and change nothing else. Open `principle-preserve-unrequested`.
+When the conversation is about a note in the work area, turn the first mention of the term in that one note into `[[Term]]` (or `[[Term|original text]]`) and change nothing else. The note the conversation is about is one the user named or is working in; a note found only by searching the vault is not it, and no other name in it is linked. Open `principle-preserve-unrequested`.
 
 ## Step 6 — Read back and report
 
-Open `principle-read-back` and read back every note written. Report each principle leaf that changed a decision and what it changed, then one line: `Wiki: created [[X]], updated [[Y]]`, with any failure on the same line, plus the candidates from Step 2 and a Concept-folder fallback if used.
+Open `principle-read-back` and read back every note written. Before the closing Wiki line, report each principle leaf that changed a decision and what it changed, plus the candidates from Step 2 and a Concept-folder fallback if used. The final line is `Wiki: created [[X]], updated [[Y]]`, listing only wiki pages that actually changed, with any failure on the same line. A first-mention link in a work note is not a wiki write; classify each wiki page once by whether it existed before the task, not by later edits within the task.
