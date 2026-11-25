@@ -61,7 +61,7 @@ When the TOC is missing, open `https://www.aladin.co.kr/shop/wproduct.aspx?ISBN=
 For a title or ISBN alone, search Yes24 first and then Aladin.
 For classic or historical texts, distinguish the recognized local title, the original-language title, the translator and the edition.
 
-Record ISBN-13, TOC and cover in the book Entity's `## Bibliographic Record`, `## Table of Contents` and `cover_url`. Label every recorded field by origin: observed storefront metadata, OCR or inferred summary, or user-supplied reading context.
+Record ISBN-13, TOC and cover in the book Entity's `## Bibliographic Record`, and `## Table of Contents`, the cover as an observed Bibliographic Record line. Label every recorded field by origin: observed storefront metadata, OCR or inferred summary, or user-supplied reading context.
 A storefront blurb is not a finished summary, and a three-line summary is not catalog fact.
 A storefront blurb or empty TOC is unfinished bibliographic work, not a finished book note.
 

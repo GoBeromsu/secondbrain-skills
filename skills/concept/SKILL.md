@@ -20,7 +20,7 @@ Open `principle-vault-roles`, `principle-resolve-target` and `principle-note-kin
 
 Run every `obsidian` command with `vault=<resolved vault>` and give `backlinks` the candidate page as `path=`, as [`obsidian-cli`](../obsidian-cli/SKILL.md) requires; an untargeted command reads whatever vault or note has focus.
 
-Search titles, aliases, translations and spelling variants with `obsidian search query=<name>`, and `obsidian backlinks path=<page>` for an existing page. An existing page for the same idea is updated, never duplicated; open `principle-revise-and-consolidate` and `principle-preserve-voice`.
+Search titles, aliases, translations and spelling variants with `obsidian search query=<name>`, and `obsidian backlinks path=<page>` for an existing page. An existing page for the same idea is updated, never duplicated; open `principle-revise-and-consolidate` and `principle-preserve-voice`, and follow [updating](../ingest/references/updating.md).
 
 ## Step 3 — Research
 

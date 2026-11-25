@@ -3,7 +3,6 @@ aliases:
   - "{original-language title, translated title or alternate title}"
 author:
   - "[[{book author, in the order the book lists them}]]"
-cover_url: {plain URL of the cover image on the bookstore or publisher page}
 date_created: {original creation date, or today for a new page}
 date_modified: {today, YYYY-MM-DD}
 date_published: {publication date of this edition, YYYY-MM-DD}

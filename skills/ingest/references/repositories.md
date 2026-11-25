@@ -20,7 +20,7 @@ Reading the repository:
 Naming and identity:
 
 - Title the page with the product's name in the spelling its maker uses. When a different referent already holds that name, use `{name} ({owner}).md`.
-- `aliases` holds `owner/repo`; `repository_url` holds the canonical repository URL as a plain URL and `url` the project homepage when it has one; `source` holds only vault notes (owner records, Raws) as quoted wikilinks.
+- `aliases` holds `owner/repo`; `url` holds the project homepage as a plain URL, or the canonical repository URL when it has none; `source` holds only vault notes (owner records, Raws) as quoted wikilinks.
 - Maintainers become `"[[Name]]"` person links only when the repository states them.
 
 A repository Raw the vault already holds stays as it is and may be cited as a source; it is not deleted, moved or rewritten by this recipe.

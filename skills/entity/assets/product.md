@@ -11,7 +11,6 @@ maker: "[[{person or organization that makes it}]]"
 model: {runtime-reported model id}
 related:
   - "[[{existing note this product connects to}]]"
-repository_url: {plain URL of the source repository}
 source:
   - "[[{Raw or owner record the page draws on}]]"
 tags:
@@ -21,7 +20,7 @@ tags:
   - {subject tag 4}
   - {subject tag 5}
 type: {product type the live policy uses}
-url: {plain URL of the canonical homepage}
+url: {plain URL of the canonical homepage, or of the repository when it has none}
 ---
 
 # {Product name}

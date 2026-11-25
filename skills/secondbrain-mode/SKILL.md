@@ -22,13 +22,13 @@ The mode is on from the message that invokes it until the session ends or the us
 | asks about a word they do not know | `term` |
 | explores a new methodology | `concept` |
 | shows interest in a specific product, person or organization | `entity` |
-| hands over a paper or an article | `ingest` (save only, without compiling: `capture`) |
+| hands over a paper or an article | `ingest` |
 | asks about something they studied before | `query` |
 | doubts something the wiki already says | `verify` |
 
 - A word counts as unknown when the user asks about it or newly uses it and the wiki has no page or alias for it. When a page or alias exists, the skill only adds new claims to it.
-- Handing over means giving the material itself and asking to keep, save or ingest it; that request is what lets `ingest` save a Raw, so the kickoff quotes it verbatim. A link mentioned in passing is not a handover: its new words go to `term`, `concept` or `entity`, and the link stays a `[label](URL)` on their pages.
-- A How-to that was actually solved and confirmed in this conversation becomes a Guide page; an unsolved How-to gets none. A Guide is a page kind, not a skill: its subagent's kickoff names `ingest`'s [guide](../ingest/templates/guide.md) template instead of a skill, plus the solved steps as confirmed; it writes the page in the Guides folder the guideline names, cites in `source` the work note where it was solved and in Sources the web pages the solution rests on, and when it was solved only in chat leaves `source` empty and says in Overview when it was confirmed, follows the Guide rule in `ingest` Step 6 for the Contradiction and Bias Check blocks, opens the page-writing principles below, and saves no Raw and touches no Map.
+- Handing over means giving the material itself and asking to keep, save or ingest it; that request is what lets `ingest` save a Raw, so the kickoff quotes it verbatim. A link mentioned in passing is not a handover: its new words go to `term`, `concept` or `entity`, and the link stays a `[label](URL)` on their pages. An explicit request to save without compiling does not trigger `ingest`.
+- A How-to solved and confirmed in this conversation becomes a Guide page (a page kind, see `principle-note-kinds`), written by `ingest` Step 6's Guide rule from its [guide](../ingest/templates/guide.md) template; an unsolved How-to gets none.
 - The mode never creates a Map (MOC). Maps are made and updated by `ingest`'s Connect step, and `lint` reports pages a Map misses.
 
 ## Running a trigger

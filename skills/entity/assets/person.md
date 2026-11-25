@@ -17,7 +17,7 @@ organization: "[[{organization they belong to}]]"
 phones:
   - "{phone number a source states}"
 related:
-  - "[[{title of the impressions note: date_created and Name}]]"
+  - "[[{date_created} {Name}]]"  # only when the impressions note exists
   - "[[{existing note this person connects to}]]"
 source:
   - "[[{Raw or owner record the page draws on}]]"

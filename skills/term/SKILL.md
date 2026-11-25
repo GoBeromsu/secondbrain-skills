@@ -22,7 +22,7 @@ Run every `obsidian` command with `vault=<resolved vault>` and give `backlinks` 
 
 Search with `obsidian-cli`, which matches what Obsidian itself resolves: `obsidian search query=<name>` for each title, alias, translation and spelling variant, `obsidian unresolved verbose` filtered to those names, and `obsidian backlinks path=<page>` for an existing page.
 
-- An existing page or alias for the same referent is updated, never duplicated; open `principle-revise-and-consolidate` and `principle-preserve-voice`. A new related sense joins the existing page.
+- An existing page or alias for the same referent is updated, never duplicated; open `principle-revise-and-consolidate` and `principle-preserve-voice`, and follow [updating](../ingest/references/updating.md). A new related sense joins the existing page.
 - Fold an empty or stub wiki page for the same referent into the Term: copy its content and properties into the Term, leave the stub itself as it is (renaming, moving or emptying it would break or rewrite links in Raw and work notes), and report it with its backlinks so the owner can retire it.
 - Retarget links to the same referent at the Term by editing the link inside wiki pages, keeping their display text (`[[이키가이]]` → `[[Ikigai|이키가이]]`); an alias alone does not resolve a link. Outside the wiki, only the work note the conversation is about may change, and only its first mention; list the rest as candidates in the report.
 
