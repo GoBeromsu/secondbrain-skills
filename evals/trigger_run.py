@@ -9,6 +9,8 @@ records the skills each query invokes, so siblings compete as they do in use. It
   a should-not-trigger query in fewer than half;
 - `principle-*` leaves and `secondbrain-mode` (`disable-model-invocation: true`) are invoked 0 times.
 
+Set --fixtures DIR or SB_EVAL_FIXTURES to the fixture root.
+
   python3 evals/trigger_run.py                         # term, concept, entity, secondbrain-mode
   python3 evals/trigger_run.py --skills term --runs 1
 """
@@ -30,7 +32,7 @@ PLUGIN = "secondbrain-skills"
 SKILL_MD = re.compile(r"skills/([a-z0-9-]+)/SKILL\.md")
 
 
-def invoked(query, model, timeout, plugin, full=False):
+def invoked(query, model, timeout, plugin, fixture, full=False):
     """{'first': skill the model reached for first or None, 'skill_calls': every Skill tool call in the run
     (main thread and subagents), 'leaf_reads': principle SKILL.md files opened by path, 'status': ...}.
 
@@ -41,7 +43,7 @@ def invoked(query, model, timeout, plugin, full=False):
     from agent_run import copy_subagents, load_subagents, sandbox_profile
     tmp = tempfile.mkdtemp(prefix="sb-trig-")
     vault = os.path.join(os.path.realpath(tmp), "vault")
-    shutil.copytree(os.path.join(HERE, "fixture-vault"), vault)
+    shutil.copytree(fixture, vault)
     cmd = ["sandbox-exec", "-f", sandbox_profile(tmp), "claude", "-p", query, "--output-format", "stream-json",
            "--verbose", "--model", model, "--setting-sources", "project,local", "--strict-mcp-config",
            "--plugin-dir", plugin, "--disallowedTools", "Bash(obsidian:*)"]
@@ -128,6 +130,7 @@ def invoked(query, model, timeout, plugin, full=False):
 
 def main(argv=None):
     ap = argparse.ArgumentParser()
+    ap.add_argument("--fixtures", metavar="DIR", help="fixture root (default: SB_EVAL_FIXTURES)")
     ap.add_argument("--skills", default="term,concept,entity,secondbrain-mode")
     ap.add_argument("--runs", type=int, default=3)
     ap.add_argument("--workers", type=int, default=10)
@@ -137,6 +140,12 @@ def main(argv=None):
     ap.add_argument("--full", action="store_true", help="run each query to its final result and scan every Skill call")
     ap.add_argument("--json", default=None)
     a = ap.parse_args(argv)
+    fixture_root = a.fixtures or os.environ.get("SB_EVAL_FIXTURES")
+    if not fixture_root:
+        ap.error("set --fixtures DIR or SB_EVAL_FIXTURES to the fixture root")
+    fixture = os.path.abspath(os.path.join(os.path.expanduser(fixture_root), "fixture-vault"))
+    if not os.path.isdir(fixture):
+        ap.error(f"fixture vault is not a directory: {fixture}")
     items = []
     for s in a.skills.split(","):
         with open(os.path.join(HERE, s, "evals.json"), encoding="utf-8") as f:
@@ -144,7 +153,7 @@ def main(argv=None):
             items += [dict(q, owner=s) for q in json.load(f)["trigger_evals"] if not q["query"].startswith("/")]
     runs = {}
     with ThreadPoolExecutor(a.workers) as pool:
-        futs = {pool.submit(invoked, q["query"], a.model, a.timeout, a.plugin, a.full): i
+        futs = {pool.submit(invoked, q["query"], a.model, a.timeout, a.plugin, fixture, a.full): i
                 for i, q in enumerate(items) for _ in range(a.runs)}
         for fu in as_completed(futs):
             runs.setdefault(futs[fu], []).append(fu.result())

@@ -172,9 +172,11 @@ Every push and pull request runs [`validate`](.github/workflows/validate.yml) in
 | Each `skills/<name>/SKILL.md` has frontmatter whose `name` is its folder and a description within 1,024 characters | `scripts/validate.py` |
 | Every package is listed in both READMEs, and every relative link resolves | `scripts/validate.py` |
 | Every image is recorded in the [asset ledger](assets/asset-ledger.json); SVGs carry no scripts or external references; the icon is a square PNG | `scripts/validate.py` |
-| Bundled scripts compile, and `link-lint.py` reproduces its [eval](evals/lint-links) | `scripts/validate.py` |
+| Bundled scripts compile; optionally, `link-lint.py` reproduces its [eval](evals/README.md) | `scripts/validate.py` |
 
 Run the same checks locally with `python3 scripts/validate.py`.
+
+Fixtures live outside the repository in `<dir>/fixture-vault/` and `<dir>/lint-links/`. To opt in to the lint regression, run `SB_EVAL_FIXTURES="<dir>" python3 scripts/validate.py`. The [fixture-based eval runners](evals/README.md) also accept `--fixtures <dir>`, which overrides the environment variable.
 
 > [!NOTE]
 > These are static checks: they claim no runtime load. What a change was run against is named in that change's commit message.
