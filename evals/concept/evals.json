@@ -73,12 +73,9 @@
           ]
         },
         {
-          "text": "link-lint --checks all reports nothing on the written wiki pages: alphabetical keys, external URLs only as plain values of *_url keys, no raw URL in the body, vault entity names as [[wikilinks]], no status, no body ---, no auto zone (unresolved links to pages still missing are allowed)",
+          "text": "link-lint --checks all reports nothing on the written wiki pages: alphabetical keys, external URLs only as plain values of *_url keys, no raw URL in the body, vault entity names as [[wikilinks]], no status, no body ---, no auto zone",
           "check": "lint_clean",
-          "files": "@changed_wiki",
-          "ignore": [
-            "BROKEN"
-          ]
+          "files": "@changed_wiki"
         },
         {
           "text": "Web pages read stay links: no Raw file is created under Sources/",
@@ -161,12 +158,9 @@
           "regex": "\\[[^\\]]+\\]\\(https?://[^)\\s]+\\)|\\[\\[[^\\]]+\\]\\]"
         },
         {
-          "text": "link-lint --checks all reports nothing on the written wiki pages: alphabetical keys, external URLs only as plain values of *_url keys, no raw URL in the body, vault entity names as [[wikilinks]], no status, no body ---, no auto zone (unresolved links to pages still missing are allowed)",
+          "text": "link-lint --checks all reports nothing on the written wiki pages: alphabetical keys, external URLs only as plain values of *_url keys, no raw URL in the body, vault entity names as [[wikilinks]], no status, no body ---, no auto zone",
           "check": "lint_clean",
-          "files": "@changed_wiki",
-          "ignore": [
-            "BROKEN"
-          ]
+          "files": "@changed_wiki"
         },
         {
           "text": "Web pages read stay links: no Raw file is created under Sources/",

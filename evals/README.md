@@ -18,7 +18,7 @@ Evals run only against fixture vaults in this folder, never against a real vault
 
 ## Fixture vault
 
-`Guideline.md` gives each role a folder name different from the owner's vault, so a skill that hardcodes a path fails: wiki is `Knowledge/`, source (Raw) is `Sources/`, work is `Projects/`. It also names the lifecycle types (`project`, `task`) and marks Entities with `layer: entities`.
+`Guideline.md` gives each role a folder name different from the owner's vault, so a skill that hardcodes a path fails: wiki is `Knowledge/`, source (Raw) is `Sources/`, work is `Projects/`. `ENTITY-UNLINKED` identifies entities by the Entity folders declared in the guideline, with `layer: entities` as a fallback. The status exception covers lifecycle types (`project`, `task`) and the owner's declared book entities carrying reading progress.
 
 Clean sample pages, which must produce no finding:
 
@@ -40,7 +40,7 @@ python3 evals/lint/run.py          # python path (link-lint.py --checks all) and
 python3 evals/lint/run.py --cli    # also obsidian-lint.py; Obsidian must already have fixture-vault open
 ```
 
-Each case names the paths it applies to. A case passes on a path when every expected finding is reported and none of its clean files has a finding; a final row per path fails on any finding no case expects. A script that crashes, prints a malformed line, or whose `# violations` total disagrees with its lines counts as not run, and every row of that path fails. The runner also stops if `evals.json` names a fixture file that does not exist, or if its `policy` differs from the wiki folder and lifecycle types `Guideline.md` declares. Without `--cli`, or when Obsidian does not have the fixture open, the CLI path does not run; `obsidian-lint.py` never opens or switches a vault itself. Only open the fixture in Obsidian when no other session depends on which vault is focused.
+Each case names the paths it applies to. A case passes on a path when every expected finding is reported and none of its clean files has a finding; a final row per path fails on any finding no case expects. A script that crashes, prints a malformed line, or whose `# violations` total disagrees with its lines counts as not run, and every row of that path fails. The runner also stops if `evals.json` names a missing fixture file or if its policy differs from the wiki folder, Entity folders, lifecycle types, or reading-progress book types declared by `Guideline.md`. Without `--cli`, or when Obsidian does not have the fixture open, the CLI path does not run; `obsidian-lint.py` never opens or switches a vault itself. Only open the fixture in Obsidian when no other session depends on which vault is focused.
 
 ## Baseline against new
 
@@ -86,17 +86,74 @@ SKILL_CREATOR=<skill-creator dir> PATH=<claude shim>:$PATH \
   --skill-path skills/term --model opus --max-iterations 5 --timeout 90 --report none
 ```
 
-The `claude` shim for skill-creator's scripts adds `--setting-sources project,local --strict-mcp-config`. The baseline for `term`, `concept` and `entity` is 0.28.1's `principle-knowledge-notes`, which held their templates; `secondbrain-mode` has no 0.28.1 counterpart, so its baseline gets the whole 0.28.1 skills tree. Checks that read a page reuse `skills/lint/scripts/link-lint.py --checks all`; its `BROKEN` rule is ignored there because the term template asks for one link to a term that has no page yet. The narration check looks for reports of wiki work in the answer body (a page written, saved, filed, or a subagent); citing a vault page in a `query` or `verify` answer is the answer, not narration.
+The `claude` shim for skill-creator's scripts adds `--setting-sources project,local --strict-mcp-config`. The baseline for `term`, `concept` and `entity` is 0.28.1's `principle-knowledge-notes`, which held their templates; `secondbrain-mode` has no 0.28.1 counterpart, so its baseline gets the whole 0.28.1 skills tree.
+
+- **Routing:** A finished background worker must open the requested skill. Query/verify require successful file-level reads of the case's relevant notes; opening only the skill does not count. Every changed wiki path needs a successful worker tool result. For shell results, the grader accepts exact literal file operands from `cat`/`head`/`tail` reads, `touch`, and single-output `cat`/`echo`/`printf` redirects (including a quoted `cat` here-doc). Dynamic paths, compound commands and paths merely echoed in an argument are not attribution. Parent writes, including visible relative shell redirects, fail the row.
+- **Report:** Verify requires an affirmative current-role conclusion, not a question, hypothesis, rumor, unconfirmed claim or attribution alone, and a citation to the decisive source note. The mode grader checks all top-level assistant text in the stream, not just terminal summaries: the parent stays silent until trusted worker completion, then gives exactly one answer without wiki-work narration, including in `principle-` lines. Explaining product behavior, note-taking mechanics or a principle decision is allowed; reporting or offering wiki edits is not. The report-only query and verify cases do not authorize record writes. An expressly approved routed write-back can update only the records prescribed by its skill (query: index and log; verify: log). Mode case 9 declares the Query folder and seeds the index and log only in its disposable vault copy.
+- **Footer:** The only `Wiki:` line comes last and has comma-separated created, updated and failed outcomes in that order, omitting empty clauses. Each failure needs a parenthesized reason (which may contain nested parentheses) and a corresponding structured or supported shell write error. A failed-only footer is valid; optional footer rows require no footer when there are no wiki outcomes. Source notes, work notes and unattempted work do not appear.
+- **Ingest and lint:** Exactly one new Raw preserves the handed-over article verbatim and ends the excerpt with a standalone `<!-- end-original-content -->` marker. The final occurrence separates preserved text from authored sections, including chapter Reading Notes. Legacy Raws without it have no unambiguous lint boundary and are not rewritten. The owner's existing impressions must move byte-exact to a dated note with reciprocal links. Lint requires a wiki write unless the row is optional and checks changed wiki pages plus any changed source pages in mode. It treats external citation labels as body mentions and does not count frontmatter links as body links.
+
+`--grade-only` runs no agents but overwrites grading and derived evidence in the selected iteration; copy a retained iteration to a fresh number first.
 
 ### Recorded knowledge-skill runs (2026-11-26)
 
-| Skill | Final iteration | `with_skill` | 0.28.1 `old_skill` |
+| Skill | R4 iteration | `with_skill` | 0.28.1 `old_skill` |
+| --- | --- | --- | --- |
+| term | 70 | 27/27 | 9/27 |
+| concept | 50 | 19/19 | 8/19 |
+| entity | 50 | 39/39 | 14/39 |
+| secondbrain-mode (R4 final run, stream regrade) | 70 | 65/69 | 35/69 |
+| secondbrain-mode (historical i14 traces, stream regrade) | 114 | 49/69 | 37/69 |
+
+Scores pool assertion rows. Mode and term i70 were fresh R4 runs; i70 predates the skill change and case 9 below. The stream regrade drops mode `with_skill` i70 from 68/69 (cases 1, 2 and 7) and i114 from 53/69 (cases 1, 3, 5 and 7); `old_skill` is unchanged at both iterations. Mode i70 vs i114, pass → fail: `with_skill` 2.8 (duplicate `Wiki:` footer); `old_skill` 1.2 (wiki narration) and 6.3 (no affirmed current role). The `with_skill` rows newly passing are 3.2, 3.5, 4.1–4.6, 4.9, 5.1–5.2, 6.1, 6.2, 6.4, 8.3, 8.4 and 8.8; no `old_skill` rows newly pass.
+
+#### R4 variance trials (`with_skill`)
+
+| Skill / case | Iterations | Saved grades, in iteration order |
+| --- | --- | --- |
+| Mode 2 — concept | 80–82 | 8/8, 8/8, 8/8 |
+| Mode 3 — entity | 50–52 | 8/8, 8/8, 8/8 |
+| Mode 4 — ingest | 60–62 | 12/12, 12/12, 12/12 |
+| Mode 5 — report-only query | 60–62 | 8/8, 8/8, 8/8 |
+| Mode 6 — report-only verify | 63–65 | 6/6, 6/6, 6/6 |
+| Term 2 | 50–52 | 9/9, 9/9, 9/9 |
+| Term 3 | 60–62 | 10/10, 10/10, 10/10 |
+| Mode 9 — approved query write-back, first wait revision | 90–92 | 0/9 (timeout), 7/9, 0/9 (timeout) |
+| Mode 9 — approved query write-back, final wait revision | 96–98 | 8/9, 8/9, 8/9 |
+
+Earlier variance trials retain their saved rubric, except mode 2 (i80–82), which was stream-regraded without a score change.
+
+Mode i90 regression checks: case 2 **7/8** and case 6 **5/6** (both emitted parent text before completion), case 5 **8/8**. Case 9 i91 emitted progress and repeated the `updated` verb in its footer. In i90 and i92 case 9, the query worker finished but the runner timed out waiting for surplus background timers. These trials predate the explicit prohibition on background wait timers.
+
+Full mode follow-up i95 scored **59/78**: cases 1–9 were 6/8, 7/8, 6/8, 0/12 (timeout), 8/8, 5/6, 11/11, 7/8 and 9/9. Cases 1–6 loaded the preceding wait instructions; cases 7–9 loaded the final text. Rows that passed i114 and failed i95 were 1.1 and 1.5 (worker attribution and key order), 3.1 (worker attribution), and 4.7–4.8 and 4.10–4.12 (ingest did not complete within 230 seconds).
+
+With the final wait revision, i96 cases 2, 5 and 6 scored **7/8**, **8/8** and **6/6**. All three approved query workers in i96–98 wrote the Query note, index and log, and each produced a valid final footer, but every parent emitted a progress message before completion. The i95 approved query was silent; silence is not reliable yet.
+
+### R3 history (earlier rubric)
+
+| Skill | Iteration | `with_skill` | 0.28.1 `old_skill` |
 | --- | --- | --- | --- |
 | term | 14 | 26/27 | 12/27 |
 | concept | 15 | 19/19 | 10/19 |
 | entity | 15 | 21/21 | 6/21 |
 | secondbrain-mode | 15 | 53/60 | 35/60 |
 
-Totals pool graded rows across cases. The baseline uses 0.28.1 `principle-knowledge-notes` for term, concept and entity and the whole 0.28.1 skill tree for mode. Each final iteration has a skill-creator `benchmark.json` and a static `review.html` in its workspace under `evals/results/`.
+These historical totals pool graded rows across cases under the earlier rubric. The baseline uses 0.28.1 `principle-knowledge-notes` for term, concept and entity and the whole 0.28.1 skill tree for mode. Each recorded iteration has a skill-creator `benchmark.json` and a static `review.html` in its workspace under `evals/results/`.
+
+Targeted mode regrades, not new runs: iteration 17 copied to 137 (query 5/7 and verify 3/6: both lack successful structured reads; verify also reports a contradictory role); iteration 121 copied to 138 (Logseq 6/7: skipped work in the footer; ingest 6/9: verbatim Raw passes, but lint, narration and footer fail).
+
+Second-review grade-only comparison, using copies of the retained `with_skill` traces. These are rubric changes, not fresh runs or baseline scores. Entity adds the no-records row; ingest adds three impressions-migration rows.
+
+| Original → copy | Entity: old → revised | Ingest: old → revised |
+| --- | --- | --- |
+| 30 → 230 | 7/7 → 8/8 | 8/9 → 8/12 |
+| 31 → 231 | 7/7 → 7/8 | 7/9 → 7/12 |
+| 32 → 232 | — | 9/9 → 12/12 |
+| 33 → 233 | — | 9/9 → 12/12 |
+| 34 → 234 | — | 7/9 → 10/12 |
+| 35 → 235 | — | 8/9 → 11/12 |
+| 36 → 236 | — | 9/9 → 12/12 |
+
+The revised rows detect unauthorized index/log creation in 231 Entity and missing impressions migration in 230–231 Ingest. Ingest 231 also has an unlinked entity; 234 has a non-verbatim Raw. Ingest 230, 231, 234 and 235 still narrate wiki work in the user-facing answer.
 
 Final whole-plugin trigger run (`trigger_run.py`, default Claude config with `CLAUDE_CONFIG_DIR` unset, 3 runs per query): term 20/20, concept 20/20, entity 20/20, and secondbrain-mode 13/13 for non-auto-invocation, not activation or lifecycle. No runs failed and no `principle-*` or `secondbrain-mode` Skill-tool invocations were observed.

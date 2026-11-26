@@ -81,12 +81,9 @@
           ]
         },
         {
-          "text": "link-lint --checks all reports nothing on the written wiki pages: alphabetical keys, external URLs only as plain values of *_url keys, no raw URL in the body, vault entity names as [[wikilinks]], no status, no body ---, no auto zone (unresolved links to pages still missing are allowed)",
+          "text": "link-lint --checks all reports nothing on the written wiki pages: alphabetical keys, external URLs only as plain values of *_url keys, no raw URL in the body, vault entity names as [[wikilinks]], no status, no body ---, no auto zone",
           "check": "lint_clean",
-          "files": "@changed_wiki",
-          "ignore": [
-            "BROKEN"
-          ]
+          "files": "@changed_wiki"
         },
         {
           "text": "Web pages read stay links: no Raw file is created under Sources/",
@@ -197,12 +194,9 @@
           ]
         },
         {
-          "text": "link-lint --checks all reports nothing on the written wiki pages: alphabetical keys, external URLs only as plain values of *_url keys, no raw URL in the body, vault entity names as [[wikilinks]], no status, no body ---, no auto zone (unresolved links to pages still missing are allowed)",
+          "text": "link-lint --checks all reports nothing on the written wiki pages: alphabetical keys, external URLs only as plain values of *_url keys, no raw URL in the body, vault entity names as [[wikilinks]], no status, no body ---, no auto zone",
           "check": "lint_clean",
-          "files": "@changed_wiki",
-          "ignore": [
-            "BROKEN"
-          ]
+          "files": "@changed_wiki"
         },
         {
           "text": "Writes stay under Knowledge/ except the exact impressions note Notes/2026-10-02 Jane Doe.md",
@@ -220,6 +214,192 @@
           "require": {
             "updated": [
               "(?i)^Jane Doe"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "eval_name": "new-organization",
+      "prompt": "What is the Mozilla Foundation, and how does it differ from the Mozilla Corporation? Make an organization page for the Foundation. Start with its own account at https://www.mozillafoundation.org/en/who-we-are/.",
+      "expected_output": "Creates a Mozilla Foundation page in Knowledge/Organizations/ from assets/organization.md, distinguishes it from the Corporation with sourced claims, saves no Raw, and reports the created page on the final Wiki line.",
+      "files": [
+        "evals/fixture-vault"
+      ],
+      "targets": {
+        "page": {
+          "glob": "Knowledge/Organizations/*.md",
+          "name_regex": "(?i)^Mozilla Foundation(?:$| \\()",
+          "state": "created"
+        }
+      },
+      "expectations": [
+        {
+          "text": "The organization page exists in its Entity folder",
+          "check": "exists",
+          "file": "@page"
+        },
+        {
+          "text": "Entity frontmatter has layer: entities and no status key",
+          "check": "frontmatter",
+          "file": "@page",
+          "equals": {
+            "layer": "entities"
+          },
+          "absent": [
+            "status"
+          ]
+        },
+        {
+          "text": "Entity body uses only assets/organization.md sections, in template order, with the TL;DR callout and Origin, Explanation, Personal Insights, References",
+          "check": "headings",
+          "file": "@page",
+          "template": "skills/entity/assets/organization.md",
+          "required": [
+            "## Origin",
+            "## Explanation",
+            "## Personal Insights",
+            "## References"
+          ],
+          "callouts": [
+            "> [!abstract] TL;DR"
+          ]
+        },
+        {
+          "text": "The ## References section carries at least one source link ([label](URL) or a vault wikilink)",
+          "check": "section_line",
+          "file": "@page",
+          "heading": "## References",
+          "regex": "\\[[^\\]]+\\]\\(https?://[^)\\s]+\\)|\\[\\[[^\\]]+\\]\\]"
+        },
+        {
+          "text": "The Explanation names the Mozilla Corporation and describes its relationship to the Foundation as a subsidiary",
+          "check": "section_line",
+          "file": "@page",
+          "heading": "## Explanation",
+          "patterns": [
+            "(?i)\\bMozilla Corporation\\b",
+            "(?i)\\b(?:subsidiary|wholly owned)\\b"
+          ]
+        },
+        {
+          "text": "link-lint --checks all reports nothing on the written wiki pages: alphabetical keys, external URLs only as plain values of *_url keys, no raw URL in the body, vault entity names as [[wikilinks]], no status, no body ---, no auto zone",
+          "check": "lint_clean",
+          "files": "@changed_wiki"
+        },
+        {
+          "text": "Web pages read stay links: no Raw file is created under Sources/",
+          "check": "no_new_under",
+          "prefix": "Sources/"
+        },
+        {
+          "text": "Every write lands in the folder the fixture Guideline gives its role (Knowledge/Organizations/)",
+          "check": "changed_only_within",
+          "prefixes": [
+            "Knowledge/Organizations/"
+          ],
+          "allow": []
+        },
+        {
+          "text": "The answer has one `Wiki:` line as its last line that names [[Mozilla Foundation...]] as created, and its created/updated pages are exactly the wiki pages written",
+          "check": "footer_matches",
+          "require": {
+            "created": [
+              "(?i)^Mozilla Foundation"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "eval_name": "new-place",
+      "prompt": "Create a place note for the Eiffel Tower (Tour Eiffel) in Paris. I want to know why it was built and how visitors get to the observation levels. Use its official site https://www.toureiffel.paris/en as a starting point.",
+      "expected_output": "Creates a Tour Eiffel page in Knowledge/Places/ from assets/place.md, cites sources for its origin and visitor access, saves no Raw, and reports the created page on the final Wiki line.",
+      "files": [
+        "evals/fixture-vault"
+      ],
+      "targets": {
+        "page": {
+          "glob": "Knowledge/Places/*.md",
+          "name_regex": "(?i)^(?:Tour Eiffel|Eiffel Tower)(?:$| \\()",
+          "state": "created"
+        }
+      },
+      "expectations": [
+        {
+          "text": "The place page exists in its Entity folder",
+          "check": "exists",
+          "file": "@page"
+        },
+        {
+          "text": "Entity frontmatter has layer: entities and no status key",
+          "check": "frontmatter",
+          "file": "@page",
+          "equals": {
+            "layer": "entities"
+          },
+          "absent": [
+            "status"
+          ]
+        },
+        {
+          "text": "Entity body uses only assets/place.md sections, in template order, with the TL;DR callout and Origin, Explanation, Personal Insights, References",
+          "check": "headings",
+          "file": "@page",
+          "template": "skills/entity/assets/place.md",
+          "required": [
+            "## Origin",
+            "## Explanation",
+            "## Personal Insights",
+            "## References"
+          ],
+          "callouts": [
+            "> [!abstract] TL;DR"
+          ]
+        },
+        {
+          "text": "The ## References section carries at least one source link ([label](URL) or a vault wikilink)",
+          "check": "section_line",
+          "file": "@page",
+          "heading": "## References",
+          "regex": "\\[[^\\]]+\\]\\(https?://[^)\\s]+\\)|\\[\\[[^\\]]+\\]\\]"
+        },
+        {
+          "text": "Origin names the 1889 exhibition that prompted construction",
+          "check": "section_line",
+          "file": "@page",
+          "heading": "## Origin",
+          "patterns": [
+            "\\b1889\\b",
+            "(?i)\\b(?:exhibition|exposition|world(?:'s|’s) fair)\\b"
+          ]
+        },
+        {
+          "text": "link-lint --checks all reports nothing on the written wiki pages: alphabetical keys, external URLs only as plain values of *_url keys, no raw URL in the body, vault entity names as [[wikilinks]], no status, no body ---, no auto zone",
+          "check": "lint_clean",
+          "files": "@changed_wiki"
+        },
+        {
+          "text": "Web pages read stay links: no Raw file is created under Sources/",
+          "check": "no_new_under",
+          "prefix": "Sources/"
+        },
+        {
+          "text": "Every write lands in the folder the fixture Guideline gives its role (Knowledge/Places/)",
+          "check": "changed_only_within",
+          "prefixes": [
+            "Knowledge/Places/"
+          ],
+          "allow": []
+        },
+        {
+          "text": "The answer has one `Wiki:` line as its last line that names [[(?:Tour Eiffel|Eiffel Tower)...]] as created, and its created/updated pages are exactly the wiki pages written",
+          "check": "footer_matches",
+          "require": {
+            "created": [
+              "(?i)^(?:Tour Eiffel|Eiffel Tower)"
             ]
           }
         }
