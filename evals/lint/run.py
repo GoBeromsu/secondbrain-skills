@@ -66,7 +66,9 @@ def main(argv=None):
     entity_folders = [f"{w}/{d}" for w in wiki for d in subfolders]
     life = re.search(r"^Only lifecycle notes carry `status`: (.*)$", guideline, re.M)
     book_types = re.findall(r"^Book Entities of `type: ([^`]+)`", guideline, re.M)
+    product_types = re.findall(r"^Product Entities of `type: ([^`]+)`", guideline, re.M)
     declared = {"wiki": wiki, "entity_folders": entity_folders, "book_types": book_types,
+                "product_types": product_types,
                 "lifecycle": re.findall(r"`type: ([^`]+)`", life[1]) if life else []}
     if any(sorted(values) != sorted(spec["policy"][key]) for key, values in declared.items()):
         sys.exit("evals.json policy %s is not what %s declares: %s" % (
@@ -75,6 +77,7 @@ def main(argv=None):
     policy = [x for w in wiki for x in ("--wiki", w)]
     policy += [x for d in entity_folders for x in ("--entity-folder", d)]
     policy += [x for t in book_types for x in ("--book-type", t)]
+    policy += [x for t in product_types for x in ("--product-type", t)]
     policy += ["--lifecycle", ",".join(declared["lifecycle"])]
 
     python = run(os.path.join(scripts, "link-lint.py"), ["--vault", vault, "--checks", "all", *policy])

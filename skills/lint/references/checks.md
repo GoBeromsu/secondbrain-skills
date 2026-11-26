@@ -80,12 +80,12 @@ rg -n -g '*.md' '`https?://[^\s)`]+`' "<scope>"
 python3 "<skill-dir>/scripts/link-lint.py" --vault "<vault>" --scope "<scope>" > link-lint.tsv
 
 # Frontmatter and structure (Step 12). Use live policy for folders and types.
-# Repeat --entity-folder and --book-type as needed; omit them if not declared.
+# Repeat --entity-folder, --book-type and --product-type as needed; omit them if not declared.
 # Obsidian already running with this vault open; exit 3 means it is not, so use the next line.
 python3 "<skill-dir>/scripts/obsidian-lint.py" --vault "<vault>" --scope "<scope>" \
-  --wiki "<wiki-folder>" --entity-folder "<entity-folder>" --book-type "<book-type>" --lifecycle "<type>,<type>" > policy-lint.tsv
+  --wiki "<wiki-folder>" --entity-folder "<entity-folder>" --book-type "<book-type>" --product-type "<product-type>" --lifecycle "<type>,<type>" > policy-lint.tsv
 python3 "<skill-dir>/scripts/link-lint.py" --vault "<vault>" --scope "<scope>" --checks policy \
-  --wiki "<wiki-folder>" --entity-folder "<entity-folder>" --book-type "<book-type>" --lifecycle "<type>,<type>" > policy-lint.tsv
+  --wiki "<wiki-folder>" --entity-folder "<entity-folder>" --book-type "<book-type>" --product-type "<product-type>" --lifecycle "<type>,<type>" > policy-lint.tsv
 
 # Links to missing headings, ambiguous links, duplicate headings. Needs .git or .marksman.toml at the vault root.
 python3 "<skill-dir>/scripts/marksman-lint.py" --vault "<vault>" --scope "<scope>" > marksman-lint.tsv

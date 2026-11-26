@@ -146,10 +146,10 @@ entity = {
  "skill_name": "entity", "fixture": "evals/fixture-vault", "baseline_skill": "principle-knowledge-notes", "wiki": "Knowledge/",
  "evals": [
   {"id": 1, "eval_name": "new-product-work-note", "prompt": "Projects/Lumen Notes Import Plan.md 보다가 궁금해졌는데, Readwise Reader 는 어떤 앱이야? 하이라이트를 Lumen 으로 넘길 수 있을지 알고 싶어.",
-   "expected_output": "Creates Knowledge/Products/Readwise Reader.md from assets/product.md (url plain, other URLs under *_url, Lumen Notes wikilinked), turns only the first mention in the work note into a wikilink; reports `Wiki: created [[Readwise Reader]]`.",
+   "expected_output": "Creates Knowledge/Products/Readwise Reader.md from assets/product.md (plain homepage URL under website_url, no bare url key, Lumen Notes wikilinked), turns only the first mention in the work note into a wikilink; reports `Wiki: created [[Readwise Reader]]`.",
    "files": ["evals/fixture-vault"], "targets": {"page": {"glob": "Knowledge/Products/*.md", "name_regex": "(?i)^readwise reader", "state": "created"}},
    "expectations": entity_page("@page", "product", ["## Origin", "## Explanation", "## References"]) + [
-     {"text": "Product frontmatter carries the homepage as a plain `url`", "check": "frontmatter", "file": "@page", "contains": {"url": "^https?://\\S+$"}},
+     {"text": "Product frontmatter carries the homepage as a plain `website_url` and has no bare `url` key", "check": "frontmatter", "file": "@page", "contains": {"website_url": "^https?://\\S+$"}, "absent": ["url"]},
      refs("@page", "## References"),
      first_mention("Readwise Reader", "(?i)^readwise reader"), OTHER_WORK, LINT, NO_RAW,
      within(["Knowledge/"], ["Projects/Lumen Notes Import Plan.md"]), wiki_line("created", "Readwise Reader")]},

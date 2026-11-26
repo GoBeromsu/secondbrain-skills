@@ -16,7 +16,7 @@ tags:
   - notes
   - product
 type: product
-url: https://lumen.example.com
+website_url: https://lumen.example.com
 youtube_url: https://www.youtube.com/@lumen-example
 ---
 # Lumen Notes

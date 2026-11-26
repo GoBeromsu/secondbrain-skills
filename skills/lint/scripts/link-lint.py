@@ -198,6 +198,7 @@ ITEM = re.compile(r"^[ \t]*-(?:[ \t]+(.*?))?[ \t]*$")
 QUOTED = re.compile(r"""^('(?:[^']|'')*'|"(?:[^"\\]|\\.)*")(?:[ \t]+#.*)?$""")
 FLOW = re.compile(r"^\[(.*)\](?:[ \t]+#.*)?$")
 PLAIN_URL = re.compile(r"^https?://[^\s<>\[\]()]+$", re.I)
+URL_HOST = re.compile(r"^https?://(?:[^/?#\s@]+@)?([^/?#\s@:]+)(?::[0-9]+)?(?:[/?#]|$)", re.I)
 ANY_URL = re.compile(r"https?://", re.I)
 LEGACY_KEYS = {"youtube", "x"}
 AUTO_ZONES = {"Wiki", "From Sources"}
@@ -213,17 +214,34 @@ SETEXT = re.compile(r"^ {0,3}(=+|-+)[ \t]*$")
 RULE_LINE = re.compile(r"^ {0,3}([-*_])(?:[ \t]*\1){2,}[ \t]*$")
 OBS_COMMENT = re.compile(r"%%.*?%%", re.S)
 BLOCK_START = re.compile(r"^ {0,3}(?:#{1,6}(?:[ \t]|$)|>|[-*+][ \t]|\d+[.)][ \t]|\||```|~~~)")
+YAML_ESCAPE = re.compile(r"\\(?:x[0-9A-Fa-f]{2}|u[0-9A-Fa-f]{4}|U[0-9A-Fa-f]{8}|.)")
+YAML_KEY_ESCAPES = {"n": "\n", "t": "\t", '"': '"', "\\": "\\", "/": "/", "0": "\0", " ": " "}
+YAML_SIMPLE_ESCAPES = {
+    **YAML_KEY_ESCAPES,
+    "a": "\a", "b": "\b", "\t": "\t", "v": "\v", "f": "\f", "r": "\r", "e": "\x1b",
+    "N": "\x85", "_": "\xa0", "L": "\u2028", "P": "\u2029",
+}
 
 
-def unquote(v):
+def decode_yaml_escape(match):
+    token = match[0][1:]
+    if len(token) > 1:
+        codepoint = int(token[1:], 16)
+        if codepoint <= 0x10FFFF and not 0xD800 <= codepoint <= 0xDFFF:
+            return chr(codepoint)
+    return YAML_SIMPLE_ESCAPES.get(token, match[0])
+
+
+def unquote(v, *, key=False):
     """A YAML scalar as a string: quotes removed, trailing comment dropped."""
     v = v.strip()
     q = QUOTED.match(v)
     if q:
         s = q.group(1)
         if s[0] == '"':
-            esc = {"n": "\n", "t": "\t", '"': '"', "\\": "\\", "/": "/", "0": "\0", " ": " "}
-            return re.sub(r"\\(.)", lambda e: esc.get(e.group(1), e.group(0)), s[1:-1])
+            if key:
+                return re.sub(r"\\(.)", lambda e: YAML_KEY_ESCAPES.get(e[1], e[0]), s[1:-1])
+            return YAML_ESCAPE.sub(decode_yaml_escape, s[1:-1])
         return s[1:-1].replace("''", "'")
     return re.sub(r"(?:^|[ \t]+)#.*$", "", v)
 
@@ -339,7 +357,7 @@ def frontmatter(text):
             block = rest[:1] in ("|", ">")
             if bad_scalar(rest) or bad_scalar(k.group(1)):
                 return None
-            keys.append((unquote(k.group(1)), i, [] if not rest or block else scalar_values(rest)))
+            keys.append((unquote(k.group(1), key=True), i, [] if not rest or block else scalar_values(rest)))
             continue
         if not keys:
             continue
@@ -370,6 +388,10 @@ def in_dirs(rel, dirs):
     return any(d == "." or rel == d or rel.startswith(d.rstrip("/") + "/") for d in dirs)
 
 
+def is_entity(in_entity_folder, layers):
+    return in_entity_folder or layers[:1] == ["entities"]
+
+
 def index_entities(root, folders):
     """Index Entity titles and aliases using registered folders and a layer fallback."""
     out = {}
@@ -381,7 +403,7 @@ def index_entities(root, folders):
         with open(os.path.join(root, rel), encoding="utf-8", errors="replace") as f:
             head = f.read(65536)
         fm = {k: v for k, _, v in frontmatter(head) or []}
-        if not in_dirs(rel, folders) and fm.get("layer", [])[:1] != ["entities"]:
+        if not is_entity(in_dirs(rel, folders), fm.get("layer", [])):
             continue
         for name in [os.path.basename(rel)[:-3]] + fm.get("aliases", []):
             name = nfc(name.strip())
@@ -504,7 +526,7 @@ def blocks(text, spans):
     return out
 
 
-def find_policy(rel, text, names, entities, pattern, wiki, lifecycle, entity_folders, book_types):
+def find_policy(rel, text, names, entities, pattern, wiki, lifecycle, entity_folders, book_types, product_types):
     out = []
     is_wiki = in_dirs(rel, wiki)
     keys = frontmatter(text)
@@ -520,10 +542,18 @@ def find_policy(rel, text, names, entities, pattern, wiki, lifecycle, entity_fol
         if k1.lower() > k2.lower():
             out.append(("FM-KEY-ORDER", at(line), "%s > %s" % (k1, k2)))
     fm = {k: (line, v) for k, line, v in keys}
+    kind = (fm.get("type", (0, []))[1] or [""])[0]
+    in_entity_folder = in_dirs(rel, entity_folders)
+    is_product = kind in product_types and is_entity(in_entity_folder, fm.get("layer", (0, []))[1])
     for key, line, values in keys:
         if key in LEGACY_KEYS:
             out.append(("FM-LEGACY-KEY", at(line), key))
             continue
+        if is_product and key == "url":
+            for v in values or [""]:
+                host = match[1] if (match := URL_HOST.match(v.strip())) else ""
+                target = "github_url" if host.isascii() and host.lower() in ("github.com", "www.github.com") else "website_url"
+                out.append(("FM-PRODUCT-URL", at(line), "%s <- url: %s" % (target, v)))
         for v in values:
             if key == "url" or key.endswith("_url"):
                 if v.strip() and not PLAIN_URL.match(v.strip()):
@@ -534,8 +564,7 @@ def find_policy(rel, text, names, entities, pattern, wiki, lifecycle, entity_fol
     found = blocks(text, spans)
     headings = [b for b in found if b[0] == "heading"]
     if "status" in fm:
-        kind = (fm.get("type", (0, []))[1] or [""])[0]
-        reading_book = kind in book_types and in_dirs(rel, entity_folders) and any(
+        reading_book = kind in book_types and in_entity_folder and any(
             title == "Reading Progress" and (match := ATX.match(line)) and match[1] == "##"
             for _, _, title, line, _ in headings)
         if kind not in lifecycle and not reading_book:
@@ -595,6 +624,7 @@ def main(argv=None):
     ap.add_argument("--wiki", action="append", default=[], help="wiki-role folder from the live policy (repeatable)")
     ap.add_argument("--entity-folder", action="append", default=[], help="entity-role folder from the live policy (repeatable)")
     ap.add_argument("--book-type", action="append", default=[], help="book Entity type from the live policy (repeatable)")
+    ap.add_argument("--product-type", action="append", default=[], help="product Entity type from the live policy (repeatable)")
     ap.add_argument("--lifecycle", help="comma-separated `type` values the live policy names as lifecycle notes")
     a = ap.parse_args(argv)
     if a.checks != "link" and (not a.wiki or a.lifecycle is None):
@@ -606,6 +636,7 @@ def main(argv=None):
     lifecycle = {t.strip() for t in (a.lifecycle or "").split(",") if t.strip()}
     folders = [nfc(d.strip("/")) for d in a.entity_folder]
     book_types = set(a.book_type)
+    product_types = set(a.product_type)
     entities = index_entities(root, folders) if a.checks != "link" else {}
     pattern = entity_pattern(entities)
     known = set()
@@ -634,7 +665,7 @@ def main(argv=None):
         if a.checks != "policy":
             found += find(text, names, paths, daily_folder)
         if a.checks != "link":
-            found += find_policy(nfc(rel), text, names, entities, pattern, wiki, lifecycle, folders, book_types)
+            found += find_policy(nfc(rel), text, names, entities, pattern, wiki, lifecycle, folders, book_types, product_types)
         rows = [(rule, text.count("\n", 0, pos) + 1, snip[:120].replace("\t", " ").replace("\n", " "), pos)
                 for rule, pos, snip in found]
         # Link-only output keeps its historical order; policy output sorts like obsidian-lint.py.

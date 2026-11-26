@@ -13,7 +13,7 @@ Open with the scope and the link source used (which notes counted as inbound lin
 9. **Core Context** — `snapshot_date`, age, registered-source drift.
 10. **Link Form** — `link-lint.py` findings by rule with path, line and text; all, and new since the baseline.
 11. **Policy Conformance** — notes in unregistered folders with the registered folder for their kind; `type`/`category`/layer/role values that differ from live policy; retired keys and duplicate property spellings with both values; replaced values not kept where live policy keeps them; backticked URLs with page, line and text as `[name](URL)` candidates; drifted notes grouped by recorded provenance with each group's newest `date_created`.
-12. **Frontmatter and Structure** — Step 12 findings by rule with path, line and text; all, and new since the baseline; which path ran (`obsidian-lint.py` or `link-lint.py --checks policy`) and the wiki and Entity folders, book Entity types, and other lifecycle types read from live policy. Fixes are named for the Obsidian Linter plugin or the owner, never applied.
+12. **Frontmatter and Structure** — Step 12 findings by rule with path, line and text; all, and new since the baseline; which path ran (`obsidian-lint.py` or `link-lint.py --checks policy`) and the wiki and Entity folders, book and product Entity types, and other lifecycle types read from live policy. Fixes are named for the Obsidian Linter plugin or the owner, never applied.
 13. **Not checked** — steps skipped or tools unavailable, with the reason.
 14. **Recommendations** — top ten by impact and effort, each naming the fix or the skill to route to.
 

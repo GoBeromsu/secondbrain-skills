@@ -37,4 +37,6 @@ Book Entities of `type: book` in a registered Entity folder carry the owner's `s
 ## Frontmatter
 
 - Keys in alphabetical order.
-- External URLs only under `*_url` keys as plain URLs (`blog_url`, `x_url`, `youtube_url` …); `url` is the canonical homepage.
+- External URLs only under `*_url` keys as plain URLs (`blog_url`, `x_url`, `youtube_url` …); `url` is the canonical homepage for non-product entities.
+
+Product Entities of `type: product` use `github_url` for `github.com` (including `www.github.com`) and `website_url` for other sites. They never use bare `url`.

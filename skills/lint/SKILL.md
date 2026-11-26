@@ -110,14 +110,15 @@ Then group the drifted notes by the provenance fields they record (`source_extra
 
 ### Step 12: Frontmatter and Structure
 
-Pass the live policy's wiki folders (`--wiki`, repeatable), registered Entity folders (`--entity-folder`, repeatable, relative to the vault root), book Entity types (`--book-type`, repeatable), and other lifecycle `type` values (`--lifecycle`, comma-separated). If live policy does not register Entity folders or book types, omit the corresponding flags rather than guessing. Do not pass book types in `--lifecycle`: that would exempt books without reading progress. If Obsidian is running with this vault already open, run `scripts/obsidian-lint.py` with `--vault <vault> --scope <scope>` and those policy flags; it exits 3 rather than open or switch a vault. Otherwise, or after exit 3, run `scripts/link-lint.py --checks policy` with the same flags. Say which path ran. Both print the same lines, `RULE<TAB>path<TAB>line<TAB>text`, and accept `--baseline`; report them verbatim.
+Pass the live policy's wiki folders (`--wiki`, repeatable), registered Entity folders (`--entity-folder`, repeatable, relative to the vault root), book Entity types (`--book-type`, repeatable), product Entity types (`--product-type`, repeatable), and other lifecycle `type` values (`--lifecycle`, comma-separated). Read product types from the live policy's Entity declarations; omit the corresponding flags for Entity folders, book types, or product types the policy does not declare. Do not pass book types in `--lifecycle`: that would exempt books without reading progress. If Obsidian is running with this vault already open, run `scripts/obsidian-lint.py` with `--vault <vault> --scope <scope>` and those policy flags; it exits 3 rather than open or switch a vault. Otherwise, or after exit 3, run `scripts/link-lint.py --checks policy` with the same flags. Say which path ran. Both print the same lines, `RULE<TAB>path<TAB>line<TAB>text`, and accept `--baseline`; report them verbatim.
 
 | Rule | Notes | Finding |
 | --- | --- | --- |
 | `FM-INVALID` | all | frontmatter that is not valid YAML (a repeated key, a broken quoted value); Obsidian reads no properties from it, so the other frontmatter rules skip the note |
 | `FM-KEY-ORDER` | all | a key sorts before the key above it, compared lowercased as the Obsidian Linter's YAML key sort does |
-| `FM-URL-KEY` | wiki | a URL in any form under a key that is neither `url` (the canonical homepage) nor `*_url`; a web citation belongs in the body as `[label](URL)`. Raw notes keep the provenance keys their ingest schema defines |
+| `FM-URL-KEY` | wiki | a URL in any form under a key that is neither `url` (the canonical homepage on non-product notes) nor `*_url`; a web citation belongs in the body as `[label](URL)`. Raw notes keep the provenance keys their ingest schema defines |
 | `FM-URL-FORM` | all | a `url` or `*_url` value that is not a plain URL |
+| `FM-PRODUCT-URL` | wiki/entity | a bare `url` key on a product Entity identified by a registered folder or `layer: entities`. The finding starts with the recommended key: `github_url` for `github.com` or `www.github.com`, `website_url` for other hosts |
 | `FM-LEGACY-KEY` | all | the retired `youtube` or `x` key; its value belongs in `youtube_url` or `x_url` |
 | `STATUS-NOT-LIFECYCLE` | all | `status` on a note that is neither a declared lifecycle type nor a registered book Entity with a real `## Reading Progress` heading (see Step 8) |
 | `DUP-HEADING` | all | a heading text the note already used |

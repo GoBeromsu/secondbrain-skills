@@ -141,6 +141,7 @@ def main(argv=None):
     ap.add_argument("--wiki", action="append", required=True, help="wiki-role folder from the live policy (repeatable)")
     ap.add_argument("--entity-folder", action="append", default=[], help="entity-role folder from the live policy (repeatable)")
     ap.add_argument("--book-type", action="append", default=[], help="book Entity type from the live policy (repeatable)")
+    ap.add_argument("--product-type", action="append", default=[], help="product Entity type from the live policy (repeatable)")
     ap.add_argument("--lifecycle", required=True, help="comma-separated `type` values the live policy names as lifecycle notes")
     ap.add_argument("--obsidian", default="obsidian", help="Obsidian CLI executable")
     a = ap.parse_args(argv)
@@ -186,6 +187,7 @@ def report(a, root, name):
         "lifecycle": [t.strip() for t in a.lifecycle.split(",") if t.strip()],
         "entityFolders": entity_folders,
         "bookTypes": a.book_type,
+        "productTypes": a.product_type,
         "entities": entities,
         "unresolved": missing,
         "plannedDailyNotes": sorted({link for links in missing.values() for link in links

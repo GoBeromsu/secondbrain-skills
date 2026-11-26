@@ -16,6 +16,9 @@
     "book_types": [
       "book"
     ],
+    "product_types": [
+      "product"
+    ],
     "lifecycle": [
       "project",
       "task"
@@ -65,7 +68,7 @@
       "id": 2,
       "eval_name": "fm-url-keys",
       "prompt": "Check evals/fixture-vault for external URLs in wiki-page frontmatter that are not under a *_url key, *_url values that are not plain URLs, and the retired youtube and x keys.",
-      "expected_output": "Reports the non-plain blog_url value, every URL under source and website, and the two retired keys in URL Keys.md; `url` as the homepage, youtube_url and the Raw note's plain URL under source are not reported.",
+      "expected_output": "Reports the non-plain blog_url value, every URL under source and website, and the two retired keys in URL Keys.md; a non-product homepage under `url`, youtube_url and the Raw note's plain URL under source are not reported.",
       "files": [
         "evals/fixture-vault"
       ],
@@ -74,7 +77,7 @@
         "website and both source items (the [label](URL) citation and the plain URL) are reported as URLs outside a *_url key",
         "The x and youtube keys are reported as retired keys",
         "url: https://example.com and youtube_url are not reported",
-        "Lumen Notes.md, Northwind Labs.md and Jane Doe.md (url, x_url, youtube_url, linkedin_url) are not reported",
+        "Lumen Notes.md (website_url, youtube_url), Northwind Labs.md and Jane Doe.md (url and their *_url keys) are not reported",
         "The Raw note's `source: <URL>` is not reported: URL placement is checked on wiki pages"
       ],
       "paths": [
@@ -124,6 +127,75 @@
         "Knowledge/Organizations/Northwind Labs.md",
         "Knowledge/Products/Lumen Notes.md",
         "Sources/2026-11-20 Lumen Notes launch post.md"
+      ]
+    },
+    {
+      "id": 23,
+      "eval_name": "fm-product-url",
+      "prompt": "Read the product types from the fixture vault's Guideline.md and lint product Entities for a bare url frontmatter key.",
+      "expected_output": "Reports FM-PRODUCT-URL on Quillstone CLI.md and the layer-classified Junefold CLI.md. Recommends github_url for github.com and www.github.com, and website_url for every other hostname.",
+      "files": [
+        "evals/fixture-vault"
+      ],
+      "expectations": [
+        "Quillstone CLI.md is in a registered Entity folder and receives github_url for its github.com URL",
+        "Junefold CLI.md is outside the registered Entity folders but is identified by layer: entities",
+        "WWW.GITHUB.COM receives github_url; cli.github.com, junefold.github.io and gıthub.com receive website_url",
+        "The YAML double-quoted escape in the github.com URL is decoded before recommending github_url",
+        "The recommendation remains visible when the value is truncated",
+        "Lumen Notes.md (website_url) and Northwind Labs.md (organization with url) are not reported"
+      ],
+      "paths": [
+        "python",
+        "obsidian-cli"
+      ],
+      "findings": [
+        [
+          "FM-PRODUCT-URL",
+          "Knowledge/Products/Quillstone CLI.md",
+          9,
+          "github_url <- url: https://github.com/quillstone/cli/tree/main"
+        ],
+        [
+          "FM-PRODUCT-URL",
+          "Knowledge/Broken/Junefold CLI.md",
+          4,
+          "github_url <- url: https://WWW.GITHUB.COM/junefold/cli"
+        ],
+        [
+          "FM-PRODUCT-URL",
+          "Knowledge/Broken/Junefold CLI.md",
+          4,
+          "website_url <- url: https://cli.github.com/junefold/cli"
+        ],
+        [
+          "FM-PRODUCT-URL",
+          "Knowledge/Broken/Junefold CLI.md",
+          4,
+          "website_url <- url: https://junefold.github.io/cli"
+        ],
+        [
+          "FM-PRODUCT-URL",
+          "Knowledge/Broken/Junefold CLI.md",
+          4,
+          "website_url <- url: https://gıthub.com/junefold/cli"
+        ],
+        [
+          "FM-PRODUCT-URL",
+          "Knowledge/Broken/Junefold CLI.md",
+          4,
+          "github_url <- url: https://github.com/org/repo"
+        ],
+        [
+          "FM-PRODUCT-URL",
+          "Knowledge/Broken/Junefold CLI.md",
+          4,
+          "website_url <- url: https://cli.github.com/0123456789/0123456789/0123456789/0123456789/0123456789/0123456789/0123456789/"
+        ]
+      ],
+      "clean_files": [
+        "Knowledge/Products/Lumen Notes.md",
+        "Knowledge/Organizations/Northwind Labs.md"
       ]
     },
     {

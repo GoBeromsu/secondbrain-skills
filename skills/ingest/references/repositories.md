@@ -20,7 +20,7 @@ Reading the repository:
 Naming and identity:
 
 - Title the page with the product's name in the spelling its maker uses. When a different referent already holds that name, use `{name} ({owner}).md`.
-- `aliases` holds `owner/repo`; `url` holds the project homepage as a plain URL, or the canonical repository URL when it has none; `source` holds only vault notes (owner records, Raws) as quoted wikilinks.
+- `aliases` holds `owner/repo`. Put a plain URL on `github.com` or `www.github.com` under `github_url`, regardless of path; use `website_url` for any other host, including GitLab repositories and `github.io` or `cli.github.com` sites. A product may carry both keys, never bare `url`; follow [`entity`'s update rules](../../entity/SKILL.md) for legacy values. `source` holds only vault notes (owner records, Raws) as quoted wikilinks.
 - Maintainers become `"[[Name]]"` person links only when the repository states them.
 
 A repository Raw the vault already holds stays as it is and may be cited as a source; it is not deleted, moved or rewritten by this recipe.

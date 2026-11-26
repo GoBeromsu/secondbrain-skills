@@ -338,6 +338,8 @@ def ck_lint_clean(ctx, e):
             cmd.extend(("--entity-folder", wiki + "/" + folder.strip("/")))
     for kind in re.findall(r"Book Entities of `type: ([^`]+)`", ctx.guideline):
         cmd.extend(("--book-type", kind))
+    for kind in re.findall(r"Product Entities of `type: ([^`]+)`", ctx.guideline):
+        cmd.extend(("--product-type", kind))
     p = subprocess.run(cmd + ["--scope", *files], capture_output=True, text=True)
     # link-lint itself excludes only the single planned link in the Term template.
     rows = [l for l in p.stdout.splitlines() if l and not l.startswith("#")]

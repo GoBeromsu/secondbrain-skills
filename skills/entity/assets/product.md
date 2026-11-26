@@ -7,6 +7,7 @@ date_created: {original creation date, or today for a new page}
 date_modified: {today, YYYY-MM-DD}
 description: "{one or two English sentences saying what the product is}"
 effort: {runtime-reported reasoning effort, or default}
+github_url: {plain URL on github.com or www.github.com, regardless of path}
 maker: "[[{person or organization that makes it}]]"
 model: {runtime-reported model id}
 related:
@@ -20,7 +21,8 @@ tags:
   - {subject tag 4}
   - {subject tag 5}
 type: {product type the live policy uses}
-url: {plain URL of the canonical homepage, or of the repository when it has none}
+website_url: {plain URL on any other host, including GitLab, github.io or cli.github.com}
+# A product may carry both URL slots. Omit unknown slots and never use a bare url key.
 ---
 
 # {Product name}

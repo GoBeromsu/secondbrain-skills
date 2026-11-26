@@ -7,16 +7,18 @@
   const files = app.vault.getMarkdownFiles().filter((f) => !f.path.endsWith(".excalidraw.md"));
   const first = (v) => (v == null ? [] : [].concat(v));
   const under = (p, d) => d === "." || p === d || p.startsWith(d.replace(/\/$/, "") + "/");
+  const isEntity = (inEntityFolder, fm) => inEntityFolder || first(fm?.layer)[0] === "entities";
   if (A.mode === "index") {
     const entities = files
-      .filter((f) => A.entityFolders.some((d) => under(f.path.normalize("NFC"), d)) ||
-        first((app.metadataCache.getFileCache(f) || {}).frontmatter?.layer)[0] === "entities")
+      .filter((f) => isEntity(A.entityFolders.some((d) => under(f.path.normalize("NFC"), d)),
+        app.metadataCache.getFileCache(f)?.frontmatter))
       .map((f) => f.path);
     return JSON.stringify({ entities, files: app.vault.getFiles().map((f) => f.path) });
   }
 
   const KEY = /^([^\s#:\-][^:]*?):(?:[ \t]+(.*?))?[ \t]*$/;
   const PLAIN_URL = /^https?:\/\/[^\s<>\[\]()]+$/i;
+  const URL_HOST = /^https?:\/\/(?:[^/?#\s@]+@)?([^/?#\s@:]+)(?::[0-9]+)?(?:[/?#]|$)/i;
   const ANY_URL = /https?:\/\//i;
   const LEGACY = new Set(["youtube", "x"]);
   const AUTO_ZONES = new Set(["Wiki", "From Sources"]);
@@ -36,6 +38,7 @@
   const MD_LINK = /(!?)\[([^\]\n]*)\]\(([^)\n]*)\)/dg;
   const lifecycle = new Set(A.lifecycle);
   const bookTypes = new Set(A.bookTypes);
+  const productTypes = new Set(A.productTypes);
   const entities = new Map(Object.entries(A.entities));
   const unresolved = new Map(Object.entries(A.unresolved || {}));
   const plannedDailyNotes = new Set(A.plannedDailyNotes);
@@ -80,6 +83,9 @@
     const push = (rule, line, snip) => out.push([rule, f.path, line, snip]);
     const isWiki = A.wiki.some((d) => under(f.path, d));
     const fm = c.frontmatter || null;
+    const kind = first(fm?.type).map(String)[0] || "";
+    const inEntityFolder = A.entityFolders.some((d) => under(own, d));
+    const isProduct = productTypes.has(kind) && isEntity(inEntityFolder, fm);
     /* Invalid YAML leaves no frontmatterPosition, but the block is still a yaml section. */
     const fp = c.frontmatterPosition || (c.sections || []).find((s) => s.type === "yaml")?.position;
     const keyLine = new Map();
@@ -104,7 +110,16 @@
         push("FM-LEGACY-KEY", keyLine.get(k), k);
         continue;
       }
-      for (const v of vals(fm[k])) {
+      const values = vals(fm[k]);
+      if (isProduct && k === "url") {
+        for (const v of values.length ? values : [""]) {
+          const host = URL_HOST.exec(v.trim())?.[1] || "";
+          const target = /^[\x00-\x7f]+$/.test(host) && ["github.com", "www.github.com"].includes(host.toLowerCase())
+            ? "github_url" : "website_url";
+          push("FM-PRODUCT-URL", keyLine.get(k), target + " <- url: " + v);
+        }
+      }
+      for (const v of values) {
         if (k === "url" || k.endsWith("_url")) {
           if (v.trim() && !PLAIN_URL.test(v.trim())) push("FM-URL-FORM", keyLine.get(k), k + ": " + v);
         } else if (isWiki && ANY_URL.test(v)) {
@@ -126,8 +141,7 @@
       }
     }
     if (fm && Object.prototype.hasOwnProperty.call(fm, "status")) {
-      const kind = first(fm.type).map(String)[0] || "";
-      const readingBook = bookTypes.has(kind) && A.entityFolders.some((d) => under(own, d)) &&
+      const readingBook = bookTypes.has(kind) && inEntityFolder &&
         headings.some((h) => h.level === 2 && h.heading === "Reading Progress" &&
           /^ {0,3}##[ \t]/.test(lines[h.position.start.line] ?? ""));
       if (!lifecycle.has(kind) && !readingBook) {
