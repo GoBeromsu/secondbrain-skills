@@ -450,6 +450,118 @@
           "optional": true
         }
       ]
+    },
+    {
+      "id": 6,
+      "eval_name": "recurring-programme-event",
+      "prompt": "Northwind Labs 가 운영하는 'Hanbit Graduate Fellowship' 노트 하나 남겨줘. 매년 기수를 뽑는 대학원생 장학 프로그램이고, 2027년 기수는 2027-03-01 부터 2028-02-29 까지야. 석사·박사 과정 재학생이 지원할 수 있고, 월 200만원 연구비를 받는 대신 기수 끝에 결과 보고서를 내야 해. 웹에는 아직 정보가 없으니 내가 말한 내용만 써줘.",
+      "expected_output": "Treats the programme as an event Entity: creates Knowledge/Events/Hanbit Graduate Fellowship.md from assets/event.md with type: event, recurrence: recurring, date_start 2027-03-01, date_end 2028-02-29, [[Northwind Labs]] linked as organizer, eligibility and obligations under Conditions; saves no Raw and reports `Wiki: created [[Hanbit Graduate Fellowship]]`.",
+      "files": [
+        "fixture-vault"
+      ],
+      "targets": {
+        "page": {
+          "glob": "Knowledge/*/*.md",
+          "name_regex": "(?i)^hanbit graduate fellowship",
+          "state": "created"
+        }
+      },
+      "expectations": [
+        {
+          "text": "The event page exists in its Entity folder",
+          "check": "exists",
+          "file": "@page"
+        },
+        {
+          "text": "The page is filed in a new Knowledge/Events/ folder beside the other Entity folders, without asking",
+          "check": "count_created",
+          "glob": "Knowledge/Events/*.md",
+          "name_regex": "(?i)^hanbit graduate fellowship",
+          "min": 1,
+          "max": 1
+        },
+        {
+          "text": "Frontmatter has type: event, recurrence: recurring, layer: entities and no status key",
+          "check": "frontmatter",
+          "file": "@page",
+          "equals": {
+            "type": "event",
+            "recurrence": "recurring",
+            "layer": "entities"
+          },
+          "absent": [
+            "status"
+          ]
+        },
+        {
+          "text": "date_start and date_end carry the 2027 round as YYYY-MM-DD",
+          "check": "frontmatter",
+          "file": "@page",
+          "contains": {
+            "date_start": "^2027-03-01$",
+            "date_end": "^2028-02-29$"
+          }
+        },
+        {
+          "text": "Entity body uses only assets/event.md sections, in template order, with the TL;DR callout and Origin, Schedule, Conditions, References",
+          "check": "headings",
+          "file": "@page",
+          "template": "skills/entity/assets/event.md",
+          "required": [
+            "## Origin",
+            "## Schedule",
+            "## Conditions",
+            "## References"
+          ],
+          "callouts": [
+            "> [!abstract] TL;DR"
+          ]
+        },
+        {
+          "text": "Origin links the organizer [[Northwind Labs]]",
+          "check": "section_line",
+          "file": "@page",
+          "heading": "## Origin",
+          "regex": "\\[\\[(?:[^\\]|]*/)?Northwind Labs(?:\\|[^\\]]*)?\\]\\]"
+        },
+        {
+          "text": "Conditions states the eligibility (master's or doctoral students) and the report obligation",
+          "check": "section_line",
+          "file": "@page",
+          "heading": "## Conditions",
+          "patterns": [
+            "(?i)master|doctor|ph\\.?d|석사|박사|graduate",
+            "(?i)report|보고서"
+          ]
+        },
+        {
+          "text": "link-lint --checks all reports nothing on the written wiki pages: alphabetical keys, external URLs only as plain values of *_url keys, no raw URL in the body, vault entity names as [[wikilinks]], no status, no body ---, no auto zone",
+          "check": "lint_clean",
+          "files": "@changed_wiki"
+        },
+        {
+          "text": "Web pages read stay links: no Raw file is created under Sources/",
+          "check": "no_new_under",
+          "prefix": "Sources/"
+        },
+        {
+          "text": "Every write lands in the folder the fixture Guideline gives its role (Knowledge/)",
+          "check": "changed_only_within",
+          "prefixes": [
+            "Knowledge/"
+          ],
+          "allow": []
+        },
+        {
+          "text": "The answer has one `Wiki:` line as its last line that names [[Hanbit Graduate Fellowship...]] as created, and its created/updated pages are exactly the wiki pages written",
+          "check": "footer_matches",
+          "require": {
+            "created": [
+              "(?i)^Hanbit Graduate Fellowship"
+            ]
+          }
+        }
+      ]
     }
   ],
   "trigger_evals": [
@@ -491,6 +603,10 @@
     },
     {
       "query": "성수동 '대림창고' 카페 가봤는데 장소 노트 남겨줘",
+      "should_trigger": true
+    },
+    {
+      "query": "I got into the Fulbright Program this year - record it in my vault with the grant period and what I have to submit",
       "should_trigger": true
     },
     {
