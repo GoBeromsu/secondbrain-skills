@@ -1,6 +1,6 @@
 {
   "name": "secondbrain-skills",
-  "version": "0.31.0",
+  "version": "0.31.1",
   "description": "Self-contained Agent Skills for Obsidian vaults: native Obsidian packages and knowledge packages, including principles. This is a public prerelease; runtime loads are unverified.",
   "author": {
     "name": "beomsukoh",
