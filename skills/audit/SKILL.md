@@ -48,7 +48,7 @@ Record pages in at least one Map, **audit-orphan pages** (in zero Maps), and the
 Pure search, no judgment. Report each check as n/total plus at most twenty failing paths.
 
 - **A.1 Frontmatter coverage.** Wiki: `claimType`, `evidenceScope`, `confidence`, `explored`, `verificationStatus`, plus `source` and `related`. A `source` wikilink that does not resolve is recorded for Phase D. `explored: false` is review backlog, not a failure. Raw: `collectionPurpose` presence.
-- **A.2 SPO structure.** H1, `## Sources`, `## Related` present; for Entities, assess the selected type template within the editable area `principle-knowledge-notes` defines for it, never counting protected owner headings or an absent append-only auto zone; for Terms, assess the corresponding content by the [Term template](../principle-knowledge-notes/templates/term.md) regardless of heading, with relations only where relevant; every `confidence: high` page carries a Bias Check.
+- **A.2 SPO structure.** H1 present; for Terms, Concepts and Guides, `## Sources` (or References) and `## Related` present; for Entities, use `principle-entity-types` to pick the type and assess the content the template the vault registers for its type, or otherwise its type template in `../entity/assets/`, asks for, never counting owner sentences kept from an older layout; for Terms, assess the corresponding content by the [Term template](../term/assets/term.md) regardless of heading, with relations only where relevant; every `confidence: high` page carries a Bias Check.
 - **A.3 Source citation density.** Check reference entries for Raws and direct evidence links, and personal claims for their original records; report a missing archival copy separately. Pages derived only from other Wiki pages must declare `evidenceScope: synthesis-only`.
 - **A.4 Policy violations.** Count the mechanical rules the live policy states (YAML indent, body indent, unquoted wikilinks in YAML other than intentional `author` wikilinks, unquoted Mermaid labels, a page whose `layer` mismatches its folder). Repair belongs to `lint`.
 
@@ -122,7 +122,7 @@ State weights used and that every score covers only the examined scope. Then the
 
 Report in the conversation first, using [report](references/report.md). Unless `--no-save`, ask whether to save; only on approval:
 
-1. Save `YYYY-MM-DD-Q-vault-audit.md` at the live policy's query location, with the vault's query-result template and frontmatter (`date_created`, `date_modified` snake_case; other fields as live policy defines). Body sections follow [report](references/report.md), including `## Vault Health` and `## Drift Since Last Audit`.
+1. Open `principle-resolve-target`, `principle-frontmatter`, `principle-link-form` and `principle-read-back` (each at `../<leaf>/SKILL.md`), then save `YYYY-MM-DD-Q-vault-audit.md` at the live policy's query location, with the vault's query-result template and frontmatter (`date_created`, `date_modified` snake_case; other fields as live policy defines). Body sections follow [report](references/report.md), including `## Vault Health` and `## Drift Since Last Audit`.
 2. Append to the wiki log in [records](../ingest/references/records.md) (append-only, never rewrite earlier entries):
 
 ```markdown
@@ -137,7 +137,7 @@ Without approval, or with `--no-save`, write nothing.
 
 ## Output
 
-Print the summary following [report](references/report.md): Vault Health composite, then 1. Eligibility, 2. Consistency, 3. Confirmability each with its score and key counts, the Top 10 `verify` queue, the report path when saved, and drift versus the last audit.
+Name each principle leaf that changed a decision and what it changed, then print the summary following [report](references/report.md): Vault Health composite, then 1. Eligibility, 2. Consistency, 3. Confirmability each with its score and key counts, the Top 10 `verify` queue, the report path when saved, and drift versus the last audit.
 
 ## Failure Modes
 

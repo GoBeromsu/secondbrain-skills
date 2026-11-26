@@ -20,7 +20,7 @@
 
 세컨드 브레인은 노트 더미가 아니라 노트 사이의 연결입니다. 이 스킬들은 그 연결을 만들고 지킵니다.
 
-패키지 하나는 한 가지 일을 맡는 `SKILL.md` 하나입니다. 루트 스킬도, 디스패처도, 공유 런타임도 없습니다. 에이전트는 그 작업에 필요한 패키지만 불러옵니다.
+패키지 하나는 한 가지 일을 맡는 `SKILL.md` 하나입니다. 루트 스킬도, 공유 런타임도 없습니다. 디스패처는 직접 켤 때만 도는 `secondbrain-mode` 하나입니다. 에이전트는 그 작업에 필요한 패키지만 불러옵니다.
 
 ## 빠른 시작
 
@@ -43,13 +43,13 @@ claude plugin install secondbrain-skills@secondbrain-skills
 | 원칙 | 실제로 뜻하는 것 |
 | --- | --- |
 | **판단은 스킬이 맡습니다.** | 무엇을 고르고, 어떻게 분류하고, 언제 멈출지는 Markdown에 적습니다. 스크립트는 질문 하나에만 답하고 실행을 막지 않습니다. |
-| **원문은 남습니다.** | 자료에 대해 무엇을 쓰기 전에 먼저 Raw 노트로 원문 그대로 보존합니다. |
+| **원문은 남습니다.** | ingest 하거나 저장하라고 건넨 자료는 무엇을 쓰기 전에 먼저 Raw 노트로 원문 그대로 보존합니다. 조사하며 읽은 웹 페이지는 링크로만 남습니다. |
 | **형식을 안다고 써도 되는 것은 아닙니다.** | 패키지는 작업이 허락한 정확한 위치에만 쓰고, 쓴 결과를 다시 읽습니다. |
 | **증거가 없으면 성공이 아닙니다.** | 파싱은 렌더링이 아니고, 종료 코드는 쓰기의 증거가 아닙니다. 패키지는 어느 수준까지 확인했는지 밝힙니다. |
 
 ## 패키지
 
-독립된 패키지 스무 개입니다. 각 행은 그 패키지를 정의하는 `SKILL.md`로 이어지고, 에이전트는 그 `description`을 보고 패키지를 고릅니다.
+독립된 패키지 마흔한 개입니다. 각 행은 그 패키지를 정의하는 `SKILL.md`로 이어지고, 에이전트는 그 `description`을 보고 패키지를 고릅니다. `principle-*` 원칙은 스스로 불리지 않고, 패키지의 단계나 `secondbrain-mode`가 이름을 댈 때 읽힙니다.
 
 | 서가 | 패키지 | 맡는 일 |
 | --- | --- | --- |
@@ -59,15 +59,36 @@ claude plugin install secondbrain-skills@secondbrain-skills
 | | [`onboard`](skills/onboard/SKILL.md) | 새 볼트를 소유자 인터뷰로 세팅하거나 기존 볼트를 진단합니다. |
 | | [`refresh-context`](skills/refresh-context/SKILL.md) | 에이전트가 소유자에 대해 쥐고 있는 Core Context를 새로 고칩니다. |
 | | [`reindex`](skills/reindex/SKILL.md) | 노트가 바뀐 뒤 qmd 검색 색인을 새로 고칩니다. |
+| | [`term`](skills/term/SKILL.md) | 분야 용어를 조사해 Term 페이지를 쓰거나 고칩니다. |
+| | [`concept`](skills/concept/SKILL.md) | 아이디어나 방법론을 조사해 Concept 페이지를 쓰거나 고칩니다. |
+| | [`entity`](skills/entity/SKILL.md) | 이름 있는 대상을 조사해 타입별 템플릿으로 Entity 페이지를 쓰거나 고칩니다. |
 | **묻기** | [`query`](skills/query/SKILL.md) | 위키에서 출처를 달아 답하고, 빈 곳을 위키로 되돌립니다. |
+| **모드** | [`secondbrain-mode`](skills/secondbrain-mode/SKILL.md) | 켜 두면 새 단어, 방법론, 이름 있는 대상의 위키 작업을 서브에이전트에 맡깁니다. 하나면 포그라운드에서, 둘 이상이면 백그라운드에서 실행합니다. 상위 에이전트는 말없이 기다린 뒤 기록 결과를 한 줄로 보고합니다. |
 | **서가 관리** | [`lint`](skills/lint/SKILL.md) | 링크, 위치, frontmatter, 색인·로그 동기화 같은 기계적 건강 검사. |
 | | [`audit`](skills/audit/SKILL.md) | Map 묶음별로 위키 페이지를 표본 추출해 품질을 매깁니다(읽기 전용). |
 | | [`verify`](skills/verify/SKILL.md) | 한 페이지의 주장을 인용한 증거와 대조합니다. |
 | | [`status`](skills/status/SKILL.md) | 개수, 밀린 작업, 커버리지를 읽기 전용으로 보여 줍니다. |
-| **원칙** | [`principle-archival`](skills/principle-archival/SKILL.md) | 출처(provenance), 원질서, 컬렉션 전체를 기술하는 법. |
-| | [`principle-formatting`](skills/principle-formatting/SKILL.md) | Obsidian 볼트에서 Markdown을 쓰는 법. |
-| | [`principle-knowledge-notes`](skills/principle-knowledge-notes/SKILL.md) | 노트의 종류(Term, Concept, Guide, Entity)와 템플릿을 정합니다. |
-| | [`principle-writing`](skills/principle-writing/SKILL.md) | 글을 쓰고, 요약하고, 번역하고, 검토하는 법. |
+| **원칙** | [`principle-vault-roles`](skills/principle-vault-roles/SKILL.md) | 볼트의 wiki, source, work 영역마다 허용되는 쓰기를 정합니다. |
+| | [`principle-resolve-target`](skills/principle-resolve-target/SKILL.md) | 쓰기 전에 볼트, 노트, 효과, 권한을 정확히 확정합니다. |
+| | [`principle-preserve-unrequested`](skills/principle-preserve-unrequested/SKILL.md) | 요청한 것만 바꾸고 나머지는 바이트 그대로 둡니다. |
+| | [`principle-read-back`](skills/principle-read-back/SKILL.md) | 쓴 뒤 다시 읽고 링크를 확인해야 끝난 것입니다. |
+| | [`principle-provenance`](skills/principle-provenance/SKILL.md) | 기록의 진짜 생산자를 찾아 남깁니다. |
+| | [`principle-original-order`](skills/principle-original-order/SKILL.md) | 자료 고유의 순서와 문장을 지킵니다. |
+| | [`principle-hierarchy`](skills/principle-hierarchy/SKILL.md) | 항목을 그것이 속한 전체 아래에 둡니다. |
+| | [`principle-collective-description`](skills/principle-collective-description/SKILL.md) | 컬렉션의 범위, 커버리지, 빈 곳을 허브에서 기술합니다. |
+| | [`principle-note-kinds`](skills/principle-note-kinds/SKILL.md) | 지식이 Term, Concept, Guide, Entity 중 무엇인지 정합니다. |
+| | [`principle-entity-types`](skills/principle-entity-types/SKILL.md) | Entity의 타입, 템플릿, 폴더를 고릅니다. |
+| | [`principle-revise-and-consolidate`](skills/principle-revise-and-consolidate/SKILL.md) | 기존 페이지의 유효한 내용을 잃지 않고 고칩니다. |
+| | [`principle-not-a-research-log`](skills/principle-not-a-research-log/SKILL.md) | 조사 과정은 페이지에 적지 않습니다. |
+| | [`principle-plain-tldr`](skills/principle-plain-tldr/SKILL.md) | TL;DR은 평이한 문장으로 씁니다. |
+| | [`principle-draw-structure`](skills/principle-draw-structure/SKILL.md) | 글로는 머릿속에서 다시 짜야 하는 구조를 그림으로 그립니다. |
+| | [`principle-standalone-note`](skills/principle-standalone-note/SKILL.md) | 대화를 못 본 독자를 위해 씁니다. |
+| | [`principle-quotation-attribution`](skills/principle-quotation-attribution/SKILL.md) | 인용, 번역, 해석, 자기 말을 구분합니다. |
+| | [`principle-preserve-voice`](skills/principle-preserve-voice/SKILL.md) | 주변을 고쳐도 저자의 문장은 그대로 둡니다. |
+| | [`principle-note-shape`](skills/principle-note-shape/SKILL.md) | 제목, 목록, 표, 굵게, 개념 하나에 용어 하나. |
+| | [`principle-frontmatter`](skills/principle-frontmatter/SKILL.md) | frontmatter의 키 순서, URL 키, 링크, status. |
+| | [`principle-link-form`](skills/principle-link-form/SKILL.md) | 위키링크, 외부 링크, 첫 언급 링크, 임베드. |
+| | [`principle-markdown-blocks`](skills/principle-markdown-blocks/SKILL.md) | 중첩 목록, 코드 펜스, 강조, 콜아웃 같은 블록. |
 | **Obsidian** | [`bases`](skills/bases/SKILL.md) | Obsidian Bases: `.base` 파일과 임베드된 base 블록. |
 | | [`obsidian-cli`](skills/obsidian-cli/SKILL.md) | 공식 `obsidian` CLI로 실행 중인 데스크톱 앱을 다룹니다. |
 | | [`obsidian-clipper`](skills/obsidian-clipper/SKILL.md) | Web Clipper 템플릿 JSON을 쓰고 고칩니다. |

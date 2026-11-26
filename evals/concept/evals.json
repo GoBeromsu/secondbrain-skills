@@ -1,0 +1,272 @@
+{
+  "skill_name": "concept",
+  "fixture": "evals/fixture-vault",
+  "baseline_skill": "principle-knowledge-notes",
+  "wiki": "Knowledge/",
+  "evals": [
+    {
+      "id": 1,
+      "eval_name": "new-concept-work-note",
+      "prompt": "Projects/Lumen Notes Import Plan.md 에 적어 둔 progressive summarization 말인데, 이 방법론이 정확히 어떻게 돌아가는 거야? 짧은 노트에도 쓸 만해?",
+      "expected_output": "Creates Knowledge/Concepts/Progressive Summarization.md from assets/concept.md with Sources links, turns only the first mention in the work note into a wikilink, saves no Raw; reports `Wiki: created [[Progressive Summarization]]`.",
+      "files": [
+        "evals/fixture-vault"
+      ],
+      "targets": {
+        "page": {
+          "glob": "Knowledge/Concepts/*.md",
+          "name_regex": "(?i)^progressive summari",
+          "state": "created"
+        }
+      },
+      "expectations": [
+        {
+          "text": "The Concept page exists in Knowledge/Concepts/",
+          "check": "exists",
+          "file": "@page"
+        },
+        {
+          "text": "Concept frontmatter has layer: concepts and no status key",
+          "check": "frontmatter",
+          "file": "@page",
+          "equals": {
+            "layer": "concepts"
+          },
+          "absent": [
+            "status"
+          ]
+        },
+        {
+          "text": "Concept body uses only assets/concept.md sections, in template order, with Key Insight, Overview, Details and Sources",
+          "check": "headings",
+          "file": "@page",
+          "template": "skills/concept/assets/concept.md",
+          "required": [
+            "## Overview",
+            "## Details",
+            "## Sources"
+          ],
+          "callouts": [
+            "> [!tip] Key Insight"
+          ]
+        },
+        {
+          "text": "The ## Sources section carries at least one source link ([label](URL) or a vault wikilink)",
+          "check": "section_line",
+          "file": "@page",
+          "heading": "## Sources",
+          "regex": "\\[[^\\]]+\\]\\(https?://[^)\\s]+\\)|\\[\\[[^\\]]+\\]\\]"
+        },
+        {
+          "text": "Projects/Lumen Notes Import Plan.md changes only by turning the first mention of progressive summarization into a link to the created page, display text unchanged",
+          "check": "first_mention_link",
+          "file": "Projects/Lumen Notes Import Plan.md",
+          "term_regex": "(?i)progressive summarization",
+          "target": "@page"
+        },
+        {
+          "text": "No other work note changes",
+          "check": "unchanged",
+          "files": [
+            "Projects/Lumen Notes Trial.md",
+            "Projects/2026-11-24 Weekly Review.md"
+          ]
+        },
+        {
+          "text": "link-lint --checks all reports nothing on the written wiki pages: alphabetical keys, external URLs only as plain values of *_url keys, no raw URL in the body, vault entity names as [[wikilinks]], no status, no body ---, no auto zone",
+          "check": "lint_clean",
+          "files": "@changed_wiki"
+        },
+        {
+          "text": "Web pages read stay links: no Raw file is created under Sources/",
+          "check": "no_new_under",
+          "prefix": "Sources/"
+        },
+        {
+          "text": "Every write lands in the folder the fixture Guideline gives its role (Knowledge/) plus the work note under discussion",
+          "check": "changed_only_within",
+          "prefixes": [
+            "Knowledge/"
+          ],
+          "allow": [
+            "Projects/Lumen Notes Import Plan.md"
+          ]
+        },
+        {
+          "text": "The answer has one `Wiki:` line as its last line that names [[Progressive Summari...]] as created, and its created/updated pages are exactly the wiki pages written",
+          "check": "footer_matches",
+          "require": {
+            "created": [
+              "(?i)^Progressive Summari"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "eval_name": "existing-concept-update",
+      "prompt": "Spaced repetition 이랑 Leitner system 은 어떻게 연결돼? 전에 정리해 둔 간격 반복 노트에 보태줘.",
+      "expected_output": "Updates Knowledge/Concepts/Spaced Repetition.md with the Leitner connection (no duplicate page), migrated to the concept template; reports `Wiki: updated [[Spaced Repetition]]`.",
+      "files": [
+        "evals/fixture-vault"
+      ],
+      "targets": {},
+      "expectations": [
+        {
+          "text": "No duplicate Spaced Repetition page is created",
+          "check": "count_created",
+          "glob": "*",
+          "name_regex": "(?i)spaced|간격",
+          "max": 0
+        },
+        {
+          "text": "Knowledge/Concepts/Spaced Repetition.md is updated",
+          "check": "modified",
+          "file": "Knowledge/Concepts/Spaced Repetition.md"
+        },
+        {
+          "text": "Spaced Repetition keeps layer: concepts, with no status key",
+          "check": "frontmatter",
+          "file": "Knowledge/Concepts/Spaced Repetition.md",
+          "equals": {
+            "layer": "concepts"
+          },
+          "absent": [
+            "status"
+          ]
+        },
+        {
+          "text": "Spaced Repetition body uses only assets/concept.md sections, in template order, with Key Insight, Overview, Details and Sources",
+          "check": "headings",
+          "file": "Knowledge/Concepts/Spaced Repetition.md",
+          "template": "skills/concept/assets/concept.md",
+          "required": [
+            "## Overview",
+            "## Details",
+            "## Sources"
+          ],
+          "callouts": [
+            "> [!tip] Key Insight"
+          ]
+        },
+        {
+          "text": "The ## Sources section carries at least one source link ([label](URL) or a vault wikilink)",
+          "check": "section_line",
+          "file": "Knowledge/Concepts/Spaced Repetition.md",
+          "heading": "## Sources",
+          "regex": "\\[[^\\]]+\\]\\(https?://[^)\\s]+\\)|\\[\\[[^\\]]+\\]\\]"
+        },
+        {
+          "text": "link-lint --checks all reports nothing on the written wiki pages: alphabetical keys, external URLs only as plain values of *_url keys, no raw URL in the body, vault entity names as [[wikilinks]], no status, no body ---, no auto zone",
+          "check": "lint_clean",
+          "files": "@changed_wiki"
+        },
+        {
+          "text": "Web pages read stay links: no Raw file is created under Sources/",
+          "check": "no_new_under",
+          "prefix": "Sources/"
+        },
+        {
+          "text": "Every write lands in the folder the fixture Guideline gives its role (Knowledge/)",
+          "check": "changed_only_within",
+          "prefixes": [
+            "Knowledge/"
+          ],
+          "allow": []
+        },
+        {
+          "text": "The answer has one `Wiki:` line as its last line that names [[Spaced Repetition...]] as updated, and its created/updated pages are exactly the wiki pages written",
+          "check": "footer_matches",
+          "require": {
+            "updated": [
+              "(?i)^Spaced Repetition"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "trigger_evals": [
+    {
+      "query": "I want to try the Zettelkasten method for my research notes this winter - how does it actually work and what's the core idea?",
+      "should_trigger": true
+    },
+    {
+      "query": "Tiago Forte 의 Progressive Summarization 이 정확히 어떤 방법인지, 짧은 노트에도 쓸 만한지 정리해줘",
+      "should_trigger": true
+    },
+    {
+      "query": "Explain Jobs To Be Done as a framework and capture it as a note in my wiki",
+      "should_trigger": true
+    },
+    {
+      "query": "first principles thinking 이 방법론으로서 어떻게 작동하는지 개념 노트로 남겨줘",
+      "should_trigger": true
+    },
+    {
+      "query": "what's the feynman technique and how would i use it to study linear algebra? write it up in my vault",
+      "should_trigger": true
+    },
+    {
+      "query": "My Spaced Repetition concept page doesn't mention the Leitner box approach - research it and update the page",
+      "should_trigger": true
+    },
+    {
+      "query": "OKR 프레임워크를 우리 팀에 도입하려는데 핵심 원리랑 한계가 뭔지 알려줘",
+      "should_trigger": true
+    },
+    {
+      "query": "can you explain the CODE method from Building a Second Brain (capture, organize, distill, express) and add a page for it",
+      "should_trigger": true
+    },
+    {
+      "query": "Pomodoro technique 이 왜 효과가 있다고 하는지 근거까지 포함해서 노트 만들어줘",
+      "should_trigger": true
+    },
+    {
+      "query": "I keep hearing about 'atomic notes' as a note-taking pattern. what's the idea, and where does it break down?",
+      "should_trigger": true
+    },
+    {
+      "query": "what does 'idempotent' mean? my reviewer used it about my retry endpoint",
+      "should_trigger": false
+    },
+    {
+      "query": "'메타인지' 라는 단어 뜻만 정확히 알려줘",
+      "should_trigger": false
+    },
+    {
+      "query": "Who makes Obsidian and how is the company funded? add an organization page",
+      "should_trigger": false
+    },
+    {
+      "query": "Readwise Reader 앱 어떤 건지 알려줘, 하이라이트 동기화도 돼?",
+      "should_trigger": false
+    },
+    {
+      "query": "Ingest this article I'm pasting about the Feynman technique into my vault and keep the original text: 'The Feynman Technique has four steps...'",
+      "should_trigger": false
+    },
+    {
+      "query": "last month i studied GTD - what did i conclude in my notes about weekly reviews?",
+      "should_trigger": false
+    },
+    {
+      "query": "Is my Zettelkasten page right that Luhmann published 70 books? double-check it against sources",
+      "should_trigger": false
+    },
+    {
+      "query": "Implement the SM-2 spaced repetition scheduler in TypeScript for my flashcard app",
+      "should_trigger": false
+    },
+    {
+      "query": "Projects/Thesis.md 제목 구조만 깔끔하게 정리해줘, 내용은 추가하지 말고",
+      "should_trigger": false
+    },
+    {
+      "query": "Make a MOC that lists all my productivity method notes",
+      "should_trigger": false
+    }
+  ]
+}

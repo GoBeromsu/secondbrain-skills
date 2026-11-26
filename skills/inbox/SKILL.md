@@ -6,7 +6,7 @@ license: MIT
 
 # Inbox
 
-Scan `00. Inbox/` for pending candidates, preview them, and route the selected ones through `ingest`. Read Core Context once per session; its §2 reuse axes are the ones offered for purpose. Scanning, previewing and counting write nothing. Ingest owns Raw, Wiki, Maps, and the wiki index and log in [records](../ingest/references/records.md). The only file action this skill performs itself is the Step 6 cleanup, and only after an explicit yes.
+Read the vault guideline (live policy) for the folder that plays the source role and for the Inbox root and its lanes. Open [principle-vault-roles](../principle-vault-roles/SKILL.md). When the guideline leaves out a mapping this run needs, ask the owner once for it; never guess a folder. Scan the resolved Inbox for pending candidates, preview them, and route the selected ones through `ingest`. Read Core Context once per session; its §2 reuse axes are the ones offered for purpose. Scanning, previewing and counting write nothing. Ingest owns Raw, Wiki, Maps, and the wiki index and log in [records](../ingest/references/records.md). The only file action this skill performs itself is the Step 6 cleanup, and only after an explicit yes.
 
 Tools: `obsidian-cli` or plain file reads over the vault; `rg` over frontmatter for counts and locators; `qmd` when a locator is missing and you need a likely existing Raw.
 
@@ -19,7 +19,7 @@ Tools: `obsidian-cli` or plain file reads over the vault; `rg` over frontmatter 
 
 ## Inbox Structure
 
-Read the destination's actual `00. Inbox/` and the lanes it has; never assume a layout. The usual lanes are Articles, Papers, Transcripts, Clippings and AI Research plus the root; a vault may add `{NN Agent}` session lanes (e.g. `01 Chat`, `04 GJC`) or dated subfolders, which are scanned like any lane.
+Read the resolved Inbox root and the lanes it has; never assume a layout. Lane labels can include Articles, Papers, Transcripts, Clippings and AI Research; scan session lanes and dated subfolders that actually exist too.
 
 A note in a lane has its kind assigned by where it sits. A note at the Inbox root is uncategorized: say so rather than guessing a lane; `ingest` settles its placement. A note still in the Inbox is pending. A `capture` note (`type: inbox`, `capture_status`, `captureMode`, dated filename) is a normal candidate; read those keys, never rewrite them.
 

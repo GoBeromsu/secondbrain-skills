@@ -1,6 +1,6 @@
 ---
 name: "onboard"
-description: "Sets up a fresh vault through an owner interview that fills template placeholders and writes Core Context plus the wiki index and log, or gives an existing vault a read-only diagnosis and proposal. Use for first-time setup, resuming an interrupted setup or a zero-diff rerun. Not for moving notes or Sync pairing."
+description: "Sets up a fresh vault through an owner interview that fills template placeholders and writes Core Context plus the wiki index and log, or gives an existing vault a read-only diagnosis and proposal. Also records, after asking once, which folders play the wiki, source and work roles when the vault guideline is silent. Use for first-time setup, resuming an interrupted setup, a zero-diff rerun, or when another skill finds the vault roles missing. Not for moving notes or Sync pairing."
 ---
 
 # Onboard
@@ -24,10 +24,26 @@ rg -m1 '^status:' "Core Context.md"
 
 Completion means none of the mandatory tokens is left: `{your-name}`, `{Your Name}`, `{PATH_TO_YOUR_LLM_WIKI}`, `{YYYY-MM-DD}`.
 
-- 0 files with mandatory tokens and `status: active` → already onboarded. Say so and ask whether to revisit anything (identity or axis changes belong to `refresh-context`).
-- Target missing or empty → scaffold only with the owner's explicit authorization: ask the role (`personal` or `knowledge`) and the template folder, confirm the owner may use its files and plugins, then copy only files the target lacks (`cp -R -n "$TEMPLATE/." "$VAULT"`), leaving any file already there byte-for-byte. The scaffold includes `Core Context.md` (`status: template`) and the wiki index and log in [records](../ingest/references/records.md). After the copy, if `index.md` or `log.md` sits at the vault root and the resolved file is absent, create the parent directory and move that root file to the resolved path. If the resolved file already exists, leave the root file and report it. Create any of Core Context, the wiki index, or the wiki log still missing. Create the index and log only at the resolved path. Never write a new `index.md` or `log.md` at the vault root. Then → Interview.
-- Freshly laid-down or cloned starting vault (placeholders present, Core Context `status: template`, no owner notes) → Interview.
-- Existing vault with owner notes → read-only diagnosis and proposal: report placeholders left, Core Context status and its §2 axes, whether the resolved wiki index and wiki log exist, and the settings changes you would suggest. A root `index.md` is a legacy file in that report, not the wiki index. Write nothing: no note, JSON, config or settings change, and no placeholder replacement in existing files. A missing wiki index or wiki log is proposed, not created; `ingest` creates the wiki index on its first run, only at the resolved path.
+- 0 files with mandatory tokens and `status: active`, but a vault-role or record-path mapping is missing → [Vault roles](#vault-roles) only.
+- 0 files with mandatory tokens, `status: active` and all role and record-path mappings valid → already onboarded. Say so and ask whether to revisit anything (identity or axis changes belong to `refresh-context`).
+- Target missing or empty → scaffold only with the owner's explicit authorization: ask the role (`personal` or `knowledge`) and the template folder and confirm the owner may use its files and plugins. Create the root and copy the template's policy files first without overwriting existing files. Run [Vault roles](#vault-roles) before copying or bootstrapping either record. Copy the remaining non-record scaffold files only where absent, including `Core Context.md` (`status: template`); do not bulk-copy template record files. Then bootstrap the records below and continue to Interview.
+- Interrupted authorized scaffold with no owner notes → finish the same scaffold from its first incomplete step. Do not assume an unfamiliar nonempty folder is a scaffold.
+- Freshly laid-down or cloned starting vault (placeholders present, Core Context `status: template`, no owner notes) → [Vault roles](#vault-roles), then bootstrap the records below and continue to Interview.
+- Existing vault with owner notes → read-only diagnosis and proposal, apart from the one guideline entry [Vault roles](#vault-roles) records: report placeholders left, Core Context status and its §2 axes, whether the resolved wiki index and wiki log exist, whether the vault guideline names the vault roles, and the settings changes you would suggest. A root `index.md` is a legacy file in that report, not the wiki index. Otherwise write nothing: no note, JSON, config or settings change, and no placeholder replacement in existing files. A missing wiki index or wiki log is proposed, not created; `ingest` creates the wiki index on its first run, only at the resolved path.
+
+## Vault roles
+
+Skills never hard-code a vault path; they read from the vault guideline (its AGENTS file or the policy note it names, the live policy) which folders play each role:
+
+- **wiki**: compiled pages (Terms, Concepts, Entities, Guides, Maps, Queries), freely written by skills;
+- **source**: Raw captures, written only when the owner hands material over to ingest or save;
+- **work**: the owner's own notes, including the permanent-notes folder where a person's impressions are kept.
+
+Inside the wiki the guideline also names a folder per page kind: Terms, Concepts, Guides, Queries and each Entity type in use.
+
+Read the live guideline for the role mappings and the vault-root `AGENTS.md` for `wiki-index` and `wiki-log`. Ask the owner once, in one batch, for missing or invalid mappings needed by onboarding or the calling skill, naming the folders that exist. Ask for record paths relative to the vault root and strictly beneath the declared wiki role. Keep valid mappings and never choose a default. Validate proposed record paths with the resolver, passing the proposed wiki folder for `--wiki` and the owner-supplied paths as `--index` and/or `--log`; do not persist invalid paths. Open `principle-resolve-target`, `principle-preserve-unrequested` and `principle-read-back` (each at `../<leaf>/SKILL.md`). Write approved role answers into the guideline's one `Vault roles` section (append it the first time, extend it later; never a second copy) and approved record paths into the `wiki-index` and `wiki-log` lines in vault-root `AGENTS.md`. Change nothing else and read the mappings back. These configuration entries are the only writes onboard makes in an existing vault with owner notes.
+
+**Bootstrap records (fresh targets only).** With the live vault-relative wiki folder, run `python3 "<ingest-scripts>/records.py" --vault "<vault>" --wiki "<wiki-folder>"` as described in [records](../ingest/references/records.md). For each `path` row, keep an existing destination untouched; otherwise create its parent and move the corresponding legacy root record already in this fresh scaffold, copy the corresponding template record directly to the resolved destination, or create the missing record there. If both a legacy root file and its resolved destination exist, leave the root file and report it. Report and skip each `unavailable` row; without a valid wiki role bootstrap neither record. Never create a new root `index.md` or `log.md`.
 
 ## Interview — 3 required + 2 optional (answer-1-of-many)
 
@@ -55,16 +71,16 @@ In voice mode one question at a time, in text a batch. After each answer, confir
 
 ## Resume logic
 
-Every run starts at the pre-flight and continues at the first unfinished step: the mode's mandatory placeholders remain → F1; Core Context still `status: template` → F2; both done → already onboarded. An existing vault with owner notes always stays in read-only diagnosis.
+Every run starts at the pre-flight. For a fresh scaffold, resolve the roles and record paths and finish authorized bootstrap writes before filling placeholders (F1) or activating Core Context (F2). An existing vault with owner notes always stays in read-only diagnosis, apart from the approved Vault roles entries.
 
 ## Wrap-up
 
-Read back the files written and list them. Then suggest:
+Read back the files written and list them, with each principle leaf that changed a decision and what it changed. Then suggest:
 
 1. `status` — the vault at a glance.
 2. A first `ingest <URL>` — when the purpose question comes, answer with one of the §2 reuse axes (a letter to your future self).
 3. A first `query <question>`.
-4. As it grows: recurring open questions become Research Question cards in `20. Wiki/25. Questions/`; a defended claim becomes a Synthesis card.
+4. As it grows: recurring open questions become Research Question cards in the Questions folder the guideline names; a defended claim becomes a Synthesis card.
 5. Later: `capture` and `inbox` for collecting before ingesting, `qmd` for search (`reindex`).
 
 Do not install skills, sync, migrate notes, ingest, delete files, or commit as a side effect; the wiki index and wiki log are the vault's records and Git never replaces them. A commit happens only when the owner separately asks.

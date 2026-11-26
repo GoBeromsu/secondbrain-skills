@@ -1,0 +1,838 @@
+{
+  "skill_name": "lint",
+  "fixture": "evals/fixture-vault",
+  "policy": {
+    "source": "evals/fixture-vault/Guideline.md",
+    "wiki": [
+      "Knowledge"
+    ],
+    "entity_folders": [
+      "Knowledge/Books",
+      "Knowledge/Organizations",
+      "Knowledge/People",
+      "Knowledge/Places",
+      "Knowledge/Products"
+    ],
+    "book_types": [
+      "book"
+    ],
+    "product_types": [
+      "product"
+    ],
+    "lifecycle": [
+      "project",
+      "task"
+    ]
+  },
+  "evals": [
+    {
+      "id": 1,
+      "eval_name": "fm-key-order",
+      "prompt": "Lint the vault at evals/fixture-vault (its live policy is Guideline.md). Are the frontmatter keys in alphabetical order everywhere?",
+      "expected_output": "Reports Key Order.md with each out-of-order pair and its line; reports no other note for key order.",
+      "files": [
+        "evals/fixture-vault"
+      ],
+      "expectations": [
+        "The report lists Knowledge/Broken/Key Order.md line 3 as `type > aliases`",
+        "The report lists Knowledge/Broken/Key Order.md line 7 as `tags > layer`",
+        "No other note is reported for key order",
+        "No file in the vault was modified; the fix is routed to the Obsidian Linter plugin"
+      ],
+      "paths": [
+        "python",
+        "obsidian-cli"
+      ],
+      "findings": [
+        [
+          "FM-KEY-ORDER",
+          "Knowledge/Broken/Key Order.md",
+          3,
+          "type > aliases"
+        ],
+        [
+          "FM-KEY-ORDER",
+          "Knowledge/Broken/Key Order.md",
+          7,
+          "tags > layer"
+        ]
+      ],
+      "clean_files": [
+        "Knowledge/People/Jane Doe.md",
+        "Knowledge/Organizations/Northwind Labs.md",
+        "Knowledge/Products/Lumen Notes.md",
+        "Guideline.md"
+      ]
+    },
+    {
+      "id": 2,
+      "eval_name": "fm-url-keys",
+      "prompt": "Check evals/fixture-vault for external URLs in wiki-page frontmatter that are not under a *_url key, *_url values that are not plain URLs, and the retired youtube and x keys.",
+      "expected_output": "Reports the non-plain blog_url value, every URL under source and website, and the two retired keys in URL Keys.md; a non-product homepage under `url`, youtube_url and the Raw note's plain URL under source are not reported.",
+      "files": [
+        "evals/fixture-vault"
+      ],
+      "expectations": [
+        "blog_url is reported because its value is a markdown link, not a plain URL",
+        "website and both source items (the [label](URL) citation and the plain URL) are reported as URLs outside a *_url key",
+        "The x and youtube keys are reported as retired keys",
+        "url: https://example.com and youtube_url are not reported",
+        "Lumen Notes.md (website_url, youtube_url), Northwind Labs.md and Jane Doe.md (url and their *_url keys) are not reported",
+        "The Raw note's `source: <URL>` is not reported: URL placement is checked on wiki pages"
+      ],
+      "paths": [
+        "python",
+        "obsidian-cli"
+      ],
+      "findings": [
+        [
+          "FM-URL-FORM",
+          "Knowledge/Broken/URL Keys.md",
+          2,
+          "blog_url: [Blog](https://blog.example.com)"
+        ],
+        [
+          "FM-URL-KEY",
+          "Knowledge/Broken/URL Keys.md",
+          5,
+          "source: [Launch post](https://lumen.example.com/blog/launch)"
+        ],
+        [
+          "FM-URL-KEY",
+          "Knowledge/Broken/URL Keys.md",
+          5,
+          "source: https://lumen.example.com/docs"
+        ],
+        [
+          "FM-URL-KEY",
+          "Knowledge/Broken/URL Keys.md",
+          12,
+          "website: https://example.org"
+        ],
+        [
+          "FM-LEGACY-KEY",
+          "Knowledge/Broken/URL Keys.md",
+          13,
+          "x"
+        ],
+        [
+          "FM-LEGACY-KEY",
+          "Knowledge/Broken/URL Keys.md",
+          14,
+          "youtube"
+        ]
+      ],
+      "clean_files": [
+        "Knowledge/People/Jane Doe.md",
+        "Knowledge/Organizations/Northwind Labs.md",
+        "Knowledge/Products/Lumen Notes.md",
+        "Sources/2026-11-20 Lumen Notes launch post.md"
+      ]
+    },
+    {
+      "id": 23,
+      "eval_name": "fm-product-url",
+      "prompt": "Read the product types from the fixture vault's Guideline.md and lint product Entities for a bare url frontmatter key.",
+      "expected_output": "Reports FM-PRODUCT-URL on Quillstone CLI.md and the layer-classified Junefold CLI.md. Recommends github_url for github.com and www.github.com, and website_url for every other hostname.",
+      "files": [
+        "evals/fixture-vault"
+      ],
+      "expectations": [
+        "Quillstone CLI.md is in a registered Entity folder and receives github_url for its github.com URL",
+        "Junefold CLI.md is outside the registered Entity folders but is identified by layer: entities",
+        "WWW.GITHUB.COM receives github_url; cli.github.com, junefold.github.io and gıthub.com receive website_url",
+        "The YAML double-quoted escape in the github.com URL is decoded before recommending github_url",
+        "The recommendation remains visible when the value is truncated",
+        "Lumen Notes.md (website_url) and Northwind Labs.md (organization with url) are not reported"
+      ],
+      "paths": [
+        "python",
+        "obsidian-cli"
+      ],
+      "findings": [
+        [
+          "FM-PRODUCT-URL",
+          "Knowledge/Products/Quillstone CLI.md",
+          9,
+          "github_url <- url: https://github.com/quillstone/cli/tree/main"
+        ],
+        [
+          "FM-PRODUCT-URL",
+          "Knowledge/Broken/Junefold CLI.md",
+          4,
+          "github_url <- url: https://WWW.GITHUB.COM/junefold/cli"
+        ],
+        [
+          "FM-PRODUCT-URL",
+          "Knowledge/Broken/Junefold CLI.md",
+          4,
+          "website_url <- url: https://cli.github.com/junefold/cli"
+        ],
+        [
+          "FM-PRODUCT-URL",
+          "Knowledge/Broken/Junefold CLI.md",
+          4,
+          "website_url <- url: https://junefold.github.io/cli"
+        ],
+        [
+          "FM-PRODUCT-URL",
+          "Knowledge/Broken/Junefold CLI.md",
+          4,
+          "website_url <- url: https://gıthub.com/junefold/cli"
+        ],
+        [
+          "FM-PRODUCT-URL",
+          "Knowledge/Broken/Junefold CLI.md",
+          4,
+          "github_url <- url: https://github.com/org/repo"
+        ],
+        [
+          "FM-PRODUCT-URL",
+          "Knowledge/Broken/Junefold CLI.md",
+          4,
+          "website_url <- url: https://cli.github.com/0123456789/0123456789/0123456789/0123456789/0123456789/0123456789/0123456789/"
+        ]
+      ],
+      "clean_files": [
+        "Knowledge/Products/Lumen Notes.md",
+        "Knowledge/Organizations/Northwind Labs.md"
+      ]
+    },
+    {
+      "id": 3,
+      "eval_name": "bare-url",
+      "prompt": "Does any note body in evals/fixture-vault contain a raw URL instead of a [label](URL) link?",
+      "expected_output": "Reports the bare URL in Bare URL.md from link-lint.py; the same URL as a [label](URL) link on the next paragraph is fine.",
+      "files": [
+        "evals/fixture-vault"
+      ],
+      "expectations": [
+        "The report lists BARE-URL for Knowledge/Broken/Bare URL.md line 10",
+        "The labelled link on line 12 is not a BARE-URL, but its entity alias is unlinked",
+        "The finding comes from scripts/link-lint.py, not from judgment"
+      ],
+      "paths": [
+        "python"
+      ],
+      "findings": [
+        [
+          "BARE-URL",
+          "Knowledge/Broken/Bare URL.md",
+          10,
+          "https://lumen.example.com/docs"
+        ]
+      ],
+      "clean_files": [
+        "Knowledge/Products/Lumen Notes.md",
+        "Sources/2026-11-20 Lumen Notes launch post.md"
+      ]
+    },
+    {
+      "id": 4,
+      "eval_name": "entity-unlinked",
+      "prompt": "In evals/fixture-vault, find Entity titles or aliases that appear without [[ ]] in wiki pages, in the body or in frontmatter. Read the Entity folders from the guideline and use layer: entities as a fallback.",
+      "expected_output": "Reports the unlinked names in Unlinked Entity.md and Horizontal Rule.md, each with the page it should link.",
+      "files": [
+        "evals/fixture-vault"
+      ],
+      "expectations": [
+        "organization: Northwind Labs is reported with [[Northwind Labs]] as the target",
+        "related: J. Doe is reported as an alias of [[Jane Doe]]",
+        "The body mentions Lumen (an alias of Lumen Notes) and Northwind Labs on line 14 are reported",
+        "Jane Doe on line 16 is not reported because the body already links [[Jane Doe]]",
+        "Mentions in inline code, a link label and a heading are not reported",
+        "Plain mentions in the Sources/ Raw note and the Projects/ work note are not reported (only the wiki role is checked)",
+        "A mention inside a quote block (Spaced Repetition.md) is not reported",
+        "A mention in a tab-indented nested list item (Horizontal Rule.md line 33) is reported: it is not indented code",
+        "A mention in a lazy continuation line of a quote is not reported"
+      ],
+      "paths": [
+        "python",
+        "obsidian-cli"
+      ],
+      "findings": [
+        [
+          "ENTITY-UNLINKED",
+          "Knowledge/Broken/Unlinked Entity.md",
+          4,
+          "organization: Northwind Labs -> [[Northwind Labs]]"
+        ],
+        [
+          "ENTITY-UNLINKED",
+          "Knowledge/Broken/Unlinked Entity.md",
+          5,
+          "related: J. Doe -> [[Jane Doe]]"
+        ],
+        [
+          "ENTITY-UNLINKED",
+          "Knowledge/Broken/Unlinked Entity.md",
+          14,
+          "Lumen -> [[Lumen Notes]]"
+        ],
+        [
+          "ENTITY-UNLINKED",
+          "Knowledge/Broken/Unlinked Entity.md",
+          14,
+          "Northwind Labs -> [[Northwind Labs]]"
+        ],
+        [
+          "ENTITY-UNLINKED",
+          "Knowledge/Broken/Horizontal Rule.md",
+          33,
+          "Northwind Labs -> [[Northwind Labs]]"
+        ]
+      ],
+      "clean_files": [
+        "Knowledge/People/Jane Doe.md",
+        "Knowledge/Organizations/Northwind Labs.md",
+        "Knowledge/Products/Lumen Notes.md",
+        "Knowledge/Maps/Tools MOC.md",
+        "Sources/2026-11-20 Lumen Notes launch post.md",
+        "Projects/Lumen Notes Trial.md",
+        "Knowledge/Concepts/Spaced Repetition.md"
+      ]
+    },
+    {
+      "id": 15,
+      "eval_name": "entity-folder-and-fallback",
+      "prompt": "Lint Entity Folder Mentions.md for unlinked Entities using the Entity folders in the fixture's Guideline.md.",
+      "expected_output": "Reports Fieldstone Studio and its alias despite the missing layer, and finds Layer Fallback Studio via layer outside the registered folders.",
+      "files": ["evals/fixture-vault"],
+      "expectations": [
+        "Fieldstone Studio and Fieldstone are reported without layer: entities",
+        "Layer Fallback Studio is reported despite not being in a registered folder"
+      ],
+      "paths": ["python", "obsidian-cli"],
+      "findings": [
+        [
+          "ENTITY-UNLINKED",
+          "Knowledge/Broken/Entity Folder Mentions.md",
+          2,
+          "organization: Fieldstone -> [[Fieldstone Studio]]"
+        ],
+        [
+          "ENTITY-UNLINKED",
+          "Knowledge/Broken/Entity Folder Mentions.md",
+          6,
+          "Fieldstone Studio -> [[Fieldstone Studio]]"
+        ],
+        [
+          "ENTITY-UNLINKED",
+          "Knowledge/Broken/Entity Folder Mentions.md",
+          6,
+          "Layer Fallback Studio -> [[Layer Fallback Studio]]"
+        ]
+      ],
+      "clean_files": [
+        "Knowledge/Organizations/Fieldstone Studio.md",
+        "Knowledge/Broken/Layer Fallback Studio.md"
+      ]
+    },
+    {
+      "id": 5,
+      "eval_name": "status-outside-lifecycle",
+      "prompt": "Which notes in evals/fixture-vault carry a status key even though the guideline says only lifecycle notes may?",
+      "expected_output": "Reads the lifecycle types from Guideline.md. The project keeps its status; status on unrelated notes is reported.",
+      "files": [
+        "evals/fixture-vault"
+      ],
+      "expectations": [
+        "The lifecycle types are taken from Guideline.md, not assumed",
+        "Knowledge/Broken/Status On Concept.md, Sources/2026-11-21 Northwind Labs hiring post.md and Projects/2026-11-24 Weekly Review.md are reported",
+        "Projects/Lumen Notes Trial.md (type: project) is not reported",
+        "Lint does not suggest adding status to any note"
+      ],
+      "paths": [
+        "python",
+        "obsidian-cli"
+      ],
+      "findings": [
+        [
+          "STATUS-NOT-LIFECYCLE",
+          "Knowledge/Broken/Status On Concept.md",
+          4,
+          "status: done"
+        ],
+        [
+          "STATUS-NOT-LIFECYCLE",
+          "Sources/2026-11-21 Northwind Labs hiring post.md",
+          5,
+          "status: todo"
+        ],
+        [
+          "STATUS-NOT-LIFECYCLE",
+          "Projects/2026-11-24 Weekly Review.md",
+          4,
+          "status: done"
+        ]
+      ],
+      "clean_files": [
+        "Projects/Lumen Notes Trial.md",
+        "Guideline.md"
+      ]
+    },
+    {
+      "id": 16,
+      "eval_name": "book-reading-lifecycle",
+      "prompt": "Which notes in the fixture can carry the owner's book reading status?",
+      "expected_output": "Only the book with a real Reading Progress heading in the Entity folder keeps its status; a catalog book, a misplaced book, a nonbook and a chapter Raw are reported.",
+      "files": ["evals/fixture-vault"],
+      "expectations": [
+        "The reading-progress book in the registered Entity folder is not reported",
+        "A book showing Reading Progress only in a code block, a misplaced book, a nonbook with a Reading Progress heading, and a chapter Raw are reported"
+      ],
+      "paths": ["python", "obsidian-cli"],
+      "findings": [
+        [
+          "STATUS-NOT-LIFECYCLE",
+          "Knowledge/Books/Catalog Book.md",
+          2,
+          "status: reading"
+        ],
+        [
+          "STATUS-NOT-LIFECYCLE",
+          "Knowledge/Broken/Misplaced Reading Book.md",
+          3,
+          "status: reading"
+        ],
+        [
+          "STATUS-NOT-LIFECYCLE",
+          "Knowledge/Books/Reading Progress Nonbook.md",
+          2,
+          "status: reading"
+        ],
+        [
+          "STATUS-NOT-LIFECYCLE",
+          "Sources/Reading Lifecycle Chapter.md",
+          4,
+          "status: reading"
+        ]
+      ],
+      "clean_files": [
+        "Knowledge/Books/Reading Lifecycle Book.md"
+      ]
+    },
+    {
+      "id": 6,
+      "eval_name": "hr-in-wiki",
+      "prompt": "Find horizontal rules in wiki page bodies in evals/fixture-vault.",
+      "expected_output": "Reports the --- and *** rules in Horizontal Rule.md; the --- inside its code block, the frontmatter fences and the rules in the Raw and work notes are not reported.",
+      "files": [
+        "evals/fixture-vault"
+      ],
+      "expectations": [
+        "Knowledge/Broken/Horizontal Rule.md lines 12 and 16 are reported",
+        "The --- inside the code block is not reported",
+        "Sources/2026-11-20 Lumen Notes launch post.md and Projects/Lumen Notes Trial.md are not reported, because they are not in the wiki role",
+        "The `---` under a two-line paragraph (a setext heading underline) and the `---` inside indented code are not reported"
+      ],
+      "paths": [
+        "python",
+        "obsidian-cli"
+      ],
+      "findings": [
+        [
+          "HR-IN-WIKI",
+          "Knowledge/Broken/Horizontal Rule.md",
+          12,
+          "---"
+        ],
+        [
+          "HR-IN-WIKI",
+          "Knowledge/Broken/Horizontal Rule.md",
+          16,
+          "***"
+        ]
+      ],
+      "clean_files": [
+        "Sources/2026-11-20 Lumen Notes launch post.md",
+        "Projects/Lumen Notes Trial.md"
+      ]
+    },
+    {
+      "id": 7,
+      "eval_name": "auto-zone",
+      "prompt": "Are there any leftover append-only auto zones (## Wiki or ## From Sources) in wiki pages of evals/fixture-vault?",
+      "expected_output": "Reports both headings in Auto Zone.md.",
+      "files": [
+        "evals/fixture-vault"
+      ],
+      "expectations": [
+        "Knowledge/Broken/Auto Zone.md line 12 `## Wiki` and line 16 `## From Sources` are reported",
+        "The report does not rewrite the page body; it names the fix (drop the heading line, promote the headings under it) for the owner"
+      ],
+      "paths": [
+        "python",
+        "obsidian-cli"
+      ],
+      "findings": [
+        [
+          "AUTO-ZONE",
+          "Knowledge/Broken/Auto Zone.md",
+          12,
+          "## Wiki"
+        ],
+        [
+          "AUTO-ZONE",
+          "Knowledge/Broken/Auto Zone.md",
+          16,
+          "## From Sources"
+        ]
+      ],
+      "clean_files": [
+        "Knowledge/People/Jane Doe.md",
+        "Knowledge/Organizations/Northwind Labs.md",
+        "Knowledge/Products/Lumen Notes.md"
+      ]
+    },
+    {
+      "id": 8,
+      "eval_name": "dup-heading",
+      "prompt": "Check evals/fixture-vault for notes that repeat a heading.",
+      "expected_output": "Reports the second ## Notes in Duplicate Heading.md.",
+      "files": [
+        "evals/fixture-vault"
+      ],
+      "expectations": [
+        "Knowledge/Broken/Duplicate Heading.md line 14 is reported",
+        "marksman-lint.py reports it from the document symbols as well"
+      ],
+      "paths": [
+        "python",
+        "marksman",
+        "obsidian-cli"
+      ],
+      "findings": [
+        [
+          "DUP-HEADING",
+          "Knowledge/Broken/Duplicate Heading.md",
+          14,
+          "## Notes"
+        ]
+      ],
+      "clean_files": [
+        "Knowledge/Products/Lumen Notes.md"
+      ]
+    },
+    {
+      "id": 9,
+      "eval_name": "broken-link",
+      "prompt": "List wikilinks in note bodies of evals/fixture-vault whose target note does not exist.",
+      "expected_output": "link-lint.py reports [[Missing Page]] in Broken Link.md; the dated Raw title resolves.",
+      "files": [
+        "evals/fixture-vault"
+      ],
+      "expectations": [
+        "Knowledge/Broken/Broken Link.md line 12 [[Missing Page]] is reported as BROKEN",
+        "Links to the Raw note by its dated title are not reported"
+      ],
+      "paths": [
+        "python"
+      ],
+      "findings": [
+        [
+          "BROKEN",
+          "Knowledge/Broken/Broken Link.md",
+          12,
+          "[[Missing Page]]"
+        ]
+      ],
+      "clean_files": [
+        "Knowledge/People/Jane Doe.md",
+        "Knowledge/Maps/Tools MOC.md"
+      ]
+    },
+    {
+      "id": 19,
+      "eval_name": "body-mentions-despite-frontmatter-link",
+      "prompt": "Check whether Frontmatter Entity Link.md links Fieldstone Studio in its body.",
+      "expected_output": "The frontmatter link is valid but does not satisfy the unlinked body mention.",
+      "files": ["evals/fixture-vault"],
+      "expectations": ["The body mention on line 6 needs a wikilink"],
+      "paths": ["python", "obsidian-cli"],
+      "findings": [
+        ["ENTITY-UNLINKED", "Knowledge/Broken/Frontmatter Entity Link.md", 6, "Fieldstone Studio -> [[Fieldstone Studio]]"]
+      ]
+    },
+    {
+      "id": 20,
+      "eval_name": "entity-mentions-in-citation-labels",
+      "prompt": "Check Citation Entity Label.md for unlinked body entities.",
+      "expected_output": "The authored external link label mentions Fieldstone Studio but does not link the vault entity.",
+      "files": ["evals/fixture-vault"],
+      "expectations": ["The entity named in Citation Entity Label.md and the entity alias in Bare URL.md need wikilinks"],
+      "paths": ["python", "obsidian-cli"],
+      "findings": [
+        ["ENTITY-UNLINKED", "Knowledge/Broken/Citation Entity Label.md", 1, "Fieldstone Studio -> [[Fieldstone Studio]]"],
+        ["ENTITY-UNLINKED", "Knowledge/Broken/Bare URL.md", 12, "Lumen -> [[Lumen Notes]]"]
+      ]
+    },
+    {
+      "id": 21,
+      "eval_name": "legacy-raw-verbatim-ingest-notes-heading",
+      "prompt": "Lint the legacy Raw Verbatim Markdown Boundary.md for bare links.",
+      "expected_output": "Does not interpret the original article's Ingest Notes heading as authored commentary.",
+      "files": ["evals/fixture-vault"],
+      "expectations": ["The Raw has no findings"],
+      "paths": ["python"],
+      "findings": [],
+      "clean_files": ["Sources/Verbatim Markdown Boundary.md"]
+    },
+    {
+      "id": 22,
+      "eval_name": "authored-chapter-reading-notes",
+      "prompt": "Check Chapter Reading Boundary.md for bare links.",
+      "expected_output": "Lints the authored Reading Notes after the boundary but not the preserved original chapter.",
+      "files": ["evals/fixture-vault"],
+      "expectations": ["Only the authored link on line 14 is flagged"],
+      "paths": ["python"],
+      "findings": [
+        ["BARE-URL", "Sources/Chapter Reading Boundary.md", 14, "https://example.com/reading"]
+      ]
+    },
+    {
+      "id": 17,
+      "eval_name": "planned-daily-notes",
+      "prompt": "Check Daily Note Links.md and Broken Daily Note Links.md for missing targets under the fixture's daily-notes policy.",
+      "expected_output": "Valid daily-note links are planned; the misspelling, invalid date, wrong folder and missing heading target remain broken.",
+      "files": ["evals/fixture-vault"],
+      "expectations": [
+        "Daily Note Links.md has no findings",
+        "Broken Daily Note Links.md has four BROKEN findings"
+      ],
+      "paths": ["python"],
+      "findings": [
+        ["BROKEN", "Projects/Broken Daily Note Links.md", 3, "[[Mispelled Project]]"],
+        ["BROKEN", "Projects/Broken Daily Note Links.md", 4, "[[2025-02-29]]"],
+        ["BROKEN", "Projects/Broken Daily Note Links.md", 5, "[[Other/2024-02-29]]"],
+        ["BROKEN", "Projects/Broken Daily Note Links.md", 6, "[[2024-02-29#Missing Heading]]"]
+      ],
+      "clean_files": ["Projects/Daily Note Links.md"]
+    },
+    {
+      "id": 13,
+      "eval_name": "broken-heading",
+      "prompt": "Check evals/fixture-vault for links to headings that do not exist in the target note.",
+      "expected_output": "marksman-lint.py reports [[Backlink#Missing Heading]] in Broken Link.md.",
+      "files": [
+        "evals/fixture-vault"
+      ],
+      "expectations": [
+        "Knowledge/Broken/Broken Link.md line 14 is reported as BROKEN-HEADING",
+        "The links to existing notes without a heading are not reported"
+      ],
+      "paths": [
+        "marksman"
+      ],
+      "findings": [
+        [
+          "BROKEN-HEADING",
+          "Knowledge/Broken/Broken Link.md",
+          14,
+          "[[Backlink#Missing Heading]]"
+        ]
+      ],
+      "clean_files": [
+        "Knowledge/Maps/Tools MOC.md",
+        "Knowledge/Products/Lumen Notes.md"
+      ]
+    },
+    {
+      "id": 14,
+      "eval_name": "broken-frontmatter-link",
+      "prompt": "Do any frontmatter link fields in evals/fixture-vault point at notes that do not exist?",
+      "expected_output": "With Obsidian running on the fixture, obsidian-lint.py reports [[Missing Related]] under related in Broken Link.md; offline, the PyYAML recipe in references/checks.md covers it.",
+      "files": [
+        "evals/fixture-vault"
+      ],
+      "expectations": [
+        "Knowledge/Broken/Broken Link.md line 4 related: [[Missing Related]] is reported as BROKEN",
+        "source and related links that resolve are not reported"
+      ],
+      "paths": [
+        "obsidian-cli"
+      ],
+      "findings": [
+        [
+          "BROKEN",
+          "Knowledge/Broken/Broken Link.md",
+          4,
+          "[[Missing Related]]"
+        ]
+      ],
+      "clean_files": [
+        "Knowledge/People/Jane Doe.md",
+        "Knowledge/Products/Lumen Notes.md"
+      ]
+    },
+    {
+      "id": 12,
+      "eval_name": "fm-invalid",
+      "prompt": "Some notes in evals/fixture-vault show no properties in Obsidian. Which ones have frontmatter that does not parse?",
+      "expected_output": "Reports Invalid Frontmatter.md, whose repeated status key makes the YAML invalid, and runs no other frontmatter check on it.",
+      "files": [
+        "evals/fixture-vault"
+      ],
+      "expectations": [
+        "Knowledge/Broken/Invalid Frontmatter.md is reported as FM-INVALID on line 1",
+        "Its repeated status key is not also reported as STATUS-NOT-LIFECYCLE or FM-KEY-ORDER"
+      ],
+      "paths": [
+        "python",
+        "obsidian-cli"
+      ],
+      "findings": [
+        [
+          "FM-INVALID",
+          "Knowledge/Broken/Invalid Frontmatter.md",
+          1,
+          "frontmatter does not parse"
+        ]
+      ],
+      "clean_files": []
+    },
+    {
+      "id": 10,
+      "eval_name": "clean-notes",
+      "prompt": "Run the scripted checks of lint (link form, frontmatter and structure, marksman) over evals/fixture-vault and tell me which notes they leave clean.",
+      "expected_output": "No scripted finding for the sample pages: the person, organization, product, term, concept, Raw, project note, MOC and guideline.",
+      "files": [
+        "evals/fixture-vault"
+      ],
+      "expectations": [
+        "None of the clean files has a finding from link-lint.py, marksman-lint.py or obsidian-lint.py",
+        "The person page with authorship: user and the owner's impressions gets no finding (moving impressions is not a lint check)"
+      ],
+      "paths": [
+        "python",
+        "marksman",
+        "obsidian-cli"
+      ],
+      "findings": [],
+      "clean_files": [
+        "Guideline.md",
+        "Knowledge/People/Jane Doe.md",
+        "Knowledge/Organizations/Northwind Labs.md",
+        "Knowledge/Products/Lumen Notes.md",
+        "Knowledge/Terms/Backlink.md",
+        "Knowledge/Concepts/Spaced Repetition.md",
+        "Knowledge/Maps/Tools MOC.md",
+        "Sources/2026-11-20 Lumen Notes launch post.md",
+        "Projects/Lumen Notes Trial.md",
+        "Projects/Daily Note Links.md"
+      ]
+    },
+    {
+      "id": 18,
+      "eval_name": "parenthesized-verbatim-urls",
+      "prompt": "Flag parenthesized bare URLs in authored prose without flagging the preserved Raw text.",
+      "expected_output": "Flags bare URLs in ordinary pages and in Ingest Notes, but not within genuine Raw Original Content or in labeled links.",
+      "files": ["evals/fixture-vault"],
+      "expectations": ["Only the authored parenthesized bare URLs are reported"],
+      "paths": ["python"],
+      "findings": [
+        ["BARE-URL", "Knowledge/Broken/Parenthesized Bare URL.md", 3, "https://example.com/paper"],
+        ["BARE-URL", "Knowledge/Broken/Parenthesized Bare URL.md", 7, "https://example.com/ordinary"],
+        ["BARE-URL", "Sources/Authored Raw URL.md", 16, "https://example.com/commentary"]
+      ],
+      "clean_files": ["Sources/Verbatim URL Sample.md"]
+    },
+    {
+      "id": 11,
+      "eval_name": "report-only",
+      "prompt": "lint evals/fixture-vault and fix whatever frontmatter problems you find",
+      "expected_output": "Runs the checks and reports every finding without editing any note; routes frontmatter fixes (key order, URL keys, status) to the Obsidian Linter plugin and body fixes to the owner or the writing skill.",
+      "files": [
+        "evals/fixture-vault"
+      ],
+      "expectations": [
+        "Wiki, source and work folders and the lifecycle types are read from Guideline.md, not assumed",
+        "Obsidian CLI is used only if Obsidian already has the fixture vault open; otherwise link-lint.py --checks policy runs and the report says which path ran",
+        "No note in evals/fixture-vault is modified, and no wiki log entry is written",
+        "The report names the Obsidian Linter plugin for key order and other frontmatter fixes"
+      ]
+    }
+  ],
+  "trigger_evals": [
+    {
+      "query": "can you run a health check on my obsidian vault? i think a bunch of links broke after i renamed the 03 Entities folder last week",
+      "should_trigger": true
+    },
+    {
+      "query": "my wiki pages in 60. AI still have `status: done` from the old templates and some have ## Wiki headings at the bottom - can you find all of them so i know how bad it is",
+      "should_trigger": true
+    },
+    {
+      "query": "Check whether the frontmatter keys in my Knowledge folder are alphabetical and whether anyone put a youtube: key instead of youtube_url",
+      "should_trigger": true
+    },
+    {
+      "query": "find notes in the vault where I wrote a person's name like Steph Ango without linking their page",
+      "should_trigger": true
+    },
+    {
+      "query": "lint the Raw Sources/01 Articles folder, just report, don't touch anything",
+      "should_trigger": true
+    },
+    {
+      "query": "which wiki pages aren't in any MOC? and are there orphans nobody links to",
+      "should_trigger": true
+    },
+    {
+      "query": "is my wiki index still in sync with the actual files? the stats table looks off",
+      "should_trigger": true
+    },
+    {
+      "query": "scan my notes for raw https:// links pasted in the body instead of [label](url)",
+      "should_trigger": true
+    },
+    {
+      "query": "before I publish the digital garden, check the 50 Digital Garden folder for broken wikilinks and horizontal rules",
+      "should_trigger": true
+    },
+    {
+      "query": "vault 점검 좀 해줘. 깨진 링크랑 frontmatter 순서 틀린 거 위주로",
+      "should_trigger": true
+    },
+    {
+      "query": "Is the claim in my Playwright MCP page that it supports Firefox actually true? check the sources",
+      "should_trigger": false
+    },
+    {
+      "query": "review the quality of my notes on spaced repetition - do they agree with each other and is anything missing?",
+      "should_trigger": false
+    },
+    {
+      "query": "set up the Obsidian Linter plugin so it sorts yaml keys alphabetically on save",
+      "should_trigger": false
+    },
+    {
+      "query": "write a person page for Jane Doe from this launch post and link her company",
+      "should_trigger": false
+    },
+    {
+      "query": "run eslint on my typescript project and fix the warnings",
+      "should_trigger": false
+    },
+    {
+      "query": "what did I study about backlinks last month? summarise my notes",
+      "should_trigger": false
+    },
+    {
+      "query": "ingest this article into my vault: https://example.com/post-about-pkm",
+      "should_trigger": false
+    },
+    {
+      "query": "rename the note 'Claude Code' to 'Claude Code (CLI)' and update all links to it",
+      "should_trigger": false
+    },
+    {
+      "query": "refresh my core context snapshot, it's from september",
+      "should_trigger": false
+    },
+    {
+      "query": "my markdownlint config complains about MD013 line length in README.md of my repo, how do I turn it off",
+      "should_trigger": false
+    }
+  ]
+}

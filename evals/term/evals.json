@@ -1,0 +1,351 @@
+{
+  "skill_name": "term",
+  "fixture": "evals/fixture-vault",
+  "baseline_skill": "principle-knowledge-notes",
+  "wiki": "Knowledge/",
+  "evals": [
+    {
+      "id": 1,
+      "eval_name": "new-term-link-in-passing",
+      "prompt": "'transclusion'이 무슨 뜻이야? 노트 앱 얘기하다가 처음 들었어. 누가 https://en.wikipedia.org/wiki/Transclusion 링크를 줬는데 읽어도 잘 모르겠어.",
+      "expected_output": "Answers the question, then creates Knowledge/Terms/Transclusion.md from assets/term.md with sourced References; the Wikipedia page stays a [label](URL) link and no Raw is saved; reports `Wiki: created [[Transclusion]]`.",
+      "files": [
+        "evals/fixture-vault"
+      ],
+      "targets": {
+        "page": {
+          "glob": "Knowledge/Terms/*.md",
+          "name_regex": "(?i)^transclusion",
+          "state": "created"
+        }
+      },
+      "expectations": [
+        {
+          "text": "The Term page exists in Knowledge/Terms/",
+          "check": "exists",
+          "file": "@page"
+        },
+        {
+          "text": "Term frontmatter has layer: terms and no status key",
+          "check": "frontmatter",
+          "file": "@page",
+          "equals": {
+            "layer": "terms"
+          },
+          "absent": [
+            "status"
+          ]
+        },
+        {
+          "text": "Term body uses only assets/term.md sections, in template order, with the TL;DR callout and References",
+          "check": "headings",
+          "file": "@page",
+          "template": "skills/term/assets/term.md",
+          "required": [
+            "## References"
+          ],
+          "callouts": [
+            "> [!abstract] TL;DR"
+          ]
+        },
+        {
+          "text": "The ## References section carries at least one source link ([label](URL) or a vault wikilink)",
+          "check": "section_line",
+          "file": "@page",
+          "heading": "## References",
+          "regex": "\\[[^\\]]+\\]\\(https?://[^)\\s]+\\)|\\[\\[[^\\]]+\\]\\]"
+        },
+        {
+          "text": "link-lint --checks all reports nothing on the written wiki pages: alphabetical keys, external URLs only as plain values of *_url keys, no raw URL in the body, vault entity names as [[wikilinks]], no status, no body ---, no auto zone",
+          "check": "lint_clean",
+          "files": "@changed_wiki"
+        },
+        {
+          "text": "Web pages read stay links: no Raw file is created under Sources/",
+          "check": "no_new_under",
+          "prefix": "Sources/"
+        },
+        {
+          "text": "Every write lands in the folder the fixture Guideline gives its role (Knowledge/)",
+          "check": "changed_only_within",
+          "prefixes": [
+            "Knowledge/"
+          ],
+          "allow": []
+        },
+        {
+          "text": "The answer has one `Wiki:` line as its last line that names [[Transclusion...]] as created, and its created/updated pages are exactly the wiki pages written",
+          "check": "footer_matches",
+          "require": {
+            "created": [
+              "(?i)^Transclusion"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "eval_name": "existing-term-by-alias",
+      "prompt": "Backlinks 랑 forward link 차이가 정확히 뭐야? Lumen 문서에 'backlinks pane' 얘기가 계속 나와서 헷갈려.",
+      "expected_output": "Finds Knowledge/Terms/Backlink.md through its alias, adds only the new claim (backlink vs forward link) to it under the template, creates no duplicate page; reports `Wiki: updated [[Backlink]]`.",
+      "files": [
+        "evals/fixture-vault"
+      ],
+      "targets": {},
+      "expectations": [
+        {
+          "text": "No duplicate page for backlink is created anywhere in the vault",
+          "check": "count_created",
+          "glob": "*",
+          "name_regex": "(?i)backlink",
+          "max": 0
+        },
+        {
+          "text": "Knowledge/Terms/Backlink.md is updated",
+          "check": "modified",
+          "file": "Knowledge/Terms/Backlink.md"
+        },
+        {
+          "text": "Backlink keeps its alias Backlinks and layer: terms, with no status key",
+          "check": "frontmatter",
+          "file": "Knowledge/Terms/Backlink.md",
+          "contains": {
+            "aliases": "^Backlinks$"
+          },
+          "equals": {
+            "layer": "terms"
+          },
+          "absent": [
+            "status"
+          ]
+        },
+        {
+          "text": "Backlink body uses only assets/term.md sections, in template order, with the TL;DR callout and References",
+          "check": "headings",
+          "file": "Knowledge/Terms/Backlink.md",
+          "template": "skills/term/assets/term.md",
+          "required": [
+            "## References"
+          ],
+          "callouts": [
+            "> [!abstract] TL;DR"
+          ]
+        },
+        {
+          "text": "The ## References section carries at least one source link ([label](URL) or a vault wikilink)",
+          "check": "section_line",
+          "file": "Knowledge/Terms/Backlink.md",
+          "heading": "## References",
+          "regex": "\\[[^\\]]+\\]\\(https?://[^)\\s]+\\)|\\[\\[[^\\]]+\\]\\]"
+        },
+        {
+          "text": "link-lint --checks all reports nothing on the written wiki pages: alphabetical keys, external URLs only as plain values of *_url keys, no raw URL in the body, vault entity names as [[wikilinks]], no status, no body ---, no auto zone",
+          "check": "lint_clean",
+          "files": "@changed_wiki"
+        },
+        {
+          "text": "Web pages read stay links: no Raw file is created under Sources/",
+          "check": "no_new_under",
+          "prefix": "Sources/"
+        },
+        {
+          "text": "Every write lands in the folder the fixture Guideline gives its role (Knowledge/)",
+          "check": "changed_only_within",
+          "prefixes": [
+            "Knowledge/"
+          ],
+          "allow": []
+        },
+        {
+          "text": "The answer has one `Wiki:` line as its last line that names [[Backlink...]] as updated, and its created/updated pages are exactly the wiki pages written",
+          "check": "footer_matches",
+          "require": {
+            "updated": [
+              "(?i)^Backlink"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "eval_name": "work-note-first-mention",
+      "prompt": "I'm drafting Projects/Lumen Notes Import Plan.md. What is transclusion exactly, and is it the same thing as embedding a note?",
+      "expected_output": "Creates the Transclusion Term page and turns only the first 'transclusion' in that one work note into a wikilink; nothing else in Projects/ changes.",
+      "files": [
+        "evals/fixture-vault"
+      ],
+      "targets": {
+        "page": {
+          "glob": "Knowledge/Terms/*.md",
+          "name_regex": "(?i)^transclusion",
+          "state": "created"
+        }
+      },
+      "expectations": [
+        {
+          "text": "The Term page exists in Knowledge/Terms/",
+          "check": "exists",
+          "file": "@page"
+        },
+        {
+          "text": "Term frontmatter has layer: terms and no status key",
+          "check": "frontmatter",
+          "file": "@page",
+          "equals": {
+            "layer": "terms"
+          },
+          "absent": [
+            "status"
+          ]
+        },
+        {
+          "text": "Term body uses only assets/term.md sections, in template order, with the TL;DR callout and References",
+          "check": "headings",
+          "file": "@page",
+          "template": "skills/term/assets/term.md",
+          "required": [
+            "## References"
+          ],
+          "callouts": [
+            "> [!abstract] TL;DR"
+          ]
+        },
+        {
+          "text": "The ## References section carries at least one source link ([label](URL) or a vault wikilink)",
+          "check": "section_line",
+          "file": "@page",
+          "heading": "## References",
+          "regex": "\\[[^\\]]+\\]\\(https?://[^)\\s]+\\)|\\[\\[[^\\]]+\\]\\]"
+        },
+        {
+          "text": "Projects/Lumen Notes Import Plan.md changes only by turning the first mention of transclusion into a link to the created page, display text unchanged",
+          "check": "first_mention_link",
+          "file": "Projects/Lumen Notes Import Plan.md",
+          "term_regex": "(?i)transclusion",
+          "target": "@page"
+        },
+        {
+          "text": "No other work note changes",
+          "check": "unchanged",
+          "files": [
+            "Projects/Lumen Notes Trial.md",
+            "Projects/2026-11-24 Weekly Review.md"
+          ]
+        },
+        {
+          "text": "link-lint --checks all reports nothing on the written wiki pages: alphabetical keys, external URLs only as plain values of *_url keys, no raw URL in the body, vault entity names as [[wikilinks]], no status, no body ---, no auto zone",
+          "check": "lint_clean",
+          "files": "@changed_wiki"
+        },
+        {
+          "text": "Web pages read stay links: no Raw file is created under Sources/",
+          "check": "no_new_under",
+          "prefix": "Sources/"
+        },
+        {
+          "text": "Every write lands in the folder the fixture Guideline gives its role (Knowledge/) plus the work note under discussion",
+          "check": "changed_only_within",
+          "prefixes": [
+            "Knowledge/"
+          ],
+          "allow": [
+            "Projects/Lumen Notes Import Plan.md"
+          ]
+        },
+        {
+          "text": "The answer has one `Wiki:` line as its last line that names [[Transclusion...]] as created, and its created/updated pages are exactly the wiki pages written",
+          "check": "footer_matches",
+          "require": {
+            "created": [
+              "(?i)^Transclusion"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "trigger_evals": [
+    {
+      "query": "what does 'idempotent' actually mean? our API reviewer keeps saying my POST /retry handler isn't idempotent and I just nodded like I knew",
+      "should_trigger": true
+    },
+    {
+      "query": "'메타인지'가 정확히 무슨 뜻이야? 교육학 책 읽다가 계속 나오는데 그냥 '생각에 대한 생각'이라고만 알고 있어서",
+      "should_trigger": true
+    },
+    {
+      "query": "Can you make a Term note for 'confabulation' in my vault? I ran into it on a neuroscience podcast and want a proper definition with sources",
+      "should_trigger": true
+    },
+    {
+      "query": "RAG 에서 말하는 'chunking' 이 용어로서 정확히 뭘 가리키는지 정리해서 내 위키에 용어 페이지 만들어줘",
+      "should_trigger": true
+    },
+    {
+      "query": "ok dumb question but what is a p-value really, like the actual definition, not the vibes version. put it in my notes too",
+      "should_trigger": true
+    },
+    {
+      "query": "'transclusion' 이라는 단어를 처음 봤어. 노트 앱 설명서에 나오던데 뭔 뜻이야?",
+      "should_trigger": true
+    },
+    {
+      "query": "My Backlink term page is thin - can you update it with the difference between backlinks and unlinked mentions?",
+      "should_trigger": true
+    },
+    {
+      "query": "what's the difference between 'latency' and 'throughput'? i keep mixing them up in design docs, define both properly",
+      "should_trigger": true
+    },
+    {
+      "query": "'형태소'가 언어학에서 정확히 뭐야? 자연어처리 공부하다가 막혔어",
+      "should_trigger": true
+    },
+    {
+      "query": "define 'opportunity cost' for me with an example and save it as a term in my secondbrain wiki",
+      "should_trigger": true
+    },
+    {
+      "query": "Explain the Zettelkasten method and how I'd actually run it for my thesis notes",
+      "should_trigger": false
+    },
+    {
+      "query": "Tiago Forte 의 PARA 방법론을 내 노트 정리에 어떻게 적용하는지 설명해줘",
+      "should_trigger": false
+    },
+    {
+      "query": "Who is Andrej Karpathy and what has he worked on? add him to my vault",
+      "should_trigger": false
+    },
+    {
+      "query": "Logseq 이라는 앱은 어떤 회사가 만들었고 어떻게 동작하는지 정리해줘",
+      "should_trigger": false
+    },
+    {
+      "query": "here's the full text of a paper on spaced repetition i downloaded, please ingest it into my vault with a Raw copy: 'Abstract. We examine the spacing effect across 254 studies...'",
+      "should_trigger": false
+    },
+    {
+      "query": "전에 내가 공부했던 'memory palace' 관련 노트들 뭐라고 정리해 놨는지 찾아줘",
+      "should_trigger": false
+    },
+    {
+      "query": "Rename every [[Backlinks]] link in my vault to [[Backlink]] so they all point at the same page",
+      "should_trigger": false
+    },
+    {
+      "query": "write a python function that checks whether an HTTP method is idempotent according to RFC 9110",
+      "should_trigger": false
+    },
+    {
+      "query": "내 Backlink 노트 frontmatter 키 순서가 알파벳 순인지 lint 돌려줘",
+      "should_trigger": false
+    },
+    {
+      "query": "is my Spaced Repetition page right that Ebbinghaus discovered the forgetting curve in 1885? check it against sources",
+      "should_trigger": false
+    }
+  ]
+}

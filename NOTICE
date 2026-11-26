@@ -50,12 +50,17 @@ these files was imported and then modified; the modifications are listed in the
 owning package's Git history. The notice is kept here, in the root `LICENSE`
 and in the README attribution, not inside each package.
 
-    skills/principle-formatting/SKILL.md                  <- skills/obsidian-markdown/SKILL.md
-    skills/principle-formatting/references/links.md       <- skills/obsidian-markdown/SKILL.md
-    skills/principle-formatting/references/syntax.md      <- skills/obsidian-markdown/SKILL.md
-    skills/principle-formatting/references/callouts.md    <- skills/obsidian-markdown/references/CALLOUTS.md
-    skills/principle-formatting/references/embeds.md      <- skills/obsidian-markdown/references/EMBEDS.md
-    skills/principle-formatting/references/properties.md  <- skills/obsidian-markdown/references/PROPERTIES.md
+    skills/principle-link-form/SKILL.md                     <- skills/obsidian-markdown/SKILL.md
+    skills/principle-markdown-blocks/SKILL.md               <- skills/obsidian-markdown/SKILL.md
+    skills/principle-preserve-unrequested/SKILL.md          <- skills/obsidian-markdown/SKILL.md
+    skills/principle-read-back/SKILL.md                     <- skills/obsidian-markdown/SKILL.md
+    skills/principle-resolve-target/SKILL.md                <- skills/obsidian-markdown/SKILL.md
+    skills/principle-frontmatter/SKILL.md                   <- skills/obsidian-markdown/SKILL.md
+    skills/principle-link-form/references/links.md          <- skills/obsidian-markdown/SKILL.md
+    skills/principle-markdown-blocks/references/syntax.md   <- skills/obsidian-markdown/SKILL.md
+    skills/principle-markdown-blocks/references/callouts.md <- skills/obsidian-markdown/references/CALLOUTS.md
+    skills/principle-link-form/references/embeds.md         <- skills/obsidian-markdown/references/EMBEDS.md
+    skills/principle-frontmatter/references/properties.md   <- skills/obsidian-markdown/references/PROPERTIES.md
     skills/bases/SKILL.md                         <- skills/obsidian-bases/SKILL.md
     skills/bases/references/FUNCTIONS_REFERENCE.md <- skills/obsidian-bases/references/FUNCTIONS_REFERENCE.md
     skills/obsidian-visualize/references/canvas.md         <- skills/json-canvas/SKILL.md
@@ -66,7 +71,7 @@ One further upstream section is owned elsewhere in this repository: the Mermaid
 diagram-block section of the upstream Markdown skill is answered by
 the Pele branch of `skills/obsidian-visualize/` (`references/pele*.md`). Its rules were re-derived from public
 Mermaid and Obsidian documentation rather than copied, so it is not listed above;
-the imported section itself survives inside `skills/principle-formatting/references/syntax.md`
+the imported section itself survives inside `skills/principle-markdown-blocks/references/syntax.md`
 and is covered by the notice in section 1.
 
 Not imported from that upstream, and no rights exercised over them here: its
