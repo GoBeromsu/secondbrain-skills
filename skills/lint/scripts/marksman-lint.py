@@ -4,10 +4,10 @@
   BROKEN-HEADING  link to a heading the target note does not have (marksman diagnostic code 2)
   AMBIGUOUS-LINK  link that more than one note answers, usually two notes with the same H1 title
                   (marksman diagnostic code 1)
-  DUP-HEADING     a heading text the note already used (from marksman's document symbols)
 
 Links to missing notes are link-lint.py's `BROKEN`, which knows the Term template's planned link,
-so marksman's "non-existent document" diagnostics are not repeated here.
+so marksman's "non-existent document" diagnostics are not repeated here; duplicate headings are
+link-lint.py's `DUP-HEADING`.
 
 Needs no Obsidian. marksman treats a folder as a workspace only when it holds `.git` or
 `.marksman.toml`; without either, or when marksman fails, this exits 3 and the check is reported
@@ -121,18 +121,13 @@ def utf16_col(line, col):
     return len(line)
 
 
-def headings(symbols):
-    for s in symbols or []:
-        yield s
-        yield from headings(s.get("children"))
-
-
 def collect(exe, root, paths, quiet, limit):
-    """({path: diagnostics}, {path: document symbols}) for every path, or raise."""
+    """({path: diagnostics}, {path: text}) for every path, or raise. A document symbol request per
+    file is only a barrier: its answer shows marksman has processed that file."""
     uri = pathlib.Path(root).as_uri()
     deadline = time.monotonic() + limit  # one bound for the whole run, launch included
     srv = Server(exe)
-    diags, symbols, texts = {}, {}, {}
+    diags, texts = {}, {}
     try:
         srv.send({"jsonrpc": "2.0", "id": 0, "method": "initialize", "params": {
             "processId": os.getpid(), "rootUri": uri, "workspaceFolders": [{"uri": uri, "name": "vault"}],
@@ -155,9 +150,7 @@ def collect(exe, root, paths, quiet, limit):
             elif msg.get("id") in pending:
                 if "error" in msg:
                     raise RuntimeError("marksman: %s" % msg["error"].get("message"))
-                path = pending.pop(msg["id"])
-                if path:
-                    symbols[path] = msg.get("result") or []
+                pending.pop(msg["id"])
             return True
 
         while 0 in pending:
@@ -186,7 +179,7 @@ def collect(exe, root, paths, quiet, limit):
             raise RuntimeError("marksman did not go quiet within %gs (--timeout)" % limit)
     finally:
         srv.close()
-    return diags, symbols, texts
+    return diags, texts
 
 
 def main(argv=None):
@@ -200,14 +193,14 @@ def main(argv=None):
     a = ap.parse_args(argv)
     root = os.path.realpath(a.vault)
     if not os.path.isfile(a.marksman) or not os.access(a.marksman, os.X_OK):
-        sys.stderr.write("marksman not found; heading links, ambiguous links and duplicate headings are Not checked\n")
+        sys.stderr.write("marksman not found; heading links and ambiguous links are Not checked\n")
         return NOT_CHECKED
     if not any(os.path.exists(os.path.join(root, m)) for m in (".git", ".marksman.toml")):
         sys.stderr.write("%s has no .git or .marksman.toml, so marksman sees no workspace; Not checked\n" % root)
         return NOT_CHECKED
     try:
         paths = sorted(set(files_in(root, a.scope)))
-        diags, symbols, texts = collect(a.marksman, root, paths, a.quiet, a.timeout)
+        diags, texts = collect(a.marksman, root, paths, a.quiet, a.timeout)
         # Documents a link can name: file names and H1 titles of every note in the vault, not only the scope.
         titles = set()
         for path in files_in(root, ["."]):
@@ -239,13 +232,6 @@ def main(argv=None):
             text = lines[line] if line < len(lines) else ""
             end = utf16_col(text, r["end"]["character"]) if r["end"]["line"] == line else len(text)
             rows.append((rel, line + 1, rule, text[utf16_col(text, r["start"]["character"]):end]))
-        seen = set()
-        for s in sorted(headings(symbols.get(path)), key=lambda s: s["range"]["start"]["line"]):
-            title = s["name"].split("\n", 1)[0].strip()
-            line = s["selectionRange"]["start"]["line"]
-            if title in seen:
-                rows.append((rel, line + 1, "DUP-HEADING", lines[line].strip()))
-            seen.add(title)
 
     known = set()
     if a.baseline:

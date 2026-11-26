@@ -1,8 +1,8 @@
 # Wiki records
 
-Use the index and log paths named for the live vault, relative to its root. Read `wiki-index` and `wiki-log` from the vault-root `AGENTS.md`. Pass `--index` or `--log` only for a path the live policy explicitly supplies for this run; it takes precedence over the corresponding `AGENTS.md` line. Persist an owner-approved path in the vault `AGENTS.md` only when authorized to change configuration.
+Read `wiki-index` and `wiki-log` (vault-relative paths) from the vault-root `AGENTS.md`. Pass `--index` or `--log` only for a path the live policy explicitly supplies for this run; it takes precedence over the corresponding `AGENTS.md` line. Persist an owner-approved path in the vault `AGENTS.md` only when authorized to change configuration.
 
-These entries illustrate the configuration syntax only. The resolver never reads them or uses them as fallback paths.
+Syntax only; the resolver never uses these as fallbacks:
 
 ```
 wiki-index: 60. AI/index.md

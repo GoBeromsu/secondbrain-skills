@@ -264,6 +264,49 @@
           }
         }
       ]
+    },
+    {
+      "id": 4,
+      "eval_name": "mislabeled-entity-asks-first",
+      "prompt": "풀브라이트 장학금을 term 노트로 만들어줘",
+      "expected_output": "Does not follow the 'term' label: explains that the Fulbright scholarship is one named program, so an Entity (optional type such as program or event), and asks once before writing. No wiki page is written without that confirmation.",
+      "files": [
+        "evals/fixture-vault"
+      ],
+      "expectations": [
+        {
+          "text": "No Term or other page is created for Fulbright",
+          "check": "count_created",
+          "glob": "*",
+          "name_regex": "(?i)fulbright|풀브라이트",
+          "max": 0
+        },
+        {
+          "text": "Nothing in the wiki changes before the owner confirms the kind",
+          "check": "no_changes_under",
+          "prefix": "Knowledge/"
+        },
+        {
+          "text": "No Raw or work note changes",
+          "check": "changed_only_within",
+          "prefixes": []
+        },
+        {
+          "text": "The answer names Entity as the kind that fits",
+          "check": "answer_line",
+          "regex": "(?i)entity|엔티티"
+        },
+        {
+          "text": "The answer asks the owner before writing",
+          "check": "answer_line",
+          "regex": "[?？]|주세요|알려 ?줘|답해|할까요|원하시|\\b(?:confirm|which do you|should I|let me know)\\b"
+        },
+        {
+          "text": "Any final Wiki line reports no created or updated page",
+          "check": "footer_matches",
+          "optional": true
+        }
+      ]
     }
   ],
   "trigger_evals": [

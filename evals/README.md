@@ -29,7 +29,7 @@ Clean sample pages, which must produce no finding:
 
 Agent cases also use the work note `Projects/Lumen Notes Import Plan.md`, which mentions transclusion, progressive summarization and Readwise Reader twice each (only the first mention may become a link), and the Raw `Sources/2026-11-25 Northwind Labs leadership update.md`, the news for the person-update case. The Guideline maps Guides to `Knowledge/Guides/` (`layer: guides`) and the owner's permanent notes to `Notes/`. The fixture root's `AGENTS.md` maps the ingest records to `Knowledge/index.md` and `Knowledge/log.md`.
 
-`Knowledge/Broken/` holds one deliberately broken note per check; `Broken Link.md` also carries a link to a missing heading (marksman) and a missing `related` target (Obsidian CLI). `Spaced Repetition.md` names an Entity inside a quote, which must not be reported. The hiring post in `Sources/` and the weekly review in `Projects/` each carry a `status` that does not belong there. The Raw and the work note also mention Entities without links and use `---`, which shows that those checks only look at the wiki role.
+`Knowledge/Broken/` holds one deliberately broken note per check; `Broken Link.md` also carries a link to a missing heading (marksman) and a missing `related` target (frontmatter `BROKEN`). `Table Alias.md` and `Table Alias Missing.md` use the table-escaped alias `[[Target\|alias]]`; only the link to a missing note is `BROKEN`. With `--orphans`, every `Knowledge/` page no other note links to is an `ORPHAN`; `Tools MOC.md` is exempt as a MOC. `Spaced Repetition.md` names an Entity inside a quote, which must not be reported. The hiring post in `Sources/` and the weekly review in `Projects/` each carry a `status` that does not belong there. The Raw and the work note also mention Entities without links and use `---`, which shows that those checks only look at the wiki role.
 
 `.obsidian/` makes the folder open as a vault. `.marksman.toml` lets marksman treat it as a workspace.
 
@@ -37,10 +37,9 @@ Agent cases also use the work note `Projects/Lumen Notes Import Plan.md`, which 
 
 ```bash
 python3 evals/lint/run.py          # python path (link-lint.py --checks all) and marksman path
-python3 evals/lint/run.py --cli    # also obsidian-lint.py; Obsidian must already have fixture-vault open
 ```
 
-Each case names the paths it applies to. A case passes on a path when every expected finding is reported and none of its clean files has a finding; a final row per path fails on any finding no case expects. A script that crashes, prints a malformed line, or whose `# violations` total disagrees with its lines counts as not run, and every row of that path fails. The runner also stops if `evals.json` names a missing fixture file or if its policy differs from the wiki folder, Entity folders, lifecycle types, reading-progress book types, or product types declared by `Guideline.md`. Without `--cli`, or when Obsidian does not have the fixture open, the CLI path does not run; `obsidian-lint.py` never opens or switches a vault itself. Only open the fixture in Obsidian when no other session depends on which vault is focused.
+Each case names the paths it applies to. A case passes on a path when every expected finding is reported and none of its clean files has a finding; a final row per path fails on any finding no case expects. A script that crashes, prints a malformed line, or whose `# violations` total disagrees with its lines counts as not run, and every row of that path fails. The runner also stops if `evals.json` names a missing fixture file or if its policy differs from the wiki folder, Entity folders, lifecycle types, reading-progress book types, or product types declared by `Guideline.md`.
 
 ## Baseline against new
 
@@ -70,7 +69,7 @@ python3 -c "import json; json.dump(json.load(open('evals/lint/evals.json'))['tri
 | 2026-11-26 | 0.28.1 snapshot (`1c73d0b`) | python + marksman | 4/16 |
 | 2026-11-26 | feat/sb-lint | python + marksman | 16/16 |
 
-Both runs grade the same 16 rows: a path that cannot run fails every row it owns. The 0.28.1 baseline has no policy checks and no marksman script, so only its link-form rows pass. The CLI path (`--cli`) was not run on the fixture: opening it in Obsidian would switch the owner's open vault.
+Both runs grade the same 16 rows: a path that cannot run fails every row it owns. The 0.28.1 baseline has no policy checks and no marksman script, so only its link-form rows pass.
 
 ## Running the knowledge-skill evals
 
@@ -132,6 +131,45 @@ Mode i90 regression checks: case 2 **7/8** and case 6 **5/6** (both emitted pare
 Full mode follow-up i95 scored **59/78**: cases 1–9 were 6/8, 7/8, 6/8, 0/12 (timeout), 8/8, 5/6, 11/11, 7/8 and 9/9. Cases 1–6 loaded the preceding wait instructions; cases 7–9 loaded the final text. Rows that passed i114 and failed i95 were 1.1 and 1.5 (worker attribution and key order), 3.1 (worker attribution), and 4.7–4.8 and 4.10–4.12 (ingest did not complete within 230 seconds).
 
 With the final wait revision, i96 cases 2, 5 and 6 scored **7/8**, **8/8** and **6/6**. All three approved query workers in i96–98 wrote the Query note, index and log, and each produced a valid final footer, but every parent emitted a progress message before completion. The i95 approved query was silent; silence is not reliable yet.
+
+### Duplicate-text trim (2026-11-26)
+
+`term`, `concept` and `entity` dropped lines that restate `principle-markdown` or the vault roles (now in `principle-knowledge-notes`), which they already open. One `--config new` run each, trimmed tree against an untrimmed snapshot passed with `--skills-root`:
+
+| Skill | Bytes | Trimmed | Untrimmed |
+| --- | --- | --- | --- |
+| term | 9,138 → 8,641 | 27/27 | 26/27 (section order) |
+| concept | 6,307 → 5,782 | 19/19 | 18/19 (unlinked entity) |
+| entity | 15,282 → 14,320 | 39/39 | 39/39 |
+
+Single runs: the two untrimmed failures are within the variance seen in R4, not evidence that trimming helped.
+
+### Size round (2026-11-26)
+
+19 principles merged into 5 (archival, markdown, writing, knowledge-notes, editing); `inbox`, `reindex` and `status` folded into `ingest` and `lint`; knap moved into `obsidian-clipper`; `obsidian-lint.py`/`.js` removed. Packages 39 → 22, Markdown 613,716 → 485,181 bytes (−21%). Baseline: the pre-round snapshot in `evals/results/trim2-workspace/pre-skills`, run in the same iteration (`new_skill` / `old_skill`, skill-creator layout, `benchmark.json` and `review.html` per suite).
+
+| Suite | New | Old | Note |
+| --- | --- | --- | --- |
+| obsidian-visualize | 16/16 | 16/16 | tokens −18% |
+| ingest + capture | 54/54 | 54/54 | tokens −11%; defuddle first |
+| obsidian-clipper | 25/25 | 25/25 | tokens 998k → 798k |
+| obsidian-sync | 21/21 | 21/21 | |
+| obsidian-cli | 15/15 | 15/15 | tokens 160k → 129k |
+| lint (mechanical) | 27/27 | 22/27 | old lacks frontmatter BROKEN, ORPHAN, `\|` alias fix |
+| term | 27/27 | 27/27 | |
+| concept | 19/19 | 19/19 | |
+| entity | 39/39 | 39/39 | |
+| secondbrain-mode | 86/87 | 86/87 | eval-6 answer content varies run to run |
+
+`ORPHAN` runs only with `--orphans`, so graders that lint a freshly written page are unaffected.
+
+Note-kind fix: `term`, `concept`, `entity` and `secondbrain-mode` choose the kind by `principle-knowledge-notes`, not by the owner's label ("make it a term" for Fulbright), and ask once on a mismatch. New cases: term `mislabeled-entity-asks-first`, entity `mislabeled-term-asks-first` (regression guards; the old tree also passes them). Results in `evals/results/trim2-workspace/classify/<skill>/iteration-1/`.
+
+| Suite | New | Old | Note |
+| --- | --- | --- | --- |
+| term | 100% | 100% | |
+| entity | 99% | 99% | place `layer` flakes 1/4 in both |
+| secondbrain-mode | 97% (full 84/87) | 95% (full 82/87) | pre-dispatch narration in both, run to run |
 
 ### R3 history (earlier rubric)
 

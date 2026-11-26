@@ -10,7 +10,9 @@ Use the official `obsidian` CLI to operate a running Obsidian instance: read, cr
 
 ## Binary identity
 
-The executable is `obsidian`, installed by the Obsidian desktop app. It talks to an app instance, so Obsidian must be open for vault and developer commands to work.
+The executable is `obsidian`, installed by the Obsidian desktop app and turned on as described at https://help.obsidian.md/cli. It talks to an app instance, so Obsidian must be open for vault and developer commands to work. When it reports that it can't find Obsidian, ask the user to open the app and retry; in a sandboxed shell the same message can mean the sandbox blocked the CLI's local socket.
+
+On WSL, run `Obsidian.com` from the Windows install folder, not `Obsidian.exe`: `Obsidian.com` is the console wrapper that prints the output, and `Obsidian.exe` exits without printing anything.
 
 Confirm the surface before relying on it:
 
@@ -37,7 +39,15 @@ obsidian create name="My Note" content="Hello world"
 obsidian vault="Research" create path="Scratch/My Note.md" overwrite
 ```
 
-For multiline content use `\n` for newline and `\t` for tab.
+Opening is opt-in: pass `open` to open the file and add `newtab` for a new tab. There is no `silent` flag.
+
+Quote parameters for the current shell, and pass note text as literal argument data, never as executable shell syntax.
+
+In `content=`, `\n` becomes a newline and `\t` a tab. Every `\n` and `\t` is converted and there is no escape, so text such as the LaTeX `\theta` or the path `C:\notes` is corrupted. When the content contains backslashes or is longer than about 4 KB, the CLI cannot carry it intact: write it to the note's file directly, only with authority for that edit, and read it back.
+
+A dot in a file name is read as the start of an extension. When a name contains a dot, include the extension: `create name="Meeting 2026.11.06.md"`, `rename name="v1.2 notes.md"`, `move to="Archive 2026.10/Note.md"`.
+
+Output options `--copy`, `--json`, `--md`, `--tsv` and `--csv` only work after the command name; before it (or before `vault=`) the first token is read as the command and fails, often as `Command "--copy" not found`. Put `vault=` first and double-dash options last. Many list commands also accept `format=json`.
 
 Every command's exact parameter set comes from `obsidian help`. This manual shows the forms it documents; where a parameter name is not shown here, read it from `help` rather than guessing a plausible one.
 
@@ -45,14 +55,14 @@ Every command's exact parameter set comes from `obsidian help`. This manual show
 
 Many commands accept `file` or `path` to target a file. Without either, the active file is used.
 
-- `file=<name>` — resolves like a wikilink (name only, no path or extension needed)
+- `file=<name>` — resolves like a wikilink (name only, no path needed). `.md` is optional; other file types need their extension, e.g. `file="Projects.base"`. Aliases don't resolve.
 - `path=<path>` — exact path from vault root, e.g. `folder/note.md`
 
 Prefer `path=` for every mutation. Both the active file and wikilink resolution depend on live app state, so they can silently select a different note than the one under discussion.
 
 ## Vault routing
 
-Commands target the most recently focused vault by default. That default is app state you did not set, so it is only acceptable for throwaway reads. Pass `vault=<name>` as the first parameter to target a specific vault:
+Without `vault=`, commands target the vault that contains the current directory, then the most recently focused vault. That default is state you did not set, so it is only acceptable for throwaway reads. `vault=<name>` only works as the first parameter; anywhere else it is ignored:
 
 ```bash
 obsidian vault="My Vault" search query="test"
@@ -73,7 +83,7 @@ obsidian daily:read
 Create and additive writes:
 
 ```bash
-obsidian create name="New Note" content="# Hello" template="Template"
+obsidian create name="New Note" template="Template"   # a template replaces content=
 obsidian create path="Projects/Roadmap.md" content="<full body>" overwrite
 obsidian append file="Meeting Notes" content="New line"
 obsidian prepend path="Projects/Roadmap.md" content="Status: draft"
@@ -86,11 +96,11 @@ obsidian property:set name="status" value="done" file="Meeting Notes"
 Move:
 
 ```bash
-obsidian help move
 obsidian vault="Research" move path="Scratch/Draft.md" to="Projects/Draft.md"
+obsidian vault="Research" rename path="Projects/Draft.md" name="Plan"
 ```
 
-A move changes the note's identity in the vault. Whether inbound links are rewritten depends on the vault's link-update setting, so do not assume either way — audit links afterwards and verify all three of destination, old path, and backlinks. See [write and move failures](references/operations.md#3-write-and-move-failures).
+Use `rename` and `move`, not filesystem `mv` or `eval`, so Obsidian can update links to the file. A move changes the note's identity in the vault. When other notes link to it and Settings → Files and links → Automatically update internal links is off, Obsidian asks in a dialog and the command waits until someone answers. Do not assume links were rewritten — audit links afterwards and verify all three of destination, old path, and backlinks. See [write and move failures](references/operations.md#3-write-and-move-failures).
 
 Search and audit:
 
@@ -111,7 +121,7 @@ Deletes:
 obsidian delete path="Scratch/probe.md"
 ```
 
-`delete` is destructive and needs explicit approved scope naming the exact paths. Clean up only probe files this task created.
+`delete` moves the file to the trash; don't pass `permanent` unless the user asks for it. It is still destructive and needs explicit approved scope naming the exact paths. Clean up only probe files this task created.
 
 Plugin and vault state:
 
@@ -125,7 +135,7 @@ obsidian plugin:reload id=my-plugin
 
 Read-only Sync state for a vault the desktop app already syncs is exposed by the `sync:` family listed in `obsidian help`; pairing, daemons, and headless clients are a different system and are out of scope here.
 
-Use clipboard and count flags only when the installed command's help lists them. Obsidian 1.12.7 `help create` lists `open` and `newtab`, but not `silent`; omit `open` when no new view is wanted. `total` is supported by the list commands that advertise it.
+`total` is supported by the list commands that advertise it.
 
 ## Mutation contract
 
@@ -146,10 +156,11 @@ If readback is impossible because the app or bridge is unavailable, say the muta
 After changing a plugin or theme, the cycle is done when the running app has loaded the changed code, its errors and warnings were read, and the rendered result was checked. Pick the commands from `obsidian help` on this build; for example:
 
 ```bash
+obsidian dev:debug on                                # once, so console messages from the reload are kept
 obsidian plugin:reload id=my-plugin                  # load the changed plugin
 obsidian dev:errors                                  # errors since the reload
 obsidian dev:console level=error                     # console warnings and errors
-obsidian dev:screenshot path=screenshot.png          # rendered state
+obsidian dev:screenshot                              # saves to a temp file and prints its path; a relative path= saves inside the vault
 obsidian dev:dom selector=".workspace-leaf" text     # or the DOM it produced
 ```
 

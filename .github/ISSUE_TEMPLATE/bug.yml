@@ -6,7 +6,7 @@ body:
     id: package
     attributes:
       label: Package
-      options: [audit, bases, capture, concept, entity, inbox, ingest, lint, obsidian-cli, obsidian-clipper, obsidian-sync, obsidian-visualize, onboard, principle-collective-description, principle-draw-structure, principle-entity-types, principle-frontmatter, principle-hierarchy, principle-link-form, principle-markdown-blocks, principle-not-a-research-log, principle-note-kinds, principle-note-shape, principle-original-order, principle-plain-tldr, principle-preserve-unrequested, principle-preserve-voice, principle-provenance, principle-quotation-attribution, principle-read-back, principle-resolve-target, principle-revise-and-consolidate, principle-standalone-note, principle-vault-roles, query, refresh-context, reindex, secondbrain-mode, status, term, verify, "not sure / several"]
+      options: [audit, capture, concept, entity, ingest, lint, obsidian-bases, obsidian-cli, obsidian-clipper, obsidian-sync, obsidian-visualize, onboard, principle-archival, principle-editing, principle-knowledge-notes, principle-markdown, principle-writing, query, refresh-context, secondbrain-mode, term, verify, "not sure / several"]
     validations: { required: true }
   - type: input
     id: runtime

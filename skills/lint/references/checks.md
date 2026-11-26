@@ -1,65 +1,15 @@
-# Lint one-liners
+# Lint recipes
 
-Starting points, not a pipeline. Replace `<scope>` and `<vault>` with live paths, always quoted. Prefer `obsidian-cli` for link questions when Obsidian is running; it resolves aliases and headings that `rg` cannot.
-
-Filenames may contain spaces, emoji and newlines: pass paths NUL-separated (`rg --null`/`-0`, `find -print0`, `xargs -0`, `while IFS= read -r -d ''`). In ripgrep `-L` means `--follow`, not "files without match" — use `--files-without-match`.
+Starting points, not a pipeline. Quote every `<scope>` and `<vault>`. Filenames may contain spaces, emoji and newlines: pass paths NUL-separated (`rg --null`/`-0`, `find -print0`, `xargs -0 -r`). In ripgrep `-L` means `--follow`; use `--files-without-match`, which cannot tell frontmatter from body, so spot-read a few results.
 
 ```bash
-# Inventory (count, NUL-safe)
-rg --files -0 -g '*.md' "<scope>" | tr -cd '\0' | wc -c
+# Notes carrying a property (Status mode), one count per key
+for k in status youtube x; do printf '%s\t' "$k"; rg -l0 -PU '\A---\n(?:(?!---$).*\n)*?'"$k:" -g '*.md' "<vault>" | tr -cd '\0' | wc -c; done
 
-# Link targets used in scope (strip alias and heading)
-rg -o --no-filename '\[\[[^]|#]+' "<scope>" | sort -u
+# High confidence without a Bias Check
+rg -l0 '^confidence: "?high"?$' "<wiki-scope>" | xargs -0 -r rg --files-without-match 'Bias Check'
 
-# Does a target exist anywhere in the vault
-rg --files -g '<name>.md' "<vault>"
-
-# Inbound links to one page from the whole vault
-rg -l "\[\[<basename>(\||#|\]\])" "<vault>"
-
-# Link targets per frontmatter key: use the PyYAML recipe below; use link-lint.py for the body
-
-# Contradiction callouts
-rg -n '> \[!warning\] Contradiction' "<scope>"
-
-# Field presence: notes lacking the field
-rg --files-without-match '^collectionPurpose:' "<raw-scope>"
-rg --files-without-match '^explored:' "<wiki-scope>"
-rg --files-without-match '^verificationStatus:' "<wiki-scope>"
-rg --files-without-match '^claimType:' "<wiki-scope>"
-rg --files-without-match '^evidenceScope:' "<wiki-scope>"
-
-# Values outside the allowed set
-rg -n '^confidence:' "<wiki-scope>" | rg -v 'confidence: "?(high|medium|low)"?$'
-rg -n '^verificationStatus:' "<wiki-scope>" | rg -v 'verificationStatus: "?(verified|partial|unverified|disputed)"?$'
-
-# Restrict this to ordinary lifecycle notes; check reading-progress books separately against live policy.
-rg -n '^status:' "<lifecycle-scope>" | rg -v 'status: "?(todo|inprogress|done|stop)"?$'
-
-# Disputed queue
-rg -l '^(verificationStatus: "?disputed"?|disputed: true)$' "<wiki-scope>"
-
-# High confidence without a Bias Check (NUL-safe pipe)
-rg -l0 '^confidence: "?high"?$' "<wiki-scope>" \
-  | xargs -0 -r rg --files-without-match 'Bias Check'
-
-# explored: true missing exploredBy or exploredDate
-rg -l0 '^explored: true$' "<wiki-scope>" \
-  | xargs -0 -r rg --files-without-match '^exploredDate:'
-rg -l0 '^explored: true$' "<wiki-scope>" \
-  | xargs -0 -r rg --files-without-match '^exploredBy:'
-
-# Stale: confidence low with date_modified (compare dates against today - 30)
-rg -l0 '^confidence: "?low"?$' "<wiki-scope>" \
-  | xargs -0 -r rg -H '^date_modified:'
-
-# Fallback age when date_modified is absent
-git log -1 --format=%cs -- "<page>"
-
-# Index catalog vs files: use the index recipe below (all sections, all roles)
-
-# Wiki log latest entry. Use the vault-relative wiki folder from the live guideline.
-# Without a configured wiki role, skip this recipe and report the log as unavailable.
+# Wiki log latest entry (vault-relative wiki folder from live policy; without one, the log is unavailable)
 if records=$(python3 "<ingest-scripts>/records.py" --vault "<vault>" --wiki "<wiki-folder>"); then
   log=$(printf '%s\n' "$records" | awk -F '\t' '$1=="log" && $2=="path"{print $3}')
   if [ -z "$log" ]; then
@@ -73,77 +23,13 @@ else
   printf 'Wiki log unavailable: record resolution blocked\n'
 fi
 
-# Backticked URLs (drop hits inside fences, commands, quotations, frontmatter and Raw `## Original Content`)
-rg -n -g '*.md' '`https?://[^\s)`]+`' "<scope>"
-
-# Link form (deterministic, offline); keep the output to pass as --baseline next time
+# Scripts; keep each output to pass as --baseline next time
 python3 "<skill-dir>/scripts/link-lint.py" --vault "<vault>" --scope "<scope>" > link-lint.tsv
-
-# Frontmatter and structure (Step 12). Use live policy for folders and types.
-# Repeat --entity-folder, --book-type and --product-type as needed; omit them if not declared.
-# Obsidian already running with this vault open; exit 3 means it is not, so use the next line.
-python3 "<skill-dir>/scripts/obsidian-lint.py" --vault "<vault>" --scope "<scope>" \
-  --wiki "<wiki-folder>" --entity-folder "<entity-folder>" --book-type "<book-type>" --product-type "<product-type>" --lifecycle "<type>,<type>" > policy-lint.tsv
-python3 "<skill-dir>/scripts/link-lint.py" --vault "<vault>" --scope "<scope>" --checks policy \
-  --wiki "<wiki-folder>" --entity-folder "<entity-folder>" --book-type "<book-type>" --product-type "<product-type>" --lifecycle "<type>,<type>" > policy-lint.tsv
-
-# Links to missing headings, ambiguous links, duplicate headings. Needs .git or .marksman.toml at the vault root.
-python3 "<skill-dir>/scripts/marksman-lint.py" --vault "<vault>" --scope "<scope>" > marksman-lint.tsv
+python3 "<skill-dir>/scripts/link-lint.py" --vault "<vault>" --scope "<scope>" --checks policy --orphans <policy flags> > policy-lint.tsv
+python3 "<skill-dir>/scripts/marksman-lint.py" --vault "<vault>" --scope "<scope>" > marksman-lint.tsv  # needs .git or .marksman.toml at the vault root
 ```
 
-`obsidian eval` needs an IIFE (`code='(()=>{...})()'`, async allowed); `obsidian-lint.py` builds it from `obsidian-lint.js` and passes its arguments in a temp file outside the vault. Run Obsidian CLI commands only through `obsidian-lint.py`: it checks that Obsidian is already running with this vault open before it calls the CLI, and a bare `obsidian` command can launch the app. Its `# properties` line gives the vault-wide counts of `status` and the retired keys.
-
-Link targets by key (read-only, needs PyYAML). Feed NUL-delimited paths: `rg --files -0 -g '*.md' "<scope>" | python3 links.py "<vault>"` (save the snippet in a temp file outside the vault). If `import yaml` fails, do not run the check and do not substitute a regex: report frontmatter links as **Not checked — PyYAML unavailable**; body links still come from `link-lint.py`.
-
-```python
-import sys, os, re
-import yaml
-sys.path.insert(0, "<skill-dir>/scripts")
-from daily_notes import daily_notes_folder, planned_daily_note
-vault = sys.argv[1]
-daily_folder = daily_notes_folder(vault)
-LINK = re.compile(r'(!?)\[\[([^\]\n]+)\]\]')
-names, paths = set(), set()
-for d, ds, fs in os.walk(vault):
-    ds[:] = [x for x in ds if not x.startswith('.')]
-    for f in fs:
-        rel = os.path.relpath(os.path.join(d, f), vault)
-        stem = rel[:-3] if rel.endswith('.md') else rel
-        paths.add(stem); paths.add(rel)
-        names.add(os.path.basename(stem)); names.add(f)
-def resolves(t):
-    t = t.strip()
-    return t in names or t.lstrip('/') in paths
-def walk(v):
-    if isinstance(v, str):
-        yield from LINK.findall(v)
-    elif isinstance(v, list):
-        for x in v: yield from walk(x)
-    elif isinstance(v, dict):
-        for x in v.values(): yield from walk(x)
-for p in sys.stdin.buffer.read().split(b'\0'):
-    if not p: continue
-    p = p.decode()
-    text = open(p, encoding='utf-8').read()
-    fm = {}
-    m = re.match(r'---\n(.*?)\n---\n?', text, re.S)
-    if m:
-        try:
-            fm = yaml.safe_load(m.group(1)) or {}
-        except yaml.YAMLError as e:
-            print(p, 'frontmatter', 'yaml-error', e, sep='\t'); fm = {}
-    for key, val in (fm.items() if isinstance(fm, dict) else []):
-        if key == 'author' or (key == 'domain' and fm.get('layer') == 'terms'):
-            continue
-        for embed, link in walk(val):
-            t = link.split('|', 1)[0].split('#', 1)[0]
-            if not resolves(t) and (embed or not planned_daily_note(link, daily_folder)):
-                print(p, key, t, sep='\t')
-```
-
-Use the body `BROKEN` findings from `link-lint.py`. Other keys checked here include `source`, `related`, `book`, `chapterPrev`, `chapterNext`, `personaOf`, and any key the live schema adds. Output is `path<TAB>key<TAB>missing target`.
-
-Index catalog check (read-only): resolves every `[[...]]` in the wiki index against the vault's actual files — Raw, Wiki, Queries, Maps, Personas and whatever sections the live index has — and recounts files per catalogued section. Use the vault-relative wiki folder from the live guideline; without it, report the index as unavailable without running the recipe. `python3 index_check.py "<vault>" "<wiki-folder>"`:
+Index catalog check (read-only, Step 6): resolves every `[[...]]` per index section and counts the files each catalogues. Without a wiki folder in the live guideline, report the index as unavailable instead. `python3 index_check.py "<vault>" "<wiki-folder>"`:
 
 ```python
 import sys, os, re
@@ -182,9 +68,9 @@ for s, hits in seen.items():
     print('catalogued', s, len(hits), sep='\t')
 ```
 
-Then compare each section with its folder on disk (from the live index and vault layout, not assumed names): files present in the folder but in no section are uncatalogued. Recount Stats from these folder counts, never from the old table. A link that resolves to two files with the same basename is ambiguous — report it rather than picking one.
+Then compare each section with its folder on disk (from the live index and vault layout, not assumed names). A link resolving to two files is ambiguous: report it rather than picking one.
 
-Policy conformance (read-only). Build `policy.json` from the live policy by hand — never guess values: `{"lanes": {"<raw folder>": {"type": "raw-source", "category": "<value>"}}, "retired": ["<key>"], "pairs": [["date modified", "date_modified"]]}`. Then `python3 conform.py "<vault>/10. Raw Sources" policy.json`:
+Policy conformance (read-only). Build `policy.json` from the live policy by hand — never guess values: `{"lanes": {"<raw folder>": {"type": "raw-source", "category": "<value>"}}, "retired": ["<key>"], "pairs": [["date modified", "date_modified"]]}`. Then `python3 conform.py "<raw-root>" policy.json`:
 
 ```python
 import sys, os, re, json, collections
@@ -219,6 +105,4 @@ for prov, dates in sorted(groups.items(), key=lambda x: -len(x[1])):
     print('group', *prov, len(dates), 'newest', max(dates), sep='\t')
 ```
 
-The line parser reads only top-level keys; use the PyYAML recipe above when nested values matter.
-
-`--files-without-match` cannot tell frontmatter from body: a field written in the body hides a gap, so spot-read a few results.
+The line parser reads only top-level keys.

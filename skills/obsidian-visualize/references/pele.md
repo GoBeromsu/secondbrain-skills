@@ -50,8 +50,8 @@ When a level cannot be reached — no app access, no vault authorization, headle
 ## Workflow
 
 1. **State the meaning first.** Write the sentence the diagram must communicate (sequence of steps, message order, state transitions, proportions, hierarchy, flow quantities). The sentence chooses the family.
-2. **Pick the smallest family that carries it** using the table below.
-3. **Start from the catalog entry**, not from memory. Replace labels and data; leave the grammar alone.
+2. **Pick the smallest family that carries it** from the table in [`pele-catalog.md`](pele-catalog.md).
+3. **Start from the catalog entry**, not from memory, for any beta or Pele-only family.
 4. **Write labels** under the escaping and readability rules below.
 5. **Fence it exactly** (see Fences and placement).
 6. **Only if the task actually edits a note:** confirm write authorization for that exact note, make the narrowest possible edit, and read the file back (see Editing a note safely).
@@ -60,42 +60,7 @@ When a level cannot be reached — no app access, no vault authorization, headle
 
 ## Choosing the family
 
-| The meaning to carry | Family | Notes |
-| --- | --- | --- |
-| Ordered steps with branches | `flowchart TD` / `flowchart LR` | The default; also the fallback for any structural diagram |
-| Who sends what to whom, in order | `sequenceDiagram` | Name participants explicitly; arrow type encodes sync/async/return |
-| Types, fields, and cardinality | `classDiagram` | Use for a domain model, not for runtime steps |
-| Lifecycle of one thing | `stateDiagram-v2` | Exact `-v2` suffix |
-| Stored entities and their keys | `erDiagram` | Schema shape, not process |
-| Dated work with durations | `gantt` | Needs `dateFormat`; durations, not vibes |
-| Step-by-step experience with scores | `journey` | Score and actor follow each task label |
-| Parts of one whole | `pie` | Quote every label; one level only |
-| Branching outline of one topic | `mindmap` | Indentation is the grammar — keep it consistent |
-| Dated milestones in order | `timeline` | One period line, then its events |
-| Quantified flow between stages | `sankey-beta` | CSV-shaped rows: source, target, value |
-| Work items across workflow columns | `kanban` | |
-| Nested proportions | `treemap-beta` | |
-| Services, groups, and their links | `architecture-beta` | |
-| Numeric series over categories | `xychart-beta` | |
-| Several actors handing off one process | `swimlane-beta` | |
-| A page or screen divided into a grid | `block-beta` | |
-| Agents splitting work and calling tools | `agentflow-beta` | |
-| Versions, branches and merges | `gitGraph` | Case-exact keyword |
-| Screens, commands and events changing state | `eventmodeling` | |
-| A few subjects profiled on several criteria | `radar-beta` | |
-| Items placed on two criteria | `quadrantChart` | |
-| Overlap of two or three sets | `venn-beta` | |
-| Requirements traced to what satisfies them | `requirementDiagram` | |
-| People, systems and external systems | `C4Context` | |
-| What actors want from a system | `usecase-beta` | |
-| Fixed-width fields of an identifier | `packet-beta` | |
-| A notation rule as EBNF | `railroad-ebnf-beta` | |
-| Folder and file paths | `treeView-beta` | |
-| Causes of one problem by category | `ishikawa-beta` | |
-| Work sorted into Cynefin domains | `cynefin-beta` | |
-| Value chain by visibility and evolution | `wardley-beta` | |
-
-Each catalog pattern also names when to avoid its family and the size past which it stops being readable.
+The family table, with when to avoid each family and its readable size, is in [`pele-catalog.md`](pele-catalog.md).
 
 Split a diagram at a real boundary (phase, actor, subsystem) as soon as labels overlap or edges cross unreadably. Pele scales wide diagrams down and lets the reader zoom and pan; that is not readability. Two readable diagrams beat one complete unreadable one.
 
@@ -160,12 +125,7 @@ flowchart LR
 
 ## Editing a note safely
 
-Authoring a diagram grants no write permission. A write needs the task's own authorization for that exact note, and the vault's live policy still decides placement and house style.
-
-- Read the note first; locate the exact insertion point or the exact existing fence to replace.
-- Anchor the edit on unique surrounding text, replacing only the diagram block. Never reformat, re-wrap, reorder, or "clean up" anything else, including frontmatter, tags, and whitespace.
-- Never write vault notes with shell redirection or stream editors. Use the host file-editing tool or the vault-aware surface the task selected.
-- Read the file back after the write and confirm both that the fence is exactly as intended and that unrelated content is unchanged. A successful write call is not readback.
+Authoring a diagram grants no write permission; the task must authorize that exact note. Read it first, anchor the edit on unique surrounding text and replace only the diagram block: never reformat, re-wrap or reorder anything else, frontmatter and whitespace included. Use the file-editing tool, not shell redirection. Read the file back; a successful write call is not readback.
 
 ## Failing without degrading meaning
 
@@ -178,28 +138,17 @@ When Pele rejects the chosen family and the source cannot be fixed, the replacem
 
 Silently shipping a smaller diagram that says less is a wrong answer that looks like a right one. So is leaving a broken fence in place because the fallback would be uglier.
 
-## Boundaries
-
-- Mermaid rendered anywhere other than Obsidian — a static site, a code host, a live editor — runs real Mermaid and does not inherit this baseline.
-- Vault policy owns whether the note may be written at all.
-
 ## Verification
 
-- [ ] The sentence the diagram must carry is stated, and the family carries it.
-- [ ] The prefix is exact.
-- [ ] Labels are quoted or escaped where the grammar needs it.
-- [ ] The block is in an exact `mermaid` fence, one diagram per fence, correctly nested if inside a callout or list.
-- [ ] If a note was edited: authorization existed, the edit was anchored, and readback confirmed unrelated content is unchanged.
-- [ ] The highest evidence level actually reached is reported, with the Obsidian app and installer versions when level C or D was reached.
-- [ ] Any replacement family preserves the original meaning, or explicitly lists what it drops.
+- [ ] The sentence is stated and the family carries it; the prefix is exact.
+- [ ] Labels are quoted or escaped where the grammar needs it, in the user's own wording.
+- [ ] One diagram per exact `mermaid` fence, nested correctly in a callout or list.
+- [ ] An edited note was authorized, anchored and read back.
+- [ ] The highest evidence level reached is reported, with app and installer versions at C or D; a replacement family lists what it drops.
 
 ## Sources
 
-- Obsidian 1.15.0 desktop changelog (early access, 2026-10-22), for the switch to Pele, the removed setting, `--mermaid-*` variables and the `loadMermaid()`/`window.pele` surface: <https://obsidian.md/changelog/2026-10-22-desktop-v1.15.0/>
-- Pele repository, MIT: <https://github.com/obsidianmd/pele>
-- Pele site, theming and compatibility differences from Mermaid: <https://pele.run>, <https://pele.run/theming>, <https://pele.run/compatibility>
-- Pele security and size limits: <https://pele.run/security>
-- Pele release notes, for features added after the build an app bundles: <https://github.com/obsidianmd/pele/releases>
-- CMDSPACE Pele gallery, for use, avoid and size guidance per family observed in Pele 1.9.0: <https://pele.cmdspace.work/>
-- Mermaid documentation, for grammar: <https://mermaid.js.org/intro/>, flowchart quoting and entity codes: <https://mermaid.js.org/syntax/flowchart.html>
-- Obsidian advanced formatting help, for the `mermaid` fence and `internal-link` class: <https://help.obsidian.md/advanced-syntax>
+- Obsidian 1.15.0 changelog: <https://obsidian.md/changelog/2026-10-22-desktop-v1.15.0/>
+- Pele, MIT: <https://github.com/obsidianmd/pele>, <https://pele.run/compatibility>, <https://pele.run/theming>, <https://pele.run/security>
+- CMDSPACE Pele gallery (use/avoid/size guidance): <https://pele.cmdspace.work/>
+- Mermaid grammar: <https://mermaid.js.org/intro/>

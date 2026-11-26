@@ -41,7 +41,7 @@ Skills never hard-code a vault path; they read from the vault guideline (its AGE
 
 Inside the wiki the guideline also names a folder per page kind: Terms, Concepts, Guides, Queries and each Entity type in use.
 
-Read the live guideline for the role mappings and the vault-root `AGENTS.md` for `wiki-index` and `wiki-log`. Ask the owner once, in one batch, for missing or invalid mappings needed by onboarding or the calling skill, naming the folders that exist. Ask for record paths relative to the vault root and strictly beneath the declared wiki role. Keep valid mappings and never choose a default. Validate proposed record paths with the resolver, passing the proposed wiki folder for `--wiki` and the owner-supplied paths as `--index` and/or `--log`; do not persist invalid paths. Open `principle-resolve-target`, `principle-preserve-unrequested` and `principle-read-back` (each at `../<leaf>/SKILL.md`). Write approved role answers into the guideline's one `Vault roles` section (append it the first time, extend it later; never a second copy) and approved record paths into the `wiki-index` and `wiki-log` lines in vault-root `AGENTS.md`. Change nothing else and read the mappings back. These configuration entries are the only writes onboard makes in an existing vault with owner notes.
+Read the live guideline for the role mappings and the vault-root `AGENTS.md` for `wiki-index` and `wiki-log`. Ask the owner once, in one batch, for missing or invalid mappings needed by onboarding or the calling skill, naming the folders that exist. Ask for record paths relative to the vault root and strictly beneath the declared wiki role. Keep valid mappings and never choose a default. Validate proposed record paths with the resolver, passing the proposed wiki folder for `--wiki` and the owner-supplied paths as `--index` and/or `--log`; do not persist invalid paths. Open [principle-editing](../principle-editing/SKILL.md). Write approved role answers into the guideline's one `Vault roles` section (append it the first time, extend it later; never a second copy) and approved record paths into the `wiki-index` and `wiki-log` lines in vault-root `AGENTS.md`. Change nothing else and read the mappings back. These configuration entries are the only writes onboard makes in an existing vault with owner notes.
 
 **Bootstrap records (fresh targets only).** With the live vault-relative wiki folder, run `python3 "<ingest-scripts>/records.py" --vault "<vault>" --wiki "<wiki-folder>"` as described in [records](../ingest/references/records.md). For each `path` row, keep an existing destination untouched; otherwise create its parent and move the corresponding legacy root record already in this fresh scaffold, copy the corresponding template record directly to the resolved destination, or create the missing record there. If both a legacy root file and its resolved destination exist, leave the root file and report it. Report and skip each `unavailable` row; without a valid wiki role bootstrap neither record. Never create a new root `index.md` or `log.md`.
 
@@ -75,13 +75,13 @@ Every run starts at the pre-flight. For a fresh scaffold, resolve the roles and 
 
 ## Wrap-up
 
-Read back the files written and list them, with each principle leaf that changed a decision and what it changed. Then suggest:
+Read back the files written and list them, with each principle that changed a decision and what it changed. Then suggest:
 
 1. `status` — the vault at a glance.
 2. A first `ingest <URL>` — when the purpose question comes, answer with one of the §2 reuse axes (a letter to your future self).
 3. A first `query <question>`.
 4. As it grows: recurring open questions become Research Question cards in the Questions folder the guideline names; a defended claim becomes a Synthesis card.
-5. Later: `capture` and `inbox` for collecting before ingesting, `qmd` for search (`reindex`).
+5. Later: `capture` for collecting before ingesting (`ingest` processes the Inbox), `qmd` for search (`ingest` refreshes it).
 
 Do not install skills, sync, migrate notes, ingest, delete files, or commit as a side effect; the wiki index and wiki log are the vault's records and Git never replaces them. A commit happens only when the owner separately asks.
 

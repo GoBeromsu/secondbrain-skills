@@ -16,7 +16,7 @@ Three separate claims. Never report a higher one on the strength of a lower one.
 
 | Level | What it proves | How it is produced |
 | --- | --- | --- |
-| A — Static validation | The file parses and satisfies the schema below | Reading the file against [Static validation](#static-validation) |
+| A — Static validation | The file parses, satisfies the schema below, and renders as intended from supplied values | [Static validation](#static-validation), including a knap test-render |
 | B — Import readback | The extension stored the template you wrote | Importing it, then comparing the editor's view field by field with the file |
 | C — Destination readback | A note exists at the intended path with the intended content | Opening the destination in the vault and reading it |
 
@@ -33,7 +33,7 @@ Owned here:
 Not owned here:
 
 - Note body syntax — callouts, wikilinks, embeds, property formatting inside a finished note.
-- `.base` structure, filters, formulas, and views. `bases` owns those; this package consumes only a Base's property keys and their intended types.
+- `.base` structure, filters, formulas, and views. `obsidian-bases` owns those; this package consumes only a Base's property keys and their intended types.
 - `.canvas` graph structure and vault-aware CLI operations, owned by `obsidian-visualize` and `obsidian-cli`.
 - What the vault's property vocabulary should be. The target vault's written convention decides; when it states none, ask instead of inventing one.
 
@@ -116,7 +116,7 @@ Templates are compressed and chunked into browser sync storage, and the extensio
 3. Analyze a real page. When no URL was given, find a representative public page of the target kind yourself and ask for one only when none is reachable; never work from a description of a page.
 4. Pick a source per field down the ladder: schema, then meta, then preset, then selector, then prompt.
 5. Draft the JSON against the schema above, adding logic only where a field is genuinely optional.
-6. Validate statically, and report the result *as* static validation.
+6. Validate statically, test-render with knap, and report the result *as* static validation.
 7. Deliver the JSON as a copy-pastable code block, with the import path and the intended list position.
 8. Earn levels B and C separately, or name them unverified.
 
@@ -130,20 +130,48 @@ Rendering never aborts either. Template errors and unknown filter names are repo
 
 ## Static validation
 
-Everything here is provable by reading the file. None of it is evidence about a page, an import, or a vault.
+Everything here is provable from the file alone. None of it is evidence about a page, an import, or a vault.
 
-1. The file parses as JSON.
-2. `name`, `behavior`, `properties`, and `noteContentFormat` are present.
-3. `noteNameFormat` and `path` are present, unless `behavior` is `append-daily` or `prepend-daily`.
-4. `behavior` is one of the six documented values.
-5. Every property has a `name` and a `value`, and every declared `type` is one of the six documented values.
-6. Property names are unique and match the destination convention, or the missing convention was raised explicitly.
-7. Every `{% if %}` has an `{% endif %}`, every `{% for %}` an `{% endfor %}`, and every `{# … #}` is closed.
-8. Quoting survives all three layers: JSON escaping, filter arguments, and the extra un-escaping pass on property values.
-9. `triggers` entries are well formed — a regex is slash-wrapped, a schema rule carries the `schema:` prefix.
-10. Fields that can be absent use `{% if %}` or `??` rather than bare interpolation.
+1. The file parses as JSON (`jq . template.json`).
+2. `name`, `behavior`, `properties`, and `noteContentFormat` are present; `noteNameFormat` and `path` too, unless `behavior` is `append-daily` or `prepend-daily`.
+3. `behavior` is one of the six values; every property has `name` and `value`, and any `type` is one of the six types.
+4. Property names are unique and match the destination convention, or the missing convention was raised explicitly.
+5. Syntax, block balance, and filter names pass `knap validate` (below) — do not hand-count `{% if %}` pairs.
+6. `triggers` entries are well formed — a regex is slash-wrapped, a schema rule carries the `schema:` prefix.
+7. Fields that can be absent use `{% if %}` or `??` rather than bare interpolation.
 
 On failure, report the offending field and the exact rule, and leave the file unchanged. Do not drop a property, relax a type, or invent a field to make the checklist pass. Report every problem found in one pass so the file can be fixed once.
+
+### Test-render with knap
+
+[knap](https://github.com/obsidianmd/knap) is the Clipper's template engine, packaged as a CLI. Run it inline, pinned: `npx -y knap@0.6.0 --help`; `knap help filters`, `knap help filter <name>`, and `knap help syntax` are the offline reference for the installed engine.
+
+```bash
+# syntax, unclosed blocks, unknown filters; exit 0 or 1, findings on stderr
+jq -r .noteContentFormat template.json | npx -y knap@0.6.0 validate -
+jq -r '.properties[].value'   template.json | npx -y knap@0.6.0 validate -
+
+# render the body against values you observed on the real page
+jq -r .noteContentFormat template.json > body.tpl
+npx -y knap@0.6.0 render body.tpl --data page.json      # or --set title="..." ; only one input may be stdin
+```
+
+`page.json` keys are the variable names exactly as the template writes them, prefixes included: `{"title":"…","schema:@Recipe:name":"…","selector:h1.title":"…","meta:property:og:image":"…"}`. An array value feeds a `{% for %}` loop. Fill it with values you observed on the page; a render from invented values proves only syntax.
+
+What knap cannot tell you:
+
+- It never fetches a page or runs a selector. An unsupplied `selector:`, `schema:`, or `meta:` variable renders empty without a warning, exactly like a selector that missed.
+- Prompt variables are not executed; `{{"summary"}}` renders its literal text.
+- Clipper-only filters such as `markdown` and `remove_html` fail validate with `UNKNOWN_FILTER`. That finding is expected for those names; any other unknown filter is a typo.
+- The extra un-escape pass Clipper applies to property values (below) does not happen in knap, so a quoted selector inside a property value is checked by reading it, not by rendering.
+
+Pitfalls the render exposes, verified on 0.6.0:
+
+- Filters bind tighter than `??`. `{{ x ?? "" | yaml_property:"k" }}` applies the filter to `""` only, so a present `x` renders bare with no `k:` key. Parenthesising, `{{ (x ?? "") | … }}`, is a parse error. Guard with `{% if x %}…{% endif %}` instead.
+- `yaml_property` on a missing value still emits `key: ""`. Wrap optional frontmatter lines in `{% if %}`.
+- `yaml_property` quotes values that need it (`a: b` becomes `"a: b"`); do not pre-quote.
+
+A clean knap render is still level A: it proves the template computes what you expect from the values you supplied, not that the page supplies them.
 
 ### Import accepts less than the schema requires
 
@@ -189,4 +217,4 @@ Both are complete and importable as written. Neither is a finished answer for a 
 
 ## Attribution
 
-Original work for this repository. No text was carried over from any third-party skill; the consulted source tree published no license notice, so it was used only to scope which failure modes a template author needs covered. Behavior is grounded in the official Web Clipper documentation linked above, and the schema, enumerations, import validation rules, and silent-failure modes were verified against the MIT-licensed [obsidianmd/obsidian-clipper](https://github.com/obsidianmd/obsidian-clipper) source at commit `6d56d618b00bd970aa738d6a7a61edee27783e81`, whose template engine is [obsidianmd/knap](https://github.com/obsidianmd/knap). No upstream file is vendored, so this package carries no third-party license notice; it is released under its bundled [LICENSE](LICENSE). See Git history for what was verified and what was not.
+Original work for this repository. No text was carried over from any third-party skill; the consulted source tree published no license notice, so it was used only to scope which failure modes a template author needs covered. Behavior is grounded in the official Web Clipper documentation linked above, and the schema, enumerations, import validation rules, and silent-failure modes were verified against the MIT-licensed [obsidianmd/obsidian-clipper](https://github.com/obsidianmd/obsidian-clipper) source at commit `6d56d618b00bd970aa738d6a7a61edee27783e81`, whose template engine is [obsidianmd/knap](https://github.com/obsidianmd/knap). The knap commands were written from the `knap@0.6.0` CLI's own help and checked by running them; no text was copied from knap or from any knap skill. No upstream file is vendored, so this package carries no third-party license notice; it is released under its bundled [LICENSE](LICENSE). See Git history for what was verified and what was not.

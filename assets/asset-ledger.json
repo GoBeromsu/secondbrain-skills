@@ -162,7 +162,7 @@
         "external_references": [],
         "only_namespace_uri": "http://www.w3.org/2000/svg"
       },
-      "depicts": "Four stations: Book drop (capture, inbox), Archive (ingest keeps the Raw source verbatim), Constellation (wiki pages, Entities and Maps linked into one network) and Reading room (query answers by following the links, with citations), and a Shelf care loop of lint, audit, verify, status and reindex.",
+      "depicts": "Four stations: Book drop (capture, with ingest's Inbox batch), Archive (ingest keeps the Raw source verbatim), Constellation (wiki pages, Entities and Maps linked into one network) and Reading room (query answers by following the links, with citations), and a Shelf care loop of lint, audit and verify.",
       "claims": "illustration of the intended workflow; the in-image footer states it is not a screenshot and not a claim that anything ran",
       "not_a_screenshot": true
     }

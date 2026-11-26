@@ -1,14 +1,14 @@
 # Updating an existing wiki page
 
-The procedure behind `principle-revise-and-consolidate`, for every skill that revises a Term, Concept, Guide or Entity page that already exists: `ingest`, `term`, `concept`, `entity`, and the narrow write-backs of `verify` and `query`.
+The procedure behind `principle-writing`'s revise-and-consolidate rules, for every skill that revises a Term, Concept, Guide or Entity page that already exists: `ingest`, `term`, `concept`, `entity`, and the narrow write-backs of `verify` and `query`.
 
 ## Steps
 
 1. Keep a before-image of the page before drafting.
-2. Draft only what is new from the inspected evidence: claims, sources and links the page does not already carry. When the page or an alias already covers the subject, the draft holds only the new claims. Neither the existing wiki nor one new source is ground truth.
+2. Draft only what is new from the inspected evidence; when the page or an alias already covers the subject, the draft holds only the new claims. Neither the existing wiki nor one new source is ground truth.
 3. Have a separate reviewer, in its own context, compare the draft with its evidence and the before-image. It keeps every valid statement, link and frontmatter value and reduces the draft to the minimal patch. When the runtime has no separate context, skip that page's update and report it.
 4. Change an existing statement only on verified evidence (a `verify` result or the owner's confirmation). When a source explicitly conflicts with a claim, keep both, attributed, in a `> [!warning] Contradiction` callout; a source that is silent does not contradict.
-5. Apply the patch and read the page back against the before-image (`principle-read-back`).
+5. Apply the patch and read the page back against the before-image (`principle-editing`).
 
 ## Template migration on touch
 
@@ -20,4 +20,4 @@ The procedure behind `principle-revise-and-consolidate`, for every skill that re
 
 - The creation date, identity and provenance.
 - Verification fields (`explored`, `verificationStatus`, `confidence` changes) belong to `verify`.
-- `authorship`: rewriting generated prose does not change it. Revising a wiki Entity marked `authorship: user` sets it to `authorship: mixed`, and every sentence the owner wrote stays unchanged.
+- `authorship`: rewriting generated prose does not change it; a wiki Entity marked `authorship: user` follows the vault roles in `principle-knowledge-notes`.

@@ -1,88 +1,48 @@
 # Books
 
-A book is one book Entity plus N chapter Raws, filled progressively as chapters are actually read. The book Entity is the hub: its `## Chapters`, `## Reading Progress` and `## Derived` sections list the chapter Raws, reading progress and the pages derived from them. Knowledge is compiled when read, not when scraped; a stub is a navigable future-compile target, never evidence that the chapter was read.
+A book is one book Entity (the hub) plus one chapter Raw per chapter, filled as chapters are actually read. The Entity's `## Chapters`, `## Reading Progress` and `## Derived` list the chapter Raws, progress and derived pages. Knowledge is compiled when read, not when scraped; a stub is a future compile target, never evidence that the chapter was read.
 
-Only a note in the vault's Entity folder with a book type and a `## Reading Progress` section may carry the owner's book reading `status`, with values defined by live policy. Ingest preserves that key when present and never sets or changes it. Chapter Raws have no frontmatter `status`; only their `Reading Status` body callout records chapter acquisition (`Stub`, `Reading` or `Completed`).
+Only a book Entity with `## Reading Progress` carries the owner's reading `status`; ingest preserves it and never sets it. Chapter Raws have no `status`; their `Reading Status` callout (`Stub`, `Reading`, `Completed`) records acquisition.
 
-## Steps 1 and 2
+Run Steps 1 and 2 once for the whole book; each stub inherits its `collectionPurpose`. Chapter Raws go into the Books Raw folder with `category: Books` unless live policy or the task names another.
 
-Run SKILL Steps 1 and 2 once for the whole book: one purpose covers every chapter and is inherited by each stub's `collectionPurpose`.
+## B-1 — TOC and chapter URL pattern
 
-## Folder and category
+- Detect a multi-page book or docs site (mdBook, VitePress, GitBook, Docusaurus, ReadTheDocs, Nextra) with 5+ chapters.
+- Fetch the preface or index page and extract the full TOC in original order and language: part, chapter number, title, slug hint, TOC one-liner.
+- Fetch two chapter URLs directly to confirm the URL pattern before naming anything; if it fails, stop and report rather than invent URLs. A commercial or offline book needs an obtained locator (file or page range) or its stubs stay unpromotable.
 
-Chapter stubs go into the Books Raw folder with `category: Books`, unless the live policy or the owner's task names another folder and `category` for books.
+## B-2 — Chapter stubs
 
-## B-1 — Fetch TOC and chapter URL pattern
+- One per TOC chapter from [book chapter](../assets/book-chapter.md), named `YYYY-MM-DD-{authorSlug}-{bookSlug}-ch{NN}-{slug}.md`.
+- Frontmatter: `source` (verified chapter URL or locator), `book` (quoted wikilink to the Entity), integer `chapterNumber`, original-language `chapterPart`, `chapterPrev`/`chapterNext` (quoted wikilinks, `null` at the ends), inherited `collectionPurpose`, `date_ingested` = scaffold date.
+- Body: `Reading Status: Stub` callout, Source, TOC Preview (the one-liner verbatim), `## Original Content` holding the template's placeholder, Reading Notes. The placeholder passes Raw pre-flight only together with the Stub callout.
+- Pre-flight per stub: exact placeholder, Stub callout, `chapterNumber`/`chapterPart`/`book` set, prev/next resolve or are `null`, no chapter Wiki page compiled.
 
-- Detect a multi-page book or docs site (mdBook, VitePress, GitBook, Docusaurus, ReadTheDocs, Nextra) with 5+ chapters in its sidebar or TOC.
-- Fetch the preface/readme/index page and extract the full TOC in original order: part, chapter number, title, slug hint and the TOC one-liner when given, all in the original language.
-- Test the URL pattern by fetching two chapter URLs directly (for example mdBook `/ch01-00-foo.html`, VitePress/Docusaurus `/ch01-foo/`, GitBook `/book/chapter-1/section-1`). Confirm the pattern matches reality before naming anything; if it fails, stop and report rather than invent URLs.
-- A commercial or offline book has no chapter URL to test; its stubs need an obtained locator (file or page range) or stay unpromotable.
+## B-3 — Book-level Wiki only
 
-## B-2 — Chapter stubs (N Raws)
+Compile only what the TOC and preface support, through SKILL Step 6: the book Entity from [book](../../entity/assets/book.md), whose `## Chapters` lists every stub as `- [[stub]] — {TOC one-liner}` grouped by part (plus the author's reading paths verbatim); a person Entity per confirmed author; optionally a companion-site Entity; 1–3 Terms or Concepts the preface names as anchors; at most one Guide when the preface gives a reusable method; the Entity linked from a Map. Never precompile chapter pages.
 
-- Name `YYYY-MM-DD-{authorSlug}-{bookSlug}-ch{NN}-{slug}.md` with [book chapter](../assets/book-chapter.md), one per TOC chapter.
-- Frontmatter: `source` = the verified direct chapter URL or obtained locator, `book` as a quoted wikilink to the book Entity, integer `chapterNumber`, original-language `chapterPart`, `chapterPrev`/`chapterNext` as quoted wikilinks to the adjacent stubs (`null` with no previous/next chapter, respectively), `collectionPurpose` inherited from the book, `date_ingested` = scaffold date.
-- Body: `Reading Status: Stub` callout, Source, TOC Preview (the TOC one-liner verbatim), `## Original Content` holding the non-empty pending-fill placeholder, Reading Notes. The placeholder satisfies Raw pre-flight but is exempt from substantiveness checks only with the `Reading Status: Stub` callout.
-- Pre-flight per stub: Original Content contains the exact placeholder, callout is `Reading Status: Stub`, `source` resolves when supplied, `chapterNumber`/`chapterPart`/`book` are set, prev/next resolve to existing stubs or are `null`, no chapter Wiki page compiled.
-
-## B-3 — Book-level Wiki only (small set)
-
-Compile only what the TOC and preface support, through SKILL Step 6:
-
-- the book Entity (native title) from [book](../../entity/assets/book.md), created or updated by SKILL Step 6's Entity rules; its `## Chapters` section lists every chapter stub as `- [[stub filename]] — {TOC one-liner}`, grouped under the source's parts, and the author's reading paths verbatim when given;
-- a person Entity for each author whose real name the source confirms, by SKILL Step 6;
-- optional Entity for a companion site;
-- 1–3 Terms or Concepts the preface names as anchors of the whole book;
-- optional 0–1 Guide when the preface itself gives a reusable methodology (for example reading paths);
-- the book Entity linked from the relevant Map, created when none exists (Step 8).
-
-Never precompile chapter-specific pages.
-
-## B-4 — Index and log
-
-- Wiki index from [records](records.md): new book-level pages under their sections, Stats recounted, one Recent Ingests row noting `{N} chapters scaffolded, {M} wiki pages`.
-- Wiki log from the same record: one appended entry for the whole scaffold, noting the progressive compile plan.
+Index and log per Step 9: one Recent Ingests row noting `{N} chapters scaffolded, {M} wiki pages`, one log entry with the progressive compile plan.
 
 ## Promotion — a chapter the owner has read
 
-Trigger: the owner runs ingest on a chapter stub or describes reading that chapter with intent to compile. Never promote an unread or unobtained chapter.
+Trigger: ingest on a chapter stub, or the owner describing reading it with intent to compile. Never promote an unread or unobtained chapter.
 
-1. For a `Reading Status: Stub` chapter, confirm its Original Content is still exactly the placeholder, then obtain the chapter text from its `source`. For `Reading Status: Reading`, obtain the missing text before marking the chapter completed. Leave a `Completed` chapter out of this promotion workflow.
-2. Replace the placeholder with the verbatim chapter text, or fill the missing positions without duplicating the text already saved. Update the callout to `Reading Status: Completed` for the full chapter or `Reading Status: Reading` when only part was obtained, revising its description to state what was obtained. Update `date_modified`. Preserve all other content, including Source, TOC Preview, human Reading Notes and navigation keys.
-3. Compile the chapter's Wiki pages by SKILL Step 6, updating existing pages first under its clean-context rule; Steps 7 and 8 apply.
-4. In the book Entity append `- [[YYYY-MM-DD]] chNN reading|completed — [[chapter Raw]]` under `## Reading Progress`, and each page compiled from the chapter under `## Derived`. Owner sentences and earlier progress lines stay.
-5. Update the wiki index per Step 9 and append to the wiki log: `## [YYYY-MM-DD] promote | {book} ch{NN}`.
-6. Read back the chapter, the book Entity and every touched page, then report qmd reindex status (Step 10).
+1. For a `Stub`, confirm Original Content is still exactly the placeholder and obtain the chapter from `source`; for `Reading`, obtain the missing text. Skip `Completed`.
+2. Replace the placeholder with the verbatim text, or fill the missing positions without duplicating saved text. Set the callout to `Completed`, or `Reading` with what was obtained; update `date_modified`; keep everything else, owner Reading Notes included.
+3. Compile the chapter's pages by Step 6; Steps 7 and 8 apply.
+4. In the book Entity append `- [[YYYY-MM-DD]] chNN reading|completed — [[chapter Raw]]` under `## Reading Progress` and each derived page under `## Derived`.
+5. Index per Step 9; log `## [YYYY-MM-DD] promote | {book} ch{NN}`.
+6. Read back the chapter, the Entity and every touched page; report the qmd reindex status (SKILL Step 10).
 
 ## Bibliographic acquisition
 
-Prefer the URL the user supplied.
-Read a Yes24 product page with `defuddle` or the aside browser for title, authors, publication date, ISBN-13, TOC and publisher text.
-When the TOC is missing, open `https://www.aladin.co.kr/shop/wproduct.aspx?ISBN=<ISBN13>`; its TOC images are `…/letslook/…_toc<N>.jpg` (`_toc1` is the cover) and count as TOC text only after OCR is actually performed.
-For a title or ISBN alone, search Yes24 first and then Aladin.
-For classic or historical texts, distinguish the recognized local title, the original-language title, the translator and the edition.
-
-Record ISBN-13, TOC and cover in the book Entity's `## Bibliographic Record`, and `## Table of Contents`, the cover as an observed Bibliographic Record line. Label every recorded field by origin: observed storefront metadata, OCR or inferred summary, or user-supplied reading context.
-A storefront blurb is not a finished summary, and a three-line summary is not catalog fact.
-A storefront blurb or empty TOC is unfinished bibliographic work, not a finished book note.
-
-## Work and edition identity
-
-Search for the existing work and edition with verified bibliographic data (ISBN, author, translator, publisher, edition) before creating a note.
-A translated or alternate title alone does not establish a different work, and differing editions are never merged silently.
-Discovering another title is not a reason to rename an existing note; a requested move needs a supported, link-preserving surface.
-The destination vault's registered book template wins for frontmatter keys and headings (never an append-only zone), otherwise the [book](../../entity/assets/book.md) Entity template; the live policy decides naming and placement. Never invent a schema beyond either.
+- Prefer the URL the owner supplied. Read a Yes24 product page (`defuddle` or the aside browser) for title, authors, date, ISBN-13, TOC and publisher text. Without a TOC, open `https://www.aladin.co.kr/shop/wproduct.aspx?ISBN=<ISBN13>`; its `…/letslook/…_toc<N>.jpg` images (`_toc1` is the cover) count as TOC only after OCR. For a title or ISBN alone, search Yes24, then Aladin.
+- Record ISBN-13, TOC and cover in the Entity's `## Bibliographic Record` and `## Table of Contents`, each field labelled by origin: storefront metadata, OCR or inferred summary, or owner-supplied context. A storefront blurb or empty TOC is unfinished work, not a book note.
+- For classic texts distinguish the local title, original title, translator and edition. Search for the existing work and edition (ISBN, author, translator, publisher) before creating; a translated title alone is not a different work, editions are never merged silently, and another title is no reason to rename.
+- The vault's registered book template wins for keys and headings (never an append-only zone), otherwise [book](../../entity/assets/book.md).
 
 ## Selected chapters
 
-Obtain only the selected chapters or supplied excerpts.
-Retain original page/chapter locations, quotation boundaries, missing pages and conversion provenance.
-Write purpose-grounded chapter analysis with links back to the obtained evidence, and reusable Concepts only where their independent information value warrants them.
-A complete TOC is not a complete book, and a selected chapter is not whole-book coverage.
-
-## Human reading
-
-Reading notes the owner wrote on a book Entity (thinking, reactions, dated personal bullets, anecdotes, highlights, next steps) stay word for word under `principle-preserve-voice`; ingest never rewrites, reorders or rephrases them.
-Quotes stay quotes and first-person notes stay first-person.
-Agent suggestions and verified links go into the template's own sections, never into an owner sentence.
+Obtain only the selected chapters or excerpts, keeping page and chapter locations, quotation boundaries, missing pages and conversion provenance. A complete TOC is not a complete book, and a selected chapter is not whole-book coverage. Owner reading notes on the book Entity stay word for word (`principle-writing`).

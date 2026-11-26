@@ -2,13 +2,13 @@
 
 `ob sync --continuous` is a long-lived writer with a vault as its output. The supervisor owns process lifetime; `ob` owns sync policy. Keeping those two apart is what makes a restart safe: nothing about "the daemon is misbehaving" justifies changing the mode, the pairing, or the conflict strategy.
 
-Read [commands.md](commands.md) first for the flag surface and the run-output vocabulary. This file covers everything that only matters once the process outlives the terminal.
+Flags come from `ob sync --help`; [commands.md](commands.md) has the lock, termination, and run-output behavior. This file covers everything that only matters once the process outlives the terminal.
 
 ## Preconditions
 
 Continuous mode is the last step of the workflow in [`../SKILL.md`](../SKILL.md), never the first. Do not start one until all of these hold.
 
-- [ ] Two consecutive one-shot runs finished with `Fully synced` and were compared against the Phase 0 baseline, not against expectations.
+- [ ] Two consecutive one-shot runs finished with `Fully synced` and were compared against the step 0 baseline, not against expectations.
 - [ ] `ob sync-status --path "$OBSIDIAN_VAULT_PATH"` reports the intended vault ID, the resolved root character for character, and the mode the task actually authorized.
 - [ ] Exactly one writer will touch the root: no desktop app, no second `ob sync`, no file-sync client, no backup job writing into the vault.
 - [ ] A named restore point exists and its coverage of uncommitted content is stated.
@@ -58,27 +58,11 @@ What each property is doing:
 
 Do not add flags the build does not have. Run the [version check](commands.md#version-check) against the exact binary the definition names.
 
-## Starting
+## Starting and stopping
 
-```bash
-ob sync --path "$OBSIDIAN_VAULT_PATH" --continuous
-```
+Start with `ob sync --path "$OBSIDIAN_VAULT_PATH" --continuous`, and read the `Starting sync:` configuration block once, under supervision, before walking away. The client then works from a filesystem watcher, server pushes, and a tick roughly every 30 seconds; `Fully synced` means the current batch converged and the process waits.
 
-The run prints `Starting sync:` and the configuration block first. Read it once, under supervision, before walking away - it is the last cheap chance to catch a wrong mode.
-
-After start, `ob` keeps working from three triggers: a filesystem watcher on the root, pushes from the server, and an internal tick roughly every 30 seconds. `Fully synced` in continuous mode means the current batch converged; the process stays up and waits.
-
-## Stopping
-
-`SIGINT` and `SIGTERM` are handled. The client prints `Received signal to shut down...`, disconnects, closes the state database, stops the watcher, and releases the lock directory.
-
-Send `SIGTERM` and let it exit. Do not follow it with `SIGKILL` on a short fuse:
-
-- A hard kill can interrupt a file write mid-transfer, leaving the vault in a state that is neither the baseline nor the target.
-- A hard kill skips the lock release. `<vault-root>/<config-dir>/.sync.lock` survives until it goes stale after 5 seconds, then the next run reclaims it automatically. Never delete it by hand - a lock that is not stale means a live writer you have not found yet.
-- A hard kill also skips closing the state database.
-
-After a stop, confirm the process is actually gone before starting anything else against the same root. `Another sync instance is already running for this vault.` (exit 1) on the next start means the old one is still alive.
+Stop with `SIGTERM` and let it exit; do not follow with `SIGKILL` on a short fuse. A hard kill can interrupt a file write mid-transfer and skips closing the state database and releasing the lock (the lock then goes stale and is reclaimed - never delete it by hand). Confirm the process is gone before starting anything else on the same root; `Another sync instance is already running for this vault.` on the next start means it is not.
 
 ## Restarting
 
@@ -136,15 +120,7 @@ Restart counts that keep climbing are not a transient. Each restart replays what
 
 Stop the process first. Then read the **earliest** relevant error, not the newest one - the newest is usually the fifth echo of the first.
 
-Classify by exit code before deciding anything:
-
-| Exit | Class | Restarting helps? |
-|---|---|---|
-| 3 | Identity - `No sync configuration found for <path>`, `Vault "<name>" not found.` | **No.** The path or the remote ID is wrong. |
-| 2 | Credentials or encryption - no token, login failure, missing key | **No.** Needs an interactive login or a configuration repair. |
-| 1 | Everything else - lock held, subscription expired, remote vault gone, runtime or native-module failure | **No, not before diagnosis.** Each of these has a distinct cause and a distinct fix. |
-
-Exits 2 and 3 are terminal for an unattended process. A supervisor configured to restart on them produces a loop that cannot succeed, and it fills the log with copies of one error.
+Classify by exit code ([commands.md](commands.md#exit-codes)) before deciding anything. Exit 3 (identity) and exit 2 (credentials or encryption) are terminal for an unattended process: a supervisor that restarts on them loops on one error. Exit 1 covers distinct causes - lock held, subscription expired, remote vault gone, runtime failure - and none of them is fixed by restarting before diagnosis.
 
 Two failures that look identical from the supervisor and are not:
 

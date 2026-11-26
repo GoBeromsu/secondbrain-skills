@@ -1,14 +1,12 @@
-# `ob` command surface
+# `ob` behavior that `--help` does not show
 
-The manual for `obsidian-headless` **0.0.14**. [`../SKILL.md`](../SKILL.md) owns the workflow and the authorization boundary; this file owns what each command actually accepts, what it writes, what it prints, and how it fails.
+Notes for `obsidian-headless` **0.0.14**. [`../SKILL.md`](../SKILL.md) owns the workflow and the authorization boundary.
 
-Everything here is checkable on the acting host without an account, without network access, and without a pairing: `--help` output, the package's bundled README, the bundled `cli.js`, and error paths that a non-vault directory triggers. Nothing here depends on a remote vault existing.
-
-`--help` on the installed build outranks this file. The tables below describe 0.0.14 and are reference, not a required invocation - see [Version check](#version-check).
+**Flags and synopses come from the CLI, not from here.** `ob --help` lists the commands; `ob <command> --help` lists each one's options and accepted values (`sync-config --help` prints the valid `--mode`, `--conflict-strategy`, `--file-types`, and `--configs` values). Run them; they are local, need no account, and outrank this file. What follows is only what help omits: hidden side effects, matching rules, failure strings, and exit codes, checked against the 0.0.14 package.
 
 ## Version check
 
-Before the first command that changes anything, read `node --version` (v22 or later), `ob --version`, and the `--help` of each subcommand this task will run. Check only what the task uses: that the build still offers a way to get each intended effect - the target vault and path, the mode, and the safety it needs. A supported form that differs from this file is fine; record which one you used.
+Before the first command that changes anything, read `node --version` (v22 or later), `ob --version`, and `ob <command> --help` for each subcommand this task will run. Check only that the build still offers a supported way to get each intended effect and its safety. A supported form that differs from this file is fine; record which one you used.
 
 Stop and report version skew only when the build offers no supported way to get an intended effect or its safety: for example no way to set `pull-only` before the first sync, or no way to pair without putting the passphrase on the command line. Never emulate a missing capability by hand-editing `config.json` or by installing a different version mid-task.
 
@@ -16,360 +14,155 @@ Record `ob --version`, `node --version`, and the subcommands checked in the task
 
 ## Reach: which commands leave the machine
 
-Authorize by class, not by command name. The left column needs nothing but a local filesystem read; the right column needs a stored token and a live connection.
+Authorize by class, not by command name.
 
 | Local only - no token, no network | Account and network |
 |---|---|
-| `sync-list-local` | `login`, `logout` |
-| `sync-status` | `sync-list-remote` |
-| `sync-config` | `sync-create-remote` |
-| `sync-unlink` | `sync-setup` |
-| | `sync` |
-| | `publish-*` |
+| `sync-list-local`, `sync-status`, `sync-config`, `sync-unlink` | `login`, `logout`, `sync-list-remote`, `sync-create-remote`, `sync-setup`, `sync`, `publish-*` |
 
-`sync-status` reads the token only to decide whether to print `Not logged in.`; it never validates it against the service. `sync-unlink` is local but destructive - see its entry below.
-
-Commands that need a token and find none stop with `No account logged in. Run "ob login" first.` and exit 2, before any network call.
+`sync-status` reads the token only to decide whether to print `Not logged in.`; it never validates it. `sync-unlink` is local but destructive. Commands that need a token and find none stop with `No account logged in. Run "ob login" first.` (exit 2) before any network call. The `publish-*` family shares the binary and login but targets Obsidian Publish; never run one for a sync request.
 
 ## Global behavior
 
-**`--path` matching is lexical.** The value (default: the current working directory) is passed through `path.resolve`, and every stored `config.json` is re-resolved the same way and compared as a string. The first configured vault whose resolved `vaultPath` matches wins.
+**`--path` matching is lexical.** The value (default: the current directory) goes through `path.resolve`, every stored `config.json` is re-resolved the same way, and they are compared as strings.
 
-- `.`, `..`, and trailing slashes normalize away - they are safe.
-- Letter case does not normalize. On a case-insensitive filesystem, `/srv/Vaults/example` and `/srv/vaults/example` are the same directory and two different vaults to `ob`.
-- Symlinks do not resolve. `path.resolve` is purely textual, so a symlinked parent, or `/tmp/x` where the config stored `/private/tmp/x`, is a different vault.
-- The failure is `No sync configuration found for <resolved-path>` with exit 3, never a warning and never a fallback to a near match.
+- `.`, `..`, and trailing slashes normalize away.
+- Letter case does not. On a case-insensitive filesystem `/srv/Vaults/example` and `/srv/vaults/example` are one directory and two vaults to `ob`.
+- Symlinks do not resolve: a symlinked parent, or `/tmp/x` where the config stored `/private/tmp/x`, is a different vault.
+- The failure is `No sync configuration found for <resolved-path>` (exit 3), never a near-match fallback.
 
 Resolve the root once per host with `pwd -P` and reuse the variable. Never copy an absolute path between machines.
 
-**`--json`** is accepted by `sync-list-remote`, `sync-list-local`, `sync-setup`, `sync-config`, `sync-status`, and the publish family. It is **not** accepted by `login`, `logout`, `sync-create-remote`, `sync-unlink`, or `sync`. In JSON mode the client suppresses progress messages, writes errors to stderr with a non-zero exit, and **disables every interactive prompt** - which is why it must not be used for `sync-setup` on an end-to-end encrypted vault.
+**`--json`** suppresses progress, sends errors to stderr, and **disables every interactive prompt** - so never use it for `sync-setup` on an end-to-end encrypted vault. Its configuration payload is redacted by construction (no host, key, salt, or token), which makes `ob sync-status --path "$ROOT" --json` the way to capture a configuration for evidence.
 
-The JSON configuration payload is redacted by construction. It carries `vaultId`, `vaultName`, `vaultPath`, `syncMode`, `conflictStrategy`, `deviceName`, `configDir`, `fileTypes`, `configs`, and `excludedFolders`, with defaults already resolved. It never carries the host, the encryption key, the salt, or the token. That makes `ob sync-status --path "$ROOT" --json` the correct way to capture a configuration for evidence.
+**Token resolution** checks `OBSIDIAN_AUTH_TOKEN` first, then the token file. That variable is the mechanism for unattended runs; the E2E passphrase has no equivalent and is never supplied non-interactively.
 
-**Token resolution** checks `OBSIDIAN_AUTH_TOKEN` first and falls back to the token file. The environment variable is the mechanism for unattended runs; the passphrase has no equivalent and is never supplied non-interactively.
+**Credentials never go on a command line.** `login --password`, `sync-setup --password`, and `sync-create-remote --password` exist, and each one puts a secret in the process table and shell history. Let the command prompt in a real terminal.
 
-## Command reference
+## Per-command notes
 
-### `ob login` / `ob logout`
+**`login`.** With a valid stored token and no credential flags it only prints `Logged in as <name> (<email>)`. Passing `--email` or `--password` discards the stored token first. A wrong MFA code is not re-prompted. Failure: `Login failed:` (exit 2).
 
-```
-ob login [--email <email>] [--password <password>] [--mfa <code>]
-ob logout
-```
+**`sync-list-remote` / `sync-list-local`.** Own and shared vaults are listed separately but selected by the same `--vault` value; record the **ID**, since a name is a mutable, duplicable label. `sync-list-local` is a pure filesystem read and the safe first command of any diagnosis: it enumerates every pairing on this host, which is how a second pairing against a differently spelled path is found.
 
-With a valid stored token and no `--email`/`--password`, `login` only reports status as `Logged in as <name> (<email>)`. Supplying either credential flag discards the stored token first and performs a real login. Two-factor is prompted on demand; an incorrect code is not re-prompted. Failure prints `Login failed:` and exits **2**.
+**`sync-create-remote`.** A remote account mutation, never the answer to `Vault "<name>" not found.` - that error means the identity was wrong, and a replacement vault hides the mistake. Without `--encryption standard` it prompts for an E2E passphrase and treats an empty answer as standard.
 
-`logout` revokes and deletes the stored token. With no token it prints `No account logged in.` and exits 0.
+**`sync-setup`.**
 
-Credential flags put secrets in the process table and shell history. Prompt instead.
+- Selection: exact **ID** across own and shared vaults first, then exact **name**. Several matches: `Multiple vaults named "<name>". Use the vault ID instead:` (exit 1). None: `Vault "<name>" not found.` (exit 3).
+- The passphrase prompt needs a real TTY. Piping, `< /dev/null`, `--json`, and a non-interactive `ssh host 'ob sync-setup ...'` all end in `Password not provided.` (exit 2). A wrong passphrase: `Failed to validate password.` (exit 2).
+- A non-empty root gets a warning, not a prompt: `notes in your local vault will be merged ... the most recent version of the note will be preserved.` That is why first contact is staged in `pull-only` - see [Conflict mechanics](#conflict-mechanics). A missing root is created.
+- **Setup writes a fresh policy.** It writes `conflictStrategy: "merge"` and no `syncMode`, file types, configs, or excluded folders, so every earlier `sync-config` choice is gone and the pairing is bidirectional again. Re-apply the intended policy before any `ob sync`.
+- Re-running setup for an already configured ID overwrites `config.json` but keeps `state.db`. `sync-unlink` then `sync-setup` drops the state database too, so the next run is an initial sync.
 
-### `ob sync-list-remote`
+**`sync-config`.** With no options it only prints the current configuration. Invalid values are rejected before the write (exit 1). Two effects are invisible in help:
 
-```
-ob sync-list-remote [--json]
-```
+- `--mode bidirectional` **removes** the stored mode rather than storing a word. A config with no `syncMode` key is an armed uploader, not an unconfigured one.
+- Changing `--excluded-folders`, `--file-types`, or `--configs` **queues every file that newly enters scope** for download on the next run. Widening scope is a scheduled transfer.
 
-Network read. Prints `Fetching vaults...`, then:
+`--config-dir` changes only which in-vault folder the client treats as app configuration; it moves nothing.
 
-```
-Vaults:
-  <vault-id>  "<vault-name>"  (<region>)
+**`sync-status`.** Reports **stored configuration only** - no service contact, queue depth, last-success time, or drift. A healthy block is not evidence that the last run worked. `Location:` must match the resolved root character for character, and `Vault:` must carry the intended ID. A leading `Not logged in.` is a credential gap, not a broken pairing.
 
-Shared vaults:
-  <vault-id>  "<vault-name>"  (<region>)
-```
+**`sync-unlink`.** Deletes the whole per-vault directory - `config.json`, `state.db`, **and `sync.log`** - and leaves notes untouched. Copy `sync.log` out first; unlinking mid-incident destroys the only run record. Unlink only the verified-wrong pairing found with `sync-list-local`, never as a remedy for a transport or login error.
 
-Empty account: `No vaults found.`, exit 0. Failure: `Failed to list vaults:` plus the error, exit 1.
+**`sync`.**
 
-Own and shared vaults are listed separately but are selectable by the same `--vault` value. Record the **ID**; a name is a mutable, duplicable display label.
-
-### `ob sync-list-local`
-
-```
-ob sync-list-local [--json]
-```
-
-Pure filesystem read of the client's private config directory - no token, no network. Safe as the first command of any diagnosis.
-
-```
-Configured vaults:
-  <vault-id>
-    Path: <absolute-local-root>
-    Host: <sync-host>
-```
-
-No configuration at all: `No vaults configured.`, exit 0. This is identity evidence: it enumerates every pairing this account's client knows on this host, which is how a second pairing against a differently-spelled path is discovered.
-
-### `ob sync-create-remote`
-
-```
-ob sync-create-remote --name <name> [--encryption <standard|end-to-end>]
-                      [--password <passphrase>] [--region <region>]
-```
-
-Creates a new remote vault. `--name` is required. Unless `--encryption standard` is passed, the command prompts for an end-to-end passphrase and treats an empty answer as standard encryption. An unknown `--region` prints `Invalid region: "<region>". Available regions:` with the valid values and exits 1.
-
-This is a remote mutation on the account, not a sync operation. It is never the right response to `Vault "<name>" not found.` - that error means the identity was wrong, and creating a replacement hides the mistake.
-
-### `ob sync-setup`
-
-```
-ob sync-setup --vault <id-or-name> [--path <local-path>] [--password <passphrase>]
-              [--device-name <name>] [--config-dir <name>] [--json]
-```
-
-Pairs one resolved local root to one remote vault and writes `config.json`. `--vault` is required; omitting it is a usage error (`error: required option '--vault <vault>' not specified`, exit 1) raised before any network call.
-
-Selection order: exact **ID** match across own and shared vaults first; only if no ID matches is an exact **name** compared.
-
-| Outcome | Output | Exit |
-|---|---|---|
-| Exactly one match | proceeds | - |
-| Several vaults share the name | `Multiple vaults named "<name>". Use the vault ID instead:` followed by each `  <id>  "<name>"` | 1 |
-| No match | `Vault "<name>" not found.` | 3 |
-
-The passphrase prompt (`End-to-end encryption password: `) needs a real TTY. Piping, `< /dev/null`, `--json`, and a non-interactive `ssh host 'ob sync-setup ...'` all fail it: no password reaches the client and it stops with `Password not provided.` (exit 2). A wrong passphrase fails validation against the service with `Failed to validate password.` (exit 2). Never pass `--password`.
-
-If the local root already contains any non-dot entry, setup prints a warning and continues - there is no confirmation prompt:
-
-```
-Warning: Your local vault already contains some notes.
-If you start syncing, notes in your local vault will be merged with notes from your remote vault.
-In case of conflicts, the most recent version of the note will be preserved.
-```
-
-That last line is literally true and is the reason first contact is staged in `pull-only` - see [Conflict mechanics](#conflict-mechanics). If the root does not exist, setup creates it.
-
-`--config-dir` must be a dotfolder name with no path separator, or setup fails with `Invalid config directory: "<name>". Must be a dotfolder name (e.g. .obsidian).`
-
-**Setup writes a fresh policy.** The config it writes contains `vaultId`, `vaultName`, `vaultPath`, `host`, `encryptionVersion`, `encryptionKey`, `encryptionSalt`, `conflictStrategy: "merge"`, `deviceName`, and `configDir`. It writes no `syncMode`, no `allowTypes`, no `allowSpecialFiles`, and no `ignoreFolders`. Every earlier `sync-config` choice is gone: the pairing is now bidirectional with merge conflicts and default attachment types. Re-apply the intended policy in the same phase, before any `ob sync`.
-
-Re-running setup for a vault ID that is already configured overwrites `config.json` but leaves `state.db` in place. `sync-unlink` followed by `sync-setup` removes the state database as well, so the next run re-reconciles from scratch as an initial sync.
-
-### `ob sync-config`
-
-```
-ob sync-config [--path <local-path>] [--mode <mode>] [--conflict-strategy <strategy>]
-               [--excluded-folders <folders>] [--file-types <types>] [--configs <settings>]
-               [--device-name <name>] [--config-dir <name>] [--json]
-```
-
-With no options it is a **reader**: `No options provided. Current configuration:` followed by the same block `sync-status` prints. With options it applies them and prints `Configuration updated:`.
-
-| Option | Accepted values | Cleared by | Effective default |
-|---|---|---|---|
-| `--mode` | `bidirectional`, `pull-only`, `mirror-remote` | - | `bidirectional` |
-| `--conflict-strategy` | `merge`, `conflict` | - | `merge` (written at setup) |
-| `--excluded-folders` | comma-separated vault-relative paths | `""` | none |
-| `--file-types` | `image`, `audio`, `video`, `pdf`, `unsupported` | `""` | `image, audio, pdf, video` |
-| `--configs` | `app`, `appearance`, `appearance-data`, `hotkey`, `core-plugin`, `core-plugin-data`, `community-plugin`, `community-plugin-data` | `""` | none - config syncing disabled |
-| `--device-name` | any string | - | `<hostname> (macOS\|Windows\|Linux)` |
-| `--config-dir` | dotfolder name | - | `.obsidian` |
-
-Validation is strict and happens before the write:
-
-- `Invalid sync mode: "<value>". Must be "bidirectional", "pull-only", or "mirror-remote".` - exit 1
-- `Invalid conflict strategy: "<value>". Must be "merge" or "conflict".` - exit 1
-- `Config update failed: Error: Invalid file type: "<value>". Valid values: image, audio, video, pdf, unsupported` - exit 1
-- `Config update failed: Error: Invalid config: "<value>". Valid values: app, appearance, appearance-data, hotkey, core-plugin, core-plugin-data, community-plugin, community-plugin-data` - exit 1
-
-Two behaviors are not visible in `--help`:
-
-- `--mode bidirectional` does not store the word `bidirectional`; it **removes** the stored mode. Absence of `syncMode` is what "bidirectional" means on disk, so a config with no mode key is an armed uploader, not an unconfigured one.
-- Changing `--excluded-folders`, `--file-types`, or `--configs` recomputes the scope against the state database and **queues every file that newly enters scope** for download on the next run. Widening scope is therefore a scheduled transfer, not a passive setting.
-
-`--config-dir` changes only this client's idea of which in-vault folder holds app configuration. It does not move or create anything.
-
-### `ob sync-status`
-
-```
-ob sync-status [--path <local-path>] [--json]
-```
-
-Local read. Prints `Not logged in.` first when no token is present - that is a credential gap, not a broken pairing - then:
-
-```
-Sync Configuration:
-  Vault: <vault-name> (<vault-id>)
-  Location: <absolute-local-root>
-  Sync mode: <bidirectional|pull-only|mirror-remote>
-  Conflict strategy: <merge|conflict>
-  Device name: <device-name>
-  Config directory: <name>          # only when --config-dir was set
-  File types: image, audio, pdf, video
-  Configs: none (config syncing disabled)
-  Excluded folders: <a, b>          # only when non-empty
-```
-
-`Location:` must match the resolved root character for character, and `Vault:` must carry the intended ID. Failures: `No sync configuration found for <path>` (exit 3); `End-to-end encryption key missing. Run setup again.` (exit 2).
-
-This command reports **stored configuration only**. It does not contact the service, does not report queue depth, last-success time, or drift, and a healthy block is not evidence that the last run worked.
-
-### `ob sync-unlink`
-
-```
-ob sync-unlink [--path <local-path>]
-```
-
-Local and destructive to client state. It deletes the entire per-vault directory - `config.json`, `state.db`, **and `sync.log`** - then prints `Sync configuration removed for <path>`. Notes in the vault are untouched.
-
-Copy `sync.log` out of that directory before unlinking anything. Unlinking during an incident destroys the only run record that explains what was deleted.
-
-Unlink exactly the verified-wrong pairing, identified by `sync-list-local`, and never as a remedy for a transport error or a failed login.
-
-### `ob sync`
-
-```
-ob sync [--path <local-path>] [--continuous]
-```
-
-Preconditions checked in order: a config for the resolved path (`No sync configuration found for <path>` / `Run 'ob sync-setup' first.`, exit 3), a stored token (exit 2), a usable encryption key (`Encryption key not found. Run setup again.`, exit 2), and the vault lock.
-
-The run announces itself with `Starting sync:` and the same configuration block as `sync-status`. Read it: it is the last chance to catch a wrong mode before changes land.
-
-**Lock.** `ob sync` creates a lock **directory** at `<vault-root>/<config-dir>/.sync.lock`, refreshes its mtime once a second, and treats a lock older than 5 seconds as stale and reclaimable. A second `ob sync` against the same root exits 1 with `Another sync instance is already running for this vault.`; a graceful exit removes the directory. After `SIGKILL` or power loss the directory survives until it goes stale and the next run reclaims it automatically - never delete it by hand, because a lock that is not stale means a live writer you have not found. The lock arbitrates between `ob sync` processes only; it does not see the desktop app, a file-sync tool, or a backup job. It sits under the config directory as a dot-entry, so it is never itself synced.
-
-**Termination.** A one-shot run ends when reconciliation reports `Fully synced` and the client stops itself. It does **not** end because the network is down: an unreachable or failing server drops the client into a reconnect loop that retries roughly every 30 seconds and logs `Waiting to connect to server`, in one-shot mode exactly as in continuous mode. Bound one-shot runs with an external timeout rather than assuming the command returns.
-
-`SIGINT` and `SIGTERM` are handled: the client prints `Received signal to shut down...`, disconnects, closes the state database, stops the watcher, and releases the lock.
-
-**Reconnect.** Backoff is exponential from a 5-second base with 50% jitter, capped at 5 minutes, and reset on a successful connection. The socket is checked every 20 seconds: it pings after 10 seconds of silence and disconnects after 120 seconds of it. `Disconnected from server` followed by a later `Fully synced` is correct behavior, not an incident.
-
-Two errors deliberately stop the client instead of retrying - `The connected remote vault no longer exists.` and `Your subscription to Obsidian Sync has expired`. Both surface as `Sync failed:` with exit 1. Retrying either only replays it.
-
-### `publish-*`
-
-`publish-list-sites`, `publish-create-site`, `publish-setup`, `publish`, `publish-config`, `publish-site-options`, `publish-unlink` share the binary and the login but target Obsidian Publish, with their own config directory and their own effects. Out of scope here. Never run one to satisfy a sync request.
+- Preconditions, in order: a config for the resolved path (exit 3), a token (exit 2), a usable encryption key (`Encryption key not found. Run setup again.`, exit 2), the vault lock.
+- It first prints `Starting sync:` and the configuration block. Read it: it is the last chance to catch a wrong mode.
+- **Lock**: a directory at `<vault-root>/<config-dir>/.sync.lock`, refreshed every second, stale after 5 seconds and then reclaimed automatically. A second `ob sync` on the same root exits 1 with `Another sync instance is already running for this vault.` Never delete the lock by hand - a fresh lock means a live writer you have not found. It arbitrates only between `ob sync` processes, not the desktop app, a file-sync tool, or a backup job.
+- **Termination**: a one-shot run stops at `Fully synced`. It does **not** stop because the network is down - it loops on `Waiting to connect to server` (about every 30 s) in one-shot mode too. Bound one-shot runs with an external timeout. `SIGINT`/`SIGTERM` print `Received signal to shut down...` and release the lock.
+- **Reconnect**: exponential backoff from 5 s, 50% jitter, capped at 5 min, reset on success. `Disconnected from server` followed later by `Fully synced` is normal.
+- Two errors stop instead of retrying, both as `Sync failed:` (exit 1): `The connected remote vault no longer exists.` and `Your subscription to Obsidian Sync has expired`. Retrying only replays them.
 
 ## Mode semantics
 
-The stored mode decides what reconciliation is allowed to do to the local root.
-
-| Mode | Remote change arrives | Remote deletion | Local-only file | Locally modified file | Local edits upload |
+| Mode | Remote change | Remote deletion | Local-only file | Locally modified file | Uploads |
 |---|---|---|---|---|---|
 | `bidirectional` | downloaded | applied locally | kept and uploaded | merged or conflict-copied | yes |
-| `pull-only` | downloaded | **applied locally** | kept, never uploaded | overwritten by the remote copy | no |
-| `mirror-remote` | downloaded | **applied locally** | **deleted** | **reverted to the remote copy** | no |
+| `pull-only` | downloaded | **applied locally** | kept, never uploaded | overwritten by remote | no |
+| `mirror-remote` | downloaded | **applied locally** | **deleted** | **reverted to remote** | no |
 
-Neither download-only mode is read-only. `pull-only` is the safe staging mode because it preserves local-only files and uploads nothing - not because it cannot delete.
-
-`mirror-remote` is a deliberate "discard this machine's work" operation. It needs its own approval and its own tested restore point, and it is never a conflict-resolution shortcut or a repair step.
+Neither download-only mode is read-only. `pull-only` is the staging mode because it keeps local-only files and uploads nothing, not because it cannot delete. `mirror-remote` discards this machine's work; it needs its own approval and a tested restore point, and is never a conflict-resolution shortcut.
 
 ## Conflict mechanics
 
-Reconciliation only reaches the merge path for a **Markdown** file that exists on both sides with differing content, in a mode that uploads. Canvas, Bases, attachments, and configuration JSON never produce conflicted copies.
+Only a **Markdown** file that exists on both sides with different content, in a mode that uploads, reaches the merge path. Canvas, Bases, and attachments never produce conflicted copies.
 
 | `conflictStrategy` | What happens | Log lines |
 |---|---|---|
-| `merge` (default) | Three-way merge against the last synced version, written in place. With no common base: the remote copy wins outright if the local file was created within the last 3 minutes, otherwise it wins only if its mtime is newer. | `Merging conflicted file`, then `Merge successful`, `Merge failed. <error>`, or `Downloading <path>` for the no-base case |
-| `conflict` | The **local** version is written beside the original as `<name> (Conflicted copy <device-name> <YYYYMMDDHHMM>).<ext>`, and the **remote** version takes the original path. Both survive. | `Merging conflicted file`, then `Conflicted copy stored` |
+| `merge` (default) | Three-way merge against the last synced version, in place. With no common base the remote wins if the local file is under 3 minutes old, otherwise only if its mtime is newer. | `Merging conflicted file`, then `Merge successful`, `Merge failed. <error>`, or `Downloading <path>` |
+| `conflict` | The **local** version is written as `<name> (Conflicted copy <device-name> <YYYYMMDDHHMM>).<ext>` (local wall-clock time); the **remote** version takes the original path. | `Merging conflicted file`, then `Conflicted copy stored` |
 
-The timestamp is local wall-clock time on the machine that stored the copy, to the minute.
+- **The initial reconciliation ignores `conflictStrategy`.** A remote file with a newer mtime simply overwrites the local one. `--conflict-strategy conflict` protects later runs, not first contact; only a restore point does.
+- Config JSON is merged key by key; on `Merge failed.` the remote file is downloaded whole.
+- Anything else that cannot be reconciled is skipped with `Rejected server change`.
 
-Three consequences that `--help` does not state:
-
-- **The initial reconciliation ignores `conflictStrategy` entirely.** While a pairing is still in its initial state, a remote file with a newer mtime simply overwrites the local one - no merge, no conflicted copy. That is exactly what the setup warning means by "the most recent version of the note will be preserved". `--conflict-strategy conflict` protects later runs, not first contact. Only an existing restore point protects first contact.
-- Configuration JSON under the config directory is reconciled key-by-key: `Merging conflicted file`, then `Merge successful`, or `Merge failed. <error>` followed by the remote file being downloaded whole.
-- Anything else that cannot be reconciled is skipped with `Rejected server change` and stays skipped.
-
-`(Conflicted copy ...)` files are ordinary notes: they sync, and they are the only surviving copy of one side. Report them with paths and leave them where they are.
+`(Conflicted copy ...)` files are ordinary notes that sync and may be the only surviving copy of one side. Report them with paths and leave them in place.
 
 ## Sync scope
 
-The filter runs before any transfer and is not configurable beyond the flags above.
-
-- `.md`, `.canvas`, and `.base` are **always** synced. `--file-types` controls attachments only.
-- Attachments map to categories: `image` = `bmp png jpg jpeg gif svg webp avif`; `audio` = `mp3 wav m4a 3gp flac ogg oga opus`; `video` = `mp4 webm ogv mov mkv`; `pdf` = `pdf`; `unsupported` = every other extension. `webm` counts as audio or video, whichever is enabled.
-- Any path segment starting with `.` is excluded outside the config directory. A `.git` directory inside a vault is never synced, which is why a Git restore point is not itself at risk from a sync run.
-- Inside the config directory, `node_modules` and dot-entries are excluded, `workspace.json` and `workspace-mobile.json` are never synced, and everything else must map to an enabled `--configs` category: `app.json`/`types.json` → `app`; `appearance.json` → `appearance`; `hotkeys.json` → `hotkey`; `core-plugins.json`/`core-plugins-migration.json` → `core-plugin`; `community-plugins.json` → `community-plugin`; `themes/<name>/theme.css`/`manifest.json` and `snippets/*.css` → `appearance-data`; other top-level `*.json` → `core-plugin-data`; `plugins/<id>/{manifest.json,main.js,styles.css,data.json}` → `community-plugin-data`.
+- `.md`, `.canvas`, and `.base` are **always** synced; `--file-types` governs attachments only. `unsupported` means every extension not in the other categories.
+- Any path segment starting with `.` is excluded outside the config directory, so a `.git` inside the vault is never synced.
+- Inside the config directory, `node_modules`, dot-entries, `workspace.json`, and `workspace-mobile.json` are never synced; everything else must map to an enabled `--configs` category.
 - `--excluded-folders` entries match a folder exactly or as a path prefix.
 
 ## Exit codes
 
-| Code | Class | Raised by |
+| Code | Class | Examples |
 |---|---|---|
-| 0 | Success, including "nothing configured" reports | all |
-| 1 | Generic failure, invalid enum value, ambiguous vault name, lock already held, usage error | `Setup failed:`, `Config update failed:`, `Status check failed:`, `Unlink failed:`, `Sync failed:`, `Failed to list vaults:`, `Failed to create vault:`, `Logout failed:`, `Invalid sync mode`, `Invalid conflict strategy`, `Invalid region`, `Multiple vaults named`, `Another sync instance is already running`, `error: required option ... not specified`, `error: unknown option`, `error: unknown command` |
-| 2 | Credentials and encryption | `No account logged in.`, `Login failed:`, `Password not provided.`, `Failed to validate password.`, `Encryption key not found.`, `End-to-end encryption key missing.` |
+| 0 | Success, including "nothing configured" | `No vaults configured.` |
+| 1 | Generic failure, invalid value, ambiguous name, lock held, usage error | `Sync failed:`, `Multiple vaults named`, `Another sync instance is already running`, `error: unknown option` |
+| 2 | Credentials and encryption | `No account logged in.`, `Login failed:`, `Password not provided.`, `Failed to validate password.`, `Encryption key not found.` |
 | 3 | Identity | `No sync configuration found for <path>`, `Vault "<name>" not found.` |
 
-Exit 2 and exit 3 are terminal for an unattended run. Restarting on either is a retry loop that cannot succeed.
+Exit 2 and 3 are terminal for an unattended run; restarting on them is a retry loop that cannot succeed.
 
 ## Error strings
 
-| String | Meaning | Correct response |
-|---|---|---|
-| `No sync configuration found for <path>` | No stored config resolves to that exact path string | Compare with `sync-list-local`; fix the spelling. Do not pair again to make it go away. |
-| `Vault "<name>" not found.` | No remote ID or exact name matched | Re-read `sync-list-remote`. Do not pair against a similar name and do not create a replacement vault. |
-| `Multiple vaults named "<name>". Use the vault ID instead:` | Ambiguous display name | Use the printed ID. |
-| `Password not provided.` | Prompt could not run - piped, `--json`, or no TTY | Re-run in a real terminal. Never add `--password`. |
-| `Failed to validate password.` | Passphrase rejected by the service | Confirm the passphrase with the account owner. Repeated attempts do not change the result. |
-| `Encryption key not found. Run setup again.` / `End-to-end encryption key missing. Run setup again.` | Stored config lacks key, salt, or version | Configuration damage. Go to [recovery.md](recovery.md) before re-pairing - re-pairing resets policy. |
-| `Encryption version not supported` | Stored `encryptionVersion` is outside the supported set | Report version skew or config damage. Do not edit the value by hand. |
-| `No account logged in. Run "ob login" first.` | No token in environment or token file | Supply the token via `OBSIDIAN_AUTH_TOKEN`, or log in interactively. |
-| `Another sync instance is already running for this vault.` | A live `ob sync` holds the lock | Find the other writer. Do not delete `.sync.lock`. |
-| `The connected remote vault no longer exists.` | Server reports the paired vault as gone | Stop. Verify against `sync-list-remote` and preserve local state; this is an identity incident. |
-| `Your subscription to Obsidian Sync has expired` | Account-level block | Report it. No client-side change fixes it. |
-| `Sync error: <error>` | Per-attempt transport or file error inside a run | Read the following lines: a later `Fully synced` means it recovered. |
+| String | Correct response |
+|---|---|
+| `No sync configuration found for <path>` | Compare with `sync-list-local` and fix the spelling. Do not pair again. |
+| `Vault "<name>" not found.` | Re-read `sync-list-remote`. No similar name, no replacement vault. |
+| `Password not provided.` | Re-run in a real terminal. Never add `--password`. |
+| `Failed to validate password.` | Confirm with the account owner; repeating does not help. |
+| `Encryption key not found.` / `End-to-end encryption key missing.` / `Encryption version not supported` | Configuration damage. Go to [recovery.md](recovery.md) before re-pairing - re-pairing resets policy. Never edit the value by hand. |
+| `Another sync instance is already running for this vault.` | Find the other writer. Do not delete `.sync.lock`. |
+| `The connected remote vault no longer exists.` | Stop; verify against `sync-list-remote` and preserve local state. Identity incident. |
+| `Your subscription to Obsidian Sync has expired` | Report it; no client-side fix. |
+| `Sync error: <error>` | Per-attempt error; a later `Fully synced` means it recovered. |
 
-## Run-output vocabulary
+## Run-output lines worth reading
 
 Each line is `<Message> <vault-relative-path>` on stdout, mirrored into `sync.log`.
 
-| Line | Meaning | Modes |
-|---|---|---|
-| `Starting sync:` | Configuration echo before any change | all |
-| `Connecting...` / `Connection successful. Detecting changes...` | Transport up | all |
-| `Waiting to connect to server` | Inside the reconnect backoff window | all |
-| `Disconnected from server` | Socket dropped; reconnect follows | all |
-| `Checking` | A known local file had no stored hash and was re-read from disk before comparison | all |
-| `Accepted` | A pending server change was applied and recorded in the state database; suppressed for no-op and filtered entries | all |
-| `Skipped` | Superseded by a later entry for the same path in the same batch | all |
-| `Downloading <path>` / `Downloaded` | Remote content written locally | all |
-| `Deleting <path>` | **A remote deletion applied to the local vault** | all, including `pull-only` |
-| `Restoring <path>` | Locally missing file re-downloaded | `mirror-remote` |
-| `Removing local-only file` / `Removing local-only folder` | Local-only content deleted | `mirror-remote` |
-| `Reverting <path>` | Local modification overwritten by the remote copy | `mirror-remote` |
-| `Renaming conflicted file` | A local *file* occupies a path the remote holds as a *folder*; the local file is renamed to `<name> (Conflicted copy).<ext>` to make room | all, independent of strategy |
-| `Conflicted copy stored` | Local version written beside the original, remote version at the original path | `conflict` strategy |
-| `Merging conflicted file` / `Merge successful` / `Merge failed. <error>` | In-place reconciliation | `merge` strategy for Markdown; config JSON in all modes |
-| `Rejected server change` | Change could not be applied and was skipped | all |
-| `Uploading` / `Uploading file` / `Upload complete` | Local content sent | `bidirectional` |
-| `Deleting remote file` / `Deleting remote folder` | **A local deletion applied to the remote vault** | `bidirectional` |
-| `Push: <path> (updated\|deleted)` | Server push received after the initial sync | continuous |
-| `Ignoring remote file name with illegal characters` | Remote path unrepresentable locally | all |
-| `Fully synced` | Reconciliation converged; a one-shot run stops here | all |
-| `Received signal to shut down...` | `SIGINT`/`SIGTERM` handled | all |
-| `Warning: btime native module failed to load.` | macOS/Windows only; creation times are not preserved | `sync-setup`, `sync` |
-
-`Deleting` in a `pull-only` run is the line that surprises operators. Every one of them must be explained from the remote side before the run is accepted.
+| Line | Meaning |
+|---|---|
+| `Deleting <path>` | **A remote deletion applied locally** - in every mode, `pull-only` included. Explain each one from the remote side before accepting the run. |
+| `Deleting remote file` / `Deleting remote folder` | **A local deletion applied to the remote** (`bidirectional`) |
+| `Removing local-only file` / `Reverting <path>` / `Restoring <path>` | `mirror-remote` discarding or restoring local state |
+| `Renaming conflicted file` | A local file sat where the remote has a folder; renamed to `<name> (Conflicted copy).<ext>` regardless of strategy |
+| `Conflicted copy stored`, `Merging conflicted file`, `Merge failed.` | See [Conflict mechanics](#conflict-mechanics) |
+| `Rejected server change` | A change was skipped and stays skipped |
+| `Ignoring remote file name with illegal characters` | Remote path unrepresentable locally |
+| `Waiting to connect to server` | In the reconnect backoff window |
+| `Fully synced` | Converged; a one-shot run stops here |
+| `Warning: btime native module failed to load.` | macOS/Windows; creation times not preserved |
 
 ## On-disk layout
 
-Client state, outside the vault:
-
 ```
-~/.obsidian-headless/                     # macOS, Windows   (mode 0700)
+~/.obsidian-headless/                              # macOS, Windows (0700)
 ${XDG_CONFIG_HOME:-~/.config}/obsidian-headless/   # Linux
-  auth_token                              # account token    (mode 0600)
-  sync/<vault-id>/config.json             # per-vault config (mode 0600)
-  sync/<vault-id>/state.db                # sync state database
-  sync/<vault-id>/sync.log                # append-only run log
-  publish/<vault-id>/                     # publish state, out of scope
+  auth_token                   # 0600
+  sync/<vault-id>/config.json  # 0600 - holds encryptionKey and encryptionSalt in cleartext
+  sync/<vault-id>/state.db
+  sync/<vault-id>/sync.log     # append-only run log
+<vault-root>/<config-dir>/.sync.lock   # lock directory, never synced
 ```
 
-In the vault:
-
-```
-<vault-root>/<config-dir>/.sync.lock      # lock directory, never synced
-```
-
-`config.json` holds the derived `encryptionKey` and `encryptionSalt` in cleartext. Never copy, print, or commit it; use `sync-status --json` when a configuration needs to be recorded.
-
-Keys written by `sync-setup`: `vaultId`, `vaultName`, `vaultPath`, `host`, `encryptionVersion`, `encryptionKey`, `encryptionSalt`, `conflictStrategy`, `deviceName`, `configDir`. Keys written only by `sync-config`: `syncMode` (absent means bidirectional), `ignoreFolders`, `allowTypes`, `allowSpecialFiles`. This asymmetry is why [recovery.md](recovery.md) captures the effective configuration before any re-pair.
+Never copy, print, or commit `config.json`; record configuration with `sync-status --json`. `sync-setup` writes the identity and key fields plus `conflictStrategy`, `deviceName`, `configDir`; only `sync-config` writes `syncMode` (absent means bidirectional), `ignoreFolders`, `allowTypes`, `allowSpecialFiles`. That asymmetry is why [recovery.md](recovery.md) captures the effective configuration before any re-pair.
 
 ## Boundary
 
-This file documents what the commands do. It grants nothing. Network access, pairing, configuration changes, sync runs, unlinking, and daemon lifecycle are separate authorizations, and an unauthorized one is reported as not performed rather than attempted.
-
-See [daemon.md](daemon.md) for continuous operation and [recovery.md](recovery.md) for incidents.
+This file documents behavior and grants nothing. Network access, pairing, configuration changes, sync runs, unlinking, and daemon lifecycle are separate authorizations; an unauthorized one is reported as not performed. See [daemon.md](daemon.md) for continuous operation and [recovery.md](recovery.md) for incidents.

@@ -52,18 +52,18 @@ Silence in one page is not a contradiction of another.
 
 ### Step 4: Save When Substantial
 
-Open `principle-resolve-target`, `principle-standalone-note`, `principle-frontmatter`, `principle-link-form` and `principle-read-back` (each at `../<leaf>/SKILL.md`) before saving. Save substantial analysis (comparison, analysis, multi-source synthesis) as `YYYY-MM-DD-Q-{question-summary}.md` in the Queries folder the vault guideline (live policy) names inside the wiki area; when it names none, `onboard` asks the owner once and records it. Use `type: query-result`, English `description`, `source` (the pages consulted), `reusableFor`, `confidence`, and `date_created`. Never overwrite an existing note. A simple factual answer is not saved.
+Open `principle-editing`, `principle-writing` and `principle-markdown` (each at `../<principle>/SKILL.md`) before saving. Save substantial analysis (comparison, analysis, multi-source synthesis) as `YYYY-MM-DD-Q-{question-summary}.md` in the Queries folder the vault guideline (live policy) names inside the wiki area; when it names none, `onboard` asks the owner once and records it. Use `type: query-result`, English `description`, `source` (the pages consulted), `reusableFor`, `confidence`, and `date_created`. Never overwrite an existing note. A simple factual answer is not saved.
 
 ### Step 5: Feedback Into Wiki
 
-When the query reveals durable improvements, open `principle-resolve-target` and update the relevant Wiki pages; report a Map (MOC) gap for `ingest` instead of writing the Map:
+When the query reveals durable improvements, open `principle-editing` and `principle-markdown` and update the relevant Wiki pages; report a Map (MOC) gap for `ingest` instead of writing the Map:
 
 - missing cross-references → add them
 - outdated information → a verified correction in the form the page's template specifies
 - new connections → `related`
 - high-confidence synthesis without counter-argument or data-gap note → `> [!note] Bias Check`
 
-Each edit to an existing page is drafted from the policy and the cited source only, then a separate preservation review compares the before-image with the proposal and reduces it to a minimal patch that keeps valid existing content; read the page back before linking to it. Changing a claim's text needs verified evidence; `explored`, `confidence` and conflict resolution stay with `verify`. Open `principle-revise-and-consolidate` and `principle-preserve-voice` for every existing page, and `principle-read-back` after each write. No blanket regeneration. Links to notes are `[[wikilinks]]` and external links `[label](URL)`; source records and protected owner prose stay untouched.
+Each edit to an existing page is drafted from the policy and the cited source only, then a separate preservation review compares the before-image with the proposal and reduces it to a minimal patch that keeps valid existing content; read the page back before linking to it. Changing a claim's text needs verified evidence; `explored`, `confidence` and conflict resolution stay with `verify`. Open `principle-writing` for every existing page. No blanket regeneration; source records and protected owner prose stay untouched.
 
 After a save or feedback write, update the wiki index in [records](../ingest/references/records.md) (Queries catalog, Recent Queries, Stats recounted from folders) and append one entry (`## [YYYY-MM-DD] query | <title>`) to the wiki log in that same record. A path the live policy names for this run replaces either file. A read-only answer writes nothing, including no log entry. Do not commit or push unless the owner separately asks.
 
@@ -82,6 +82,6 @@ Set `reusableFor` on a saved note to that axis.
 Answer the question, then briefly note:
 - pages consulted, with each one's `verificationStatus`/`confidence`
 - whether the result was saved, and the Wiki/index/log writes made or proposed, each read back
-- each principle leaf that changed a decision and what it changed
+- each principle that changed a decision and what it changed
 - gaps or contradictions found
 - the reuse axis
