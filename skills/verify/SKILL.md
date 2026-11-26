@@ -32,6 +32,10 @@ Conflicts are flagged `disputed`, never deleted.
 
 ## Process
 
+Read the target and each decisive source at its exact path in a dedicated file-reading call, separate from discovery. If no file-reading tool is available, use a separate command, e.g. `cat "/absolute/path/to/source.md"`, per file. Check each result before citing it; do not treat a failed batch or a search match as a source read.
+
+For a routed report-only check, return the verdict in your own words and include the decisive vault note's exact `[[note title]]` alongside the date and finding so the parent can preserve the reference unchanged. Keep write-back proposals out of these findings.
+
 1. Resolve the target page.
 2. Read the target page, the wiki index in [records](../ingest/references/records.md), and the cited Raw Sources. Trace direct citations to the original URL, DOI, preserved Raw or attachment; trace personal observations to their original dated records. Report a missing archival copy separately from an inaccessible passage. Read Core Context once per session and reuse it; its reuse axes are the ones actually registered in its §2.
 3. Classify `claimType` and `evidenceScope` per [claims](references/claims.md), for the page and per claim where they differ.
@@ -65,6 +69,7 @@ disputed: true
 - Set `explored: true` (with `exploredBy`, `exploredDate`) only when the owner explicitly confirms this verification counts as explored.
 - Update `date_modified` on each changed page; keep unrelated and unknown keys, values and config exactly. No incidental metadata migration.
 - Read each changed page back, then append to the wiki log: `## [YYYY-MM-DD] verify | {Page}` with the verdict, `verificationStatus`, recommended `confidence`, and disputed counterparts. The wiki log is append-only; Git history never replaces it. Never commit or push; commit only when the owner separately asks.
+- When routed by secondbrain mode, append only this prescribed log entry after a successful, expressly approved write-back. Never write the index on this route. A report-only check, a blocked or failed write-back, and an unapproved edit leave both records untouched. Include actual log write outcomes with the other wiki outcomes returned to the parent.
 
 ## Resolution mode (`--resolve`)
 

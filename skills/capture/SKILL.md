@@ -10,13 +10,11 @@ Capture is the pre-ingest capture layer: it preserves evidence in the Inbox and 
 
 ## Purpose
 
-Use this skill when the owner has a tab group, open tabs, a URL, a file, an AI-chat research session (ChatGPT, Gemini, Grok, Claude, Perplexity) or selected agent sessions and wants it kept as Markdown in `00. Inbox/` before `ingest`.
+Use this skill when the owner has a tab group, open tabs, a URL, a file, an AI-chat research session (ChatGPT, Gemini, Grok, Claude, Perplexity) or selected agent sessions and wants it kept as Markdown in the Inbox before `ingest`.
 
-The default output is one research-bundle note:
+Read the vault guideline (live policy) for the Inbox root and its lanes. Open [principle-vault-roles](../principle-vault-roles/SKILL.md). When the guideline leaves out a mapping this run needs, stop before writing and ask the owner once; never guess a folder or invent a lane.
 
-`00. Inbox/05. AI Research/YYYY-MM-DD-ai-research-{topic-slug}.md`
-
-Use `00. Inbox/04. Clippings/` only for short excerpts, social posts, or a manifest-only capture without substantial conversation text. When the destination's live policy names different Inbox lanes, use its lane with the same dated naming; never invent a lane.
+The default output is one `YYYY-MM-DD-ai-research-{topic-slug}.md` research-bundle note in the resolved AI Research lane. Use the resolved Clippings lane only for short excerpts, social posts, or a manifest-only capture without substantial conversation text; keep the same dated naming.
 
 ## Capture Principles
 
@@ -84,33 +82,33 @@ Use the destination's AI Research Capture template as the shape; without one, us
 Frontmatter:
 
 ```yaml
-type: "inbox"
 aliases: []
-category:
-  - "AI Research"
-clip_type: "ai-research-tab-group"
-source_url:
-  - "{primary-url-or-conversation-url}"
-platforms:
-  - "ChatGPT"
-capture_method: "{tool actually used}"
-capture_status: "captured"
-captureMode: "mixed"
-collectionPurpose: "{verbatim answer, or inference + reason}"
-referenced: []
-description: "English one-sentence description of the captured research bundle."
 author:
   - "[[{owner-name}]]"
   - "{Agent}"
-model: "{runtime-reported model id}"
-effort: "{runtime-reported effort, or default}"
+capture_method: "{tool actually used}"
+capture_status: "captured"
+captureMode: "mixed"
+category:
+  - "AI Research"
+clip_type: "ai-research-tab-group"
+collectionPurpose: "{verbatim answer, or inference + reason}"
+date_clipped: YYYY-MM-DD
 date_created: YYYY-MM-DD
 date_modified: YYYY-MM-DD
-date_clipped: YYYY-MM-DD
+description: "English one-sentence description of the captured research bundle."
+effort: "{runtime-reported effort, or default}"
+model: "{runtime-reported model id}"
+platforms:
+  - "ChatGPT"
+referenced: []
+source_url:
+  - "{primary-url-or-conversation-url}"
 tags:
   - inbox
   - agent-capture
   - ai-research
+type: "inbox"
 ```
 
 `referenced` lists originals and earlier captures the material cites: a wikilink when already a Raw or Entity in the vault, else the canonical URL. It never claims the original was read and never authorizes fetching it. `capture_status` is `captured`, `partial` or `manifest-only` truthfully. Body: `## Capture Summary`, `## Source Manifest` (# | Platform | Title | URL | Role | Capture status), `## Original Content` (one `### Source N` block per member with platform, URL, visible model/workspace and capture limitation), `## Agent Capture Notes`, `## Ingest Notes`.
@@ -140,7 +138,7 @@ Route beyond `inbox-only` only when the owner chose it. Never delete or move the
 
 Open `principle-read-back`, then read the written note back before reporting:
 
-1. The `.md` file exists at the new dated path in the AI Research or Clippings lane (or the live policy's equivalent).
+1. The `.md` file exists at the new dated path in the resolved AI Research or Clippings lane.
 2. `## Original Content` is non-empty and holds only acquired text, or the note is explicitly `captureMode: manifest-only`.
 3. Source URLs are present for every member.
 4. Agent synthesis is separated from raw content; omissions are marked where they occur.

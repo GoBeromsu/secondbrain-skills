@@ -24,6 +24,8 @@ Read the wiki index in [records](../ingest/references/records.md). A path the li
 
 ### Step 2: Synthesize
 
+Before using a note as evidence, open its exact path with a dedicated file-reading call and check that it succeeded. Keep searches and bulk discovery separate from these reads. If no file-reading tool is available, use a separate command, e.g. `cat "/absolute/path/to/note.md"`, for each decisive note.
+
 Answer from compiled Wiki pages first, not raw-source sprawl. Cite with `[[wikilinks]]` in saved notes and name the source pages in the chat response; reach a Raw through the Wiki page that compiled it.
 
 Read `verificationStatus` and `confidence` together with each claim's recorded review scope, and state each claim accordingly:
@@ -64,6 +66,8 @@ When the query reveals durable improvements, open `principle-resolve-target` and
 Each edit to an existing page is drafted from the policy and the cited source only, then a separate preservation review compares the before-image with the proposal and reduces it to a minimal patch that keeps valid existing content; read the page back before linking to it. Changing a claim's text needs verified evidence; `explored`, `confidence` and conflict resolution stay with `verify`. Open `principle-revise-and-consolidate` and `principle-preserve-voice` for every existing page, and `principle-read-back` after each write. No blanket regeneration. Links to notes are `[[wikilinks]]` and external links `[label](URL)`; source records and protected owner prose stay untouched.
 
 After a save or feedback write, update the wiki index in [records](../ingest/references/records.md) (Queries catalog, Recent Queries, Stats recounted from folders) and append one entry (`## [YYYY-MM-DD] query | <title>`) to the wiki log in that same record. A path the live policy names for this run replaces either file. A read-only answer writes nothing, including no log entry. Do not commit or push unless the owner separately asks.
+
+When routed by secondbrain mode, apply these record updates only after a successful save or feedback write expressly approved by the owner. Otherwise leave both records untouched. Report any actual record write outcomes to the parent with the other wiki outcomes.
 
 ### Step 6: Reuse Axis
 

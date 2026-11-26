@@ -63,4 +63,6 @@ When the conversation is about a note in the work area, turn the first mention o
 
 ## Step 6 — Read back and report
 
-Open `principle-read-back` and read back every note written. Report candidates and each principle leaf that changed a decision and what it changed before the closing Wiki line. The final line is `Wiki: created [[X]], updated [[Y]]`, with any failure on the same line.
+Open `principle-read-back` and read back every note written. In the standalone report, put candidates and decision-changing principles before the footer. When routed through secondbrain-mode, return the findings and wiki outcomes separately rather than the standalone report.
+
+The standalone final line is `Wiki: created [[X]], updated [[Y]], failed [[Z]] (reason)`; omit empty clauses. Include only read-back-confirmed changes in the live policy's wiki area, each page once by whether it existed before the task. Use `failed [[Z]] (reason)` only for an attempted wiki write that failed. Omit unattempted work, Raw and other outside-wiki notes, including work-note links. Omit the line when there are no successful or failed wiki writes. Nothing follows it.

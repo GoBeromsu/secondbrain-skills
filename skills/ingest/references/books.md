@@ -2,6 +2,8 @@
 
 A book is one book Entity plus N chapter Raws, filled progressively as chapters are actually read. The book Entity is the hub: its `## Chapters`, `## Reading Progress` and `## Derived` sections list the chapter Raws, reading progress and the pages derived from them. Knowledge is compiled when read, not when scraped; a stub is a navigable future-compile target, never evidence that the chapter was read.
 
+Only a note in the vault's Entity folder with a book type and a `## Reading Progress` section may carry the owner's book reading `status`, with values defined by live policy. Ingest preserves that key when present and never sets or changes it. Chapter Raws have no frontmatter `status`; only their `Reading Status` body callout records chapter acquisition (`Stub`, `Reading` or `Completed`).
+
 ## Steps 1 and 2
 
 Run SKILL Steps 1 and 2 once for the whole book: one purpose covers every chapter and is inherited by each stub's `collectionPurpose`.
@@ -19,10 +21,10 @@ Chapter stubs go into the Books Raw folder with `category: Books`, unless the li
 
 ## B-2 — Chapter stubs (N Raws)
 
-- Name `YYYY-MM-DD-{authorSlug}-{bookSlug}-ch{NN}-{slug}.md` with [book chapter](../templates/book-chapter.md), one per TOC chapter.
-- Frontmatter: `status: stub`, `source` = the direct chapter URL (verified pattern), `book` as a quoted wikilink to the book Entity, integer `chapterNumber`, original-language `chapterPart`, `chapterPrev`/`chapterNext` as quoted wikilinks to the adjacent stubs (`null` at the first and last chapter), `collectionPurpose` inherited from the book, `date_ingested` = scaffold date.
-- Body: Reading Status stub callout, Source, TOC Preview (the TOC one-liner verbatim), `## Original Content` holding the non-empty pending-fill placeholder by design (it satisfies the Raw pre-flight; substantiveness checks exempt `status: stub`), Reading Notes.
-- Pre-flight per stub: Original Content present, `status: stub`, resolvable chapter URL, `chapterNumber`/`chapterPart`/`book` set, prev/next resolve to existing stubs or are `null`, no chapter Wiki page compiled.
+- Name `YYYY-MM-DD-{authorSlug}-{bookSlug}-ch{NN}-{slug}.md` with [book chapter](../assets/book-chapter.md), one per TOC chapter.
+- Frontmatter: `source` = the verified direct chapter URL or obtained locator, `book` as a quoted wikilink to the book Entity, integer `chapterNumber`, original-language `chapterPart`, `chapterPrev`/`chapterNext` as quoted wikilinks to the adjacent stubs (`null` with no previous/next chapter, respectively), `collectionPurpose` inherited from the book, `date_ingested` = scaffold date.
+- Body: `Reading Status: Stub` callout, Source, TOC Preview (the TOC one-liner verbatim), `## Original Content` holding the non-empty pending-fill placeholder, Reading Notes. The placeholder satisfies Raw pre-flight but is exempt from substantiveness checks only with the `Reading Status: Stub` callout.
+- Pre-flight per stub: Original Content contains the exact placeholder, callout is `Reading Status: Stub`, `source` resolves when supplied, `chapterNumber`/`chapterPart`/`book` are set, prev/next resolve to existing stubs or are `null`, no chapter Wiki page compiled.
 
 ## B-3 — Book-level Wiki only (small set)
 
@@ -46,8 +48,8 @@ Never precompile chapter-specific pages.
 
 Trigger: the owner runs ingest on a chapter stub or describes reading that chapter with intent to compile. Never promote an unread or unobtained chapter.
 
-1. Fetch the chapter from the stub's `source`. Only `status: stub` whose Original Content is still exactly the placeholder is promotable.
-2. Replace only the placeholder with the verbatim chapter text; set `status: completed` for the full chapter or `reading` when only part was obtained; update `date_modified`. Every other byte stays, including Source, TOC Preview, human Reading Notes and the navigation keys. A later `reading` → `completed` needs the missing text actually obtained.
+1. For a `Reading Status: Stub` chapter, confirm its Original Content is still exactly the placeholder, then obtain the chapter text from its `source`. For `Reading Status: Reading`, obtain the missing text before marking the chapter completed. Leave a `Completed` chapter out of this promotion workflow.
+2. Replace the placeholder with the verbatim chapter text, or fill the missing positions without duplicating the text already saved. Update the callout to `Reading Status: Completed` for the full chapter or `Reading Status: Reading` when only part was obtained, revising its description to state what was obtained. Update `date_modified`. Preserve all other content, including Source, TOC Preview, human Reading Notes and navigation keys.
 3. Compile the chapter's Wiki pages by SKILL Step 6, updating existing pages first under its clean-context rule; Steps 7 and 8 apply.
 4. In the book Entity append `- [[YYYY-MM-DD]] chNN reading|completed — [[chapter Raw]]` under `## Reading Progress`, and each page compiled from the chapter under `## Derived`. Owner sentences and earlier progress lines stay.
 5. Update the wiki index per Step 9 and append to the wiki log: `## [YYYY-MM-DD] promote | {book} ch{NN}`.

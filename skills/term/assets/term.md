@@ -61,11 +61,11 @@ verificationStatus: unverified
 
 ## Related Terms
 
-- [[{existing note}]]
+- [[{first resolving note}]]
 	- {how it relates to this term}
-- [[{second existing note}]]
+- [[{second resolving note}]]
 	- {how it relates to this term}
-- [[{relevant term with no page yet}]]
+- [[{optional sole missing term}]]
 	- {how it relates to this term}
 
 ## References

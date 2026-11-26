@@ -46,8 +46,7 @@ Format:
 
 - Frontmatter keys in alphabetical order; about five subject tags; `domain` as quoted English field wikilinks.
 - `source` lists vault notes as quoted wikilinks. An external URL in frontmatter goes only under a `*_url` key as a plain URL; every other web reference is a `[label](URL)` in the body. No raw URL anywhere in the body.
-- An entity with a page in the vault is a `[[wikilink]]` in the body and a quoted wikilink in frontmatter. Quoted words stay as written, so when such a name appears only inside a quotation, link it once in your own prose beside the quotation.
-- At read-back, check that each existing vault entity is linked once in the body, at its first eligible prose mention. Never alter quoted or preserved text. If an entity is named only in an inline quotation or preserved passage, use a linked attribution in your own prose beside it (for example, `[[Northwind Labs]]' announcement says "…"`). Check references and footnotes too: link the first eligible entity mention there when it has no earlier prose link, and link existing Raw notes by wikilink rather than citing bare filenames.
+- Link each existing vault entity at its first eligible body mention, including in references and footnotes, and use quoted wikilinks for entity names in frontmatter. Link existing Raw notes by wikilink rather than citing bare filenames.
 - A template the vault registers for this kind wins for frontmatter keys and headings.
 - English section headings, in the template's order, using only the sections the term needs. No `---` in the body and no `status` key.
 
@@ -57,7 +56,7 @@ Content:
 - Cite empirical, quantitative and historical claims at the passage, table or figure that supports them, linking the first author's surname and year to that location. Use a footnote only for a quotation, method detail or caveat that would interrupt the explanation, and check quoted wording against the original.
 - Personal Insights holds only context found in the owner's notes, quoted accurately and linked; keep the owner's observation apart from a study's outcome, and suggest a separate insight note only when it stands on its own.
 - Link to the whole Term, never to one of its sections, so the page stays the single target for the referent.
-- Related Terms aims for three named links with a nested line on the relationship: up to two existing notes, then one relevant term still missing, as a wikilink without creating its page.
+- Under Related Terms, list up to two relevant notes whose wikilinks resolve in this vault, each with a nested relationship bullet. Omit any unfilled existing-note slots rather than substituting missing targets. You may add one relevant term without a page as the final top-level bullet: a bare `[[Term]]` with a nested relationship bullet. Do not create its page or reuse that unresolved link elsewhere in the body; write any other missing terms as plain text.
 - References lists each cited work once, unnumbered, following the owner's research style where known: link an existing source note by wikilink, or the first author and year to the full text; keep coauthors, title, venue, DOI, the available Raw and the scope actually inspected. The precise locator stays beside the claim.
 
 ## Step 5 — Link the work note
@@ -66,4 +65,10 @@ When the conversation is about a note in the work area, turn the first mention o
 
 ## Step 6 — Read back and report
 
-Open `principle-read-back` and read back every note written. Before the closing Wiki line, report each principle leaf that changed a decision and what it changed, plus the candidates from Step 2 and a Concept-folder fallback if used. The final line is `Wiki: created [[X]], updated [[Y]]`, listing only wiki pages that actually changed, with any failure on the same line. A first-mention link in a work note is not a wiki write; classify each wiki page once by whether it existed before the task, not by later edits within the task.
+Open `principle-read-back` and read back every note written. For each written wiki page, scan the final text for entity titles and aliases, including in quotations, Personal Insights, references and footnotes. Checking that existing links resolve does not catch missing links. Keep quoted and preserved text unchanged: when the only mention is in such a passage, name and link the entity in your own prose beside it (e.g. `[[Trial Note]] records the owner's question about [[Product]]: "…"`). A link to the quoted note alone does not link the entities it mentions.
+
+Check that all body wikilinks resolve except the single planned final Related Terms bullet. In authored prose, remove any other unresolved wikilink markup while keeping useful text, or retarget it to a verified page for the same referent. Report unresolved links in quoted or preserved text without changing that text.
+
+In the standalone report, put decision-changing principles, Step 2 candidates and any Concept-folder fallback before the footer. When routed through secondbrain-mode, return the findings and wiki outcomes separately rather than the standalone report.
+
+The standalone final line is `Wiki: created [[X]], updated [[Y]], failed [[Z]] (reason)`; omit empty clauses. Include only read-back-confirmed changes in the live policy's wiki area, each page once by whether it existed before the task. Use `failed [[Z]] (reason)` only for an attempted wiki write that failed. Omit unattempted work, Raw and other outside-wiki notes, including work-note links. Omit the line when there are no successful or failed wiki writes. Nothing follows it.
