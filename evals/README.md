@@ -1,11 +1,19 @@
 # Evals
 
-Evals run only against fixture vaults in this folder, never against a real vault.
+Fixture vaults live in a local folder outside the repository. Fixture-based checks are opt-in and run only against these fixtures, never against a real vault. The fixture root has this layout:
+
+```text
+<dir>/fixture-vault/
+<dir>/lint-links/vault/
+<dir>/lint-links/expected.tsv
+```
+
+Set `export SB_EVAL_FIXTURES="<dir>"` before running the examples below, or pass `--fixtures <dir>` to `lint/run.py`, `agent_run.py`, or `trigger_run.py` (the option overrides the environment). `scripts/validate.py` uses only `SB_EVAL_FIXTURES` and skips the lint regression by default. Generating the eval JSON, running `agent_run.py --self-test`, and grading saved agent runs with `--grade-only` do not need the fixtures.
 
 | Path | What it is |
 | --- | --- |
-| `lint-links/` | Regression case for `skills/lint/scripts/link-lint.py` link-form rules. `scripts/validate.py` checks that the script reproduces `expected.tsv`. |
-| `fixture-vault/` | Shared fixture vault. `Guideline.md` is its live policy. |
+| `<dir>/lint-links/` | External regression case for `skills/lint/scripts/link-lint.py` link-form rules. When opted in, `scripts/validate.py` checks that the script reproduces `expected.tsv`. |
+| `<dir>/fixture-vault/` | Shared external fixture vault. `Guideline.md` is its live policy. |
 | `lint/evals.json` | skill-creator eval set for `lint`: one case per check, with the findings it expects, plus `trigger_evals` for description optimization. |
 | `lint/run.py` | Runs the lint scripts on the fixture vault and grades the mechanical cases in `lint/evals.json` (those with `paths`). The report-only case and `trigger_evals` need agent runs, below. |
 | `term/`, `concept/`, `entity/`, `secondbrain-mode/` `evals.json` | skill-creator eval sets for the knowledge skills: agent cases (`evals`) whose `expectations` each name a programmatic check, plus `trigger_evals` for description optimization. |
@@ -27,7 +35,7 @@ Clean sample pages, which must produce no finding:
 - the term `Knowledge/Terms/Backlink.md`, the concept `Knowledge/Concepts/Spaced Repetition.md` and the MOC `Knowledge/Maps/Tools MOC.md`
 - the Raw `Sources/2026-11-20 Lumen Notes launch post.md`, the work note `Projects/Lumen Notes Trial.md` and `Guideline.md`
 
-Agent cases also use the work note `Projects/Lumen Notes Import Plan.md`, which mentions transclusion, progressive summarization and Readwise Reader twice each (only the first mention may become a link), and the Raw `Sources/2026-11-25 Northwind Labs leadership update.md`, the news for the person-update case. The Guideline maps Guides to `Knowledge/Guides/` (`layer: guides`) and the owner's permanent notes to `Notes/`. The fixture root's `AGENTS.md` maps the ingest records to `Knowledge/index.md` and `Knowledge/log.md`.
+Agent cases also use the work note `Projects/Lumen Notes Import Plan.md`, which mentions transclusion, progressive summarization and Readwise Reader twice each (only the first mention may become a link), and the Raw `Sources/2026-11-25 Northwind Labs leadership update.md`, the news for the person-update case. The Guideline maps Guides to `Knowledge/Guides/` (`layer: guides`) and the owner's permanent notes to `Notes/`. The fixture vault's `AGENTS.md` maps the ingest records to `Knowledge/index.md` and `Knowledge/log.md`.
 
 `Knowledge/Broken/` holds one deliberately broken note per check; `Broken Link.md` also carries a link to a missing heading (marksman) and a missing `related` target (Obsidian CLI). `Spaced Repetition.md` names an Entity inside a quote, which must not be reported. The hiring post in `Sources/` and the weekly review in `Projects/` each carry a `status` that does not belong there. The Raw and the work note also mention Entities without links and use `---`, which shows that those checks only look at the wiki role.
 
@@ -55,7 +63,7 @@ python3 evals/lint/run.py --json evals/results/lint-workspace/new_skill.json
 
 `baseline.sh <skill> [commit]` works for any skill that exists at that commit. It extracts every skill of that commit, so links from the snapshot to sibling skills (`../ingest/...`) still resolve; point the `old_skill` subagent at `old-skills/<skill>`. A baseline without the policy checks only runs its link-form rules, so it gets credit just for those.
 
-Agent-level runs follow skill-creator's "Running and evaluating test cases": for each case in `lint/evals.json`, give one subagent `skills/lint` and another the snapshot, use the same `prompt`, and save the outputs to `evals/results/lint-workspace/iteration-<N>/<eval_name>/with_skill/outputs/` and `.../old_skill/outputs/`. Then grade each case against its `expectations` and aggregate the results with skill-creator's `aggregate_benchmark`.
+Agent-level runs follow skill-creator's "Running and evaluating test cases": for each case in `lint/evals.json`, give one subagent `skills/lint` and another the snapshot, stage a separate copy of `fixture-vault/` in each run's working directory, use the same `prompt`, and save the outputs to `evals/results/lint-workspace/iteration-<N>/<eval_name>/with_skill/outputs/` and `.../old_skill/outputs/`. Then grade each case against its `expectations` and aggregate the results with skill-creator's `aggregate_benchmark`.
 
 For description optimization, extract the trigger set and pass it to skill-creator's `run_loop.py`:
 

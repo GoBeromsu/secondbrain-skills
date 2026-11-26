@@ -1,6 +1,6 @@
 {
   "skill_name": "secondbrain-mode",
-  "fixture": "evals/fixture-vault",
+  "fixture": "fixture-vault",
   "baseline_skill": "ingest",
   "mode": true,
   "wiki": "Knowledge/",
@@ -11,7 +11,7 @@
       "prompt": "What does 'idempotent' mean? Our reviewer linked https://developer.mozilla.org/en-US/docs/Glossary/Idempotent and said my retry endpoint isn't idempotent.",
       "expected_output": "Answers the question; a term subagent writes Knowledge/Terms/Idempoten*.md; the MDN link stays a [label](URL) link; last line `Wiki: created [[Idempotence]]`.",
       "files": [
-        "evals/fixture-vault"
+        "fixture-vault"
       ],
       "targets": {
         "page": {
@@ -99,7 +99,7 @@
       "prompt": "I want to try the Zettelkasten method for my research notes this winter. How does it actually work, and what's the core idea behind it?",
       "expected_output": "Answers; a concept subagent writes Knowledge/Concepts/Zettelkasten*.md; last line `Wiki: created [[Zettelkasten]]`.",
       "files": [
-        "evals/fixture-vault"
+        "fixture-vault"
       ],
       "targets": {
         "page": {
@@ -187,7 +187,7 @@
       "prompt": "Logseq 라는 앱 들어봤어? Lumen Notes 랑 비교하면 어떤 앱인지 궁금해.",
       "expected_output": "Answers; an entity subagent writes Knowledge/Products/Logseq.md with [[Lumen Notes]] linked; last line `Wiki: created [[Logseq]]`.",
       "files": [
-        "evals/fixture-vault"
+        "fixture-vault"
       ],
       "targets": {
         "page": {
@@ -275,7 +275,7 @@
       "prompt": "이 글 ingest 해줘. 모으는 목적: Lumen Notes 평가 프로젝트.\n\nLumen Notes 1.0 is out — Northwind Labs blog, 2026-11-26 (https://lumen.example.com/blog/1-0)\n\nToday Northwind Labs ships Lumen Notes 1.0. The headline feature is block references: you can link to a single paragraph in another note, and that paragraph shows how many notes cite it. Jane Doe, now our CTO, says block references were the most requested feature of the beta. After a 30-day trial, Lumen Notes 1.0 costs $8 a month.",
       "expected_output": "An ingest subagent saves one verbatim Raw in Sources/, compiles it into the wiki and updates Tools MOC, index and log. Jane Doe's original impressions move byte-exact to a dated note with reciprocal links. The last line is `Wiki: created ..., updated ...`.",
       "files": [
-        "evals/fixture-vault"
+        "fixture-vault"
       ],
       "targets": {
         "note": {
@@ -394,7 +394,7 @@
       "prompt": "전에 spaced repetition 공부해서 정리해 둔 게 있었는데, 핵심이 뭐였지?",
       "expected_output": "A query subagent reads Knowledge/Concepts/Spaced Repetition.md and the answer gives its cited content; nothing written outside the wiki; a Wiki line only if a page was written.",
       "files": [
-        "evals/fixture-vault"
+        "fixture-vault"
       ],
       "targets": {},
       "expectations": [
@@ -474,7 +474,7 @@
       "prompt": "Lumen Notes 페이지에 Jane Doe 가 디자인 리드라고 돼 있던데, 그거 아직 맞아? 출처 다시 확인해 봐.",
       "expected_output": "A foreground verify subagent checks the claim against the Raws (the 2026-11-25 leadership update makes her CTO). The source-check request authorizes no writes, and there is no Wiki line.",
       "files": [
-        "evals/fixture-vault"
+        "fixture-vault"
       ],
       "targets": {},
       "expectations": [
@@ -549,7 +549,7 @@
       "prompt": "(Earlier in this conversation)\nMe: Lumen Notes 에서 노트 이름을 바꾸면 다른 노트에 걸린 링크가 깨져. 어떻게 해?\nYou: Settings → Links 에서 'Update links on rename' 을 켜고, 이미 깨진 링크는 Command palette 의 'Find broken links' 로 찾은 다음 각 항목에서 'Relink' 로 새 이름에 다시 연결해 보세요.\n\nMe (now): 해봤는데 됐어! 'Update links on rename' 켜고, 'Find broken links' 로 찾은 깨진 링크 12개를 'Relink' 로 다 고쳤어. 이름 하나 더 바꿔 봤는데 이번엔 링크가 그대로 살아 있어. 고마워.",
       "expected_output": "The How-to solved and confirmed in the conversation becomes a Guide page (layer: guides) in Knowledge/Guides/ from the ingest guide template, with no Raw, MOC, or index/log changes; last line `Wiki: created [[...]]`.",
       "files": [
-        "evals/fixture-vault"
+        "fixture-vault"
       ],
       "targets": {
         "guide": {
@@ -671,7 +671,7 @@
       "prompt": "Lumen Notes 에서 transclusion 한 노트를 plain text 로 export 하는 방법 알아? 'Export as Markdown' 이랑 'Flatten embeds' 둘 다 해봤는데 embed 가 그대로 남아. 아직 못 풀었어.",
       "expected_output": "No Guide page is created for the unsolved How-to; an unknown word may still go to term; Wiki line only if something was written.",
       "files": [
-        "evals/fixture-vault"
+        "fixture-vault"
       ],
       "targets": {},
       "expectations": [
@@ -751,7 +751,7 @@
       "prompt": "I studied spaced repetition in my vault before. Compare its purpose and mechanism with the idea of a backlink using the relevant existing vault pages. Save this substantial comparison as a new Query result; I explicitly approve the query skill’s usual wiki index and log updates, but no edits to existing knowledge pages.",
       "expected_output": "One answer comparing the two ideas with both vault citations, after the foreground query worker writes a new Query note and updates index and log without parent narration. The final Wiki line lists all three.",
       "files": [
-        "evals/fixture-vault"
+        "fixture-vault"
       ],
       "fixture_append": {
         "Guideline.md": "\nSaved Query results belong in the wiki subfolder `Queries/`.\n",
