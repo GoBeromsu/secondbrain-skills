@@ -187,6 +187,8 @@ Note-skill trim (0.30.1): the steps `term`, `concept` and `entity` each repeated
 | concept | 19/19 | 18/19 |
 | entity | 45/45 | 45/45 |
 
+Event entity type: `event` (one-off or recurring; a programme is an Event) became a required Entity type with `assets/event.md`. New case entity `recurring-programme-event`. Pre-change tree via `--skills-root`, both `--config new`, results in `evals/results/entity-workspace/iteration-501` (new) and `-502` (old): new 56/56, old 47/56; cases 1–5 equal (45/45 each), case 6 11/11 vs 2/11 (the old tree treats an event as an optional type, asks before creating a folder and writes nothing).
+
 ### R3 history (earlier rubric)
 
 | Skill | Iteration | `with_skill` | 0.28.1 `old_skill` |

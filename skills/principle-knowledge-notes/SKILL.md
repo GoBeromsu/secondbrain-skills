@@ -25,7 +25,7 @@ Each wiki page holds exactly one kind of knowledge, and the kind decides the tem
 
 The type decides the template and the folder, so it is settled before an Entity page is written.
 
-- Type an Entity by what it is: person, organization, place, paper, book, media (a publisher that keeps putting things out), product, or an optional type for any other named individual: an event, program, scholarship or award.
+- Type an Entity by what it is: person, organization, place, paper, book, media (a publisher that keeps putting things out), product, event (a named happening or programme with a time, one-off or recurring: a hackathon, a scholarship, an award round), or an optional type for any other named individual: a movie, an album, a game title.
 - One video, episode, issue or post is a Raw source, not an Entity; the media Entity that published it lists it.
 - An update leaves an Entity's folder and type alone: the owner chose them, and a move breaks links. Moving or retyping is the owner's call.
 - A folder for a new optional type needs the owner's approval.

@@ -269,7 +269,7 @@
       "id": 4,
       "eval_name": "mislabeled-entity-asks-first",
       "prompt": "풀브라이트 장학금을 term 노트로 만들어줘",
-      "expected_output": "Does not follow the 'term' label: explains that the Fulbright scholarship is one named program, so an Entity (optional type such as program or event), and asks once before writing. No wiki page is written without that confirmation.",
+      "expected_output": "Does not follow the 'term' label: explains that the Fulbright scholarship is one named program, so an Entity of type event, and asks once before writing. No wiki page is written without that confirmation.",
       "files": [
         "fixture-vault"
       ],

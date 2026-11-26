@@ -1,6 +1,6 @@
 ---
 name: "entity"
-description: "Apply when the user shows interest in a specific named thing (not a kind or a method): a product, tool, library or model, a person, an organization, a place, a book, a paper, or a channel, podcast or newsletter. Research it and write or update its Entity page in the wiki from the template for its type. Also use when the owner asks to add, record or update a note on one named person, company, product, book, paper, place, event or program, or brings news about one; a kind or method the owner labels an Entity is handed off, not written as one. Material the owner hands over to compile, such as a paper's PDF or an article, belongs to ingest; a request to save it without compiling belongs to capture."
+description: "Apply when the user shows interest in a specific named thing (not a kind or a method): a product, tool, library or model, a person, an organization, a place, a book, a paper, a channel, podcast or newsletter, or an event or programme such as a hackathon, conference or scholarship. Research it and write or update its Entity page in the wiki from the template for its type. Also use when the owner asks to add, record or update a note on one named person, company, product, book, paper, place, event or programme, or brings news about one; a kind or method the owner labels an Entity is handed off, not written as one. Material the owner hands over to compile, such as a paper's PDF or an article, belongs to ingest; a request to save it without compiling belongs to capture."
 license: MIT
 ---
 
@@ -21,11 +21,12 @@ Open `principle-knowledge-notes` and `principle-editing`. Confirm by the princip
 | `book` | one book work and edition | [book](assets/book.md) |
 | `media` | a publisher that keeps putting things out: a YouTube channel, podcast, newsletter, blog | [media](assets/media.md) |
 | `product` | named software, a service, a library, an agent, a model or a dataset | [product](assets/product.md) |
-| optional | any other named individual: an event, a movie, an album, a game title | [other](assets/other.md) |
+| `event` | a named happening or programme with a time: a hackathon, conference, scholarship, cohort or award round; one-off or recurring | [event](assets/event.md) |
+| optional | any other named individual: a movie, an album, a game title | [other](assets/other.md) |
 
 A registered template never brings back an append-only zone (`## Wiki`, `## From Sources`).
 
-Resolve the roles and the permanent-notes folder. The live policy decides each type's folder, and adding to an existing type folder needs no approval. A required type with no folder gets one without asking: the folder existing notes of that type or a synonym already use (`channel` → media, `people` → person), otherwise a new one beside the existing Entity folders in their naming and numbering, named in the report for the owner to register. For an optional type with no folder, name the type, the proposed folder and its Entities and ask; without approval create nothing and list them as candidates.
+Resolve the roles and the permanent-notes folder. The live policy decides each type's folder, and adding to an existing type folder needs no approval. A required type with no folder gets one without asking: the folder existing notes of that type or a synonym already use (`channel` → media, `people` → person, `program` or `programme` → event), otherwise a new one beside the existing Entity folders in their naming and numbering, named in the report for the owner to register. For an optional type with no folder, name the type, the proposed folder and its Entities and ask; without approval create nothing and list them as candidates.
 
 ## Step 2 — Look the entity up in the vault
 
@@ -62,6 +63,7 @@ Fill the type's template. Open `principle-writing` and `principle-markdown`.
 - **media.** One video, episode, issue or post is a Raw listed under `## Published`. The person or organization behind it is its own Entity in `operators`; a channel never replaces its operator's page.
 - **book.** Identity is the work and edition: search by ISBN, author, translator, publisher and edition before creating; a translated or alternate title alone is not a different work, and editions are separate Entities, never merged silently. For a classic, distinguish the recognized local title, the original-language title, the translator and the edition. Set bibliographic keys only from the bookstore or publisher page, and label each Bibliographic Record line `observed`, `inferred` or `owner`, the cover included. Keep the table of contents in original order and language with its source; an empty one is unfinished work. Chapter Raws go under `## Chapters`, progress as appended dated lines whose latest line per chapter is its state. `## Highlights` is filled only by the owner or a highlight-sync tool. Never set or change `bookstore`, `date_started`, `date_finished` or `status`; `status` stays only on a book in a registered Entity folder of the live policy's book type with a real `## Reading Progress` heading.
 - **paper.** Identity is `doi` and `citekey`, resolved against the actual paper and identical to its Raw; surname plus year is a search hint, never identity. A provisional citekey carries `citekeyProvisional: true`; a later registered key is recorded and the page is never renamed for it. Link the paper's Raw only when the vault has one; a paper researched from the web is cited by `doi` and a `[label](URL)` reference, and gets no Raw.
+- **event.** One page per named event or programme, not per round: `recurrence: one-off` for a single happening at a set time, `recurring` for one that runs again by cycle or cohort or keeps taking rounds. `date_start` and `date_end` hold the one-off's dates or the current or next round's; an earlier round's dates move into Schedule. The organizer is its own Entity, linked in Origin and `related`.
 - **product.** The README, documentation and release notes are evidence, not the page. A pinned repository link already carries its commit; label it plainly (`README`, `LICENSE`) and keep the sha out of prose.
 
 ## Step 5 — Link the work note
