@@ -42,6 +42,9 @@ LINK_LINT = os.path.join(ROOT, "skills", "lint", "scripts", "link-lint.py")
 BASELINE_REF = "1c73d0b"
 CONFIGS = {"new": "with_skill", "old": "old_skill"}
 WIKILINK = re.compile(r"\[\[([^\]|#]+)(?:#[^\]|]*)?(?:\|([^\]]*))?\]\]")
+MODE_TRIGGERS = Path(ROOT, "skills", "secondbrain-mode", "SKILL.md").read_text(encoding="utf-8").split(
+    "## Triggers\n", 1)[1].split("\n## ", 1)[0]
+MODE_ROUTES = frozenset(re.findall(r"^\|[^|]+\|\s*`([\w-]+)`\s*\|$", MODE_TRIGGERS, re.M))
 
 SKILL_WRAPPER = """Read {skill_md} and follow it for the user message below.
 The vault root is {vault} (its live policy is {vault}/Guideline.md). Work only inside the vault root.
@@ -208,11 +211,12 @@ def unlink(text):
 # ---------------------------------------------------------------- checks
 
 class Ctx:
-    def __init__(self, case, run_dir, before, after, answer, events, subagents, mode=False, vault=None):
+    def __init__(self, case, run_dir, before, after, answer, events, subagents, mode=False, vault=None, plugin_paths=()):
         self.case, self.run_dir, self.before, self.after = case, run_dir, before, after
         self.answer, self.events, self.subagents = answer, events, subagents
         self.mode = mode
         self.vault = vault
+        self.plugin_paths = plugin_paths
         self.ch = changes(before, after)
         self.guideline = self.text("Guideline.md", "before") or ""
         self.roles = dict(re.findall(r"^\|\s*(wiki|source)\s*\|\s*`([^`]+)`\s*\|", self.guideline, re.M))
@@ -679,7 +683,7 @@ def ck_answer_no_wiki_prose(ctx, e):
     )]
     evidence = ["echoed control tag: %s" % tags[0]] if tags else []
     if ctx.mode and ctx.events:
-        ok, detail = ck_parent_answer(ctx.events)
+        ok, detail = ck_parent_answer(ctx.events, ctx)
         if not ok:
             evidence.append(detail)
     evidence.extend("wiki prose: %r" % line[:120] for line in hits[:4])
@@ -696,7 +700,7 @@ def parent_text(events):
                 yield i, msg.get("id") or i, text
 
 
-def ck_parent_answer(events):
+def ck_parent_answer(events, ctx=None):
     # Only runtime terminal notifications clear launched background tasks, never
     # matching tags printed by the assistant or the tool's launch acknowledgement.
     tasks = {}
@@ -711,11 +715,149 @@ def ck_parent_answer(events):
         if (event.get("subtype") == "task_notification" and key in tasks
                 and event.get("status") in {"completed", "failed", "stopped", "cancelled"}):
             tasks[key] = min(i, tasks[key])
+    returns = parent_returns(events)
+    skills = [row["skill"] for row in routed_rows(ctx)] if ctx is not None else []
     text = list(parent_text(events))
     if text and text[0][0] < max(tasks.values(), default=-1):
         return False, "parent text before trusted completion: %r" % text[0][2][:120]
+    for launch, use in routed_launches(events, skills, all_routes=True):
+        returned, result = returns.get(use["id"], (len(events), {}))
+        if is_background(events, use, worker_trace(ctx, use)):
+            returned = min((end for (_, use_id), end in tasks.items() if use_id == use["id"]),
+                           default=returned if result.get("is_error") else len(events))
+        if (early := early_route_text(events, text, launch, returned)) is not None:
+            return False, "parent text before routed worker finished: %r" % early[:120]
     turns = len({msg for _, msg, _ in text})
     return turns == 1, "%d visible parent answer messages (expected one)" % turns
+
+
+def routed_rows(ctx):
+    return [row for row in ctx.case.get("expectations", []) if row["check"] == "routed"]
+
+
+def routed_launches(events, skills, *, all_routes=False):
+    names = list(map(re.escape, sorted(set(skills) | (MODE_ROUTES if all_routes else set()))))
+    if all_routes:
+        names.append(r"skills/[^/\s\"']+")
+    names = "|".join(names)
+    pattern = re.compile(r"(^|[/\s\"'`(\[])(?:%s)/SKILL\.md(?=\.?(?:$|[^\w./-]))" % names) if names else None
+    for i, event in enumerate(events):
+        if event.get("type") != "assistant" or event.get("parent_tool_use_id") is not None:
+            continue
+        content = (event.get("message") or {}).get("content")
+        for use in content if isinstance(content, list) else []:
+            tool_input = use.get("input", {})
+            if (use.get("type") == "tool_use" and use.get("name") in ("Task", "Agent")
+                    and (pattern is None or pattern.search(tool_input.get("prompt") or "")
+                         or pattern.search(json.dumps(tool_input, ensure_ascii=False)))):
+                yield i, use
+
+
+def parent_returns(events):
+    """First matching top-level tool result after dispatch, with its stream position."""
+    launched = {use["id"]: i for i, use in routed_launches(events, [])}
+    returns = {}
+    for i, event in enumerate(events):
+        if event.get("type") != "user" or event.get("parent_tool_use_id") is not None:
+            continue
+        content = (event.get("message") or {}).get("content")
+        for block in content if isinstance(content, list) else []:
+            if isinstance(block, dict) and block.get("type") == "tool_result":
+                use_id = block.get("tool_use_id")
+                if launched.get(use_id, i) < i:
+                    returns.setdefault(use_id, (i, block))
+    return returns
+
+
+def worker_trace(ctx, use):
+    if ctx is None:
+        return None
+    return ctx.subagents.get(use["id"]) or ctx.subagents.get(
+        ("prompt", (use["input"].get("prompt") or "").strip()))
+
+
+def unique_worker_traces(ctx):
+    """Match direct tool IDs first; a fallback trace must have just one claimant."""
+    ambiguous = {key[1] for key in ctx.subagents if isinstance(key, tuple) and key[0] == "duplicate"}
+    matches = {}
+    claimed = {}
+    for _, use in routed_launches(ctx.events, []):
+        use_id = use["id"]
+        key = use_id if use_id in ctx.subagents else ("prompt", (use["input"].get("prompt") or "").strip())
+        if key in ambiguous or (child := ctx.subagents.get(key)) is None:
+            continue
+        matches[use_id] = child
+        claimed[id(child[1])] = claimed.get(id(child[1]), 0) + 1
+    return {use_id: child for use_id, child in matches.items() if claimed[id(child[1])] == 1}
+
+
+def is_background(events, use, child):
+    meta = child[0] if child is not None else {}
+    return (use["input"].get("run_in_background", False) or meta.get("requestShape") == "background"
+            or any(event.get("type") == "system" and event.get("subtype") == "task_started"
+                   and event.get("parent_tool_use_id") is None and event.get("tool_use_id") == use["id"]
+                   and event.get("is_backgrounded") for event in events))
+
+
+def early_route_text(events, text, launch, returned):
+    kickoff_msg = (events[launch].get("message") or {}).get("id") or launch
+    return next((content for i, msg, content in text if i < returned or msg == kickoff_msg), None)
+
+
+def ck_foreground(ctx, e):
+    launches = list(routed_launches(ctx.events, [e["skill"]], all_routes=True))
+    if len(launches) != 1:
+        return False, "expected one routed launch, found %d" % len(launches)
+    launch, use = launches[0]
+    if not any(expected["id"] == use["id"] for _, expected in routed_launches(ctx.events, [e["skill"]])):
+        return False, "single routed worker did not name %s/SKILL.md" % e["skill"]
+    return check_foreground_return(ctx, launch, use)
+
+
+def check_foreground_return(ctx, launch, use):
+    if is_background(ctx.events, use, worker_trace(ctx, use)):
+        return False, "single routed worker was launched in background"
+    returned = parent_returns(ctx.events).get(use["id"])
+    if returned is None or returned[1].get("is_error"):
+        return False, "no successful matching foreground return"
+    if early_route_text(ctx.events, parent_text(ctx.events), launch, returned[0]) is not None:
+        return False, "parent text before foreground return"
+    return True, "single foreground worker returned before any parent answer"
+
+
+def check_multi_launches(ctx, launches, workers):
+    events = ctx.events
+    for _, use in launches:
+        if not is_background(events, use, workers.get(use["id"])):
+            return False, "multi-route case requires a background launch for every routed worker"
+    if len(launches) > 1:
+        first, last = launches[0][0], launches[-1][0]
+        routed_ids = {use["id"] for _, use in launches}
+        remaining = len(launches)
+        for event in events[first:last + 1]:
+            if event.get("parent_tool_use_id") is not None:
+                continue
+            if (remaining < len(launches) and event.get("type") == "system"
+                    and event.get("subtype") == "task_notification"
+                    and event.get("status") in {"completed", "failed", "stopped", "cancelled"}):
+                return False, "terminal notification before all routed workers were launched"
+            for _, use in tool_uses(ctx, [event]):
+                if use["id"] in routed_ids:
+                    remaining -= 1
+                    if remaining == 0:
+                        break
+                elif remaining < len(launches):
+                    return False, "parent called %s before all routed workers were launched" % use["name"]
+    return True, "all routed workers launched in background before waiting"
+
+
+def ck_optional_launch_mode(ctx, e):
+    launches = list(routed_launches(ctx.events, [], all_routes=True))
+    if not launches:
+        return True, "no routed wiki worker"
+    if len(launches) == 1:
+        return check_foreground_return(ctx, *launches[0])
+    return check_multi_launches(ctx, launches, unique_worker_traces(ctx))
 
 
 def tool_uses(ctx, events=None):
@@ -837,61 +979,128 @@ def parent_shell_write(ctx, command):
     return False
 
 
-def ck_routed(ctx, e):
-    """A top-level background subagent got a kickoff naming <skill>/SKILL.md, opened that file, finished,
-    and did the case's writes; the main thread wrote nothing into the wiki itself."""
-    skill = e["skill"]
-    pat = re.compile(r"(^|[/\s\"'])%s/SKILL\.md(?=\.?(?:$|[^\w./-]))" % re.escape(skill))
-    kick = [c for parent, c in tool_uses(ctx) if parent is None and c.get("name") in ("Task", "Agent")
-            and pat.search(json.dumps(c.get("input", {}), ensure_ascii=False))]
+def foreground_entrypoint_reads(ctx, kickoff, skill, reads, launch_cwd):
+    entrypoint = f"{skill}/SKILL.md"
+    end = re.escape(entrypoint)
+    path_pattern = re.compile(r"(?P<quote>[\"'`])(?P<quoted>(?:(?!(?P=quote))[^\r\n])*?" + end
+                              + r")(?P=quote)|(?:^|[\s(\[])(?P<bare>[^\s\"'`()\[\]]*?" + end
+                              + r")(?=\.?(?:$|[^\w./-]))")
+
+    def canonical(path, cwd):
+        if os.path.isabs(path):
+            return os.path.realpath(path)
+        if cwd and os.path.isabs(cwd):
+            return os.path.realpath(os.path.join(cwd, path))
+        return None
+
+    prompt = kickoff.get("prompt") or ""
+    expected = {canonical(m["quoted"] or m["bare"], launch_cwd) for m in path_pattern.finditer(prompt)}
+    staged = {os.path.realpath(os.path.join(root, "skills", entrypoint)) for root in ctx.plugin_paths}
+    return bool(expected and expected <= staged and any(canonical(path, cwd) in expected for path, cwd in reads))
+
+
+def route_evidence(ctx, row, wiki, writes, returns, workers):
+    skill = row["skill"]
+    kick = list(routed_launches(ctx.events, [skill]))
     if not kick:
-        starts = [c.get("input", {}).get("description") for _, c in tool_uses(ctx) if c.get("name") in ("Task", "Agent")]
-        return False, "no subagent kickoff names %s/SKILL.md; subagents: %s" % (e["skill"], starts)
+        return {}, "no subagent kickoff names %s/SKILL.md" % skill
+    required_reads = set(row.get("reads", []))
+    candidates = {}
+    matched = False
+    for i, c in kick:
+        child = worker_trace(ctx, c) if workers is None else workers.get(c["id"])
+        background = is_background(ctx.events, c, child)
+        if child is None:
+            continue
+        meta, events = child
+        # For a foreground call, its parent tool result is terminal. A background
+        # call returns a launch acknowledgement instead, so keep using worker evidence.
+        _, result = returns.get(c["id"], (None, None))
+        finished = meta.get("finished") if background else result is not None and not result.get("is_error")
+        uses = [u for u, r in resolved_uses(ctx, events) if not r.get("is_error")]
+        file_reads = {u.get("input", {}).get("file_path", "") for u in uses if u.get("name") == "Read"}
+        reads = set(file_reads)
+        reads.update(p for u in uses if u.get("name") == "Bash"
+                     for p in shell_files(u.get("input", {}).get("command", ""))[0])
+        entrypoint = skill + "/SKILL.md"
+        if background:
+            # Keep the baseline's dedicated Read, shell read, and Skill activation alternatives.
+            opened = any(os.path.normpath(p).endswith("/" + entrypoint) or p == entrypoint for p in reads) or any(
+                u.get("name") == "Skill" and u.get("input", {}).get("skill", "").rsplit(":", 1)[-1] == skill
+                for u in uses)
+        else:
+            runner_cwd = ctx.vault or next((event["cwd"] for event in ctx.events if event.get("cwd")), None)
+            worker_cwd = next((event["cwd"] for event in events if event.get("cwd")), runner_cwd)
+            tool_cwds = {u["id"]: event["cwd"] for event in events if event.get("cwd")
+                         for _, u in tool_uses(ctx, [event])}
+            worker_reads = [(u["input"]["file_path"], tool_cwds.get(u["id"], worker_cwd)) for u in uses
+                            if u.get("name") == "Read" and u.get("input", {}).get("file_path")]
+            opened = foreground_entrypoint_reads(ctx, c["input"], skill, worker_reads,
+                                                 ctx.events[i].get("cwd") or runner_cwd or worker_cwd)
+        if not (finished and opened and required_reads <= {vault_path(ctx, p) for p in reads}):
+            continue
+        attributed = writes & {p for u in uses for p in write_paths(ctx, u) if p.startswith(wiki)}
+        matched = True
+        if not row.get("writes") or attributed:
+            candidates[c["id"]] = attributed
+    if not matched:
+        return {}, "no finished %s worker opened its skill and read %s" % (skill, sorted(required_reads))
+    if not candidates:
+        return {}, "no successful %s worker writes account for wiki changes" % skill
+    return candidates, "finished %s worker opened its skill and read %s" % (skill, sorted(required_reads))
+
+
+def distinct_assignments(routes, used=frozenset()):
+    if not routes:
+        yield ()
+        return
+    first, *rest = routes
+    for launch_id in first:
+        if launch_id in used:
+            continue
+        for suffix in distinct_assignments(rest, used | {launch_id}):
+            yield (first[launch_id], *suffix)
+
+
+def ck_routed(ctx, e):
+    """Check this route's evidence and account for the wiki diff across routed workers."""
+    routes = {row["skill"]: row for row in routed_rows(ctx)}
+    routes[e["skill"]] = e
     wiki = ctx.role_prefix("wiki")
     main_writes = [p for parent, c in tool_uses(ctx) if parent is None
                    for p in write_paths(ctx, c) if p.startswith(wiki)]
-    # Reject visible parent shell writes, including shell expressions outside the
-    # narrower set accepted as positive file-level evidence for child work.
+    # Reject visible parent shell writes even when too complex to count as attribution.
     main_bash = [c["input"].get("command", "")[:60] for parent, c in tool_uses(ctx) if parent is None and c.get("name") == "Bash"
                  and parent_shell_write(ctx, c["input"].get("command", ""))]
     if main_writes or main_bash:
         return False, "main thread wrote to the wiki itself: %s" % (main_writes + main_bash)[:3]
     writes = {p for paths in ctx.ch.values() for p in paths if p.startswith(wiki)}
-    attributed = set()
-    matched_reader = False
-    required_reads = set(e.get("reads", []))
-    for c in kick:
-        child = ctx.subagents.get(c["id"]) or ctx.subagents.get(("prompt", (c["input"].get("prompt") or "").strip()))
-        if child is None:
-            continue
-        meta, events = child
-        if not (
-            meta.get("requestShape") == "background" if "requestShape" in meta
-            else c["input"].get("run_in_background")
-        ):
-            continue
-        uses = [u for u, r in resolved_uses(ctx, events) if not r.get("is_error")]
-        reads = {u.get("input", {}).get("file_path", "") for u in uses if u.get("name") == "Read"}
-        reads.update(p for u in uses if u.get("name") == "Bash"
-                     for p in shell_files(u.get("input", {}).get("command", ""))[0])
-        opened = any(
-            u.get("name") == "Skill" and u.get("input", {}).get("skill", "").rsplit(":", 1)[-1] == skill
-            for u in uses
-        ) or any(os.path.normpath(p).endswith("/" + skill + "/SKILL.md") or p == skill + "/SKILL.md" for p in reads)
-        if not (meta.get("finished") and opened):
-            continue
-        attributed.update(p for u in uses for p in write_paths(ctx, u))
-        read = {vault_path(ctx, p) for p in reads}
-        if required_reads and required_reads <= read:
-            matched_reader = True
-    if writes - attributed:
-        return False, "wiki changes lack successful %s worker writes: %s" % (skill, sorted(writes - attributed))
-    if required_reads and not matched_reader:
-        return False, "no finished %s worker read %s" % (skill, sorted(required_reads))
-    if e.get("writes"):
-        return bool(writes), "finished %s worker(s) attributed wiki changes: %s" % (skill, sorted(writes))
-    return matched_reader, "finished %s reader opened the skill and read %s: %s" % (
-        skill, sorted(required_reads), matched_reader)
+    returns = parent_returns(ctx.events)
+    workers = None
+    if len(routes) > 1:
+        workers = unique_worker_traces(ctx)
+        launches = list(routed_launches(ctx.events, routes, all_routes=True))
+        ok, detail = check_multi_launches(ctx, launches, workers)
+        if not ok:
+            return False, detail
+    evidence = {skill: route_evidence(ctx, row, wiki, writes, returns, workers)
+                for skill, row in routes.items()}
+    for candidates, detail in evidence.values():
+        if not candidates:
+            return False, detail
+    candidates, detail = evidence[e["skill"]]
+    assignments = (tuple(candidates.values()),) if len(evidence) == 1 else distinct_assignments(
+        [matches for matches, _ in evidence.values()])
+    missing = None
+    for assignment in assignments:
+        unattributed = writes - set().union(*assignment)
+        if not unattributed:
+            return True, detail
+        if missing is None or len(unattributed) < len(missing):
+            missing = unattributed
+    if missing is None:
+        return False, "required routes lack distinct successful worker launches"
+    return False, "wiki changes lack successful routed worker writes: %s" % sorted(missing)
 
 
 CHECKS = {
@@ -902,6 +1111,7 @@ CHECKS = {
     "moved_verbatim": ck_moved_verbatim, "contains": ck_contains, "count_created": ck_count_created,
     "links_new_page": ck_links_new_page, "answer_line": ck_answer_line, "answer_no_wiki_line": ck_answer_no_wiki_line,
     "answer_no_wiki_prose": ck_answer_no_wiki_prose, "routed": ck_routed, "modified": ck_modified,
+    "foreground": ck_foreground, "optional_launch_mode": ck_optional_launch_mode,
     "footer_matches": ck_footer_matches, "raw_original": ck_raw_original,
 }
 
@@ -1058,7 +1268,7 @@ def save_staged_evidence(out, hashes):
 
 
 def copy_subagents(transcript, vault, dest):
-    """Background subagents log to ~/.claude/projects/<cwd slug>/<session>/subagents/; keep them with the run."""
+    """Keep all subagent logs from ~/.claude/projects/<cwd slug>/<session>/subagents/ with the run."""
     try:
         with open(transcript) as f:
             sid = json.loads(f.readline())["session_id"]
@@ -1368,7 +1578,7 @@ def grader_self_test(prose_check, verdict, citation):
         meta = {"finished": True, "requestShape": "background"}
         role = {"skill": "term", "writes": True}
         read = event("Read", file_path="/tmp/skills/term/SKILL.md")
-        edit = event("Edit", file_path="/tmp/vault/Notes/New.md")
+        edit = event("Edit", file_path="Notes/New.md")
         old = event("Write", file_path="Notes/Old.md")
         after["Notes/Old.md"] = before["Notes/Old.md"]
         bash = event("Bash", command="printf text > /tmp/vault/Notes/New.md")
@@ -1386,6 +1596,219 @@ def grader_self_test(prose_check, verdict, citation):
         failed_read = [read, result("Read", error=True), edit, result("Edit")]
         assert not ck_routed(ctx(events=[kick], agents={"Agent": (meta, failed_read)}), role)[0]
         child = [read, result("Read"), edit, result("Edit")]
+
+        foreground = event("Agent", prompt="Read /tmp/skills/term/SKILL.md")
+        foreground_start = dict(start, is_backgrounded=False)
+        parent_result = result("Agent")
+        # Foreground logs can lack metadata and a final stop reason. Preserve the
+        # worker file, match its opening prompt, and use the parent's tool result.
+        launch_vault = os.path.join(os.path.realpath(tmp), "vault")
+        projects = Path(os.path.realpath(tmp), "projects")
+        worker_dir = projects / re.sub(r"[^A-Za-z0-9]", "-", launch_vault) / "session-test" / "subagents"
+        worker_dir.mkdir(parents=True)
+        kickoff = {"type": "user", "message": {"content": "Read /tmp/skills/term/SKILL.md"}}
+        (worker_dir / "agent-test.jsonl").write_text("\n".join(map(json.dumps, [kickoff] + child)) + "\n")
+        transcript = Path(tmp, "transcript.jsonl")
+        transcript.write_text('{"session_id":"session-test"}\n')
+        copied = str(Path(tmp, "copied-subagents"))
+        with patch.object(os.path, "expanduser", return_value=str(projects)):
+            copy_subagents(transcript, launch_vault, copied)
+        agents = load_subagents(copied)
+        single = ctx(events=[foreground, foreground_start, parent_result], agents=agents)
+        single.case = {"expectations": [dict(role, check="routed")]}
+        single.plugin_paths = ["/tmp"]
+        ok, detail = ck_routed(single, role)
+        assert ok, detail
+        assert ck_foreground(single, role)[0]
+        visible = text("answer", final)
+        kickoff_text = dict(foreground, message={"id": "kickoff", "content":
+                            foreground["message"]["content"] + text("kickoff", final)["message"]["content"]})
+        split_kickoff = dict(foreground, message=dict(foreground["message"], id="kickoff"))
+        for events, expected in (
+            ([visible, foreground, parent_result], False),
+            ([kickoff_text, parent_result], False),
+            ([split_kickoff, parent_result, text("kickoff", final)], False),
+            ([foreground, visible, parent_result], False),
+            ([foreground, visible], False),
+            ([foreground, result("Bash"), visible], False),
+            ([foreground, dict(parent_result, parent_tool_use_id="Task"), visible], False),
+            ([parent_result, foreground, visible], False),
+            ([foreground, parent_result, visible], True),
+        ):
+            single.events = events
+            single.answer = final
+            assert ck_answer_no_wiki_prose(single, prose_check)[0] == expected, events
+            assert ck_foreground(single, role)[0] == expected, events
+        print("PASS: foreground silence rejects pre-launch, kickoff, pending and missing or unmatched returns")
+        extra = event("Agent", prompt="Read query/SKILL.md")
+        extra["message"]["content"][0]["id"] = "extra-query"
+        single.events = [foreground, parent_result, extra, visible]
+        assert not ck_answer_no_wiki_prose(single, prose_check)[0]
+        assert not ck_foreground(single, role)[0]
+        for background in (False, True):
+            query = event("Task", prompt="Read /tmp/skills/query/SKILL.md", run_in_background=background)
+            single.events = [foreground, parent_result, query, *([result("Task")] if background else []), visible]
+            assert not ck_answer_no_wiki_prose(single, prose_check)[0]
+            assert not ck_foreground(single, role)[0]
+            terminal = dict(start, subtype="task_notification", tool_use_id="Task", status="completed")
+            query_start = dict(start, tool_use_id="Task")
+            single.events = [foreground, parent_result, query,
+                             *([query_start, result("Task"), terminal] if background else [result("Task")]), visible]
+            assert ck_answer_no_wiki_prose(single, prose_check)[0]
+            assert not ck_foreground(single, role)[0]
+        print("PASS: a second route blocks silence until it finishes and always fails the single-foreground row")
+        for results in ([], [result("Agent", error=True)], [dict(parent_result, parent_tool_use_id="Task")]):
+            single.events = [foreground, foreground_start, *results]
+            assert not ck_routed(single, role)[0]
+        single.events = [foreground, parent_result]
+        for opening in ([event("Skill", skill="plugin:term"), result("Skill")],
+                        [shell_skill, result("shell-skill")], failed_read[:2],
+                        [event("Read", file_path="/tmp/unrelated/term/SKILL.md"), result("Read")]):
+            single.subagents["Agent"] = ({}, opening + child[2:])
+            assert not ck_routed(single, role)[0]
+        correct = "/scratch/run/plugin/skills/term/SKILL.md"
+        wrong = "/wrong/staging/skills/term/SKILL.md"
+        single.plugin_paths = ["/scratch/run/plugin"]
+        single.vault = "/scratch/run/vault"
+        single.events = [event("Agent", prompt=f"Read `{correct}`."), parent_result]
+        for path, cwd, trace_cwd, expected in (
+            (correct, None, None, True),
+            ("../plugin/skills/term/SKILL.md", single.vault, "/wrong", True),
+            ("../plugin/skills/term/SKILL.md", None, single.vault, True),
+            ("../plugin/skills/term/SKILL.md", None, None, True),
+            ("../plugin/skills/term/SKILL.md", "/wrong", single.vault, False),
+            ("skills/term/SKILL.md", single.vault, None, False),
+            ("skills/term/SKILL.md", "/scratch/run/plugin", None, True),
+            (wrong, None, None, False),
+        ):
+            single.subagents["Agent"] = ({}, [dict(kickoff, cwd=trace_cwd),
+                                            dict(event("Read", file_path=path), cwd=cwd), result("Read")] + child[2:])
+            assert ck_routed(single, role)[0] == expected, (path, cwd, trace_cwd)
+        single.events = [event("Agent", prompt=f"Read {wrong}"), parent_result]
+        single.subagents["Agent"] = ({}, [event("Read", file_path=correct), result("Read")] + child[2:])
+        assert not ck_routed(single, role)[0]
+        spaced = "/scratch/run with spaces/plugin/skills/term/SKILL.md"
+        single.plugin_paths = ["/scratch/run with spaces/plugin"]
+        single.subagents["Agent"] = ({}, [event("Read", file_path=spaced), result("Read")] + child[2:])
+        for quote in ('"', "'", "`"):
+            single.events = [event("Agent", prompt=f"Read {quote}{spaced}{quote}."), parent_result]
+            assert ck_routed(single, role)[0], quote
+        single.events = [event("Agent", prompt=f"Read {spaced}."), parent_result]
+        assert not ck_routed(single, role)[0]
+        staged = Path(tmp, "plugin")
+        staged.mkdir()
+        alias = Path(tmp, "plugin alias")
+        alias.symlink_to(staged, target_is_directory=True)
+        single.plugin_paths = [str(staged)]
+        single.events = [event("Agent", prompt=f'Read "{alias}/skills/term/SKILL.md".'), parent_result]
+        single.subagents["Agent"] = ({}, [event("Read", file_path=str(staged / "skills/term/SKILL.md")),
+                                        result("Read")] + child[2:])
+        assert ck_routed(single, role)[0]
+        print("PASS: foreground skill evidence requires a successful dedicated Read of the dispatched staged entrypoint")
+        assert not ck_routed(ctx(events=[kick, start, parent_result],
+                                 agents={"Agent": (dict(meta, finished=False), child)}), role)[0]
+        single.events = [kick, parent_result, visible]
+        single.subagents["Agent"] = (meta, child)
+        assert ck_routed(single, role)[0]
+        assert not ck_foreground(single, role)[0]
+        print("PASS: single-route attribution accepts either launch mode, but the foreground row rejects background")
+
+        concept = {"check": "routed", "skill": "concept", "reads": ["Notes/Old.md"], "writes": True}
+        concept_kick = event("Task", prompt="Read concept/SKILL.md", run_in_background=True)
+        concept_child = [event("Skill", skill="plugin:concept"), result("Skill"),
+                         event("Read", file_path="Notes/Old.md"), result("Read"),
+                         event("Edit", file_path="Notes/Old.md"), result("Edit")]
+        put("Notes/Old.md", b"concept edit")
+        single = ctx(agents=single.subagents)
+        single.case = {"expectations": [dict(role, check="routed")]}
+        single.case["expectations"].append(concept)
+        single.subagents["Task"] = (meta, concept_child)
+        del single.subagents["Agent"]
+        single.events = [foreground, foreground_start, parent_result, concept_kick]
+        for route in (role, concept):
+            ok, detail = ck_routed(single, route)
+            assert not ok and "requires a background" in detail, detail
+        single.events = [kick, concept_kick]
+        single.subagents["Agent"] = (meta, child)
+        assert ck_routed(single, role)[0]
+        assert ck_routed(single, concept)[0]
+        wait_for_worker = event("Bash", command="sleep 15")
+        terminal = dict(start, subtype="task_notification", status="completed")
+        grouped = dict(kick, message={"content": kick["message"]["content"]
+                       + wait_for_worker["message"]["content"] + concept_kick["message"]["content"]})
+        grouped_then_wait = dict(kick, message={"content": kick["message"]["content"]
+                                 + concept_kick["message"]["content"] + wait_for_worker["message"]["content"]})
+        for events, expected in (
+            ([kick, start, parent_result, wait_for_worker, terminal, concept_kick], False),
+            ([kick, start, parent_result, terminal, concept_kick], False),
+            ([grouped], False),
+            ([grouped_then_wait], True),
+            ([kick, start, parent_result, concept_kick, wait_for_worker, terminal], True),
+        ):
+            single.events = events
+            for route in (role, concept):
+                assert ck_routed(single, route)[0] == expected, events
+            assert ck_optional_launch_mode(single, {})[0] == expected, events
+        optional = ctx()
+        for events, expected in (
+            ([event("Agent", prompt="Research the export format"), visible], True),
+            ([foreground, parent_result, visible], True),
+            ([foreground, visible, parent_result], False),
+            ([kick, parent_result, visible], False),
+            ([kick, concept_kick, visible], True),
+            ([foreground, concept_kick, parent_result, visible], False),
+        ):
+            optional.events = events
+            assert ck_optional_launch_mode(optional, {})[0] == expected, events
+        print("PASS: optional worker launch modes and launch-all-before-waiting for multiple routes")
+        single.events = [kick, concept_kick]
+        unrelated = event("Agent", prompt="Read /tmp/plugin/skills/verify/SKILL.md")
+        unrelated["message"]["content"][0]["id"] = "extra-verify"
+        single.events.append(unrelated)
+        for route in (role, concept):
+            ok, detail = ck_routed(single, route)
+            assert not ok and "requires a background" in detail, detail
+        single.events.pop()
+        single.subagents["Task"] = (meta, concept_child[:-2])
+        assert not ck_routed(single, concept)[0]
+        single.subagents["Task"] = (meta, concept_child)
+        combined = event("Agent", prompt="Read term/SKILL.md and concept/SKILL.md", run_in_background=True)
+        single.events = [combined]
+        single.subagents["Agent"] = (meta, child + concept_child)
+        for route in (role, concept):
+            ok, detail = ck_routed(single, route)
+            assert not ok and "distinct successful worker launches" in detail, detail
+        combined_prompt = combined["message"]["content"][0]["input"]["prompt"]
+        repeated = event("Task", prompt=combined_prompt, run_in_background=True)
+        combined_trace = single.subagents.pop("Agent")
+        del single.subagents["Task"]
+        prompt_key = ("prompt", combined_prompt)
+        single.subagents[prompt_key] = combined_trace
+        single.events = [combined, repeated]
+        for route in (role, concept):
+            ok, detail = ck_routed(single, route)
+            assert not ok and "no finished" in detail, detail
+        # Identical kickoff text is not ambiguous when both traces have direct IDs.
+        single.subagents["Agent"] = combined_trace
+        single.subagents["Task"] = (meta, concept_child)
+        assert ck_routed(single, role)[0]
+        assert ck_routed(single, concept)[0]
+        del single.subagents[prompt_key]
+        single.events = [combined, concept_kick]
+        assert ck_routed(single, role)[0]
+        assert ck_routed(single, concept)[0]
+        single.events = [kick, concept_kick]
+        single.subagents["Agent"] = (meta, child)
+        put("Notes/Extra.md", b"unattributed")
+        unattributed = ctx(events=single.events, agents=single.subagents)
+        unattributed.case = single.case
+        for route in (role, concept):
+            ok, detail = ck_routed(unattributed, route)
+            assert not ok and "lack successful routed worker writes" in detail, detail
+        del after["Notes/Extra.md"]
+        after["Notes/Old.md"] = before["Notes/Old.md"]
+        print("PASS: disjoint background workers cover the wiki diff; mixed launch modes and unattributed writes fail")
+
         for suffix, expected in ((". Then apply it.", True), (".bak", False), ("./other", False)):
             kickoff = event("Agent", prompt="Read /tmp/skills/term/SKILL.md" + suffix, run_in_background=True)
             ok, detail = ck_routed(ctx(events=[kickoff], agents={"Agent": (meta, child)}), role)
@@ -1503,7 +1926,10 @@ def load_subagents(d):
         # assistant turn ends without a pending tool call.
         last = next((e for e in reversed(events) if e.get("type") == "assistant"), {})
         meta.setdefault("finished", (last.get("message") or {}).get("stop_reason") == "end_turn")
-        out[meta.get("toolUseId") or ("prompt", (prompt or "").strip())] = (meta, events)
+        key = meta.get("toolUseId") or ("prompt", (prompt or "").strip())
+        if key in out:
+            out["duplicate", key, f] = out[key]
+        out[key] = (meta, events)
     return out
 
 
@@ -1621,7 +2047,9 @@ def grade(spec, case, config, ws, it, elapsed=None):
     with open(os.path.join(out, "answer.md"), "w") as f:
         f.write(answer)
     ctx = Ctx(case, run_dir, before, after, answer, events, load_subagents(os.path.join(out, "subagents")),
-              spec.get("mode", False), run.get("vault"))
+              spec.get("mode", False), run.get("vault"),
+              (run.get("launch_paths") or {}).get("plugin") or (
+                  [str(Path(run["vault"]).with_name("plugin"))] if run.get("vault") else []))
     with open(os.path.join(out, "changes.json"), "w") as f:
         json.dump(dict(ctx.ch, targets=ctx.targets), f, indent=2, ensure_ascii=False)
     with open(os.path.join(out, "diff.patch"), "w") as f:

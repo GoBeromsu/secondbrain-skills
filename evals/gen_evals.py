@@ -41,7 +41,7 @@ def entity_page(f, kind, required):
 PROSE = ["\\b(is|was|are|were|now|been|got) (written|created|updated|saved|filed|added|ingested|fixed|corrected|linked)\\b", "\\b(I|I've|I have|we've)\\s+(just\\s+)?(wrote|written|created|updated|saved|filed|added|recorded|ingested|fixed|corrected|changed|moved|linked|cited)\\b", "\\b(page|note|Raw)s?\\b[^.\\n]{0,40}\\b(in|to|into) (your|the) (wiki|vault)\\b", "(만들었|만들고|생성했|작성했|업데이트했|갱신했|저장했|저장하고|반영했|기록했|보존했|추가했|고치고|고쳐 ?(뒀|놓았|놨)|수정했|수정하고|달았|붙였|바꿨|바꾸었|바꾸고|옮겼|넣었|걸었|남겼|적었|실었|정리해 ?뒀|남겨 ?뒀|써 ?뒀|쓰지 못했|마쳤)", "(ingest|인제스트)[^.\\n]{0,20}(끝났|완료)", "sub-?agent", "서브 ?에이전트", "in the background", "백그라운드"]
 def mode_common(skill, reads=()):
     checks = [
-        {"text": "Finished background %s workers opened their skill and %s; the main thread writes nothing to the wiki" % (skill, "read the relevant notes" if reads else "performed all wiki writes"), "check": "routed", "skill": skill, "writes": not reads, "reads": list(reads)},
+        {"text": "Finished %s workers opened their skill and %s; the main thread writes nothing to the wiki" % (skill, "read the relevant notes" if reads else "performed all wiki writes"), "check": "routed", "skill": skill, "writes": not reads, "reads": list(reads)},
         {"text": "The parent stays silent until routed workers finish and gives one answer without wiki-work narration", "check": "answer_no_wiki_prose", "forbid": PROSE},
     ]
     return checks if skill in ("ingest", "verify") else checks + [NO_RECORDS]
@@ -259,7 +259,7 @@ mode = {
      {"text": "The answer gives the page's content: reviews spaced so material returns just before it would be forgotten", "check": "answer_line", "regex": "(?i)(forgotten|forget|잊(기|어버리기|히기|혀지기|어버릴)? ?(직전|전에|바로 전))"},
      NO_RAW, within(["Knowledge/"]), FOOTER_OPT]},
   {"id": 6, "eval_name": "doubt-to-verify", "prompt": "Lumen Notes 페이지에 Jane Doe 가 디자인 리드라고 돼 있던데, 그거 아직 맞아? 출처 다시 확인해 봐.",
-   "expected_output": "A background verify subagent checks the claim against the Raws (the 2026-11-25 leadership update makes her CTO). The source-check request authorizes no writes, and there is no Wiki line.",
+   "expected_output": "A foreground verify subagent checks the claim against the Raws (the 2026-11-25 leadership update makes her CTO). The source-check request authorizes no writes, and there is no Wiki line.",
    "files": ["evals/fixture-vault"], "targets": {},
    "expectations": mode_common("verify", reads=["Knowledge/Products/Lumen Notes.md", "Sources/" + LEADERSHIP + ".md"]) + [
      {"text": "The answer concludes in its own words that Jane Doe is now CTO, with no conflicting person or current role in any answer turn", "check": "answer_line", "regex": VERDICT, "unquoted": True, "asserted": True, "attribution": [
@@ -278,7 +278,7 @@ mode = {
    "expected_output": "The How-to solved and confirmed in the conversation becomes a Guide page (layer: guides) in Knowledge/Guides/ from the ingest guide template, with no Raw, MOC, or index/log changes; last line `Wiki: created [[...]]`.",
    "files": ["evals/fixture-vault"], "targets": {"guide": {"glob": "Knowledge/Guides/*.md", "name_regex": "", "state": "created"}},
    "expectations": [
-     {"text": "The guide is written by ingest in a finished background subagent that opened ingest/SKILL.md and wrote it; the main thread writes nothing to the wiki", "check": "routed", "skill": "ingest", "writes": True},
+     {"text": "The guide is written by ingest in a finished subagent that opened ingest/SKILL.md and wrote it; the main thread writes nothing to the wiki", "check": "routed", "skill": "ingest", "writes": True},
      mode_common("ingest")[1],
      {"text": "A Guide page (layer: guides) is created in Knowledge/Guides/", "check": "count_created", "glob": "Knowledge/Guides/*.md", "frontmatter_equals": {"layer": "guides"}, "min": 1},
      {"text": "The Guide uses only the guide template sections, in order, with Key Insight, Overview and Details", "check": "headings", "file": "@guide", "template": "skills/ingest/assets/guide.md", "required": ["## Overview", "## Details"], "callouts": ["> [!tip] Key Insight"]},
@@ -292,17 +292,18 @@ mode = {
    "expectations": [
      {"text": "No Guide page (layer: guides) is created for the unsolved How-to", "check": "count_created", "glob": "*", "frontmatter_equals": {"layer": "guides"}, "max": 0},
      {"text": "Nothing is created, modified or deleted in the Guides folder", "check": "no_changes_under", "prefix": "Knowledge/Guides/"},
-     mode_common("ingest")[1], NO_RECORDS, NO_RAW, dict(LINT, optional=True), within(["Knowledge/"]), FOOTER_OPT]},
+     mode_common("ingest")[1], NO_RECORDS, NO_RAW, dict(LINT, optional=True), within(["Knowledge/"]), FOOTER_OPT,
+     {"text": "No wiki worker is required; one runs in foreground and returns before the answer; multiple all launch in background before waiting", "check": "optional_launch_mode"}]},
   {"id": 9, "eval_name": "approved-query-write-back",
    "prompt": "I studied spaced repetition in my vault before. Compare its purpose and mechanism with the idea of a backlink using the relevant existing vault pages. Save this substantial comparison as a new Query result; I explicitly approve the query skill’s usual wiki index and log updates, but no edits to existing knowledge pages.",
-   "expected_output": "One answer comparing the two ideas with both vault citations, after a silent background query writes a new Query note and updates index and log. The final Wiki line lists all three.",
+   "expected_output": "One answer comparing the two ideas with both vault citations, after the foreground query worker writes a new Query note and updates index and log without parent narration. The final Wiki line lists all three.",
    "files": ["evals/fixture-vault"],
    "fixture_append": {"Guideline.md": "\nSaved Query results belong in the wiki subfolder `Queries/`.\n",
                       "Knowledge/index.md": "# Wiki Index\n\n## Queries\n\n## Recent Queries\n\n## Stats\n",
                       "Knowledge/log.md": "# Wiki Log\n"},
    "targets": {"query": {"glob": "Knowledge/Queries/*.md", "state": "created"}},
    "expectations": [
-     {"text": "A finished background query opens its skill, reads both relevant notes and performs every wiki write; the parent writes nothing", "check": "routed", "skill": "query", "writes": True,
+     {"text": "A finished query opens its skill, reads both relevant notes and performs every wiki write; the parent writes nothing", "check": "routed", "skill": "query", "writes": True,
       "reads": ["Knowledge/Concepts/Spaced Repetition.md", "Knowledge/Terms/Backlink.md"]},
      mode_common("query")[1],
      {"text": "One new Query note is saved", "check": "count_created", "glob": "Knowledge/Queries/*.md", "min": 1, "max": 1},
@@ -330,6 +331,14 @@ mode = {
   {"query": "lint my vault and list the broken links", "should_trigger": False},
   {"query": "Who is Tiago Forte? add him to my people notes", "should_trigger": False}
  ]}
+
+for case in mode["evals"]:
+    routes = [e["skill"] for e in case["expectations"] if e["check"] == "routed"]
+    if len(routes) == 1:
+        case["expectations"].append({
+            "text": "The single routed worker was not run in background and the parent waited for its return",
+            "check": "foreground", "skill": routes[0],
+        })
 
 if __name__ == "__main__":
     here = Path(__file__).resolve().parent
