@@ -3,7 +3,7 @@
 
 Runs each case of evals/<skill>/evals.json through `claude -p` on a fresh temp copy of the fixture
 vault, saves the outputs in skill-creator's workspace layout, and grades every expectation with a
-programmatic check. The committed fixture is never written.
+programmatic check. The external fixture is never written. Set --fixtures DIR or SB_EVAL_FIXTURES.
 
   python3 evals/agent_run.py term                     # new skill and the 0.28.1 baseline, iteration 1
   python3 evals/agent_run.py term --config new --iteration 2 --cases 1,3
@@ -1381,7 +1381,7 @@ def self_test():
         with tempfile.TemporaryDirectory(dir=tmp) as launch_tmp:
             with patch(__name__ + ".ROOT", str(source)), patch.object(subprocess, "run", side_effect=OSError("launch failed")):
                 try:
-                    run_in_snapshot({"fixture": "fixture"}, {"prompt": "test"}, "new", "test", 1, "example",
+                    run_in_snapshot({}, fixture, {"prompt": "test"}, "new", "test", 1, "example",
                                     launch_tmp, failure_out)
                 except OSError as exc:
                     assert str(exc) == "launch failed"
@@ -1935,24 +1935,24 @@ def load_subagents(d):
     return out
 
 
-def run_case(spec, case, config, ws, it, model, timeout, skill, skills_root):
+def run_case(spec, fixture, case, config, ws, it, model, timeout, skill, skills_root):
     run_dir = os.path.join(eval_dir(ws, it, case), CONFIGS[config], "run-1")
     out = os.path.join(run_dir, "outputs")
     shutil.rmtree(run_dir, ignore_errors=True)
     os.makedirs(out)
     tmp = tempfile.TemporaryDirectory(prefix="sb-eval-")
     try:
-        return run_in_snapshot(spec, case, config, model, timeout, skill, tmp.name, out, skills_root)
+        return run_in_snapshot(spec, fixture, case, config, model, timeout, skill, tmp.name, out, skills_root)
     finally:
         tmp.cleanup()
 
 
-def run_in_snapshot(spec, case, config, model, timeout, skill, tmp, out, skills_root=None):
+def run_in_snapshot(spec, fixture, case, config, model, timeout, skill, tmp, out, skills_root=None):
     vault = os.path.join(os.path.realpath(tmp), "vault")
     plugin = Path(os.path.realpath(tmp), "plugin")
     write_roots = sandbox_write_roots(tmp)
     validate_snapshot_location(plugin, write_roots)
-    shutil.copytree(os.path.join(ROOT, spec["fixture"]), vault)
+    shutil.copytree(fixture, vault)
     for name, content in case.get("fixture_append", {}).items():
         path = Path(vault, name)
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -2090,6 +2090,7 @@ def main(argv=None):
     ap = argparse.ArgumentParser()
     ap.add_argument("skill", nargs="?")
     ap.add_argument("--self-test", action="store_true")
+    ap.add_argument("--fixtures", metavar="DIR", help="fixture root (default: SB_EVAL_FIXTURES)")
     ap.add_argument("--config", choices=["new", "old", "both"], default="both")
     ap.add_argument("--skills-root", type=Path, metavar="DIR", help="skills tree to stage for config new")
     ap.add_argument("--iteration", type=int, default=1)
@@ -2110,9 +2111,16 @@ def main(argv=None):
         entrypoint = a.skills_root / a.skill / "SKILL.md"
         if not entrypoint.is_file():
             ap.error(f"--skills-root is missing the skill entrypoint: {entrypoint}")
+    fixture_root = a.fixtures or os.environ.get("SB_EVAL_FIXTURES")
+    if not a.grade_only and not fixture_root:
+        ap.error("set --fixtures DIR or SB_EVAL_FIXTURES to the fixture root")
     with open(os.path.join(HERE, a.skill, "evals.json"), encoding="utf-8") as f:
         spec = json.load(f)
     validate(spec)
+    if not a.grade_only:
+        fixture = Path(fixture_root).expanduser().resolve() / spec["fixture"]
+        if not fixture.is_dir():
+            ap.error(f"fixture vault is not a directory: {fixture}")
     ws = os.path.join(HERE, "results", "%s-workspace" % a.skill)
     cases = [c for c in spec["evals"] if not a.cases or str(c["id"]) in a.cases.split(",")]
     configs = ["new", "old"] if a.config == "both" else [a.config]
@@ -2125,7 +2133,7 @@ def main(argv=None):
     elapsed = {}
     if not a.grade_only:
         with ThreadPoolExecutor(a.workers) as pool:
-            futs = {pool.submit(run_case, spec, c, cfg, ws, a.iteration, a.model, a.timeout, a.skill,
+            futs = {pool.submit(run_case, spec, fixture, c, cfg, ws, a.iteration, a.model, a.timeout, a.skill,
                                 a.skills_root): (c["id"], cfg)
                     for c in cases for cfg in configs}
             for fu, key in futs.items():

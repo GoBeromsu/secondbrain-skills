@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Mechanical eval for the lint skill's scripts against evals/fixture-vault.
+"""Mechanical eval for the lint skill's scripts against an external fixture vault.
 
 Each case in evals.json lists the findings it expects and the script paths it applies to. For each
 path that runs, a case passes when every expected finding is reported and none of its clean files
 has a finding; a last check per path fails on any finding no case expects.
+Set --fixtures DIR or SB_EVAL_FIXTURES to the fixture root.
 
   python3 evals/lint/run.py                       # current skill: python and marksman paths
   python3 evals/lint/run.py --skill-dir <old>     # baseline from evals/baseline.sh lint
@@ -48,13 +49,21 @@ def run(script, args):
 
 def main(argv=None):
     ap = argparse.ArgumentParser()
+    ap.add_argument("--fixtures", metavar="DIR", help="fixture root (default: SB_EVAL_FIXTURES)")
     ap.add_argument("--skill-dir", default=os.path.join(ROOT, "skills", "lint"))
     ap.add_argument("--json", help="write per-case results to this file")
     a = ap.parse_args(argv)
+    fixture_root = a.fixtures or os.environ.get("SB_EVAL_FIXTURES")
+    if not fixture_root:
+        ap.error("set --fixtures DIR or SB_EVAL_FIXTURES to the fixture root")
+    fixture_root = os.path.abspath(os.path.expanduser(fixture_root))
     with open(os.path.join(HERE, "evals.json"), encoding="utf-8") as f:
         spec = json.load(f)
-    vault = os.path.join(ROOT, spec["fixture"])
-    with open(os.path.join(ROOT, spec["policy"]["source"]), encoding="utf-8") as f:
+    vault = os.path.join(fixture_root, spec["fixture"])
+    guideline_path = os.path.join(fixture_root, spec["policy"]["source"])
+    if not os.path.isfile(guideline_path):
+        ap.error(f"fixture guideline is missing: {guideline_path}")
+    with open(guideline_path, encoding="utf-8") as f:
         guideline = f.read()
     # Read fixture-specific role and type declarations from its guideline.
     wiki = re.findall(r"^\| wiki \| `([^`]+?)/?` \|", guideline, re.M)

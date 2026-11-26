@@ -1,6 +1,6 @@
 {
   "skill_name": "term",
-  "fixture": "evals/fixture-vault",
+  "fixture": "fixture-vault",
   "baseline_skill": "principle-knowledge-notes",
   "wiki": "Knowledge/",
   "evals": [
@@ -10,7 +10,7 @@
       "prompt": "'transclusion'이 무슨 뜻이야? 노트 앱 얘기하다가 처음 들었어. 누가 https://en.wikipedia.org/wiki/Transclusion 링크를 줬는데 읽어도 잘 모르겠어.",
       "expected_output": "Answers the question, then creates Knowledge/Terms/Transclusion.md from assets/term.md with sourced References; the Wikipedia page stays a [label](URL) link and no Raw is saved; reports `Wiki: created [[Transclusion]]`.",
       "files": [
-        "evals/fixture-vault"
+        "fixture-vault"
       ],
       "targets": {
         "page": {
@@ -90,7 +90,7 @@
       "prompt": "Backlinks 랑 forward link 차이가 정확히 뭐야? Lumen 문서에 'backlinks pane' 얘기가 계속 나와서 헷갈려.",
       "expected_output": "Finds Knowledge/Terms/Backlink.md through its alias, adds only the new claim (backlink vs forward link) to it under the template, creates no duplicate page; reports `Wiki: updated [[Backlink]]`.",
       "files": [
-        "evals/fixture-vault"
+        "fixture-vault"
       ],
       "targets": {},
       "expectations": [
@@ -174,7 +174,7 @@
       "prompt": "I'm drafting Projects/Lumen Notes Import Plan.md. What is transclusion exactly, and is it the same thing as embedding a note?",
       "expected_output": "Creates the Transclusion Term page and turns only the first 'transclusion' in that one work note into a wikilink; nothing else in Projects/ changes.",
       "files": [
-        "evals/fixture-vault"
+        "fixture-vault"
       ],
       "targets": {
         "page": {
@@ -271,7 +271,7 @@
       "prompt": "풀브라이트 장학금을 term 노트로 만들어줘",
       "expected_output": "Does not follow the 'term' label: explains that the Fulbright scholarship is one named program, so an Entity (optional type such as program or event), and asks once before writing. No wiki page is written without that confirmation.",
       "files": [
-        "evals/fixture-vault"
+        "fixture-vault"
       ],
       "expectations": [
         {

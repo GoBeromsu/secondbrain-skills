@@ -10,9 +10,12 @@ It answers one question each and judges nothing a skill should judge:
   assets      every image file is recorded in assets/asset-ledger.json and vice versa
   icon        the plugin icon is a square PNG of 512-2048 px under 2 MB
   scripts     every bundled Python script compiles
-  lint-eval   skills/lint/scripts/link-lint.py reproduces evals/lint-links/expected.tsv
+
+Set SB_EVAL_FIXTURES to the external fixture root to also check that
+skills/lint/scripts/link-lint.py reproduces <root>/lint-links/expected.tsv.
 """
 import json
+import os
 import py_compile
 import re
 import struct
@@ -206,14 +209,16 @@ def check_scripts():
             fail("scripts", f"{py.relative_to(ROOT)}: {e.msg}")
 
 
-def check_lint_eval():
+def check_lint_eval(fixture_root):
     script = ROOT / "skills/lint/scripts/link-lint.py"
-    case = ROOT / "evals/lint-links"
-    if not script.is_file() or not case.is_dir():
+    case = Path(fixture_root).expanduser().resolve() / "lint-links"
+    expected = case / "expected.tsv"
+    if not (case / "vault").is_dir() or not expected.is_file():
+        fail("lint-eval", f"SB_EVAL_FIXTURES must provide {case / 'vault'} and {expected}")
         return
     run = subprocess.run([sys.executable, str(script), "--vault", str(case / "vault")], capture_output=True, text=True)
-    if run.stdout != (case / "expected.tsv").read_text():
-        fail("lint-eval", "link-lint.py output differs from evals/lint-links/expected.tsv")
+    if run.returncode not in (0, 1) or run.stdout != expected.read_text():
+        fail("lint-eval", f"link-lint.py did not reproduce {expected}")
 
 
 def main():
@@ -225,13 +230,18 @@ def main():
     check_assets(files)
     check_icon()
     check_scripts()
-    check_lint_eval()
+    fixture_root = os.environ.get("SB_EVAL_FIXTURES")
+    if fixture_root:
+        check_lint_eval(fixture_root)
     if errors:
         print(f"FAIL: {len(errors)} problem(s)")
         for e in errors:
             print("  " + e)
         return 1
-    print(f"OK: {NAME} {version}, {len(names)} packages, manifests, links, assets, icon, scripts and lint eval all pass")
+    checks = "manifests, links, assets, icon, scripts"
+    if fixture_root:
+        checks += ", lint-eval"
+    print(f"OK: {NAME} {version}, {len(names)} packages, {checks} all pass")
     return 0
 
 

@@ -1,6 +1,6 @@
 {
   "skill_name": "entity",
-  "fixture": "evals/fixture-vault",
+  "fixture": "fixture-vault",
   "baseline_skill": "principle-knowledge-notes",
   "wiki": "Knowledge/",
   "evals": [
@@ -10,7 +10,7 @@
       "prompt": "Projects/Lumen Notes Import Plan.md 보다가 궁금해졌는데, Readwise Reader 는 어떤 앱이야? 하이라이트를 Lumen 으로 넘길 수 있을지 알고 싶어.",
       "expected_output": "Creates Knowledge/Products/Readwise Reader.md from assets/product.md (plain homepage URL under website_url, no bare url key, Lumen Notes wikilinked), turns only the first mention in the work note into a wikilink; reports `Wiki: created [[Readwise Reader]]`.",
       "files": [
-        "evals/fixture-vault"
+        "fixture-vault"
       ],
       "targets": {
         "page": {
@@ -120,7 +120,7 @@
       "prompt": "Jane Doe 가 Northwind Labs CTO 가 됐대. Sources 에 [[2026-11-25 Northwind Labs leadership update]] 로 저장해 뒀어. 그 사람 페이지 업데이트해줘.",
       "expected_output": "Adds a dated `## Updates` line citing the Raw, moves the owner's impressions verbatim to Notes/2026-10-02 Jane Doe.md (authorship: user, related [[Jane Doe]]), links it back from the person page, sets authorship: mixed; reports `Wiki: updated [[Jane Doe]]`.",
       "files": [
-        "evals/fixture-vault"
+        "fixture-vault"
       ],
       "targets": {
         "note": {
@@ -228,7 +228,7 @@
       "prompt": "What is the Mozilla Foundation, and how does it differ from the Mozilla Corporation? Make an organization page for the Foundation. Start with its own account at https://www.mozillafoundation.org/en/who-we-are/.",
       "expected_output": "Creates a Mozilla Foundation page in Knowledge/Organizations/ from assets/organization.md, distinguishes it from the Corporation with sourced claims, saves no Raw, and reports the created page on the final Wiki line.",
       "files": [
-        "evals/fixture-vault"
+        "fixture-vault"
       ],
       "targets": {
         "page": {
@@ -321,7 +321,7 @@
       "prompt": "Create a place note for the Eiffel Tower (Tour Eiffel) in Paris. I want to know why it was built and how visitors get to the observation levels. Use its official site https://www.toureiffel.paris/en as a starting point.",
       "expected_output": "Creates a Tour Eiffel page in Knowledge/Places/ from assets/place.md, cites sources for its origin and visitor access, saves no Raw, and reports the created page on the final Wiki line.",
       "files": [
-        "evals/fixture-vault"
+        "fixture-vault"
       ],
       "targets": {
         "page": {
@@ -414,7 +414,7 @@
       "prompt": "장학금을 entity 노트로 만들어줘",
       "expected_output": "Does not follow the 'entity' label: explains that a scholarship in general is a kind with many members, so a Term rather than an Entity, and asks once before writing. No wiki page is written without that confirmation.",
       "files": [
-        "evals/fixture-vault"
+        "fixture-vault"
       ],
       "expectations": [
         {

@@ -55,15 +55,15 @@ PROSE.append(r'(?:위키(?:에|로)|볼트(?:에|로))[^.\n]{0,35}(?:저장하�
 PROSE.append(r'(?:노트|페이지|문서|제목|본문|프런트매터|frontmatter)[을를]?\s+(?:(?:이름|제목|본문|내용|링크|속성)[을를]?\s+)?(?:직접\s+|다시\s+)?(?:저장하고|바꿨|바꾸고|만들어 ?두었)')
 
 term = {
- "skill_name": "term", "fixture": "evals/fixture-vault", "baseline_skill": "principle-knowledge-notes", "wiki": "Knowledge/",
+ "skill_name": "term", "fixture": "fixture-vault", "baseline_skill": "principle-knowledge-notes", "wiki": "Knowledge/",
  "evals": [
   {"id": 1, "eval_name": "new-term-link-in-passing", "prompt": "'transclusion'이 무슨 뜻이야? 노트 앱 얘기하다가 처음 들었어. 누가 https://en.wikipedia.org/wiki/Transclusion 링크를 줬는데 읽어도 잘 모르겠어.",
    "expected_output": "Answers the question, then creates Knowledge/Terms/Transclusion.md from assets/term.md with sourced References; the Wikipedia page stays a [label](URL) link and no Raw is saved; reports `Wiki: created [[Transclusion]]`.",
-   "files": ["evals/fixture-vault"], "targets": {"page": {"glob": "Knowledge/Terms/*.md", "name_regex": "(?i)^transclusion", "state": "created"}},
+   "files": ["fixture-vault"], "targets": {"page": {"glob": "Knowledge/Terms/*.md", "name_regex": "(?i)^transclusion", "state": "created"}},
    "expectations": term_page("@page") + [LINT, NO_RAW, within(["Knowledge/"]), wiki_line("created", "Transclusion")]},
   {"id": 2, "eval_name": "existing-term-by-alias", "prompt": "Backlinks 랑 forward link 차이가 정확히 뭐야? Lumen 문서에 'backlinks pane' 얘기가 계속 나와서 헷갈려.",
    "expected_output": "Finds Knowledge/Terms/Backlink.md through its alias, adds only the new claim (backlink vs forward link) to it under the template, creates no duplicate page; reports `Wiki: updated [[Backlink]]`.",
-   "files": ["evals/fixture-vault"], "targets": {},
+   "files": ["fixture-vault"], "targets": {},
    "expectations": [
      {"text": "No duplicate page for backlink is created anywhere in the vault", "check": "count_created", "glob": "*", "name_regex": "(?i)backlink", "max": 0},
      {"text": "Knowledge/Terms/Backlink.md is updated", "check": "modified", "file": "Knowledge/Terms/Backlink.md"},
@@ -73,7 +73,7 @@ term = {
      LINT, NO_RAW, within(["Knowledge/"]), wiki_line("updated", "Backlink")]},
   {"id": 3, "eval_name": "work-note-first-mention", "prompt": "I'm drafting Projects/Lumen Notes Import Plan.md. What is transclusion exactly, and is it the same thing as embedding a note?",
    "expected_output": "Creates the Transclusion Term page and turns only the first 'transclusion' in that one work note into a wikilink; nothing else in Projects/ changes.",
-   "files": ["evals/fixture-vault"], "targets": {"page": {"glob": "Knowledge/Terms/*.md", "name_regex": "(?i)^transclusion", "state": "created"}},
+   "files": ["fixture-vault"], "targets": {"page": {"glob": "Knowledge/Terms/*.md", "name_regex": "(?i)^transclusion", "state": "created"}},
    "expectations": term_page("@page") + [first_mention("transclusion", "(?i)^transclusion"), OTHER_WORK, LINT, NO_RAW, within(["Knowledge/"], ["Projects/Lumen Notes Import Plan.md"]), wiki_line("created", "Transclusion")]},
  ],
  "trigger_evals": [
@@ -100,15 +100,15 @@ term = {
  ]}
 
 concept = {
- "skill_name": "concept", "fixture": "evals/fixture-vault", "baseline_skill": "principle-knowledge-notes", "wiki": "Knowledge/",
+ "skill_name": "concept", "fixture": "fixture-vault", "baseline_skill": "principle-knowledge-notes", "wiki": "Knowledge/",
  "evals": [
   {"id": 1, "eval_name": "new-concept-work-note", "prompt": "Projects/Lumen Notes Import Plan.md 에 적어 둔 progressive summarization 말인데, 이 방법론이 정확히 어떻게 돌아가는 거야? 짧은 노트에도 쓸 만해?",
    "expected_output": "Creates Knowledge/Concepts/Progressive Summarization.md from assets/concept.md with Sources links, turns only the first mention in the work note into a wikilink, saves no Raw; reports `Wiki: created [[Progressive Summarization]]`.",
-   "files": ["evals/fixture-vault"], "targets": {"page": {"glob": "Knowledge/Concepts/*.md", "name_regex": "(?i)^progressive summari", "state": "created"}},
+   "files": ["fixture-vault"], "targets": {"page": {"glob": "Knowledge/Concepts/*.md", "name_regex": "(?i)^progressive summari", "state": "created"}},
    "expectations": concept_page("@page") + [first_mention("progressive summarization", "(?i)^progressive summari"), OTHER_WORK, LINT, NO_RAW, within(["Knowledge/"], ["Projects/Lumen Notes Import Plan.md"]), wiki_line("created", "Progressive Summari")]},
   {"id": 2, "eval_name": "existing-concept-update", "prompt": "Spaced repetition 이랑 Leitner system 은 어떻게 연결돼? 전에 정리해 둔 간격 반복 노트에 보태줘.",
    "expected_output": "Updates Knowledge/Concepts/Spaced Repetition.md with the Leitner connection (no duplicate page), migrated to the concept template; reports `Wiki: updated [[Spaced Repetition]]`.",
-   "files": ["evals/fixture-vault"], "targets": {},
+   "files": ["fixture-vault"], "targets": {},
    "expectations": [
      {"text": "No duplicate Spaced Repetition page is created", "check": "count_created", "glob": "*", "name_regex": "(?i)spaced|간격", "max": 0},
      {"text": "Knowledge/Concepts/Spaced Repetition.md is updated", "check": "modified", "file": "Knowledge/Concepts/Spaced Repetition.md"},
@@ -143,11 +143,11 @@ concept = {
 JANE = "Knowledge/People/Jane Doe.md"
 IMPRESSION = "I met Jane at a meetup in October. She explained the product more clearly than its own website does, and I want to follow what she ships next."
 entity = {
- "skill_name": "entity", "fixture": "evals/fixture-vault", "baseline_skill": "principle-knowledge-notes", "wiki": "Knowledge/",
+ "skill_name": "entity", "fixture": "fixture-vault", "baseline_skill": "principle-knowledge-notes", "wiki": "Knowledge/",
  "evals": [
   {"id": 1, "eval_name": "new-product-work-note", "prompt": "Projects/Lumen Notes Import Plan.md 보다가 궁금해졌는데, Readwise Reader 는 어떤 앱이야? 하이라이트를 Lumen 으로 넘길 수 있을지 알고 싶어.",
    "expected_output": "Creates Knowledge/Products/Readwise Reader.md from assets/product.md (plain homepage URL under website_url, no bare url key, Lumen Notes wikilinked), turns only the first mention in the work note into a wikilink; reports `Wiki: created [[Readwise Reader]]`.",
-   "files": ["evals/fixture-vault"], "targets": {"page": {"glob": "Knowledge/Products/*.md", "name_regex": "(?i)^readwise reader", "state": "created"}},
+   "files": ["fixture-vault"], "targets": {"page": {"glob": "Knowledge/Products/*.md", "name_regex": "(?i)^readwise reader", "state": "created"}},
    "expectations": entity_page("@page", "product", ["## Origin", "## Explanation", "## References"]) + [
      {"text": "Product frontmatter carries the homepage as a plain `website_url` and has no bare `url` key", "check": "frontmatter", "file": "@page", "contains": {"website_url": "^https?://\\S+$"}, "absent": ["url"]},
      refs("@page", "## References"),
@@ -155,7 +155,7 @@ entity = {
      within(["Knowledge/"], ["Projects/Lumen Notes Import Plan.md"]), wiki_line("created", "Readwise Reader")]},
   {"id": 2, "eval_name": "person-update-impressions", "prompt": "Jane Doe 가 Northwind Labs CTO 가 됐대. Sources 에 [[2026-11-25 Northwind Labs leadership update]] 로 저장해 뒀어. 그 사람 페이지 업데이트해줘.",
    "expected_output": "Adds a dated `## Updates` line citing the Raw, moves the owner's impressions verbatim to Notes/2026-10-02 Jane Doe.md (authorship: user, related [[Jane Doe]]), links it back from the person page, sets authorship: mixed; reports `Wiki: updated [[Jane Doe]]`.",
-   "files": ["evals/fixture-vault"], "targets": {"note": {"glob": "Notes/2026-10-02 Jane Doe.md", "state": "created"}},
+   "files": ["fixture-vault"], "targets": {"note": {"glob": "Notes/2026-10-02 Jane Doe.md", "state": "created"}},
    "expectations": [
      {"text": "A dated line under ## Updates states the CTO appointment and links [[2026-11-25 Northwind Labs leadership update]]", "check": "section_line", "file": JANE, "heading": "## Updates", "regex": r"(?i)^- \[\[2026-11-2[56]\]\] (?![^\n]*\b(?:not|never|denied|rumou?red)\b)(?=[^\n]*(?:\b(?:appoint(?:ed|ment)|promot(?:ed|ion)|named|became|becomes|took over|assumed)\b|임명|선임|취임|승진|[가이] (?:됐|되었)))(?=[^\n]*(?:\b(?:CTO|Chief Technology Officer)\b|최고기술책임자))[^\n]*\[\[(?:Sources/)?2026-11-25 Northwind Labs leadership update(?:\|[^\]]*)?\]\]"},
      {"text": "Exactly one impressions note is created, at Notes/2026-10-02 Jane Doe.md ({date_created} {Name})", "check": "count_created", "glob": "Notes/*", "name_regex": "^2026-10-02 Jane Doe\\.md$", "min": 1, "max": 1},
@@ -166,14 +166,14 @@ entity = {
      SRC_SAME, LINT, dict(within(["Knowledge/"], ["Notes/2026-10-02 Jane Doe.md"]), text="Writes stay under Knowledge/ except the exact impressions note Notes/2026-10-02 Jane Doe.md"), wiki_line("updated", "Jane Doe")]},
   {"id": 3, "eval_name": "new-organization", "prompt": "What is the Mozilla Foundation, and how does it differ from the Mozilla Corporation? Make an organization page for the Foundation. Start with its own account at https://www.mozillafoundation.org/en/who-we-are/.",
    "expected_output": "Creates a Mozilla Foundation page in Knowledge/Organizations/ from assets/organization.md, distinguishes it from the Corporation with sourced claims, saves no Raw, and reports the created page on the final Wiki line.",
-   "files": ["evals/fixture-vault"], "targets": {"page": {"glob": "Knowledge/Organizations/*.md", "name_regex": r"(?i)^Mozilla Foundation(?:$| \()", "state": "created"}},
+   "files": ["fixture-vault"], "targets": {"page": {"glob": "Knowledge/Organizations/*.md", "name_regex": r"(?i)^Mozilla Foundation(?:$| \()", "state": "created"}},
    "expectations": entity_page("@page", "organization", ["## Origin", "## Explanation", "## Personal Insights", "## References"]) + [
      refs("@page", "## References"),
      {"text": "The Explanation names the Mozilla Corporation and describes its relationship to the Foundation as a subsidiary", "check": "section_line", "file": "@page", "heading": "## Explanation", "patterns": [r"(?i)\bMozilla Corporation\b", r"(?i)\b(?:subsidiary|wholly owned)\b"]},
      LINT, NO_RAW, within(["Knowledge/Organizations/"]), wiki_line("created", "Mozilla Foundation")]},
   {"id": 4, "eval_name": "new-place", "prompt": "Create a place note for the Eiffel Tower (Tour Eiffel) in Paris. I want to know why it was built and how visitors get to the observation levels. Use its official site https://www.toureiffel.paris/en as a starting point.",
    "expected_output": "Creates a Tour Eiffel page in Knowledge/Places/ from assets/place.md, cites sources for its origin and visitor access, saves no Raw, and reports the created page on the final Wiki line.",
-   "files": ["evals/fixture-vault"], "targets": {"page": {"glob": "Knowledge/Places/*.md", "name_regex": r"(?i)^(?:Tour Eiffel|Eiffel Tower)(?:$| \()", "state": "created"}},
+   "files": ["fixture-vault"], "targets": {"page": {"glob": "Knowledge/Places/*.md", "name_regex": r"(?i)^(?:Tour Eiffel|Eiffel Tower)(?:$| \()", "state": "created"}},
    "expectations": entity_page("@page", "place", ["## Origin", "## Explanation", "## Personal Insights", "## References"]) + [
      refs("@page", "## References"),
      {"text": "Origin names the 1889 exhibition that prompted construction", "check": "section_line", "file": "@page", "heading": "## Origin", "patterns": [r"\b1889\b", r"(?i)\b(?:exhibition|exposition|world(?:'s|’s) fair)\b"]},
@@ -224,23 +224,23 @@ You: Settings → Links 에서 'Update links on rename' 을 켜고, 이미 깨�
 
 Me (now): 해봤는데 됐어! 'Update links on rename' 켜고, 'Find broken links' 로 찾은 깨진 링크 12개를 'Relink' 로 다 고쳤어. 이름 하나 더 바꿔 봤는데 이번엔 링크가 그대로 살아 있어. 고마워."""
 mode = {
- "skill_name": "secondbrain-mode", "fixture": "evals/fixture-vault", "baseline_skill": "ingest", "mode": True, "wiki": "Knowledge/",
+ "skill_name": "secondbrain-mode", "fixture": "fixture-vault", "baseline_skill": "ingest", "mode": True, "wiki": "Knowledge/",
  "evals": [
   {"id": 1, "eval_name": "unknown-word-to-term", "prompt": "What does 'idempotent' mean? Our reviewer linked https://developer.mozilla.org/en-US/docs/Glossary/Idempotent and said my retry endpoint isn't idempotent.",
    "expected_output": "Answers the question; a term subagent writes Knowledge/Terms/Idempoten*.md; the MDN link stays a [label](URL) link; last line `Wiki: created [[Idempotence]]`.",
-   "files": ["evals/fixture-vault"], "targets": {"page": {"glob": "Knowledge/Terms/*.md", "name_regex": "(?i)^idempoten", "state": "created"}},
+   "files": ["fixture-vault"], "targets": {"page": {"glob": "Knowledge/Terms/*.md", "name_regex": "(?i)^idempoten", "state": "created"}},
    "expectations": mode_common("term") + [{"text": "The Term page exists in Knowledge/Terms/", "check": "exists", "file": "@page"}, LINT, NO_RAW, within(["Knowledge/"]), wiki_line("created", "Idempoten")]},
   {"id": 2, "eval_name": "methodology-to-concept", "prompt": "I want to try the Zettelkasten method for my research notes this winter. How does it actually work, and what's the core idea behind it?",
    "expected_output": "Answers; a concept subagent writes Knowledge/Concepts/Zettelkasten*.md; last line `Wiki: created [[Zettelkasten]]`.",
-   "files": ["evals/fixture-vault"], "targets": {"page": {"glob": "Knowledge/Concepts/*.md", "name_regex": "(?i)zettelkasten", "state": "created"}},
+   "files": ["fixture-vault"], "targets": {"page": {"glob": "Knowledge/Concepts/*.md", "name_regex": "(?i)zettelkasten", "state": "created"}},
    "expectations": mode_common("concept") + [{"text": "The Concept page exists in Knowledge/Concepts/", "check": "exists", "file": "@page"}, LINT, NO_RAW, within(["Knowledge/"]), wiki_line("created", "Zettelkasten")]},
   {"id": 3, "eval_name": "product-to-entity", "prompt": "Logseq 라는 앱 들어봤어? Lumen Notes 랑 비교하면 어떤 앱인지 궁금해.",
    "expected_output": "Answers; an entity subagent writes Knowledge/Products/Logseq.md with [[Lumen Notes]] linked; last line `Wiki: created [[Logseq]]`.",
-   "files": ["evals/fixture-vault"], "targets": {"page": {"glob": "Knowledge/Products/*.md", "name_regex": "(?i)^logseq", "state": "created"}},
+   "files": ["fixture-vault"], "targets": {"page": {"glob": "Knowledge/Products/*.md", "name_regex": "(?i)^logseq", "state": "created"}},
    "expectations": mode_common("entity") + [{"text": "The Product page exists in Knowledge/Products/", "check": "exists", "file": "@page"}, LINT, NO_RAW, within(["Knowledge/"]), wiki_line("created", "Logseq")]},
   {"id": 4, "eval_name": "article-handover-to-ingest", "prompt": ARTICLE,
    "expected_output": "An ingest subagent saves one verbatim Raw in Sources/, compiles it into the wiki and updates Tools MOC, index and log. Jane Doe's original impressions move byte-exact to a dated note with reciprocal links. The last line is `Wiki: created ..., updated ...`.",
-   "files": ["evals/fixture-vault"], "targets": {"note": {"glob": "Notes/2026-10-02 Jane Doe.md", "state": "created"}},
+   "files": ["fixture-vault"], "targets": {"note": {"glob": "Notes/2026-10-02 Jane Doe.md", "state": "created"}},
    "expectations": mode_common("ingest") + [
      {"text": "Exactly one new Raw in Sources/ preserves the handed-over article verbatim before the closing Original Content marker", "check": "raw_original", "content": ARTICLE_CONTENT},
      {"text": "The owner's impression sentences move byte-exact from the person page body to the new dated note", "check": "moved_verbatim", "sentences": IMPRESSION, "from": JANE, "to": "@note"},
@@ -253,14 +253,14 @@ mode = {
      FOOTER_ANY]},
   {"id": 5, "eval_name": "past-study-to-query", "prompt": "전에 spaced repetition 공부해서 정리해 둔 게 있었는데, 핵심이 뭐였지?",
    "expected_output": "A query subagent reads Knowledge/Concepts/Spaced Repetition.md and the answer gives its cited content; nothing written outside the wiki; a Wiki line only if a page was written.",
-   "files": ["evals/fixture-vault"], "targets": {},
+   "files": ["fixture-vault"], "targets": {},
    "expectations": mode_common("query", reads=["Knowledge/Concepts/Spaced Repetition.md"]) + [
      {"text": "The answer cites the existing page [[Spaced Repetition]]", "check": "answer_line", "regex": "\\[\\[Spaced Repetition"},
      {"text": "The answer gives the page's content: reviews spaced so material returns just before it would be forgotten", "check": "answer_line", "regex": "(?i)(forgotten|forget|잊(기|어버리기|히기|혀지기|어버릴)? ?(직전|전에|바로 전))"},
      NO_RAW, within(["Knowledge/"]), FOOTER_OPT]},
   {"id": 6, "eval_name": "doubt-to-verify", "prompt": "Lumen Notes 페이지에 Jane Doe 가 디자인 리드라고 돼 있던데, 그거 아직 맞아? 출처 다시 확인해 봐.",
    "expected_output": "A foreground verify subagent checks the claim against the Raws (the 2026-11-25 leadership update makes her CTO). The source-check request authorizes no writes, and there is no Wiki line.",
-   "files": ["evals/fixture-vault"], "targets": {},
+   "files": ["fixture-vault"], "targets": {},
    "expectations": mode_common("verify", reads=["Knowledge/Products/Lumen Notes.md", "Sources/" + LEADERSHIP + ".md"]) + [
      {"text": "The answer concludes in its own words that Jane Doe is now CTO, with no conflicting person or current role in any answer turn", "check": "answer_line", "regex": VERDICT, "unquoted": True, "asserted": True, "attribution": [
        r"(?i)\b(?:says?|said|reports?|reported|claims?|claimed|states?|stated|writes?|wrote|suggests?|suggested|alleges?|alleged)\s+(?:that\s+)?Jane Doe\b",
@@ -276,7 +276,7 @@ mode = {
      {"text": "The report-only answer has no Wiki line", "check": "answer_no_wiki_line"}]},
   {"id": 7, "eval_name": "solved-howto-guide", "prompt": SOLVED,
    "expected_output": "The How-to solved and confirmed in the conversation becomes a Guide page (layer: guides) in Knowledge/Guides/ from the ingest guide template, with no Raw, MOC, or index/log changes; last line `Wiki: created [[...]]`.",
-   "files": ["evals/fixture-vault"], "targets": {"guide": {"glob": "Knowledge/Guides/*.md", "name_regex": "", "state": "created"}},
+   "files": ["fixture-vault"], "targets": {"guide": {"glob": "Knowledge/Guides/*.md", "name_regex": "", "state": "created"}},
    "expectations": [
      {"text": "The guide is written by ingest in a finished subagent that opened ingest/SKILL.md and wrote it; the main thread writes nothing to the wiki", "check": "routed", "skill": "ingest", "writes": True},
      mode_common("ingest")[1],
@@ -288,7 +288,7 @@ mode = {
      {"text": "The answer's last line is the only `Wiki:` line, names the Guide as created, and its pages are exactly the wiki pages written", "check": "footer_matches", "require": {"created": ["."]}}]},
   {"id": 8, "eval_name": "unsolved-howto-no-guide", "prompt": "Lumen Notes 에서 transclusion 한 노트를 plain text 로 export 하는 방법 알아? 'Export as Markdown' 이랑 'Flatten embeds' 둘 다 해봤는데 embed 가 그대로 남아. 아직 못 풀었어.",
    "expected_output": "No Guide page is created for the unsolved How-to; an unknown word may still go to term; Wiki line only if something was written.",
-   "files": ["evals/fixture-vault"], "targets": {},
+   "files": ["fixture-vault"], "targets": {},
    "expectations": [
      {"text": "No Guide page (layer: guides) is created for the unsolved How-to", "check": "count_created", "glob": "*", "frontmatter_equals": {"layer": "guides"}, "max": 0},
      {"text": "Nothing is created, modified or deleted in the Guides folder", "check": "no_changes_under", "prefix": "Knowledge/Guides/"},
@@ -297,7 +297,7 @@ mode = {
   {"id": 9, "eval_name": "approved-query-write-back",
    "prompt": "I studied spaced repetition in my vault before. Compare its purpose and mechanism with the idea of a backlink using the relevant existing vault pages. Save this substantial comparison as a new Query result; I explicitly approve the query skill’s usual wiki index and log updates, but no edits to existing knowledge pages.",
    "expected_output": "One answer comparing the two ideas with both vault citations, after the foreground query worker writes a new Query note and updates index and log without parent narration. The final Wiki line lists all three.",
-   "files": ["evals/fixture-vault"],
+   "files": ["fixture-vault"],
    "fixture_append": {"Guideline.md": "\nSaved Query results belong in the wiki subfolder `Queries/`.\n",
                       "Knowledge/index.md": "# Wiki Index\n\n## Queries\n\n## Recent Queries\n\n## Stats\n",
                       "Knowledge/log.md": "# Wiki Log\n"},

@@ -1,8 +1,8 @@
 {
   "skill_name": "lint",
-  "fixture": "evals/fixture-vault",
+  "fixture": "fixture-vault",
   "policy": {
-    "source": "evals/fixture-vault/Guideline.md",
+    "source": "fixture-vault/Guideline.md",
     "wiki": [
       "Knowledge"
     ],
@@ -28,10 +28,10 @@
     {
       "id": 1,
       "eval_name": "fm-key-order",
-      "prompt": "Lint the vault at evals/fixture-vault (its live policy is Guideline.md). Are the frontmatter keys in alphabetical order everywhere?",
+      "prompt": "Lint the vault at fixture-vault (its live policy is Guideline.md). Are the frontmatter keys in alphabetical order everywhere?",
       "expected_output": "Reports Key Order.md with each out-of-order pair and its line; reports no other note for key order.",
       "files": [
-        "evals/fixture-vault"
+        "fixture-vault"
       ],
       "expectations": [
         "The report lists Knowledge/Broken/Key Order.md line 3 as `type > aliases`",
@@ -66,10 +66,10 @@
     {
       "id": 2,
       "eval_name": "fm-url-keys",
-      "prompt": "Check evals/fixture-vault for external URLs in wiki-page frontmatter that are not under a *_url key, *_url values that are not plain URLs, and the retired youtube and x keys.",
+      "prompt": "Check fixture-vault for external URLs in wiki-page frontmatter that are not under a *_url key, *_url values that are not plain URLs, and the retired youtube and x keys.",
       "expected_output": "Reports the non-plain blog_url value, every URL under source and website, and the two retired keys in URL Keys.md; a non-product homepage under `url`, youtube_url and the Raw note's plain URL under source are not reported.",
       "files": [
-        "evals/fixture-vault"
+        "fixture-vault"
       ],
       "expectations": [
         "blog_url is reported because its value is a markdown link, not a plain URL",
@@ -133,7 +133,7 @@
       "prompt": "Read the product types from the fixture vault's Guideline.md and lint product Entities for a bare url frontmatter key.",
       "expected_output": "Reports FM-PRODUCT-URL on Quillstone CLI.md and the layer-classified Junefold CLI.md. Recommends github_url for github.com and www.github.com, and website_url for every other hostname.",
       "files": [
-        "evals/fixture-vault"
+        "fixture-vault"
       ],
       "expectations": [
         "Quillstone CLI.md is in a registered Entity folder and receives github_url for its github.com URL",
@@ -198,10 +198,10 @@
     {
       "id": 3,
       "eval_name": "bare-url",
-      "prompt": "Does any note body in evals/fixture-vault contain a raw URL instead of a [label](URL) link?",
+      "prompt": "Does any note body in fixture-vault contain a raw URL instead of a [label](URL) link?",
       "expected_output": "Reports the bare URL in Bare URL.md from link-lint.py; the same URL as a [label](URL) link on the next paragraph is fine.",
       "files": [
-        "evals/fixture-vault"
+        "fixture-vault"
       ],
       "expectations": [
         "The report lists BARE-URL for Knowledge/Broken/Bare URL.md line 10",
@@ -227,10 +227,10 @@
     {
       "id": 4,
       "eval_name": "entity-unlinked",
-      "prompt": "In evals/fixture-vault, find Entity titles or aliases that appear without [[ ]] in wiki pages, in the body or in frontmatter. Read the Entity folders from the guideline and use layer: entities as a fallback.",
+      "prompt": "In fixture-vault, find Entity titles or aliases that appear without [[ ]] in wiki pages, in the body or in frontmatter. Read the Entity folders from the guideline and use layer: entities as a fallback.",
       "expected_output": "Reports the unlinked names in Unlinked Entity.md and Horizontal Rule.md, each with the page it should link.",
       "files": [
-        "evals/fixture-vault"
+        "fixture-vault"
       ],
       "expectations": [
         "organization: Northwind Labs is reported with [[Northwind Labs]] as the target",
@@ -294,7 +294,7 @@
       "prompt": "Lint Entity Folder Mentions.md for unlinked Entities using the Entity folders in the fixture's Guideline.md.",
       "expected_output": "Reports Fieldstone Studio and its alias despite the missing layer, and finds Layer Fallback Studio via layer outside the registered folders.",
       "files": [
-        "evals/fixture-vault"
+        "fixture-vault"
       ],
       "expectations": [
         "Fieldstone Studio and Fieldstone are reported without layer: entities",
@@ -330,10 +330,10 @@
     {
       "id": 5,
       "eval_name": "status-outside-lifecycle",
-      "prompt": "Which notes in evals/fixture-vault carry a status key even though the guideline says only lifecycle notes may?",
+      "prompt": "Which notes in fixture-vault carry a status key even though the guideline says only lifecycle notes may?",
       "expected_output": "Reads the lifecycle types from Guideline.md. The project keeps its status; status on unrelated notes is reported.",
       "files": [
-        "evals/fixture-vault"
+        "fixture-vault"
       ],
       "expectations": [
         "The lifecycle types are taken from Guideline.md, not assumed",
@@ -375,7 +375,7 @@
       "prompt": "Which notes in the fixture can carry the owner's book reading status?",
       "expected_output": "Only the book with a real Reading Progress heading in the Entity folder keeps its status; a catalog book, a misplaced book, a nonbook and a chapter Raw are reported.",
       "files": [
-        "evals/fixture-vault"
+        "fixture-vault"
       ],
       "expectations": [
         "The reading-progress book in the registered Entity folder is not reported",
@@ -417,10 +417,10 @@
     {
       "id": 6,
       "eval_name": "hr-in-wiki",
-      "prompt": "Find horizontal rules in wiki page bodies in evals/fixture-vault.",
+      "prompt": "Find horizontal rules in wiki page bodies in fixture-vault.",
       "expected_output": "Reports the --- and *** rules in Horizontal Rule.md; the --- inside its code block, the frontmatter fences and the rules in the Raw and work notes are not reported.",
       "files": [
-        "evals/fixture-vault"
+        "fixture-vault"
       ],
       "expectations": [
         "Knowledge/Broken/Horizontal Rule.md lines 12 and 16 are reported",
@@ -453,10 +453,10 @@
     {
       "id": 7,
       "eval_name": "auto-zone",
-      "prompt": "Are there any leftover append-only auto zones (## Wiki or ## From Sources) in wiki pages of evals/fixture-vault?",
+      "prompt": "Are there any leftover append-only auto zones (## Wiki or ## From Sources) in wiki pages of fixture-vault?",
       "expected_output": "Reports both headings in Auto Zone.md.",
       "files": [
-        "evals/fixture-vault"
+        "fixture-vault"
       ],
       "expectations": [
         "Knowledge/Broken/Auto Zone.md line 12 `## Wiki` and line 16 `## From Sources` are reported",
@@ -488,10 +488,10 @@
     {
       "id": 8,
       "eval_name": "dup-heading",
-      "prompt": "Check evals/fixture-vault for notes that repeat a heading.",
+      "prompt": "Check fixture-vault for notes that repeat a heading.",
       "expected_output": "Reports the second ## Notes in Duplicate Heading.md.",
       "files": [
-        "evals/fixture-vault"
+        "fixture-vault"
       ],
       "expectations": [
         "Knowledge/Broken/Duplicate Heading.md line 14 is reported",
@@ -515,10 +515,10 @@
     {
       "id": 9,
       "eval_name": "broken-link",
-      "prompt": "List wikilinks in note bodies of evals/fixture-vault whose target note does not exist.",
+      "prompt": "List wikilinks in note bodies of fixture-vault whose target note does not exist.",
       "expected_output": "link-lint.py reports [[Missing Page]] in Broken Link.md; the dated Raw title resolves.",
       "files": [
-        "evals/fixture-vault"
+        "fixture-vault"
       ],
       "expectations": [
         "Knowledge/Broken/Broken Link.md line 12 [[Missing Page]] is reported as BROKEN",
@@ -546,7 +546,7 @@
       "prompt": "Check whether Frontmatter Entity Link.md links Fieldstone Studio in its body.",
       "expected_output": "The frontmatter link is valid but does not satisfy the unlinked body mention.",
       "files": [
-        "evals/fixture-vault"
+        "fixture-vault"
       ],
       "expectations": [
         "The body mention on line 6 needs a wikilink"
@@ -569,7 +569,7 @@
       "prompt": "Check Citation Entity Label.md for unlinked body entities.",
       "expected_output": "The authored external link label mentions Fieldstone Studio but does not link the vault entity.",
       "files": [
-        "evals/fixture-vault"
+        "fixture-vault"
       ],
       "expectations": [
         "The entity named in Citation Entity Label.md and the entity alias in Bare URL.md need wikilinks"
@@ -598,7 +598,7 @@
       "prompt": "Lint the legacy Raw Verbatim Markdown Boundary.md for bare links.",
       "expected_output": "Does not interpret the original article's Ingest Notes heading as authored commentary.",
       "files": [
-        "evals/fixture-vault"
+        "fixture-vault"
       ],
       "expectations": [
         "The Raw has no findings"
@@ -617,7 +617,7 @@
       "prompt": "Check Chapter Reading Boundary.md for bare links.",
       "expected_output": "Lints the authored Reading Notes after the boundary but not the preserved original chapter.",
       "files": [
-        "evals/fixture-vault"
+        "fixture-vault"
       ],
       "expectations": [
         "Only the authored link on line 14 is flagged"
@@ -640,7 +640,7 @@
       "prompt": "Check Daily Note Links.md and Broken Daily Note Links.md for missing targets under the fixture's daily-notes policy.",
       "expected_output": "Valid daily-note links are planned; the misspelling, invalid date, wrong folder and missing heading target remain broken.",
       "files": [
-        "evals/fixture-vault"
+        "fixture-vault"
       ],
       "expectations": [
         "Daily Note Links.md has no findings",
@@ -682,10 +682,10 @@
     {
       "id": 13,
       "eval_name": "broken-heading",
-      "prompt": "Check evals/fixture-vault for links to headings that do not exist in the target note.",
+      "prompt": "Check fixture-vault for links to headings that do not exist in the target note.",
       "expected_output": "marksman-lint.py reports [[Backlink#Missing Heading]] in Broken Link.md.",
       "files": [
-        "evals/fixture-vault"
+        "fixture-vault"
       ],
       "expectations": [
         "Knowledge/Broken/Broken Link.md line 14 is reported as BROKEN-HEADING",
@@ -710,10 +710,10 @@
     {
       "id": 14,
       "eval_name": "broken-frontmatter-link",
-      "prompt": "Do any frontmatter link fields in evals/fixture-vault point at notes that do not exist?",
+      "prompt": "Do any frontmatter link fields in fixture-vault point at notes that do not exist?",
       "expected_output": "link-lint.py --checks policy reports [[Missing Related]] under related in Broken Link.md, on the line of its key.",
       "files": [
-        "evals/fixture-vault"
+        "fixture-vault"
       ],
       "expectations": [
         "Knowledge/Broken/Broken Link.md line 4 related: [[Missing Related]] is reported as BROKEN",
@@ -738,10 +738,10 @@
     {
       "id": 25,
       "eval_name": "table-escaped-alias",
-      "prompt": "Check the wikilinks inside tables in evals/fixture-vault for links to notes that do not exist.",
+      "prompt": "Check the wikilinks inside tables in fixture-vault for links to notes that do not exist.",
       "expected_output": "link-lint.py reads `\\|` inside a wikilink as the alias separator, as Obsidian does in a table cell: it reports [[Missing Table Page\\|missing]] in Table Alias Missing.md, and neither [[Table Alias\\|the resolving table]] there nor [[Backlink\\|backlinks]] in Table Alias.md.",
       "files": [
-        "evals/fixture-vault"
+        "fixture-vault"
       ],
       "expectations": [
         "Knowledge/Broken/Table Alias Missing.md line 6 [[Missing Table Page\\|missing]] is reported as BROKEN",
@@ -765,10 +765,10 @@
     {
       "id": 24,
       "eval_name": "orphan",
-      "prompt": "Which wiki pages in evals/fixture-vault does no other note link to?",
+      "prompt": "Which wiki pages in fixture-vault does no other note link to?",
       "expected_output": "Reports every page under Knowledge/ with no inbound wikilink from another note, using the whole vault as link source; the MOC and linked pages are not reported.",
       "files": [
-        "evals/fixture-vault"
+        "fixture-vault"
       ],
       "expectations": [
         "Each Knowledge/ page no other note wikilinks to is reported as ORPHAN on line 1",
@@ -918,10 +918,10 @@
     {
       "id": 12,
       "eval_name": "fm-invalid",
-      "prompt": "Some notes in evals/fixture-vault show no properties in Obsidian. Which ones have frontmatter that does not parse?",
+      "prompt": "Some notes in fixture-vault show no properties in Obsidian. Which ones have frontmatter that does not parse?",
       "expected_output": "Reports Invalid Frontmatter.md, whose repeated status key makes the YAML invalid, and runs no other frontmatter check on it.",
       "files": [
-        "evals/fixture-vault"
+        "fixture-vault"
       ],
       "expectations": [
         "Knowledge/Broken/Invalid Frontmatter.md is reported as FM-INVALID on line 1",
@@ -943,10 +943,10 @@
     {
       "id": 10,
       "eval_name": "clean-notes",
-      "prompt": "Run the scripted checks of lint (link form, frontmatter and structure, marksman) over evals/fixture-vault and tell me which notes they leave clean.",
+      "prompt": "Run the scripted checks of lint (link form, frontmatter and structure, marksman) over fixture-vault and tell me which notes they leave clean.",
       "expected_output": "No scripted finding for the sample pages: the person, organization, product, term, concept, Raw, project note, MOC and guideline.",
       "files": [
-        "evals/fixture-vault"
+        "fixture-vault"
       ],
       "expectations": [
         "None of the clean files has a finding from link-lint.py or marksman-lint.py",
@@ -976,7 +976,7 @@
       "prompt": "Flag parenthesized bare URLs in authored prose without flagging the preserved Raw text.",
       "expected_output": "Flags bare URLs in ordinary pages and in Ingest Notes, but not within genuine Raw Original Content or in labeled links.",
       "files": [
-        "evals/fixture-vault"
+        "fixture-vault"
       ],
       "expectations": [
         "Only the authored parenthesized bare URLs are reported"
@@ -1011,15 +1011,15 @@
     {
       "id": 11,
       "eval_name": "report-only",
-      "prompt": "lint evals/fixture-vault and fix whatever frontmatter problems you find",
+      "prompt": "lint fixture-vault and fix whatever frontmatter problems you find",
       "expected_output": "Runs the checks and reports every finding without editing any note; routes frontmatter fixes (key order, URL keys, status) to the Obsidian Linter plugin and body fixes to the owner or the writing skill.",
       "files": [
-        "evals/fixture-vault"
+        "fixture-vault"
       ],
       "expectations": [
         "Wiki, source and work folders and the lifecycle types are read from Guideline.md, not assumed",
         "Obsidian CLI is used only if Obsidian already has the fixture vault open; otherwise link-lint.py --checks policy runs and the report says which path ran",
-        "No note in evals/fixture-vault is modified, and no wiki log entry is written",
+        "No note in fixture-vault is modified, and no wiki log entry is written",
         "The report names the Obsidian Linter plugin for key order and other frontmatter fixes"
       ]
     }

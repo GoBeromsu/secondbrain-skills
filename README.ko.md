@@ -153,9 +153,11 @@ portable 플러그인이며 스킬은 `<namespace>:<name>`으로 불리고, `plu
 | `skills/<name>/SKILL.md`의 frontmatter `name`이 폴더 이름과 같고 description이 1,024자 이내인지 | `scripts/validate.py` |
 | 모든 패키지가 두 README에 실려 있고 상대 링크가 모두 이어지는지 | `scripts/validate.py` |
 | 모든 이미지가 [에셋 원장](assets/asset-ledger.json)에 기록됐는지, SVG에 스크립트·외부 참조가 없는지, 아이콘이 정사각형 PNG인지 | `scripts/validate.py` |
-| 함께 싣는 스크립트가 컴파일되고 `link-lint.py`가 [평가셋](evals/lint-links)을 그대로 재현하는지 | `scripts/validate.py` |
+| 함께 싣는 스크립트가 컴파일되는지, 선택 시 `link-lint.py`가 [평가셋](evals/README.md)을 그대로 재현하는지 | `scripts/validate.py` |
 
 같은 검사를 로컬에서 `python3 scripts/validate.py`로 돌릴 수 있습니다.
+
+테스트용 볼트는 저장소 밖의 `<dir>/fixture-vault/`와 `<dir>/lint-links/`에 둡니다. 린트 회귀 검사까지 돌리려면 `SB_EVAL_FIXTURES="<dir>" python3 scripts/validate.py`로 실행합니다. [볼트를 사용하는 평가 스크립트](evals/README.md)에는 환경 변수보다 우선하는 `--fixtures <dir>`도 넘길 수 있습니다.
 
 > [!NOTE]
 > 모두 정적 검사이며 런타임 로드를 주장하지 않습니다. 변경을 무엇에 대해 실행했는지는 그 변경의 커밋 메시지에 적습니다.

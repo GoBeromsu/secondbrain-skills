@@ -1,6 +1,6 @@
 {
   "skill_name": "concept",
-  "fixture": "evals/fixture-vault",
+  "fixture": "fixture-vault",
   "baseline_skill": "principle-knowledge-notes",
   "wiki": "Knowledge/",
   "evals": [
@@ -10,7 +10,7 @@
       "prompt": "Projects/Lumen Notes Import Plan.md 에 적어 둔 progressive summarization 말인데, 이 방법론이 정확히 어떻게 돌아가는 거야? 짧은 노트에도 쓸 만해?",
       "expected_output": "Creates Knowledge/Concepts/Progressive Summarization.md from assets/concept.md with Sources links, turns only the first mention in the work note into a wikilink, saves no Raw; reports `Wiki: created [[Progressive Summarization]]`.",
       "files": [
-        "evals/fixture-vault"
+        "fixture-vault"
       ],
       "targets": {
         "page": {
@@ -109,7 +109,7 @@
       "prompt": "Spaced repetition 이랑 Leitner system 은 어떻게 연결돼? 전에 정리해 둔 간격 반복 노트에 보태줘.",
       "expected_output": "Updates Knowledge/Concepts/Spaced Repetition.md with the Leitner connection (no duplicate page), migrated to the concept template; reports `Wiki: updated [[Spaced Repetition]]`.",
       "files": [
-        "evals/fixture-vault"
+        "fixture-vault"
       ],
       "targets": {},
       "expectations": [
