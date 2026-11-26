@@ -63,7 +63,7 @@ Forty-one independent packages. Every row links to the `SKILL.md` that defines i
 | | [`concept`](skills/concept/SKILL.md) | Research an idea or method and write or update its Concept page. |
 | | [`entity`](skills/entity/SKILL.md) | Research a named thing and write or update its Entity page from its type template. |
 | **Ask** | [`query`](skills/query/SKILL.md) | Answer from the Wiki with citations, and feed gaps back into it. |
-| **Mode** | [`secondbrain-mode`](skills/secondbrain-mode/SKILL.md) | While on, route new words, methods and named things to background wiki writes and report them in one line. |
+| **Mode** | [`secondbrain-mode`](skills/secondbrain-mode/SKILL.md) | While on, route new words, methods and named things to wiki workers. One runs in the foreground; two or more run in the background. The parent waits silently and reports writes in one line. |
 | **Shelf care** | [`lint`](skills/lint/SKILL.md) | Mechanical health: links, placement, frontmatter, index and log sync. |
 | | [`audit`](skills/audit/SKILL.md) | Sample Wiki pages per Map cluster and score their quality, read-only. |
 | | [`verify`](skills/verify/SKILL.md) | Check one page's claims against its cited evidence. |
