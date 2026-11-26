@@ -63,7 +63,7 @@ claude plugin install secondbrain-skills@secondbrain-skills
 | | [`concept`](skills/concept/SKILL.md) | 아이디어나 방법론을 조사해 Concept 페이지를 쓰거나 고칩니다. |
 | | [`entity`](skills/entity/SKILL.md) | 이름 있는 대상을 조사해 타입별 템플릿으로 Entity 페이지를 쓰거나 고칩니다. |
 | **묻기** | [`query`](skills/query/SKILL.md) | 위키에서 출처를 달아 답하고, 빈 곳을 위키로 되돌립니다. |
-| **모드** | [`secondbrain-mode`](skills/secondbrain-mode/SKILL.md) | 켜 두면 새 단어, 방법론, 이름 있는 대상을 백그라운드에서 위키에 쓰고 한 줄로 보고합니다. |
+| **모드** | [`secondbrain-mode`](skills/secondbrain-mode/SKILL.md) | 켜 두면 새 단어, 방법론, 이름 있는 대상의 위키 작업을 서브에이전트에 맡깁니다. 하나면 포그라운드에서, 둘 이상이면 백그라운드에서 실행합니다. 상위 에이전트는 말없이 기다린 뒤 기록 결과를 한 줄로 보고합니다. |
 | **서가 관리** | [`lint`](skills/lint/SKILL.md) | 링크, 위치, frontmatter, 색인·로그 동기화 같은 기계적 건강 검사. |
 | | [`audit`](skills/audit/SKILL.md) | Map 묶음별로 위키 페이지를 표본 추출해 품질을 매깁니다(읽기 전용). |
 | | [`verify`](skills/verify/SKILL.md) | 한 페이지의 주장을 인용한 증거와 대조합니다. |

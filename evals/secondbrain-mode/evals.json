@@ -22,7 +22,7 @@
       },
       "expectations": [
         {
-          "text": "Finished background term workers opened their skill and performed all wiki writes; the main thread writes nothing to the wiki",
+          "text": "Finished term workers opened their skill and performed all wiki writes; the main thread writes nothing to the wiki",
           "check": "routed",
           "skill": "term",
           "writes": true,
@@ -85,6 +85,11 @@
               "(?i)^Idempoten"
             ]
           }
+        },
+        {
+          "text": "The single routed worker was not run in background and the parent waited for its return",
+          "check": "foreground",
+          "skill": "term"
         }
       ]
     },
@@ -105,7 +110,7 @@
       },
       "expectations": [
         {
-          "text": "Finished background concept workers opened their skill and performed all wiki writes; the main thread writes nothing to the wiki",
+          "text": "Finished concept workers opened their skill and performed all wiki writes; the main thread writes nothing to the wiki",
           "check": "routed",
           "skill": "concept",
           "writes": true,
@@ -168,6 +173,11 @@
               "(?i)^Zettelkasten"
             ]
           }
+        },
+        {
+          "text": "The single routed worker was not run in background and the parent waited for its return",
+          "check": "foreground",
+          "skill": "concept"
         }
       ]
     },
@@ -188,7 +198,7 @@
       },
       "expectations": [
         {
-          "text": "Finished background entity workers opened their skill and performed all wiki writes; the main thread writes nothing to the wiki",
+          "text": "Finished entity workers opened their skill and performed all wiki writes; the main thread writes nothing to the wiki",
           "check": "routed",
           "skill": "entity",
           "writes": true,
@@ -251,6 +261,11 @@
               "(?i)^Logseq"
             ]
           }
+        },
+        {
+          "text": "The single routed worker was not run in background and the parent waited for its return",
+          "check": "foreground",
+          "skill": "entity"
         }
       ]
     },
@@ -270,7 +285,7 @@
       },
       "expectations": [
         {
-          "text": "Finished background ingest workers opened their skill and performed all wiki writes; the main thread writes nothing to the wiki",
+          "text": "Finished ingest workers opened their skill and performed all wiki writes; the main thread writes nothing to the wiki",
           "check": "routed",
           "skill": "ingest",
           "writes": true,
@@ -365,6 +380,11 @@
         {
           "text": "The sole final `Wiki:` line reports exactly the created, updated, and failed wiki write outcomes",
           "check": "footer_matches"
+        },
+        {
+          "text": "The single routed worker was not run in background and the parent waited for its return",
+          "check": "foreground",
+          "skill": "ingest"
         }
       ]
     },
@@ -379,7 +399,7 @@
       "targets": {},
       "expectations": [
         {
-          "text": "Finished background query workers opened their skill and read the relevant notes; the main thread writes nothing to the wiki",
+          "text": "Finished query workers opened their skill and read the relevant notes; the main thread writes nothing to the wiki",
           "check": "routed",
           "skill": "query",
           "writes": false,
@@ -440,6 +460,11 @@
           "text": "A `Wiki:` last line appears exactly when wiki writes succeeded or failed, and names exactly those outcomes",
           "check": "footer_matches",
           "optional": true
+        },
+        {
+          "text": "The single routed worker was not run in background and the parent waited for its return",
+          "check": "foreground",
+          "skill": "query"
         }
       ]
     },
@@ -447,14 +472,14 @@
       "id": 6,
       "eval_name": "doubt-to-verify",
       "prompt": "Lumen Notes 페이지에 Jane Doe 가 디자인 리드라고 돼 있던데, 그거 아직 맞아? 출처 다시 확인해 봐.",
-      "expected_output": "A background verify subagent checks the claim against the Raws (the 2026-11-25 leadership update makes her CTO). The source-check request authorizes no writes, and there is no Wiki line.",
+      "expected_output": "A foreground verify subagent checks the claim against the Raws (the 2026-11-25 leadership update makes her CTO). The source-check request authorizes no writes, and there is no Wiki line.",
       "files": [
         "evals/fixture-vault"
       ],
       "targets": {},
       "expectations": [
         {
-          "text": "Finished background verify workers opened their skill and read the relevant notes; the main thread writes nothing to the wiki",
+          "text": "Finished verify workers opened their skill and read the relevant notes; the main thread writes nothing to the wiki",
           "check": "routed",
           "skill": "verify",
           "writes": false,
@@ -510,6 +535,11 @@
         {
           "text": "The report-only answer has no Wiki line",
           "check": "answer_no_wiki_line"
+        },
+        {
+          "text": "The single routed worker was not run in background and the parent waited for its return",
+          "check": "foreground",
+          "skill": "verify"
         }
       ]
     },
@@ -530,7 +560,7 @@
       },
       "expectations": [
         {
-          "text": "The guide is written by ingest in a finished background subagent that opened ingest/SKILL.md and wrote it; the main thread writes nothing to the wiki",
+          "text": "The guide is written by ingest in a finished subagent that opened ingest/SKILL.md and wrote it; the main thread writes nothing to the wiki",
           "check": "routed",
           "skill": "ingest",
           "writes": true
@@ -627,6 +657,11 @@
               "."
             ]
           }
+        },
+        {
+          "text": "The single routed worker was not run in background and the parent waited for its return",
+          "check": "foreground",
+          "skill": "ingest"
         }
       ]
     },
@@ -703,6 +738,10 @@
           "text": "A `Wiki:` last line appears exactly when wiki writes succeeded or failed, and names exactly those outcomes",
           "check": "footer_matches",
           "optional": true
+        },
+        {
+          "text": "No wiki worker is required; one runs in foreground and returns before the answer; multiple all launch in background before waiting",
+          "check": "optional_launch_mode"
         }
       ]
     },
@@ -710,7 +749,7 @@
       "id": 9,
       "eval_name": "approved-query-write-back",
       "prompt": "I studied spaced repetition in my vault before. Compare its purpose and mechanism with the idea of a backlink using the relevant existing vault pages. Save this substantial comparison as a new Query result; I explicitly approve the query skill’s usual wiki index and log updates, but no edits to existing knowledge pages.",
-      "expected_output": "One answer comparing the two ideas with both vault citations, after a silent background query writes a new Query note and updates index and log. The final Wiki line lists all three.",
+      "expected_output": "One answer comparing the two ideas with both vault citations, after the foreground query worker writes a new Query note and updates index and log without parent narration. The final Wiki line lists all three.",
       "files": [
         "evals/fixture-vault"
       ],
@@ -727,7 +766,7 @@
       },
       "expectations": [
         {
-          "text": "A finished background query opens its skill, reads both relevant notes and performs every wiki write; the parent writes nothing",
+          "text": "A finished query opens its skill, reads both relevant notes and performs every wiki write; the parent writes nothing",
           "check": "routed",
           "skill": "query",
           "writes": true,
@@ -793,6 +832,11 @@
         {
           "text": "The sole final `Wiki:` line reports exactly the created, updated, and failed wiki write outcomes",
           "check": "footer_matches"
+        },
+        {
+          "text": "The single routed worker was not run in background and the parent waited for its return",
+          "check": "foreground",
+          "skill": "query"
         }
       ]
     }
