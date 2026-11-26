@@ -15,11 +15,7 @@ related:
 source:
   - "[[{paper Raw, only when the vault has one}]]"
 tags:
-  - {subject tag 1}
-  - {subject tag 2}
-  - {subject tag 3}
-  - {subject tag 4}
-  - {subject tag 5}
+  - {subject tag, about five}
 title: "{full title}"
 type: {paper type the live policy uses}
 venue: "{journal or conference}"

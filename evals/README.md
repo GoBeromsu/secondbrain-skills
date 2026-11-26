@@ -179,6 +179,14 @@ Note-kind fix: `term`, `concept`, `entity` and `secondbrain-mode` choose the kin
 | entity | 99% | 99% | place `layer` flakes 1/4 in both |
 | secondbrain-mode | 97% (full 84/87) | 95% (full 82/87) | pre-dispatch narration in both, run to run |
 
+Note-skill trim (0.30.1): the steps `term`, `concept` and `entity` each repeated moved to "Writing one page" in `principle-knowledge-notes`. concept 8,703 → 6,028, entity 29,918 → 25,115, term 10,755 → 7,420 bytes; the principle +3,326; net −7.5 KB. Results in `evals/results/trim3-workspace/<skill>/iteration-1/`.
+
+| Suite | New | Old |
+| --- | --- | --- |
+| term | 33/33 | 33/33 |
+| concept | 19/19 | 18/19 |
+| entity | 45/45 | 45/45 |
+
 ### R3 history (earlier rubric)
 
 | Skill | Iteration | `with_skill` | 0.28.1 `old_skill` |

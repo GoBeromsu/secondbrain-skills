@@ -15,11 +15,7 @@ related:
 source:
   - "[[{Raw or owner record the page draws on}]]"
 tags:
-  - {subject tag 1}
-  - {subject tag 2}
-  - {subject tag 3}
-  - {subject tag 4}
-  - {subject tag 5}
+  - {subject tag, about five}
 type: {product type the live policy uses}
 website_url: {plain URL on any other host, including GitLab, github.io or cli.github.com}
 # A product may carry both URL slots. Omit unknown slots and never use a bare url key.

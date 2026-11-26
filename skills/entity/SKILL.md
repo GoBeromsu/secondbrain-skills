@@ -6,13 +6,11 @@ license: MIT
 
 # Entity
 
-Research one identifiable thing and leave the wiki with one Entity page that tells the owner what a source alone cannot: what it is, where it came from, how it really works, and what their own records show about it. The answer the user asked for comes first; the page is written after, and the report names it.
-
-Every type is revised and consolidated: the page is one sourced synthesis, rewritten as evidence grows, with no append-only zone. Open each principle named at a step by reading `../<principle>/SKILL.md` before acting on that step.
+Research one identifiable thing and leave the wiki with one Entity page that tells the owner what a source alone cannot: what it is, where it came from, how it really works, and what their own records show about it. Every type is one sourced synthesis, rewritten as evidence grows, with no append-only zone. Open each principle named at a step by reading `../<principle>/SKILL.md` before acting on that step; `principle-knowledge-notes`' Writing one page governs roles, lookup, title, form, entity links, the work note and the report.
 
 ## Step 1 — Resolve the type, the vault roles and the target
 
-Open `principle-knowledge-notes` and confirm by its criteria, not the owner's label, that the thing is one named individual; otherwise follow its rule for a mislabeled request. Then pick the type and its template.
+Open `principle-knowledge-notes` and `principle-editing`. Confirm by the principle's criteria, not the owner's label, that the thing is one named individual; when it is a kind (a Term or Concept), name that kind and why, and ask once before writing. Then pick the type and its template.
 
 | Type | What it is | Template |
 | --- | --- | --- |
@@ -25,23 +23,19 @@ Open `principle-knowledge-notes` and confirm by its criteria, not the owner's la
 | `product` | named software, a service, a library, an agent, a model or a dataset | [product](assets/product.md) |
 | optional | any other named individual: an event, a movie, an album, a game title | [other](assets/other.md) |
 
-A template the vault registers for the type wins over these for frontmatter keys and headings, except that it never brings back an append-only zone (`## Wiki`, `## From Sources`).
+A registered template never brings back an append-only zone (`## Wiki`, `## From Sources`).
 
-The live policy decides each type's folder. Creating or adding to an Entity inside an existing type folder needs no approval. A required type with no folder yet gets one without asking: first map it to the folder existing notes of that type or a synonym already use (`channel` → media, `people` → person), otherwise create one beside the existing Entity folders in their naming and numbering, and name it in the report for the owner to register. For an optional type with no folder, name the type, the proposed folder and the Entities that would go there, and ask the owner; without approval create nothing and list them as candidates. A move or a type correction of an existing Entity happens only on the owner's own request.
-
-Read the vault guideline (live policy) for the folders that play the wiki, source and work roles and for the permanent-notes folder; the type's folder follows the rules above. When the guideline leaves out one of these role mappings this run needs, stop before writing and run `onboard`'s Vault roles step, which asks the owner once and records the answer; never guess a folder. Running as a subagent, return the missing mappings to the main thread instead, which asks once for all of them. Open `principle-editing`.
+Resolve the roles and the permanent-notes folder. The live policy decides each type's folder, and adding to an existing type folder needs no approval. A required type with no folder gets one without asking: the folder existing notes of that type or a synonym already use (`channel` → media, `people` → person), otherwise a new one beside the existing Entity folders in their naming and numbering, named in the report for the owner to register. For an optional type with no folder, name the type, the proposed folder and its Entities and ask; without approval create nothing and list them as candidates.
 
 ## Step 2 — Look the entity up in the vault
 
-Run every `obsidian` command with `vault=<resolved vault>` and give `backlinks` the candidate page as `path=`, as [`obsidian-cli`](../obsidian-cli/SKILL.md) requires; an untargeted command reads whatever vault or note has focus.
-
-Search titles, aliases, handles, translations and identifiers (ISBN, DOI, citekey, repository) with `obsidian search query=<name>` and `obsidian backlinks path=<page>`. An existing page or alias for the same referent is updated, never duplicated, and never moved or retyped; open `principle-writing` and follow [updating](../ingest/references/updating.md): before-image, a separate reviewer, template migration on touch. When the run only brings news, add just the new claims.
+Look it up as the principle describes, adding handles and identifiers (ISBN, DOI, citekey, repository) to the names. Updating an existing page, open `principle-writing`; when the run only brings news, add just the new claims.
 
 ## Step 3 — Gather before writing
 
 One source rarely carries all the page needs, so collect evidence first and write second. Open `principle-archival`.
 
-- **The maker's or subject's own account.** Beyond what triggered the page, read their own pages for origin and mechanism: an about or history page, the documentation of the feature the owner cares about, release notes for what changed; for a repository, the README and the files that carry the claim at one commit. Read as many as the claims need; when a page that should carry the origin could not be found, say which was sought instead of stretching one source.
+- **The maker's or subject's own account.** Beyond what triggered the page, read their own pages for origin and mechanism: an about or history page, the documentation of the feature the owner cares about, release notes for what changed; for a repository, the README and the files that carry the claim at one commit. When a page that should carry the origin could not be found, say which was sought instead of stretching one source.
 - **The owner's record.** Search the whole vault for the name and aliases, not only the notes the request names: daily and periodic notes, project notes, essays, meeting notes. Read each hit in context and note its date; mentions scattered over years are where a change of view lives.
 - **The limits.** For each claim, note what its evidence does not establish: a maker's retrospective is not independent research, a documented rule is not a measured effect.
 
@@ -49,47 +43,31 @@ One source rarely carries all the page needs, so collect evidence first and writ
 
 Fill the type's template. Open `principle-writing` and `principle-markdown`.
 
-Naming:
-
-- Title the page with the full original name, followed by the common abbreviation in parentheses when one is in use. Put abbreviations, translations, former names, handles and romanizations in `aliases`.
-- Title a person with the real name a source confirms, in its original language and script; never infer a real name. When none is confirmed, report it rather than presenting an alias as a real name.
-
-Format:
-
-- About five subject tags. Fill only keys a source supports and omit the rest.
-- When the live policy names `layer: entities` for Entities or types them `wiki-page`, a new page also gets the wiki-page fields of the [frontmatter contract](../ingest/references/frontmatter.md): `layer: entities`, `explored: false`, `confidence` and `verificationStatus: unverified`. An existing page keeps its own `explored`, `confidence` and `verificationStatus` values.
+- Title a person with the real name a source confirms, in its original language and script; never infer one. When none is confirmed, report it rather than presenting an alias as a real name. Handles and romanizations go in `aliases`.
+- When the live policy names `layer: entities` for Entities or types them `wiki-page`, a new page also gets the wiki-page fields of the [frontmatter contract](../ingest/references/frontmatter.md): `layer: entities`, `explored: false`, `confidence` and `verificationStatus: unverified`. An existing page keeps its own `explored`, `confidence` and `verificationStatus`.
 - External URLs follow `principle-markdown`'s `*_url` rule, with `feed_url` and `source_url` as the vault's properties define them. Omit unknown slots; never write a bare `url` on a product, even when a registered template still lists it.
-- When updating an older product, move its `url` by that host rule only when the value is a plain URL and the destination key is absent; otherwise leave it in place and report why. For older keys (`youtube`, `x`, `linkedin`, `website`, `feedUrl`, `repository`), move only a URL with the same meaning; leave a bare handle or conflicting value in place and report it ([updating](../ingest/references/updating.md)). `source` lists vault notes as quoted wikilinks.
-- Quoted words stay as written, so when an entity with a page appears only inside a quotation, link it once in your own prose beside the quotation.
-- Before writing and again at read-back, check the names and aliases in the draft, including comparisons, tables and entities discovered indirectly in other notes' prose or frontmatter. When search is unavailable, follow those notes' wikilinks with direct reads and confirm named candidates in the entity folders registered by the live policy. Link each confirmed entity once in the body, at its first eligible mention; a link in a source note or in this page's frontmatter does not count. Never alter quoted or preserved text.
-- No list of channels or profiles in the body; those are frontmatter keys.
-- English section headings in the template's order. Frontmatter `status` is allowed only on a note in a registered Entity folder with the book Entity type specified by live policy and a real `## Reading Progress` heading. Preserve an existing owner-maintained reading status on such a Book; never set or change it.
-
-Sections:
-
-- **TL;DR** says what it is and, in bold, why it matters to the owner's work, in plain text; on a person page the bold phrase is the fact that matters most.
-- **Origin** names who made it or who they are, when, their relevant background and the problem they said prompted it, then separates that account from what it is today.
-- **Explanation** opens with one concrete worked example and follows the mechanism or work the owner depends on. Bold the one reading a newcomer usually gets wrong. Date changing features, prices, roles and versions.
-- **Personal Insights** is organized under `###` headings named for a theme or judgment, never as a dated list of mentions. Each paragraph cites the records it draws on, quotes the owner's sentence where it carries the judgment, and keeps an earlier view beside the later one that replaced it. A conclusion no record states is labelled as interpretation. When the vault holds no owner record, say so in one sentence.
-- **Footnotes** carry each sourced claim's locator and, where it changes how the claim reads, the limit of that evidence as a fact about the evidence. One named footnote per source passage, reused.
-- **References** lists each external work once, with a nested line giving its publication date, or that none is shown, and what it establishes.
+- Updating an older product, move its `url` by that host rule only when the value is a plain URL and the destination key is absent; otherwise leave it and report why. Older keys (`youtube`, `x`, `linkedin`, `website`, `feedUrl`, `repository`) move only a URL with the same meaning; a bare handle or conflicting value stays and is reported.
+- Channels and profiles are frontmatter keys, never a list in the body.
+- TL;DR's bold phrase says why it matters to the owner's work; on a person, the fact that matters most.
+- Origin separates the maker's or subject's account (who, when, background, the problem they said prompted it) from what it is today.
+- Explanation opens with one concrete worked example and follows the mechanism or work the owner depends on. Bold the one reading a newcomer usually gets wrong. Date changing features, prices, roles and versions.
+- Personal Insights goes under `###` headings named for a theme or judgment, never a dated list of mentions. Each paragraph cites its records, quotes the owner's sentence where it carries the judgment, and keeps an earlier view beside the later one that replaced it. A conclusion no record states is labelled interpretation. With no owner record, say so in one sentence.
+- One named footnote per source passage, reused, with its locator and, where it changes how the claim reads, the limit of that evidence.
 
 ## Type rules
 
-- **person.** The body holds only sourced facts and `## Updates`; the template has no Personal Insights, and the general Personal Insights rule does not apply. Facts a source states about the person go into Origin and Explanation; news goes under `## Updates` as dated lines, newest last: `- [[YYYY-MM-DD]] {fact} — [label](URL)` or `— [[Raw]]`. Impressions the owner wrote do not live on the entity: move them, sentences unchanged, into a separate note in the permanent-notes folder named `{date_created} {Name}`, where `date_created` is the person page's value. That note has `authorship: user` and `related: "[[{Name}]]"`; once it exists, the person page's `related` links it back; until then that `related` item is left out. Writing it is the one permitted new note in the work area.
-- **organization.** Use the name it uses for itself. A branch with its own address is its own Entity. A product it makes, a channel it runs and a place it occupies are separate Entities, linked.
-- **place.** Use the name in local use, qualified by area when shared. A trip or itinerary is not a place. The organization that runs it is its own Entity.
-- **media.** One video, episode, issue or post is a Raw, listed under `## Published`, never an Entity. The person or organization behind it is its own Entity named in `operators`; a channel never replaces its operator's page.
-- **book.** Identity is the work and edition: search by ISBN, author, translator, publisher and edition before creating; a translated or alternate title alone is not a different work, and editions are separate Entities, never merged silently. For a classic, distinguish the recognized local title, the original-language title, the translator and the edition. `author` holds the book's authors. Set bibliographic keys only from the bookstore or publisher page, and label each Bibliographic Record line `observed`, `inferred` or `owner`. The cover is cited as an observed line in the Bibliographic Record. The table of contents is kept in original order and language with its source linked; an empty table of contents is unfinished bibliographic work. Chapter Raws are listed under `## Chapters`, progress as appended dated lines; the latest line for a chapter is its state. `## Highlights` is filled only by the owner or a highlight-sync tool. Keep owner-set `bookstore`, `date_started` and `date_finished` unchanged and never set them. Apply the `status` exception above separately.
-- **paper.** Identity is `doi` and `citekey`, resolved against the actual paper and identical to its Raw; surname plus year is a search hint, never identity. A provisional citekey carries `citekeyProvisional: true`; a later registered key is recorded and the page is never renamed for it. Link the paper's Raw only when the vault has one; a paper researched from the web is cited by `doi` and a `[label](URL)` reference, and no Raw is created for it. `author` holds the paper's authors in source order.
+- **person.** The body holds only sourced facts and `## Updates`; there is no Personal Insights. News goes under `## Updates` as dated lines, newest last: `- [[YYYY-MM-DD]] {fact} — [label](URL)` or `— [[Raw]]`. Impressions the owner wrote do not live on the entity: move them, sentences unchanged, into a new note in the permanent-notes folder named `{date_created} {Name}`, with the person page's `date_created`, `authorship: user` and `related: "[[{Name}]]"`; the person page's `related` then links it back. This is the one permitted new note in the work area.
+- **organization.** The name it uses for itself. A branch with its own address is its own Entity; a product it makes, a channel it runs and a place it occupies are separate Entities, linked.
+- **place.** The name in local use, qualified by area when shared. A trip or itinerary is not a place; the organization that runs it is its own Entity.
+- **media.** One video, episode, issue or post is a Raw listed under `## Published`. The person or organization behind it is its own Entity in `operators`; a channel never replaces its operator's page.
+- **book.** Identity is the work and edition: search by ISBN, author, translator, publisher and edition before creating; a translated or alternate title alone is not a different work, and editions are separate Entities, never merged silently. For a classic, distinguish the recognized local title, the original-language title, the translator and the edition. Set bibliographic keys only from the bookstore or publisher page, and label each Bibliographic Record line `observed`, `inferred` or `owner`, the cover included. Keep the table of contents in original order and language with its source; an empty one is unfinished work. Chapter Raws go under `## Chapters`, progress as appended dated lines whose latest line per chapter is its state. `## Highlights` is filled only by the owner or a highlight-sync tool. Never set or change `bookstore`, `date_started`, `date_finished` or `status`; `status` stays only on a book in a registered Entity folder of the live policy's book type with a real `## Reading Progress` heading.
+- **paper.** Identity is `doi` and `citekey`, resolved against the actual paper and identical to its Raw; surname plus year is a search hint, never identity. A provisional citekey carries `citekeyProvisional: true`; a later registered key is recorded and the page is never renamed for it. Link the paper's Raw only when the vault has one; a paper researched from the web is cited by `doi` and a `[label](URL)` reference, and gets no Raw.
 - **product.** The README, documentation and release notes are evidence, not the page. A pinned repository link already carries its commit; label it plainly (`README`, `LICENSE`) and keep the sha out of prose.
 
 ## Step 5 — Link the work note
 
-When the conversation is about a note in the work area, turn the first mention of the entity in that one note into `[[Entity]]` (or `[[Entity|original text]]`) and change nothing else. The note the conversation is about is one the user named or is working in; a note found only by searching the vault is not it, and no other name in it is linked. Open `principle-editing`.
+Link the entity from the work note as the principle describes. Open `principle-editing`.
 
 ## Step 6 — Read back and report
 
-Read back every note written, as `principle-editing` describes. In the standalone report, put source links, decision-changing principles, any impressions note moved out, type folders created and optional-type candidates awaiting approval before the footer. When routed through secondbrain-mode, return the findings and wiki outcomes separately rather than the standalone report.
-
-The standalone final line is `Wiki: created [[X]], updated [[Y]], failed [[Z]] (reason)`; omit empty clauses. Include only read-back-confirmed changes in the live policy's wiki area, each page once by whether it existed before the task. Use `failed [[Z]] (reason)` only for an attempted wiki write that failed. Omit unattempted work, Raw and other outside-wiki notes, including work-note links and outside-wiki impressions. Omit the line when there are no successful or failed wiki writes. Nothing follows it.
+Read back and report as the principle describes. Before the footer, list source links, any impressions note moved out, type folders created and optional-type candidates awaiting approval; the impressions note stays out of the footer.
