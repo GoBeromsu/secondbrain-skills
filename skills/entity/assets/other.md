@@ -13,11 +13,7 @@ related:
 source:
   - "[[{Raw or owner record the page draws on}]]"
 tags:
-  - {subject tag 1}
-  - {subject tag 2}
-  - {subject tag 3}
-  - {subject tag 4}
-  - {subject tag 5}
+  - {subject tag, about five}
 type: {type the live policy uses for this optional kind}
 url: {plain URL of the canonical page}
 ---

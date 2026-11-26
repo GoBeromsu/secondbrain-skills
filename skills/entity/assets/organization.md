@@ -14,11 +14,7 @@ related:
 source:
   - "[[{Raw or owner record the page draws on}]]"
 tags:
-  - {subject tag 1}
-  - {subject tag 2}
-  - {subject tag 3}
-  - {subject tag 4}
-  - {subject tag 5}
+  - {subject tag, about five}
 type: {organization type the live policy uses}
 url: {plain URL of the canonical homepage}
 ---

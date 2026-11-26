@@ -19,11 +19,7 @@ related:
 source:
   - "[[{Raw or vault note the page draws on}]]"
 tags:
-  - {subject tag 1}
-  - {subject tag 2}
-  - {subject tag 3}
-  - {subject tag 4}
-  - {subject tag 5}
+  - {subject tag, about five}
 type: wiki-page
 verificationStatus: unverified
 ---

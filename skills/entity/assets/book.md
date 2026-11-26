@@ -18,11 +18,7 @@ source:
 source_url: {plain URL of the bookstore or publisher page}
 subtitle: "{subtitle}"
 tags:
-  - {subject tag 1}
-  - {subject tag 2}
-  - {subject tag 3}
-  - {subject tag 4}
-  - {subject tag 5}
+  - {subject tag, about five}
 title: "{title of this edition}"
 total_page: {page count, an integer}
 type: {book type the live policy uses}
