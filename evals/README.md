@@ -16,8 +16,7 @@ Set `export SB_EVAL_FIXTURES="<dir>"` before running the examples below, or pass
 | `<dir>/fixture-vault/` | Shared external fixture vault. `Guideline.md` is its live policy. |
 | `lint/evals.json` | skill-creator eval set for `lint`: one case per check, with the findings it expects, plus `trigger_evals` for description optimization. |
 | `lint/run.py` | Runs the lint scripts on the fixture vault and grades the mechanical cases in `lint/evals.json` (those with `paths`). The report-only case and `trigger_evals` need agent runs, below. |
-| `term/`, `concept/`, `entity/`, `secondbrain-mode/` `evals.json` | skill-creator eval sets for the knowledge skills: agent cases (`evals`) whose `expectations` each name a programmatic check, plus `trigger_evals` for description optimization. |
-| `gen_evals.py` | Regenerates all four knowledge-skill `evals.json` files (`python3 evals/gen_evals.py`). |
+| `term/`, `concept/`, `entity/`, `secondbrain-mode/` `evals.json` | skill-creator eval sets for the knowledge skills: agent cases (`evals`) whose `expectations` each name a programmatic check, plus `trigger_evals` for description optimization. Edit the JSON directly; it is the only source. |
 | `agent_run.py` | Runs those agent cases through `claude -p` on a temp copy of the fixture vault, new skill and 0.28.1 baseline, and grades every expectation. |
 | `trigger_run.py` | Loads the whole plugin and records which skill each trigger query invokes, so siblings compete; also counts auto-invocations of `principle-*` and `secondbrain-mode`, which must be 0. |
 | `skill_creator_trigger.py` | Runs skill-creator's `run_eval.py` / `run_loop.py` with one project dir per query, so parallel workers do not see each other's temporary command. |
