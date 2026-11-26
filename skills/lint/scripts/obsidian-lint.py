@@ -16,6 +16,8 @@ import sys
 import tempfile
 import unicodedata
 
+from daily_notes import daily_notes_folder, planned_daily_note
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 NOT_RUNNING = 3
 LEGACY_KEYS = {"youtube", "x"}
@@ -137,6 +139,8 @@ def main(argv=None):
     ap.add_argument("--scope", nargs="*", default=["."])
     ap.add_argument("--baseline")
     ap.add_argument("--wiki", action="append", required=True, help="wiki-role folder from the live policy (repeatable)")
+    ap.add_argument("--entity-folder", action="append", default=[], help="entity-role folder from the live policy (repeatable)")
+    ap.add_argument("--book-type", action="append", default=[], help="book Entity type from the live policy (repeatable)")
     ap.add_argument("--lifecycle", required=True, help="comma-separated `type` values the live policy names as lifecycle notes")
     ap.add_argument("--obsidian", default="obsidian", help="Obsidian CLI executable")
     a = ap.parse_args(argv)
@@ -156,7 +160,11 @@ def main(argv=None):
 
 
 def report(a, root, name):
-    index = evaluate(a.obsidian, name, {"mode": "index"})
+    entity_folders = [nfc(d.strip("/")) for d in a.entity_folder]
+    index = evaluate(a.obsidian, name, {
+        "mode": "index",
+        "entityFolders": entity_folders,
+    })
     files = set(index["files"])
     alias_map = aliases(a.obsidian, name, files)
     entities = {}
@@ -169,13 +177,19 @@ def report(a, root, name):
     if any(s == ".." or s.startswith("../") for s in scope):
         raise RuntimeError("a scope is outside the vault")
     in_scope = lambda p: any(s == "." or p == s or p.startswith(s.rstrip("/") + "/") for s in scope)
+    missing = {p: v for p, v in unresolved(a.obsidian, name, files).items() if in_scope(p)}
+    daily_folder = daily_notes_folder(root)
     findings = evaluate(a.obsidian, name, {
         "mode": "check",
         "scope": scope,
         "wiki": [w.strip("/") for w in a.wiki],
         "lifecycle": [t.strip() for t in a.lifecycle.split(",") if t.strip()],
+        "entityFolders": entity_folders,
+        "bookTypes": a.book_type,
         "entities": entities,
-        "unresolved": {p: v for p, v in unresolved(a.obsidian, name, files).items() if in_scope(p)},
+        "unresolved": missing,
+        "plannedDailyNotes": sorted({link for links in missing.values() for link in links
+                                     if planned_daily_note(link, daily_folder)}),
     })
 
     known = set()

@@ -19,17 +19,20 @@ This vault is an eval fixture. Its folder names differ from any real vault on pu
 | wiki | `Knowledge/` | Agents create, revise, overwrite and delete pages freely. |
 | source | `Sources/` | Raw sources. Saved only when the owner hands over material and asks to ingest or save it. |
 | work | `Projects/` | The owner's work notes. Agents only turn the first mention of a term that has a page into a wikilink. |
+| daily-notes | `Projects/Journal/` | `YYYY-MM-DD` filenames. Missing daily notes may be linked by date; agents do not create them. |
 
-Wiki subfolders: `Maps/` for MOCs, `People/`, `Organizations/` and `Products/` for Entities, `Terms/`, `Concepts/`, `Guides/`.
+Wiki subfolders: `Maps/` for MOCs, `People/`, `Organizations/`, `Places/`, `Products/` and `Books/` for Entities, `Terms/`, `Concepts/`, `Guides/`.
 
 ## Pages
 
-- An Entity page has `layer: entities`. Terms have `layer: terms`, Concepts `layer: concepts`, Guides `layer: guides`, MOCs `type: moc`.
+- Notes in the registered Entity folders are Entities; `layer: entities` also identifies an Entity elsewhere. Terms have `layer: terms`, Concepts `layer: concepts`, Guides `layer: guides`, MOCs `type: moc`.
 - The owner's permanent notes live in `Notes/`. Impressions the owner wrote about a person move there as `{date_created} {Name}.md`, with `authorship: user` and `related` linking the person.
 
 ## Lifecycle
 
-Only lifecycle notes carry `status`: notes with `type: project` or `type: task`. Allowed values are `todo`, `inprogress`, `done` and `stop`. No other note has a `status` key.
+Only lifecycle notes carry `status`: notes with `type: project` or `type: task`. Allowed values are `todo`, `inprogress`, `done` and `stop` for these two types.
+
+Book Entities of `type: book` in a registered Entity folder carry the owner's `status` only when they have a `## Reading Progress` heading. No other note, including a chapter Raw, has a `status` key.
 
 ## Frontmatter
 

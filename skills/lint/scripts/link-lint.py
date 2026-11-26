@@ -5,7 +5,9 @@ import re
 import sys
 import unicodedata
 
-BARE = re.compile(r"(?<![\w/(\[<\"'=@])https?://[^\s<>\[\]()\"']+")
+from daily_notes import daily_notes_folder, planned_daily_note
+
+BARE = re.compile(r"(?<![\w/\[<\"'=@])https?://[^\s<>\[\]()\"']+")
 AUTOLINK = re.compile(r"<https?://[^\s<>]+>")
 EMAIL = re.compile(r"(?<![\w/@.:+-])[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}(?![\w@-])")
 FILE_EXT = set("png jpg jpeg gif webp svg bmp heic avif pdf md css js json txt csv mp3 mp4 mov zip".split())
@@ -114,9 +116,25 @@ def planned_term_link(text, spans):
     return None
 
 
-def find(text, names, paths):
+def raw_original_span(text):
+    fm = {key: values for key, _, values in frontmatter(text) or []}
+    if fm.get("type") != ["raw-source"] and not (fm.get("source") and "raw" in fm.get("tags", [])):
+        return []
+    headings = [b for b in blocks(text, block_spans(text)) if b[0] == "heading"]
+    start = next((b[4] for b in headings if b[3] == "## Original Content"), None)
+    if start is None:
+        return []
+    # Verbatim Markdown can contain any heading. Legacy Raws without the marker
+    # have no unambiguous authored boundary.
+    stop = len(text)
+    for marker in re.finditer(r"^<!-- end-original-content -->[ \t]*$", text[start:], re.M):
+        stop = start + marker.start()
+    return [(start, stop)]
+
+
+def find(text, names, paths, daily_folder=None):
     out = []
-    sp = protected(text)
+    sp = protected(text) + raw_original_span(text)
     planned = planned_term_link(text, sp)
     mdspans = [(m.start(), m.end()) for m in MDLINK.finditer(text)]
     wlspans = [(m.start(), m.end()) for m in WIKILINK.finditer(text)]
@@ -167,7 +185,8 @@ def find(text, names, paths):
             key = base[:-3] if base.endswith(".md") else base
             if len(names.get(key, [])) == 1 and resolves(target, names, paths):
                 out.append(("PATH-WIKILINK", m.start(), m.group(0)))
-        if m.start() != planned and not resolves(target, names, paths):
+        daily = not m.group(1) and planned_daily_note(m.group(2), daily_folder)
+        if m.start() != planned and not daily and not resolves(target, names, paths):
             out.append(("BROKEN", m.start(), m.group(0)))
     return sorted(out, key=lambda r: (r[1], r[0]))
 
@@ -351,8 +370,8 @@ def in_dirs(rel, dirs):
     return any(d == "." or rel == d or rel.startswith(d.rstrip("/") + "/") for d in dirs)
 
 
-def index_entities(root):
-    """{name: [entity paths]} for every note with `layer: entities`: its file name and its aliases."""
+def index_entities(root, folders):
+    """Index Entity titles and aliases using registered folders and a layer fallback."""
     out = {}
     for rel in sorted(nfc(r) for r in walk(root) if r.endswith(".md") and not r.endswith(".excalidraw.md")
                       and not any(part.startswith(".") for part in r.split(os.sep))):
@@ -362,7 +381,7 @@ def index_entities(root):
         with open(os.path.join(root, rel), encoding="utf-8", errors="replace") as f:
             head = f.read(65536)
         fm = {k: v for k, _, v in frontmatter(head) or []}
-        if fm.get("layer", [""])[:1] != ["entities"]:
+        if not in_dirs(rel, folders) and fm.get("layer", [])[:1] != ["entities"]:
             continue
         for name in [os.path.basename(rel)[:-3]] + fm.get("aliases", []):
             name = nfc(name.strip())
@@ -485,7 +504,7 @@ def blocks(text, spans):
     return out
 
 
-def find_policy(rel, text, names, entities, pattern, wiki, lifecycle):
+def find_policy(rel, text, names, entities, pattern, wiki, lifecycle, entity_folders, book_types):
     out = []
     is_wiki = in_dirs(rel, wiki)
     keys = frontmatter(text)
@@ -511,15 +530,18 @@ def find_policy(rel, text, names, entities, pattern, wiki, lifecycle):
                     out.append(("FM-URL-FORM", at(line), "%s: %s" % (key, v)))
             elif is_wiki and ANY_URL.search(v):
                 out.append(("FM-URL-KEY", at(line), "%s: %s" % (key, v)))
+    spans = block_spans(text) + raw_original_span(text)
+    found = blocks(text, spans)
+    headings = [b for b in found if b[0] == "heading"]
     if "status" in fm:
-        kind = (fm.get("type", (0, [""]))[1] or [""])[0]
-        if kind not in lifecycle:
+        kind = (fm.get("type", (0, []))[1] or [""])[0]
+        reading_book = kind in book_types and in_dirs(rel, entity_folders) and any(
+            title == "Reading Progress" and (match := ATX.match(line)) and match[1] == "##"
+            for _, _, title, line, _ in headings)
+        if kind not in lifecycle and not reading_book:
             line, values = fm["status"]
             out.append(("STATUS-NOT-LIFECYCLE", at(line), "status: %s" % ", ".join(values)))
 
-    spans = block_spans(text)
-    found = blocks(text, spans)
-    headings = [b for b in found if b[0] == "heading"]
     seen = set()
     for _, pos, title, line, _ in headings:
         if title in seen:
@@ -542,18 +564,22 @@ def find_policy(rel, text, names, entities, pattern, wiki, lifecycle):
             if targets:
                 out.append(("ENTITY-UNLINKED", at(line), "%s: %s" % (key, entity_text(v, targets))))
     linked = set()
+    front = FRONT.match(text)
+    body_start = front.end() if front else 0
     code = spans + [(m.start(), m.end()) for m in INLINE.finditer(text)] + [(b[1], b[2]) for b in found if b[0] == "code"]
     for m in WIKILINK.finditer(text):
-        if not inside(code, m.start(), m.end()):
+        if m.start() >= body_start and not inside(code, m.start(), m.end()):
             linked.update(resolve_path(m.group(2).split("|", 1)[0].split("#", 1)[0], names))
     masked = code + [(h[1], h[4]) for h in headings] + [(b[1], b[2]) for b in found if b[0] in ("quote", "code")]
-    for rx in (WIKILINK, MDLINK, AUTOLINK, BARE):
+    for rx in (WIKILINK, AUTOLINK, BARE):
         masked += [(m.start(), m.end()) for m in rx.finditer(text)]
+    masked += [(m.end(2) if not m[1] and re.match(r"https?://", m[3].strip(), re.I) else m.start(), m.end())
+               for m in MDLINK.finditer(text)]
     reported = set()
     for m in pattern.finditer(text):
         targets = [t for t in entities[nfc(m.group(0))] if t != own]
         key = tuple(targets)
-        if not targets or linked & set(targets) or key in reported or inside(masked, m.start(), m.end()):
+        if m.start() < body_start or not targets or linked & set(targets) or key in reported or inside(masked, m.start(), m.end()):
             continue
         reported.add(key)
         out.append(("ENTITY-UNLINKED", m.start(), entity_text(m.group(0), targets)))
@@ -567,15 +593,20 @@ def main(argv=None):
     ap.add_argument("--baseline")
     ap.add_argument("--checks", choices=("link", "policy", "all"), default="link")
     ap.add_argument("--wiki", action="append", default=[], help="wiki-role folder from the live policy (repeatable)")
+    ap.add_argument("--entity-folder", action="append", default=[], help="entity-role folder from the live policy (repeatable)")
+    ap.add_argument("--book-type", action="append", default=[], help="book Entity type from the live policy (repeatable)")
     ap.add_argument("--lifecycle", help="comma-separated `type` values the live policy names as lifecycle notes")
     a = ap.parse_args(argv)
     if a.checks != "link" and (not a.wiki or a.lifecycle is None):
         ap.error("--checks %s needs --wiki and --lifecycle from the vault's live policy" % a.checks)
     root = os.path.abspath(a.vault)
     names, paths = index_vault(root)
+    daily_folder = daily_notes_folder(root) if a.checks != "policy" else None
     wiki = [nfc(w.strip("/")) for w in a.wiki]
     lifecycle = {t.strip() for t in (a.lifecycle or "").split(",") if t.strip()}
-    entities = index_entities(root) if a.checks != "link" else {}
+    folders = [nfc(d.strip("/")) for d in a.entity_folder]
+    book_types = set(a.book_type)
+    entities = index_entities(root, folders) if a.checks != "link" else {}
     pattern = entity_pattern(entities)
     known = set()
     if a.baseline:
@@ -601,9 +632,9 @@ def main(argv=None):
             text = f.read()
         found = []
         if a.checks != "policy":
-            found += find(text, names, paths)
+            found += find(text, names, paths, daily_folder)
         if a.checks != "link":
-            found += find_policy(nfc(rel), text, names, entities, pattern, wiki, lifecycle)
+            found += find_policy(nfc(rel), text, names, entities, pattern, wiki, lifecycle, folders, book_types)
         rows = [(rule, text.count("\n", 0, pos) + 1, snip[:120].replace("\t", " ").replace("\n", " "), pos)
                 for rule, pos, snip in found]
         # Link-only output keeps its historical order; policy output sorts like obsidian-lint.py.

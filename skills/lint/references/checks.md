@@ -33,7 +33,7 @@ rg --files-without-match '^evidenceScope:' "<wiki-scope>"
 rg -n '^confidence:' "<wiki-scope>" | rg -v 'confidence: "?(high|medium|low)"?$'
 rg -n '^verificationStatus:' "<wiki-scope>" | rg -v 'verificationStatus: "?(verified|partial|unverified|disputed)"?$'
 
-# Restrict this to notes with a lifecycle; use the values allowed by live policy.
+# Restrict this to ordinary lifecycle notes; check reading-progress books separately against live policy.
 rg -n '^status:' "<lifecycle-scope>" | rg -v 'status: "?(todo|inprogress|done|stop)"?$'
 
 # Disputed queue
@@ -58,9 +58,20 @@ git log -1 --format=%cs -- "<page>"
 
 # Index catalog vs files: use the index recipe below (all sections, all roles)
 
-# wiki log latest entry. Resolve the path with records.py. Do not read <vault>/log.md.
-log=$(python3 "<ingest-scripts>/records.py" --vault "<vault>" --records "<ingest-references>/records.md" | awk -F '\t' '$1=="log"{print $2}')
-rg -n '^## \[[0-9]{4}-[0-9]{2}-[0-9]{2}\]' "$log" | tail -n 1
+# Wiki log latest entry. Use the vault-relative wiki folder from the live guideline.
+# Without a configured wiki role, skip this recipe and report the log as unavailable.
+if records=$(python3 "<ingest-scripts>/records.py" --vault "<vault>" --wiki "<wiki-folder>"); then
+  log=$(printf '%s\n' "$records" | awk -F '\t' '$1=="log" && $2=="path"{print $3}')
+  if [ -z "$log" ]; then
+    printf '%s\n' "$records" | awk -F '\t' '$1=="log" && $2=="unavailable"{print "Wiki log unavailable: " $3}'
+  elif [ ! -f "$log" ]; then
+    printf 'Wiki log missing: %s\n' "$log"
+  else
+    rg -n '^## \[[0-9]{4}-[0-9]{2}-[0-9]{2}\]' "$log" | tail -n 1
+  fi
+else
+  printf 'Wiki log unavailable: record resolution blocked\n'
+fi
 
 # Backticked URLs (drop hits inside fences, commands, quotations, frontmatter and Raw `## Original Content`)
 rg -n -g '*.md' '`https?://[^\s)`]+`' "<scope>"
@@ -68,12 +79,13 @@ rg -n -g '*.md' '`https?://[^\s)`]+`' "<scope>"
 # Link form (deterministic, offline); keep the output to pass as --baseline next time
 python3 "<skill-dir>/scripts/link-lint.py" --vault "<vault>" --scope "<scope>" > link-lint.tsv
 
-# Frontmatter and structure (Step 12). Wiki folder(s) and lifecycle types come from live policy.
+# Frontmatter and structure (Step 12). Use live policy for folders and types.
+# Repeat --entity-folder and --book-type as needed; omit them if not declared.
 # Obsidian already running with this vault open; exit 3 means it is not, so use the next line.
 python3 "<skill-dir>/scripts/obsidian-lint.py" --vault "<vault>" --scope "<scope>" \
-  --wiki "<wiki-folder>" --lifecycle "<type>,<type>" > policy-lint.tsv
+  --wiki "<wiki-folder>" --entity-folder "<entity-folder>" --book-type "<book-type>" --lifecycle "<type>,<type>" > policy-lint.tsv
 python3 "<skill-dir>/scripts/link-lint.py" --vault "<vault>" --scope "<scope>" --checks policy \
-  --wiki "<wiki-folder>" --lifecycle "<type>,<type>" > policy-lint.tsv
+  --wiki "<wiki-folder>" --entity-folder "<entity-folder>" --book-type "<book-type>" --lifecycle "<type>,<type>" > policy-lint.tsv
 
 # Links to missing headings, ambiguous links, duplicate headings. Needs .git or .marksman.toml at the vault root.
 python3 "<skill-dir>/scripts/marksman-lint.py" --vault "<vault>" --scope "<scope>" > marksman-lint.tsv
@@ -81,13 +93,16 @@ python3 "<skill-dir>/scripts/marksman-lint.py" --vault "<vault>" --scope "<scope
 
 `obsidian eval` needs an IIFE (`code='(()=>{...})()'`, async allowed); `obsidian-lint.py` builds it from `obsidian-lint.js` and passes its arguments in a temp file outside the vault. Run Obsidian CLI commands only through `obsidian-lint.py`: it checks that Obsidian is already running with this vault open before it calls the CLI, and a bare `obsidian` command can launch the app. Its `# properties` line gives the vault-wide counts of `status` and the retired keys.
 
-Link targets by key (read-only, needs PyYAML). Feed NUL-delimited paths: `rg --files -0 -g '*.md' "<scope>" | python3 links.py "<vault>"` (run the snippet from stdin or a temp file outside the vault). If `import yaml` fails, do not run the check and do not substitute a regex: report frontmatter links as **Not checked — PyYAML unavailable**; body links still come from `link-lint.py`.
+Link targets by key (read-only, needs PyYAML). Feed NUL-delimited paths: `rg --files -0 -g '*.md' "<scope>" | python3 links.py "<vault>"` (save the snippet in a temp file outside the vault). If `import yaml` fails, do not run the check and do not substitute a regex: report frontmatter links as **Not checked — PyYAML unavailable**; body links still come from `link-lint.py`.
 
 ```python
 import sys, os, re
 import yaml
+sys.path.insert(0, "<skill-dir>/scripts")
+from daily_notes import daily_notes_folder, planned_daily_note
 vault = sys.argv[1]
-LINK = re.compile(r'\[\[([^\]|#]+)')
+daily_folder = daily_notes_folder(vault)
+LINK = re.compile(r'(!?)\[\[([^\]\n]+)\]\]')
 names, paths = set(), set()
 for d, ds, fs in os.walk(vault):
     ds[:] = [x for x in ds if not x.startswith('.')]
@@ -120,21 +135,30 @@ for p in sys.stdin.buffer.read().split(b'\0'):
     for key, val in (fm.items() if isinstance(fm, dict) else []):
         if key == 'author' or (key == 'domain' and fm.get('layer') == 'terms'):
             continue
-        for t in walk(val):
-            if not resolves(t): print(p, key, t, sep='\t')
+        for embed, link in walk(val):
+            t = link.split('|', 1)[0].split('#', 1)[0]
+            if not resolves(t) and (embed or not planned_daily_note(link, daily_folder)):
+                print(p, key, t, sep='\t')
 ```
 
 Use the body `BROKEN` findings from `link-lint.py`. Other keys checked here include `source`, `related`, `book`, `chapterPrev`, `chapterNext`, `personaOf`, and any key the live schema adds. Output is `path<TAB>key<TAB>missing target`.
 
-Index catalog check (read-only): resolves every `[[...]]` in the wiki index against the vault's actual files — Raw, Wiki, Queries, Maps, Personas and whatever sections the live index has — and recounts files per catalogued section. The index path comes from `skills/ingest/scripts/records.py`. `python3 index_check.py "<vault>"`:
+Index catalog check (read-only): resolves every `[[...]]` in the wiki index against the vault's actual files — Raw, Wiki, Queries, Maps, Personas and whatever sections the live index has — and recounts files per catalogued section. Use the vault-relative wiki folder from the live guideline; without it, report the index as unavailable without running the recipe. `python3 index_check.py "<vault>" "<wiki-folder>"`:
 
 ```python
 import sys, os, re
 from pathlib import Path
 sys.path.insert(0, "<ingest-scripts>")
-from records import resolve_wiki_records
+from records import RecordError, resolve_wiki_records
 vault = sys.argv[1]
-located = resolve_wiki_records(Path(vault), Path("<ingest-references>/records.md"), None, None)
+try:
+    index = resolve_wiki_records(Path(vault), sys.argv[2]).index
+except (RecordError, OSError, RuntimeError) as exc:
+    sys.exit(f'Wiki index unavailable: {exc}')
+if index.path is None:
+    sys.exit(f'Wiki index unavailable: {index.reason}')
+if not index.path.is_file():
+    sys.exit(f'Wiki index missing: {index.path}')
 LINK = re.compile(r'\[\[([^\]|#]+)')
 names, paths = {}, set()
 for d, ds, fs in os.walk(vault):
@@ -145,7 +169,7 @@ for d, ds, fs in os.walk(vault):
         paths.update((stem, rel))
         names.setdefault(os.path.basename(stem), []).append(rel); names.setdefault(f, []).append(rel)
 section, seen = '(top)', {}
-for line in open(located.index, encoding='utf-8'):
+for line in open(index.path, encoding='utf-8'):
     h = re.match(r'#{1,6}\s+(.*)', line)
     if h: section = h.group(1).strip(); continue
     for t in LINK.findall(line):

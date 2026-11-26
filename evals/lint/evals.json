@@ -6,6 +6,16 @@
     "wiki": [
       "Knowledge"
     ],
+    "entity_folders": [
+      "Knowledge/Books",
+      "Knowledge/Organizations",
+      "Knowledge/People",
+      "Knowledge/Places",
+      "Knowledge/Products"
+    ],
+    "book_types": [
+      "book"
+    ],
     "lifecycle": [
       "project",
       "task"
@@ -126,7 +136,7 @@
       ],
       "expectations": [
         "The report lists BARE-URL for Knowledge/Broken/Bare URL.md line 10",
-        "The labelled link on line 12 is not reported",
+        "The labelled link on line 12 is not a BARE-URL, but its entity alias is unlinked",
         "The finding comes from scripts/link-lint.py, not from judgment"
       ],
       "paths": [
@@ -148,8 +158,8 @@
     {
       "id": 4,
       "eval_name": "entity-unlinked",
-      "prompt": "In evals/fixture-vault, find Entity names (titles or aliases of pages with layer: entities) that appear without [[ ]] in wiki pages, in the body or in frontmatter.",
-      "expected_output": "Reports the two frontmatter values and the two first body mentions in Unlinked Entity.md, each with the page it should link.",
+      "prompt": "In evals/fixture-vault, find Entity titles or aliases that appear without [[ ]] in wiki pages, in the body or in frontmatter. Read the Entity folders from the guideline and use layer: entities as a fallback.",
+      "expected_output": "Reports the unlinked names in Unlinked Entity.md and Horizontal Rule.md, each with the page it should link.",
       "files": [
         "evals/fixture-vault"
       ],
@@ -211,10 +221,46 @@
       ]
     },
     {
+      "id": 15,
+      "eval_name": "entity-folder-and-fallback",
+      "prompt": "Lint Entity Folder Mentions.md for unlinked Entities using the Entity folders in the fixture's Guideline.md.",
+      "expected_output": "Reports Fieldstone Studio and its alias despite the missing layer, and finds Layer Fallback Studio via layer outside the registered folders.",
+      "files": ["evals/fixture-vault"],
+      "expectations": [
+        "Fieldstone Studio and Fieldstone are reported without layer: entities",
+        "Layer Fallback Studio is reported despite not being in a registered folder"
+      ],
+      "paths": ["python", "obsidian-cli"],
+      "findings": [
+        [
+          "ENTITY-UNLINKED",
+          "Knowledge/Broken/Entity Folder Mentions.md",
+          2,
+          "organization: Fieldstone -> [[Fieldstone Studio]]"
+        ],
+        [
+          "ENTITY-UNLINKED",
+          "Knowledge/Broken/Entity Folder Mentions.md",
+          6,
+          "Fieldstone Studio -> [[Fieldstone Studio]]"
+        ],
+        [
+          "ENTITY-UNLINKED",
+          "Knowledge/Broken/Entity Folder Mentions.md",
+          6,
+          "Layer Fallback Studio -> [[Layer Fallback Studio]]"
+        ]
+      ],
+      "clean_files": [
+        "Knowledge/Organizations/Fieldstone Studio.md",
+        "Knowledge/Broken/Layer Fallback Studio.md"
+      ]
+    },
+    {
       "id": 5,
       "eval_name": "status-outside-lifecycle",
       "prompt": "Which notes in evals/fixture-vault carry a status key even though the guideline says only lifecycle notes may?",
-      "expected_output": "Reads the lifecycle types (project, task) from Guideline.md and reports the concept page, the Raw note and the plain work note; the project note keeps its status.",
+      "expected_output": "Reads the lifecycle types from Guideline.md. The project keeps its status; status on unrelated notes is reported.",
       "files": [
         "evals/fixture-vault"
       ],
@@ -251,6 +297,47 @@
       "clean_files": [
         "Projects/Lumen Notes Trial.md",
         "Guideline.md"
+      ]
+    },
+    {
+      "id": 16,
+      "eval_name": "book-reading-lifecycle",
+      "prompt": "Which notes in the fixture can carry the owner's book reading status?",
+      "expected_output": "Only the book with a real Reading Progress heading in the Entity folder keeps its status; a catalog book, a misplaced book, a nonbook and a chapter Raw are reported.",
+      "files": ["evals/fixture-vault"],
+      "expectations": [
+        "The reading-progress book in the registered Entity folder is not reported",
+        "A book showing Reading Progress only in a code block, a misplaced book, a nonbook with a Reading Progress heading, and a chapter Raw are reported"
+      ],
+      "paths": ["python", "obsidian-cli"],
+      "findings": [
+        [
+          "STATUS-NOT-LIFECYCLE",
+          "Knowledge/Books/Catalog Book.md",
+          2,
+          "status: reading"
+        ],
+        [
+          "STATUS-NOT-LIFECYCLE",
+          "Knowledge/Broken/Misplaced Reading Book.md",
+          3,
+          "status: reading"
+        ],
+        [
+          "STATUS-NOT-LIFECYCLE",
+          "Knowledge/Books/Reading Progress Nonbook.md",
+          2,
+          "status: reading"
+        ],
+        [
+          "STATUS-NOT-LIFECYCLE",
+          "Sources/Reading Lifecycle Chapter.md",
+          4,
+          "status: reading"
+        ]
+      ],
+      "clean_files": [
+        "Knowledge/Books/Reading Lifecycle Book.md"
       ]
     },
     {
@@ -359,7 +446,7 @@
       "id": 9,
       "eval_name": "broken-link",
       "prompt": "List wikilinks in note bodies of evals/fixture-vault whose target note does not exist.",
-      "expected_output": "link-lint.py reports [[Missing Page]] in Broken Link.md; every other body wikilink resolves.",
+      "expected_output": "link-lint.py reports [[Missing Page]] in Broken Link.md; the dated Raw title resolves.",
       "files": [
         "evals/fixture-vault"
       ],
@@ -382,6 +469,73 @@
         "Knowledge/People/Jane Doe.md",
         "Knowledge/Maps/Tools MOC.md"
       ]
+    },
+    {
+      "id": 19,
+      "eval_name": "body-mentions-despite-frontmatter-link",
+      "prompt": "Check whether Frontmatter Entity Link.md links Fieldstone Studio in its body.",
+      "expected_output": "The frontmatter link is valid but does not satisfy the unlinked body mention.",
+      "files": ["evals/fixture-vault"],
+      "expectations": ["The body mention on line 6 needs a wikilink"],
+      "paths": ["python", "obsidian-cli"],
+      "findings": [
+        ["ENTITY-UNLINKED", "Knowledge/Broken/Frontmatter Entity Link.md", 6, "Fieldstone Studio -> [[Fieldstone Studio]]"]
+      ]
+    },
+    {
+      "id": 20,
+      "eval_name": "entity-mentions-in-citation-labels",
+      "prompt": "Check Citation Entity Label.md for unlinked body entities.",
+      "expected_output": "The authored external link label mentions Fieldstone Studio but does not link the vault entity.",
+      "files": ["evals/fixture-vault"],
+      "expectations": ["The entity named in Citation Entity Label.md and the entity alias in Bare URL.md need wikilinks"],
+      "paths": ["python", "obsidian-cli"],
+      "findings": [
+        ["ENTITY-UNLINKED", "Knowledge/Broken/Citation Entity Label.md", 1, "Fieldstone Studio -> [[Fieldstone Studio]]"],
+        ["ENTITY-UNLINKED", "Knowledge/Broken/Bare URL.md", 12, "Lumen -> [[Lumen Notes]]"]
+      ]
+    },
+    {
+      "id": 21,
+      "eval_name": "legacy-raw-verbatim-ingest-notes-heading",
+      "prompt": "Lint the legacy Raw Verbatim Markdown Boundary.md for bare links.",
+      "expected_output": "Does not interpret the original article's Ingest Notes heading as authored commentary.",
+      "files": ["evals/fixture-vault"],
+      "expectations": ["The Raw has no findings"],
+      "paths": ["python"],
+      "findings": [],
+      "clean_files": ["Sources/Verbatim Markdown Boundary.md"]
+    },
+    {
+      "id": 22,
+      "eval_name": "authored-chapter-reading-notes",
+      "prompt": "Check Chapter Reading Boundary.md for bare links.",
+      "expected_output": "Lints the authored Reading Notes after the boundary but not the preserved original chapter.",
+      "files": ["evals/fixture-vault"],
+      "expectations": ["Only the authored link on line 14 is flagged"],
+      "paths": ["python"],
+      "findings": [
+        ["BARE-URL", "Sources/Chapter Reading Boundary.md", 14, "https://example.com/reading"]
+      ]
+    },
+    {
+      "id": 17,
+      "eval_name": "planned-daily-notes",
+      "prompt": "Check Daily Note Links.md and Broken Daily Note Links.md for missing targets under the fixture's daily-notes policy.",
+      "expected_output": "Valid daily-note links are planned; the misspelling, invalid date, wrong folder and missing heading target remain broken.",
+      "files": ["evals/fixture-vault"],
+      "expectations": [
+        "Daily Note Links.md has no findings",
+        "Broken Daily Note Links.md has four BROKEN findings"
+      ],
+      "paths": ["python"],
+      "findings": [
+        ["BROKEN", "Projects/Broken Daily Note Links.md", 3, "[[Mispelled Project]]"],
+        ["BROKEN", "Projects/Broken Daily Note Links.md", 4, "[[2025-02-29]]"],
+        ["BROKEN", "Projects/Broken Daily Note Links.md", 5, "[[Other/2024-02-29]]"],
+        ["BROKEN", "Projects/Broken Daily Note Links.md", 6, "[[2024-02-29#Missing Heading]]"]
+      ],
+      "clean_files": ["Projects/Daily Note Links.md"]
     },
     {
       "id": 13,
@@ -492,8 +646,24 @@
         "Knowledge/Concepts/Spaced Repetition.md",
         "Knowledge/Maps/Tools MOC.md",
         "Sources/2026-11-20 Lumen Notes launch post.md",
-        "Projects/Lumen Notes Trial.md"
+        "Projects/Lumen Notes Trial.md",
+        "Projects/Daily Note Links.md"
       ]
+    },
+    {
+      "id": 18,
+      "eval_name": "parenthesized-verbatim-urls",
+      "prompt": "Flag parenthesized bare URLs in authored prose without flagging the preserved Raw text.",
+      "expected_output": "Flags bare URLs in ordinary pages and in Ingest Notes, but not within genuine Raw Original Content or in labeled links.",
+      "files": ["evals/fixture-vault"],
+      "expectations": ["Only the authored parenthesized bare URLs are reported"],
+      "paths": ["python"],
+      "findings": [
+        ["BARE-URL", "Knowledge/Broken/Parenthesized Bare URL.md", 3, "https://example.com/paper"],
+        ["BARE-URL", "Knowledge/Broken/Parenthesized Bare URL.md", 7, "https://example.com/ordinary"],
+        ["BARE-URL", "Sources/Authored Raw URL.md", 16, "https://example.com/commentary"]
+      ],
+      "clean_files": ["Sources/Verbatim URL Sample.md"]
     },
     {
       "id": 11,

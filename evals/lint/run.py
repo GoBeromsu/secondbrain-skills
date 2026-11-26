@@ -58,17 +58,24 @@ def main(argv=None):
     vault = os.path.join(ROOT, spec["fixture"])
     with open(os.path.join(ROOT, spec["policy"]["source"]), encoding="utf-8") as f:
         guideline = f.read()
-    # The policy passed to the scripts is what the guideline declares: the wiki row of its Roles
-    # table and the `type:` values of its lifecycle sentence.
+    # Read fixture-specific role and type declarations from its guideline.
     wiki = re.findall(r"^\| wiki \| `([^`]+?)/?` \|", guideline, re.M)
+    section = re.search(r"^Wiki subfolders:.*?(?P<folders>`[^`]+`(?:, `[^`]+`)*(?: and `[^`]+`)?) for Entities\b",
+                        guideline, re.M)
+    subfolders = re.findall(r"`([^`]+?)/?`", section["folders"]) if section else []
+    entity_folders = [f"{w}/{d}" for w in wiki for d in subfolders]
     life = re.search(r"^Only lifecycle notes carry `status`: (.*)$", guideline, re.M)
-    declared = (sorted(wiki), sorted(re.findall(r"`type: ([^`]+)`", life.group(1))) if life else [])
-    if declared != (sorted(spec["policy"]["wiki"]), sorted(spec["policy"]["lifecycle"])):
+    book_types = re.findall(r"^Book Entities of `type: ([^`]+)`", guideline, re.M)
+    declared = {"wiki": wiki, "entity_folders": entity_folders, "book_types": book_types,
+                "lifecycle": re.findall(r"`type: ([^`]+)`", life[1]) if life else []}
+    if any(sorted(values) != sorted(spec["policy"][key]) for key, values in declared.items()):
         sys.exit("evals.json policy %s is not what %s declares: %s" % (
             spec["policy"], spec["policy"]["source"], declared))
     scripts = os.path.join(a.skill_dir, "scripts")
-    policy = [x for w in spec["policy"]["wiki"] for x in ("--wiki", w)]
-    policy += ["--lifecycle", ",".join(spec["policy"]["lifecycle"])]
+    policy = [x for w in wiki for x in ("--wiki", w)]
+    policy += [x for d in entity_folders for x in ("--entity-folder", d)]
+    policy += [x for t in book_types for x in ("--book-type", t)]
+    policy += ["--lifecycle", ",".join(declared["lifecycle"])]
 
     python = run(os.path.join(scripts, "link-lint.py"), ["--vault", vault, "--checks", "all", *policy])
     if python[0] is None and python[2] == 2 and os.path.realpath(a.skill_dir) != os.path.realpath(os.path.join(ROOT, "skills", "lint")):
