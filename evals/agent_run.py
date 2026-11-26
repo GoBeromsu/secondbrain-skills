@@ -19,6 +19,7 @@ and an `obsidian` stub on PATH: the real CLI would open or switch the owner's va
 import argparse
 import difflib
 import fnmatch
+import hashlib
 import json
 import os
 import re
@@ -30,8 +31,10 @@ import sys
 import tempfile
 import time
 from concurrent.futures import ThreadPoolExecutor
+from io import StringIO
 from pathlib import Path
 from types import SimpleNamespace
+from unittest.mock import patch
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
@@ -728,7 +731,7 @@ def tool_uses(ctx, events=None):
 WRITE_TOOLS = ("Write", "Edit", "MultiEdit", "NotebookEdit")
 
 
-def resolved_uses(ctx, events=None):
+def resolved_uses(ctx, events=None, *, parent_id=None):
     events = ctx.events if events is None else events
     results = {}
     for event in events:
@@ -737,7 +740,7 @@ def resolved_uses(ctx, events=None):
             results.update((c.get("tool_use_id"), c) for c in content
                            if isinstance(c, dict) and c.get("type") == "tool_result")
     return [(u, results[u["id"]]) for parent, u in tool_uses(ctx, events)
-            if parent is None and u.get("id") in results]
+            if parent == parent_id and u.get("id") in results]
 
 
 def vault_path(ctx, path):
@@ -924,41 +927,134 @@ def eval_dir(ws, it, case):
     return os.path.join(ws, "iteration-%d" % it, "eval-%d-%s" % (case["id"], case["eval_name"]))
 
 
-def old_plugin(spec, ws):
-    """Plugin dir for the 0.28.1 baseline: its manifest plus the extracted skills tree."""
-    plug = os.path.join(ws, "old-plugin")
-    skills = os.path.join(HERE, "results", "%s-workspace" % spec["baseline_skill"], "old-skills", spec["baseline_skill"])
-    if not os.path.isfile(os.path.join(skills, "SKILL.md")):  # extract once; parallel runners share it
-        skills = subprocess.run([os.path.join(HERE, "baseline.sh"), spec["baseline_skill"], BASELINE_REF],
-                                capture_output=True, text=True, check=True).stdout.strip()
-    skills_root = os.path.dirname(skills)
-    os.makedirs(os.path.join(plug, ".claude-plugin"), exist_ok=True)
-    manifest = subprocess.run(["git", "-C", ROOT, "show", "%s:.claude-plugin/plugin.json" % BASELINE_REF],
-                              capture_output=True, text=True, check=True).stdout
-    with open(os.path.join(plug, ".claude-plugin", "plugin.json"), "w") as f:
-        f.write(manifest)
-    link = os.path.join(plug, "skills")
-    if os.path.islink(link):
-        os.unlink(link)
-    os.symlink(skills_root, link)
-    return plug, skills
+def materialize_plugin(source, plugin, skill, *, baseline=False, skills_root=None):
+    """Stage the plugin inputs and fingerprint the bytes the run can load."""
+    if baseline:
+        # Extract directly into this run's private snapshot; no shared extraction cache.
+        plugin.mkdir()
+        with tempfile.TemporaryFile() as archive:
+            subprocess.run(["git", "-C", ROOT, "archive", BASELINE_REF,
+                            ".claude-plugin/plugin.json", "skills"], stdout=archive, check=True)
+            archive.seek(0)
+            subprocess.run(["tar", "-xf", "-", "-C", str(plugin)], stdin=archive, check=True)
+    else:
+        shutil.copytree(Path(source, ".claude-plugin"), plugin / ".claude-plugin")
+        skills_root = Path(skills_root if skills_root is not None else Path(source, "skills")).resolve()
+        shutil.copytree(skills_root, plugin / "skills")
+    paths = [plugin, *plugin.rglob("*")]
+    if any(path.is_symlink() for path in paths):
+        raise ValueError("plugin snapshot must not contain symlinks: %s" % plugin)
+    for path in reversed(paths):
+        path.chmod(path.stat().st_mode & ~(stat.S_IWUSR | stat.S_IWGRP | stat.S_IWOTH))
+    skills = plugin / "skills"
+    files = sorted([path.relative_to(skills).as_posix(), hashlib.sha256(path.read_bytes()).hexdigest()]
+                   for path in skills.rglob("*") if path.is_file())
+    # Hash compact JSON to delimit paths and digests unambiguously.
+    tree = json.dumps(files, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+    entrypoint = f"{skill}/SKILL.md" if skill is not None else None
+    skill_hash = dict(files).get(entrypoint)
+    if entrypoint is not None and skill_hash is None:
+        raise ValueError("plugin snapshot is missing %s" % entrypoint)
+    return {"skills_root": str(skills_root) if not baseline else None,
+            "skills_tree_sha256": hashlib.sha256(tree).hexdigest(), "skills_tree_manifest": files,
+            "skill_sha256": skill_hash, "skill_entrypoint": str(skills / entrypoint) if entrypoint else None,
+            "entrypoint_absent_in_baseline": baseline and entrypoint is None}
 
 
-def sandbox_profile(tmp):
+CLAUDE_CWD_WRITE_PATTERN = r"^(/private)?/tmp/claude-[0-9a-f]+-cwd$"
+
+
+def sandbox_write_roots(tmp):
+    return tuple(Path(p).resolve() for p in (Path(tmp, "vault"), Path.home() / ".claude",
+                                            Path("/tmp", "claude-%d" % os.getuid())))
+
+
+def validate_snapshot_location(plugin, write_roots):
+    plugin = plugin.resolve()
+    ancestors = (plugin, *plugin.parents)
+    for path in ancestors:
+        if path in write_roots or path == Path("/dev/null") or re.fullmatch(CLAUDE_CWD_WRITE_PATTERN, str(path)):
+            raise ValueError(f"plugin snapshot {plugin} is under a sandbox-writable path: {path}; use a safe TMPDIR")
+
+
+def sandbox_profile(tmp, write_roots):
     """Only the disposable vault and Claude's own state are writable by the worker."""
     path = os.path.join(tmp, "eval.sb")
-    vault = os.path.join(os.path.realpath(tmp), "vault")
-    claude = os.path.expanduser("~/.claude")
-    claude_tmp = os.path.join(os.path.realpath("/tmp"), "claude-%d" % os.getuid())
     results = os.path.realpath(os.path.join(HERE, "results"))
     with open(path, "w") as f:
         f.write('(version 1)\n(allow default)\n(deny file-write*)\n'
                 '(allow file-write* (subpath %s) (subpath %s) (subpath %s))\n'
-                '(allow file-write* (literal "/dev/null") (regex #"^(/private)?/tmp/claude-[0-9a-f]+-cwd$"))\n'
+                '(allow file-write* (literal "/dev/null") (regex #"%s"))\n'
                 '(deny file-write* (subpath %s))\n'
                 '(deny process-exec (subpath "/Applications/Obsidian.app") (literal "/usr/bin/open"))\n'
-                % tuple(json.dumps(p, ensure_ascii=False) for p in (vault, claude, claude_tmp, results)))
+                % (*[json.dumps(str(p), ensure_ascii=False) for p in write_roots],
+                   CLAUDE_CWD_WRITE_PATTERN, json.dumps(results, ensure_ascii=False)))
     return path
+
+
+def launch_path_spellings(path):
+    return sorted({str(path), os.path.realpath(path)}) if path else []
+
+
+def shows_file_content(content, staged_text):
+    if isinstance(content, list):
+        content = "\n".join(block["text"] for block in content if block.get("type") == "text")
+    if not isinstance(content, str) or not content.strip():
+        return False
+    # Read may return either raw text or lines prefixed with a line number and a tab.
+    content = content.replace("\r\n", "\n").strip("\n")
+    excerpt = re.sub(r"^ *\d+\t", "", content, flags=re.MULTILINE).strip("\n")
+    staged = "\n" + staged_text + "\n"
+    return bool(excerpt.strip()) and any(
+        "\n" + text + "\n" in staged for text in (content, excerpt))
+
+
+def observed_provenance(transcript, status, launch_paths, skill_hash, out):
+    evidence = {"observed_plugin_paths": [], "skill_read_observed": False, "skill_read_by": [],
+                "provenance_verified": False}
+    try:
+        traces = {}
+        for event in load_events(transcript):
+            parent_id = event.get("parent_tool_use_id")
+            if parent_id is not None and (not isinstance(parent_id, str) or not parent_id):
+                return evidence
+            traces.setdefault(parent_id, []).append(event)
+        events = traces.get(None, [])
+        plugin_paths = sorted({p["path"] for e in events
+                               if e.get("type") == "system" and e.get("subtype") == "init"
+                               for p in e.get("plugins") or []
+                               if isinstance(p, dict) and isinstance(p.get("path"), str)})
+        evidence["observed_plugin_paths"] = plugin_paths
+        if not skill_hash or not launch_paths["skill_entrypoint"]:
+            return evidence
+        staged = Path(out, "staged-SKILL.md").read_bytes()
+        if hashlib.sha256(staged).hexdigest() != skill_hash:
+            return evidence
+        staged_text = staged.decode("utf-8").replace("\r\n", "\n")
+        readers = set()
+        for parent_id, trace in traces.items():
+            if any(use.get("name") == "Read"
+                   and use["input"]["file_path"] in launch_paths["skill_entrypoint"]
+                   and not result.get("is_error")
+                   and shows_file_content(result.get("content"), staged_text)
+                   for use, result in resolved_uses(SimpleNamespace(events=trace), parent_id=parent_id)):
+                readers.add("parent" if parent_id is None else "worker")
+        completed = status == "exit 0" and any(e.get("type") == "result" and e.get("subtype") == "success"
+                                               and not e.get("is_error") for e in events)
+        evidence.update(skill_read_observed=bool(readers), skill_read_by=sorted(readers),
+                        provenance_verified=bool(completed and readers
+                                                 and set(plugin_paths).intersection(launch_paths["plugin"])))
+    except (AttributeError, KeyError, OSError, TypeError, ValueError):
+        # Transcript and retained artifact shapes may differ across runs; fail closed.
+        pass
+    return evidence
+
+
+def save_staged_evidence(out, hashes):
+    if hashes["skill_entrypoint"] is not None:
+        shutil.copyfile(hashes["skill_entrypoint"], Path(out, "staged-SKILL.md"))
+    Path(out, "skills-tree-manifest.json").write_text(
+        json.dumps(hashes["skills_tree_manifest"], ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
 def copy_subagents(transcript, vault, dest):
@@ -976,6 +1072,126 @@ def copy_subagents(transcript, vault, dest):
 
 
 def self_test():
+    with (tempfile.TemporaryDirectory(prefix="sb-skill-evidence-test-") as artifacts,
+          (staging := tempfile.TemporaryDirectory(prefix="sb-skill-hash-test-", dir=artifacts)) as scratch):
+        tmp = os.path.realpath(scratch)
+        source, snapshot = Path(tmp, "source"), Path(tmp, "snapshot")
+        (source / ".claude-plugin").mkdir(parents=True)
+        skill_md = source / "skills" / "example" / "SKILL.md"
+        skill_md.parent.mkdir(parents=True)
+        skill_md.write_bytes(b"abc")
+        for root, diagnostic in [(Path(tmp, "missing"), "not a directory"),
+                                 (skill_md.parent, "term/SKILL.md")]:
+            with (patch.object(sys, "stderr", StringIO()) as stderr,
+                  patch.object(os, "makedirs", side_effect=AssertionError("unexpected metadata write")),
+                  patch(__name__ + ".ThreadPoolExecutor", side_effect=AssertionError("unexpected job start"))):
+                try:
+                    main(["term", "--config", "both", "--skills-root", str(root)])
+                except SystemExit as exc:
+                    assert exc.code == 2 and "--skills-root" in stderr.getvalue()
+                    assert diagnostic in stderr.getvalue()
+                else:
+                    raise AssertionError("invalid skills root accepted: %s" % root)
+        expected = "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+        first = materialize_plugin(source, snapshot, "example")
+        assert first["skill_sha256"] == expected
+        assert all(not path.stat().st_mode & 0o222 for path in [snapshot, *snapshot.rglob("*")])
+        baseline = materialize_plugin(ROOT, Path(tmp, "baseline"), None, baseline=True)
+        assert baseline["skill_sha256"] is None and baseline["skill_entrypoint"] is None
+        assert baseline["entrypoint_absent_in_baseline"]
+        assert any(path == "ingest/SKILL.md" for path, _ in baseline["skills_tree_manifest"])
+        assert baseline["skills_tree_manifest"] == sorted(baseline["skills_tree_manifest"])
+        (skill_md.parent / "asset.md").write_bytes(b"asset")
+        changed = materialize_plugin(source, Path(tmp, "changed"), "example")
+        assert changed["skill_sha256"] == expected
+        assert changed["skills_tree_sha256"] != first["skills_tree_sha256"]
+        override = materialize_plugin(source, Path(tmp, "override"), "example", skills_root=snapshot / "skills")
+        assert override["skills_root"] == str(snapshot / "skills")
+        assert override["skills_tree_sha256"] == first["skills_tree_sha256"]
+        save_staged_evidence(artifacts, first)
+        baseline_out = Path(artifacts, "old")
+        baseline_out.mkdir()
+        save_staged_evidence(baseline_out, baseline)
+        entrypoint = first["skill_entrypoint"]
+        init = {"type": "system", "subtype": "init", "plugins": [{"path": str(snapshot)}]}
+        read = {"type": "tool_use", "id": "read", "name": "Read", "input": {"file_path": entrypoint}}
+        reply = {"type": "tool_result", "tool_use_id": "read", "content": "1\tabc"}
+        success = {"type": "result", "subtype": "success"}
+
+        def transcript(use, result, parent_id=None):
+            return [init, {"type": "assistant", "parent_tool_use_id": parent_id, "message": {"content": [use]}},
+                    {"type": "user", "parent_tool_use_id": parent_id, "message": {"content": [result]}}, success]
+
+        events = transcript(read, reply)
+        log = Path(tmp, "transcript.jsonl")
+        launch_paths = {"plugin": launch_path_spellings(snapshot), "skill_entrypoint": launch_path_spellings(entrypoint)}
+
+        def provenance(trace, status="exit 0", skill_hash=expected, paths=launch_paths):
+            log.write_text("\n".join(map(json.dumps, trace)), encoding="utf-8")
+            return observed_provenance(log, status, paths, skill_hash, artifacts)
+
+        assert provenance(events) == {"observed_plugin_paths": [str(snapshot)], "skill_read_observed": True,
+                                      "skill_read_by": ["parent"], "provenance_verified": True}
+        worker = provenance(transcript(read, reply, parent_id="agent"))
+        assert worker["provenance_verified"] and worker["skill_read_by"] == ["worker"]
+        assert not provenance([init, events[1], dict(events[2], parent_tool_use_id="agent"), success])["skill_read_observed"]
+        assert not provenance(events[1:])["provenance_verified"]
+        assert not provenance(events[:-1])["provenance_verified"]
+        wrong_init = dict(init, plugins=[{"path": str(source)}])
+        assert not provenance([wrong_init, *events[1:]])["provenance_verified"]
+        assert not provenance(events, "exit 1")["provenance_verified"]
+        assert not provenance(events, skill_hash=None)["skill_read_observed"]
+        alias = Path(tmp, "alias")
+        alias.symlink_to(snapshot, target_is_directory=True)
+        alias_read = dict(read, input={"file_path": str(alias / Path(entrypoint).relative_to(snapshot))})
+        alias_init = dict(init, plugins=[{"path": str(alias)}])
+        alias_trace = [alias_init, *transcript(alias_read, reply)[1:]]
+        assert not provenance(alias_trace)["skill_read_observed"]
+        assert not provenance([alias_init, *events[1:]])["provenance_verified"]
+        trusted_alias = {"plugin": launch_path_spellings(alias),
+                         "skill_entrypoint": launch_path_spellings(alias_read["input"]["file_path"])}
+        assert provenance(alias_trace, paths=trusted_alias)["provenance_verified"]
+        assert provenance(events, paths=trusted_alias)["provenance_verified"]
+        acknowledgment = dict(reply, content="Async agent launched successfully.")
+        invoke = dict(read, name="Skill", input={"skill": "example"})
+        loaded = dict(reply, content=f"Base directory for this skill: {Path(entrypoint).parent}\nabc")
+        shell_read = dict(read, name="Bash", input={"command": f"cat {shlex.quote(entrypoint)}"})
+        for traces in (transcript(read, dict(reply, is_error=True)),
+                       transcript(dict(read, input={"file_path": str(skill_md)}), reply),
+                       transcript(read, dict(reply, content=None)), transcript(read, acknowledgment),
+                       transcript(invoke, loaded), transcript(shell_read, reply),
+                       transcript(dict(read, input=[]), reply), [init, events[1], success], [None]):
+            assert not provenance(traces)["skill_read_observed"]
+        failure_out = Path(artifacts, "failed-launch")
+        failure_out.mkdir()
+        fixture = source / "fixture"
+        fixture.mkdir()
+        with tempfile.TemporaryDirectory(dir=tmp) as launch_tmp:
+            with patch(__name__ + ".ROOT", str(source)), patch.object(subprocess, "run", side_effect=OSError("launch failed")):
+                try:
+                    run_in_snapshot({"fixture": "fixture"}, {"prompt": "test"}, "new", "test", 1, "example",
+                                    launch_tmp, failure_out)
+                except OSError as exc:
+                    assert str(exc) == "launch failed"
+                else:
+                    raise AssertionError("expected launch failure")
+        assert (failure_out / "staged-SKILL.md").read_bytes() == b"abc"
+        assert json.loads((failure_out / "skills-tree-manifest.json").read_text()) == changed["skills_tree_manifest"]
+        validate_snapshot_location(snapshot, sandbox_write_roots(tmp))
+        try:
+            validate_snapshot_location(snapshot, (*sandbox_write_roots(tmp), Path(artifacts).resolve()))
+        except ValueError as exc:
+            assert "sandbox-writable path" in str(exc)
+        else:
+            raise AssertionError("accepted a snapshot under a writable TMPDIR")
+        # Remove the read-only staging tree before checking the retained copies.
+        staging.cleanup()
+        assert not Path(tmp).exists()
+        assert Path(artifacts, "staged-SKILL.md").read_bytes() == b"abc"
+        for out, hashes in ((Path(artifacts), first), (baseline_out, baseline)):
+            assert json.loads((out / "skills-tree-manifest.json").read_text()) == hashes["skills_tree_manifest"]
+        assert not (baseline_out / "staged-SKILL.md").exists()
+        print("PASS: staged skill evidence, baseline manifest, writable TMPDIR rejection, and transcript provenance")
     with open(os.path.join(HERE, "secondbrain-mode", "evals.json"), encoding="utf-8") as f:
         spec = json.load(f)
     case = next(case for case in spec["evals"] if case["id"] == 3)
@@ -1291,13 +1507,23 @@ def load_subagents(d):
     return out
 
 
-def run_case(spec, case, config, ws, it, model, timeout, plugin, skill_dir):
+def run_case(spec, case, config, ws, it, model, timeout, skill, skills_root):
     run_dir = os.path.join(eval_dir(ws, it, case), CONFIGS[config], "run-1")
     out = os.path.join(run_dir, "outputs")
     shutil.rmtree(run_dir, ignore_errors=True)
     os.makedirs(out)
-    tmp = tempfile.mkdtemp(prefix="sb-eval-")
+    tmp = tempfile.TemporaryDirectory(prefix="sb-eval-")
+    try:
+        return run_in_snapshot(spec, case, config, model, timeout, skill, tmp.name, out, skills_root)
+    finally:
+        tmp.cleanup()
+
+
+def run_in_snapshot(spec, case, config, model, timeout, skill, tmp, out, skills_root=None):
     vault = os.path.join(os.path.realpath(tmp), "vault")
+    plugin = Path(os.path.realpath(tmp), "plugin")
+    write_roots = sandbox_write_roots(tmp)
+    validate_snapshot_location(plugin, write_roots)
     shutil.copytree(os.path.join(ROOT, spec["fixture"]), vault)
     for name, content in case.get("fixture_append", {}).items():
         path = Path(vault, name)
@@ -1310,15 +1536,21 @@ def run_case(spec, case, config, ws, it, model, timeout, plugin, skill_dir):
         f.write("#!/bin/sh\necho 'obsidian CLI is not available in this eval; read the vault files directly.' >&2\nexit 127\n")
     os.chmod(os.path.join(stub, "obsidian"), 0o755)
     copy_evidence(vault, os.path.join(out, "vault-before"))
-    skill_md = os.path.join(skill_dir, "SKILL.md")
-    if spec.get("mode") and config == "old":
-        prompt = OLD_MODE_WRAPPER.format(skills_dir=os.path.dirname(skill_dir), vault=vault, prompt=case["prompt"])
+    old_mode = spec.get("mode") and config == "old"
+    entry_skill = None if old_mode else spec["baseline_skill"] if config == "old" else skill
+    hashes = materialize_plugin(ROOT, plugin, entry_skill, baseline=config == "old", skills_root=skills_root)
+    save_staged_evidence(out, hashes)
+    launch_paths = {"plugin": launch_path_spellings(plugin),
+                    "skill_entrypoint": launch_path_spellings(hashes["skill_entrypoint"])}
+    skills = plugin / "skills"
+    if old_mode:
+        prompt = OLD_MODE_WRAPPER.format(skills_dir=skills, vault=vault, prompt=case["prompt"])
     else:
         prompt = (MODE_WRAPPER if spec.get("mode") else SKILL_WRAPPER).format(
-            skill_md=skill_md, vault=vault, prompt=case["prompt"])
-    cmd = ["sandbox-exec", "-f", sandbox_profile(tmp), "claude", "-p", prompt,
+            skill_md=hashes["skill_entrypoint"], vault=vault, prompt=case["prompt"])
+    cmd = ["sandbox-exec", "-f", sandbox_profile(tmp, write_roots), "claude", "-p", prompt,
            "--output-format", "stream-json", "--verbose", "--model", model,
-           "--setting-sources", "project,local", "--strict-mcp-config", "--plugin-dir", plugin,
+           "--setting-sources", "project,local", "--strict-mcp-config", "--plugin-dir", str(plugin),
            "--permission-mode", "bypassPermissions", "--disallowedTools", "Bash(obsidian:*)"]
     env = {k: v for k, v in os.environ.items() if k not in {"CLAUDECODE", "CLAUDE_CONFIG_DIR"}}
     env["PATH"] = stub + os.pathsep + env.get("PATH", "")
@@ -1330,13 +1562,15 @@ def run_case(spec, case, config, ws, it, model, timeout, plugin, skill_dir):
     except subprocess.TimeoutExpired as exc:
         status, transcript = "timeout after %ds" % timeout, exc.stdout or b""
     elapsed = time.time() - t0
-    with open(os.path.join(out, "transcript.jsonl"), "xb") as tf:
+    transcript_path = os.path.join(out, "transcript.jsonl")
+    with open(transcript_path, "xb") as tf:
         tf.write(transcript)
+    provenance = observed_provenance(transcript_path, status, launch_paths, hashes["skill_sha256"], out)
     copy_evidence(vault, os.path.join(out, "vault-full"))
-    copy_subagents(os.path.join(out, "transcript.jsonl"), vault, os.path.join(out, "subagents"))
-    shutil.rmtree(tmp, ignore_errors=True)
+    copy_subagents(transcript_path, vault, os.path.join(out, "subagents"))
     with open(os.path.join(out, "run.json"), "w") as f:
-        json.dump({"status": status, "prompt": prompt, "vault": vault, "config": config, "model": model}, f, indent=2)
+        json.dump({"status": status, "prompt": prompt, "vault": vault, "config": config, "model": model,
+                   "launch_paths": launch_paths, **hashes, **provenance}, f, indent=2)
     return elapsed
 
 
@@ -1349,6 +1583,22 @@ def load_events(path):
             except json.JSONDecodeError:
                 pass
     return ev
+
+
+def refresh_provenance(out):
+    metadata = Path(out, "run.json")
+    run = json.loads(metadata.read_text(encoding="utf-8"))
+    launch_paths = run.get("launch_paths")
+    if launch_paths is None:
+        # The previous runner passed canonical paths under the same temporary root.
+        # Only use the recorded launch spellings; the staging directory is gone.
+        launch_paths = {"plugin": [str(Path(run["vault"]).with_name("plugin"))] if run.get("vault") else [],
+                        "skill_entrypoint": [run["skill_entrypoint"]] if run.get("skill_entrypoint") else []}
+    evidence = observed_provenance(Path(out, "transcript.jsonl"), run.get("status"),
+                                   launch_paths, run.get("skill_sha256"), out)
+    if any(run.get(key) != value for key, value in evidence.items()):
+        run.update(evidence)
+        metadata.write_text(json.dumps(run, indent=2), encoding="utf-8")
 
 
 def grade(spec, case, config, ws, it, elapsed=None):
@@ -1411,6 +1661,7 @@ def main(argv=None):
     ap.add_argument("skill", nargs="?")
     ap.add_argument("--self-test", action="store_true")
     ap.add_argument("--config", choices=["new", "old", "both"], default="both")
+    ap.add_argument("--skills-root", type=Path, metavar="DIR", help="skills tree to stage for config new")
     ap.add_argument("--iteration", type=int, default=1)
     ap.add_argument("--cases", help="comma-separated eval ids")
     ap.add_argument("--workers", type=int, default=4)
@@ -1423,6 +1674,12 @@ def main(argv=None):
         return 0
     if not a.skill:
         ap.error("skill is required unless --self-test is used")
+    if a.skills_root is not None and not a.grade_only and a.config in ("new", "both"):
+        if not a.skills_root.is_dir():
+            ap.error(f"--skills-root is not a directory: {a.skills_root}")
+        entrypoint = a.skills_root / a.skill / "SKILL.md"
+        if not entrypoint.is_file():
+            ap.error(f"--skills-root is missing the skill entrypoint: {entrypoint}")
     with open(os.path.join(HERE, a.skill, "evals.json"), encoding="utf-8") as f:
         spec = json.load(f)
     validate(spec)
@@ -1435,13 +1692,11 @@ def main(argv=None):
         with open(os.path.join(d, "eval_metadata.json"), "w") as f:
             json.dump({"eval_id": case["id"], "eval_name": case["eval_name"], "prompt": case["prompt"],
                        "assertions": [e["text"] for e in case["expectations"]]}, f, indent=2, ensure_ascii=False)
-    setup = {"new": (ROOT, os.path.join(ROOT, "skills", a.skill))}
-    if "old" in configs and not a.grade_only:
-        setup["old"] = old_plugin(spec, ws)
     elapsed = {}
     if not a.grade_only:
         with ThreadPoolExecutor(a.workers) as pool:
-            futs = {pool.submit(run_case, spec, c, cfg, ws, a.iteration, a.model, a.timeout, *setup[cfg]): (c["id"], cfg)
+            futs = {pool.submit(run_case, spec, c, cfg, ws, a.iteration, a.model, a.timeout, a.skill,
+                                a.skills_root): (c["id"], cfg)
                     for c in cases for cfg in configs}
             for fu, key in futs.items():
                 elapsed[key] = fu.result()
@@ -1449,6 +1704,8 @@ def main(argv=None):
     totals = {cfg: [0, 0] for cfg in configs}
     for c in cases:
         for cfg in configs:
+            if a.grade_only:
+                refresh_provenance(Path(eval_dir(ws, a.iteration, c), CONFIGS[cfg], "run-1", "outputs"))
             g = grade(spec, c, cfg, ws, a.iteration, elapsed.get((c["id"], cfg)))
             s = g["summary"]
             totals[cfg][0] += s["passed"]
