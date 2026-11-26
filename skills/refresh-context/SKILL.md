@@ -45,7 +45,7 @@ Scan, read-only, the Permanent Notes folder the Core Context registers for notes
 
 ## Step 4: Diff & Propose
 
-Open `principle-provenance` and `principle-preserve-voice` (each at `../<leaf>/SKILL.md`).
+Open `principle-archival` and `principle-writing` (each at `../<principle>/SKILL.md`).
 
 Show side by side, section by section:
 
@@ -64,7 +64,7 @@ Ask: **"Apply this diff? (all / part / reject)"** — in the owner's language. R
 
 ## Step 5: Apply
 
-Open `principle-resolve-target`, `principle-preserve-unrequested`, `principle-frontmatter` and `principle-read-back`; the same leaves apply to the log entry in Step 6. If approved, edit only the approved sections and leave the rest of the file byte-for-byte. Set `snapshot_date` and `date_modified` to today, add approved essays to `source`, bump `version` (minor for §2/§4/§5 changes, major for a restructure). A later proposal needs its own OK. Read the note back.
+Open `principle-editing` and `principle-markdown`; both apply to the log entry in Step 6. If approved, edit only the approved sections and leave the rest of the file byte-for-byte. Set `snapshot_date` and `date_modified` to today, add approved essays to `source`, bump `version` (minor for §2/§4/§5 changes, major for a restructure). A later proposal needs its own OK. Read the note back.
 
 ## Step 6: Log
 
@@ -88,7 +88,7 @@ Git history does not replace this entry. Do not commit or push; commit only when
 3. **Source drift**: files changed since the last snapshot and recent Permanent Notes used as evidence, or not configured.
 4. **New essays added to source**: count and titles.
 5. **Version bump**: old → new.
-6. **Principles**: each principle leaf that changed a decision and what it changed.
+6. **Principles**: each principle that changed a decision and what it changed.
 
 Never edit Me, AGENTS, policy notes, user instructions, qmd configuration or runtime profiles from here; if a source looks wrong, tell the owner. Do not publish the snapshot.
 

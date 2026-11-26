@@ -9,8 +9,7 @@ The CLI reports on a live app, so exit status, stdout, and the filesystem can ea
 
 ## 1. Vault resolution
 
-Without `vault=`, commands follow the most recently focused vault.
-That focus is app state nobody in this task set, and it changes whenever the user clicks another window.
+The default vault ([SKILL.md](../SKILL.md#vault-routing)) is app state that changes whenever the user clicks another window.
 The dangerous outcome is not an error — it is a command that succeeds against a vault the task never meant to touch.
 
 Resolve in this order and stop at the first that holds:
@@ -19,7 +18,7 @@ Resolve in this order and stop at the first that holds:
 2. A vault name the task already verified with a read-only probe in this session.
 3. Nothing — stay read-only and ask.
 
-`vault=` takes the vault name as Obsidian displays it, not a filesystem path, and it must be the first parameter.
+`vault=` takes the vault name as Obsidian displays it, not a filesystem path.
 
 A name becomes a target only after the app's own vault registry confirms it.
 `obsidian vaults` lists the vaults the app knows, and its `verbose` flag adds each vault's root folder.
@@ -58,9 +57,7 @@ Read the outcome this way:
 - Content comes back but it is not the note under discussion — you reached a different vault or a same-named note elsewhere. Stop; a write here overwrites someone else's note.
 - Empty output with exit code 0 — indeterminate, not absence. Go to [branch 2](#2-app-or-runtime-unavailable).
 
-Two or more candidate vaults, or a vault name that only appears in an old message, are ambiguity, not a default.
-Report the candidates and let the user choose.
-Never resolve ambiguity by picking the most recently focused vault, and never hardcode a vault name, workstation path, or account identifier into anything reusable.
+A vault name that only appears in an old message is ambiguity, not a default; never resolve it by picking the most recently focused vault.
 
 ## 2. App or runtime unavailable
 
@@ -121,11 +118,11 @@ Always re-read before retrying a mutating command, and only retry when the readb
 A move can half-succeed in three places at once: the destination, the old path, and every inbound link.
 Check all three, in this order:
 
-The isolated 1.12.7 collision check returned exit code 0 with `Error: Destination file already exists!`; both files were preserved. Inspect error text and materialized state, not only the exit status.
-
 1. Read the destination path — the note must be there with its content intact.
 2. Read the old path — it must no longer resolve.
 3. Audit links with `obsidian backlinks file="<moved note>"` and `obsidian unresolved`, compared against the pre-move audit.
+
+On 1.12.7 a collision returned exit code 0 with `Error: Destination file already exists!` and preserved both files, so inspect error text and materialized state, not only the exit status.
 
 Common outcomes:
 
@@ -173,14 +170,7 @@ Their absence is plugin state to report, not a CLI defect to work around.
 
 ### Destructive set
 
-Treat these as destructive and require explicit approved scope naming exact paths before running them:
-
-- `delete`
-- `create ... overwrite` on an existing note
-- a move onto an occupied destination
-- any bulk replacement across multiple notes
-- anything that touches `.obsidian/` or plugin data
-- `eval` that assigns, saves, or deletes
+Beyond `delete` and `create ... overwrite` (see SKILL.md), these also need explicit approved scope naming exact paths: a move onto an occupied destination, any bulk replacement across notes, anything that touches `.obsidian/` or plugin data, and `eval` that assigns, saves, or deletes.
 
 Default to read-only when authorization is missing or ambiguous.
 Reuse authorization the task already granted for that note and effect; do not demand consent again for the same approved change, and do not stretch consent for one note to cover its neighbors.
@@ -210,7 +200,6 @@ A failure report is complete when it names:
 
 ## Verification
 
-- [ ] The vault was resolved explicitly, and ambiguity was reported instead of defaulting to focus.
 - [ ] The selected vault name was mapped to one registered root, or the missing, stale, or ambiguous registration was reported and nothing was written.
 - [ ] An unavailable capability was confirmed by a second, different probe before being reported.
 - [ ] Empty output with exit code 0 was retried and then treated as indeterminate.
@@ -218,4 +207,3 @@ A failure report is complete when it names:
 - [ ] A move was verified at the destination, the old path, and the link audit.
 - [ ] The post-change diff contained only the requested change.
 - [ ] Missing commands or parameters were reported as skew, never approximated.
-- [ ] Destructive operations had explicit approved scope, or were skipped and reported.

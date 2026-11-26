@@ -37,7 +37,7 @@ claude plugin install secondbrain-skills@secondbrain-skills
 ## 동작 방식
 
 <p align="center">
-  <img src="assets/demo/workflow.svg" alt="네 구역: 반납함(capture, inbox), 서고(ingest가 Raw 원문을 그대로 보존), 별자리(위키 페이지, Entity, Map이 하나의 네트워크로 연결), 열람실(query가 연결을 따라가며 출처를 달아 답함)과 서가 관리 순환(lint, audit, verify, status, reindex)" width="100%">
+  <img src="assets/demo/workflow.svg" alt="네 구역: 반납함(capture, ingest의 Inbox 일괄 처리), 서고(ingest가 Raw 원문을 그대로 보존), 별자리(위키 페이지, Entity, Map이 하나의 네트워크로 연결), 열람실(query가 연결을 따라가며 출처를 달아 답함)과 서가 관리 순환(lint, audit, verify)" width="100%">
 </p>
 
 | 원칙 | 실제로 뜻하는 것 |
@@ -49,47 +49,28 @@ claude plugin install secondbrain-skills@secondbrain-skills
 
 ## 패키지
 
-독립된 패키지 마흔한 개입니다. 각 행은 그 패키지를 정의하는 `SKILL.md`로 이어지고, 에이전트는 그 `description`을 보고 패키지를 고릅니다. `principle-*` 원칙은 스스로 불리지 않고, 패키지의 단계나 `secondbrain-mode`가 이름을 댈 때 읽힙니다.
+독립된 패키지 스물두 개입니다. 각 행은 그 패키지를 정의하는 `SKILL.md`로 이어지고, 에이전트는 그 `description`을 보고 패키지를 고릅니다. `principle-*` 원칙은 스스로 불리지 않고, 패키지의 단계나 `secondbrain-mode`가 이름을 댈 때 읽힙니다.
 
 | 서가 | 패키지 | 맡는 일 |
 | --- | --- | --- |
 | **모으기** | [`capture`](skills/capture/SKILL.md) | 탭, URL, 파일, 대화, 에이전트 세션을 Inbox 후보로 저장합니다. |
-| | [`inbox`](skills/inbox/SKILL.md) | Inbox를 검토하고 고른 범위를 `ingest`로 보냅니다. |
-| **엮기** | [`ingest`](skills/ingest/SKILL.md) | 자료 하나를 보존된 Raw 노트와 위키 페이지, Entity, Map으로 만듭니다. |
+| **엮기** | [`ingest`](skills/ingest/SKILL.md) | 자료 하나나 고른 Inbox 묶음을 보존된 Raw 노트와 위키 페이지, Entity, Map으로 만들고 qmd 색인을 새로 고칩니다. |
 | | [`onboard`](skills/onboard/SKILL.md) | 새 볼트를 소유자 인터뷰로 세팅하거나 기존 볼트를 진단합니다. |
 | | [`refresh-context`](skills/refresh-context/SKILL.md) | 에이전트가 소유자에 대해 쥐고 있는 Core Context를 새로 고칩니다. |
-| | [`reindex`](skills/reindex/SKILL.md) | 노트가 바뀐 뒤 qmd 검색 색인을 새로 고칩니다. |
 | | [`term`](skills/term/SKILL.md) | 분야 용어를 조사해 Term 페이지를 쓰거나 고칩니다. |
 | | [`concept`](skills/concept/SKILL.md) | 아이디어나 방법론을 조사해 Concept 페이지를 쓰거나 고칩니다. |
 | | [`entity`](skills/entity/SKILL.md) | 이름 있는 대상을 조사해 타입별 템플릿으로 Entity 페이지를 쓰거나 고칩니다. |
 | **묻기** | [`query`](skills/query/SKILL.md) | 위키에서 출처를 달아 답하고, 빈 곳을 위키로 되돌립니다. |
 | **모드** | [`secondbrain-mode`](skills/secondbrain-mode/SKILL.md) | 켜 두면 새 단어, 방법론, 이름 있는 대상의 위키 작업을 서브에이전트에 맡깁니다. 하나면 포그라운드에서, 둘 이상이면 백그라운드에서 실행합니다. 상위 에이전트는 말없이 기다린 뒤 기록 결과를 한 줄로 보고합니다. |
-| **서가 관리** | [`lint`](skills/lint/SKILL.md) | 링크, 위치, frontmatter, 색인·로그 동기화 같은 기계적 건강 검사. |
+| **서가 관리** | [`lint`](skills/lint/SKILL.md) | 링크, 위치, frontmatter, 색인·로그 동기화 같은 기계적 건강 검사, 또는 개수만 보여 주는 상태 요약. |
 | | [`audit`](skills/audit/SKILL.md) | Map 묶음별로 위키 페이지를 표본 추출해 품질을 매깁니다(읽기 전용). |
 | | [`verify`](skills/verify/SKILL.md) | 한 페이지의 주장을 인용한 증거와 대조합니다. |
-| | [`status`](skills/status/SKILL.md) | 개수, 밀린 작업, 커버리지를 읽기 전용으로 보여 줍니다. |
-| **원칙** | [`principle-vault-roles`](skills/principle-vault-roles/SKILL.md) | 볼트의 wiki, source, work 영역마다 허용되는 쓰기를 정합니다. |
-| | [`principle-resolve-target`](skills/principle-resolve-target/SKILL.md) | 쓰기 전에 볼트, 노트, 효과, 권한을 정확히 확정합니다. |
-| | [`principle-preserve-unrequested`](skills/principle-preserve-unrequested/SKILL.md) | 요청한 것만 바꾸고 나머지는 바이트 그대로 둡니다. |
-| | [`principle-read-back`](skills/principle-read-back/SKILL.md) | 쓴 뒤 다시 읽고 링크를 확인해야 끝난 것입니다. |
-| | [`principle-provenance`](skills/principle-provenance/SKILL.md) | 기록의 진짜 생산자를 찾아 남깁니다. |
-| | [`principle-original-order`](skills/principle-original-order/SKILL.md) | 자료 고유의 순서와 문장을 지킵니다. |
-| | [`principle-hierarchy`](skills/principle-hierarchy/SKILL.md) | 항목을 그것이 속한 전체 아래에 둡니다. |
-| | [`principle-collective-description`](skills/principle-collective-description/SKILL.md) | 컬렉션의 범위, 커버리지, 빈 곳을 허브에서 기술합니다. |
-| | [`principle-note-kinds`](skills/principle-note-kinds/SKILL.md) | 지식이 Term, Concept, Guide, Entity 중 무엇인지 정합니다. |
-| | [`principle-entity-types`](skills/principle-entity-types/SKILL.md) | Entity의 타입, 템플릿, 폴더를 고릅니다. |
-| | [`principle-revise-and-consolidate`](skills/principle-revise-and-consolidate/SKILL.md) | 기존 페이지의 유효한 내용을 잃지 않고 고칩니다. |
-| | [`principle-not-a-research-log`](skills/principle-not-a-research-log/SKILL.md) | 조사 과정은 페이지에 적지 않습니다. |
-| | [`principle-plain-tldr`](skills/principle-plain-tldr/SKILL.md) | TL;DR은 평이한 문장으로 씁니다. |
-| | [`principle-draw-structure`](skills/principle-draw-structure/SKILL.md) | 글로는 머릿속에서 다시 짜야 하는 구조를 그림으로 그립니다. |
-| | [`principle-standalone-note`](skills/principle-standalone-note/SKILL.md) | 대화를 못 본 독자를 위해 씁니다. |
-| | [`principle-quotation-attribution`](skills/principle-quotation-attribution/SKILL.md) | 인용, 번역, 해석, 자기 말을 구분합니다. |
-| | [`principle-preserve-voice`](skills/principle-preserve-voice/SKILL.md) | 주변을 고쳐도 저자의 문장은 그대로 둡니다. |
-| | [`principle-note-shape`](skills/principle-note-shape/SKILL.md) | 제목, 목록, 표, 굵게, 개념 하나에 용어 하나. |
-| | [`principle-frontmatter`](skills/principle-frontmatter/SKILL.md) | frontmatter의 키 순서, URL 키, 링크, status. |
-| | [`principle-link-form`](skills/principle-link-form/SKILL.md) | 위키링크, 외부 링크, 첫 언급 링크, 임베드. |
-| | [`principle-markdown-blocks`](skills/principle-markdown-blocks/SKILL.md) | 중첩 목록, 코드 펜스, 강조, 콜아웃 같은 블록. |
-| **Obsidian** | [`bases`](skills/bases/SKILL.md) | Obsidian Bases: `.base` 파일과 임베드된 base 블록. |
+| **원칙** | [`principle-editing`](skills/principle-editing/SKILL.md) | 쓰기 전에 대상을 확정하고, 요청한 것만 바꾸고, 다시 읽어 확인합니다. |
+| | [`principle-knowledge-notes`](skills/principle-knowledge-notes/SKILL.md) | Term, Concept, Guide, Entity 구분, Entity 타입, 볼트 영역별 허용 쓰기. |
+| | [`principle-archival`](skills/principle-archival/SKILL.md) | 기록의 출처, 원질서, 계층, 집합 기술. |
+| | [`principle-writing`](skills/principle-writing/SKILL.md) | 혼자 읽히는 노트, 조사 기록 배제, 저자의 목소리, 고쳐 통합하기. |
+| | [`principle-markdown`](skills/principle-markdown/SKILL.md) | 프런트매터, 링크, 블록, TL;DR, 인용, 노트 모양, 다이어그램. |
+| **Obsidian** | [`obsidian-bases`](skills/obsidian-bases/SKILL.md) | Obsidian Bases: `.base` 파일과 임베드된 base 블록. |
 | | [`obsidian-cli`](skills/obsidian-cli/SKILL.md) | 공식 `obsidian` CLI로 실행 중인 데스크톱 앱을 다룹니다. |
 | | [`obsidian-clipper`](skills/obsidian-clipper/SKILL.md) | Web Clipper 템플릿 JSON을 쓰고 고칩니다. |
 | | [`obsidian-sync`](skills/obsidian-sync/SKILL.md) | `ob` 클라이언트로 하는 헤드리스 Obsidian Sync. |

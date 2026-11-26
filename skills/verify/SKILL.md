@@ -10,7 +10,7 @@ Verify that one Wiki page meets the quality requirements of a knowledge unit. `v
 
 The claim taxonomy, evidence scopes, primary/secondary judgment and confidence meaning are in [claims](references/claims.md). Field names and values follow `ingest`'s frontmatter reference.
 
-Open `principle-provenance` and `principle-quotation-attribution` (each at `../<leaf>/SKILL.md`) before tracing a claim; open `principle-resolve-target`, `principle-preserve-unrequested`, `principle-revise-and-consolidate`, `principle-frontmatter`, `principle-link-form` and `principle-markdown-blocks` before an approved write-back, and `principle-read-back` after each write, the log entry included.
+Open `principle-archival` and `principle-markdown` (each at `../<principle>/SKILL.md`) before tracing a claim; open `principle-editing` and `principle-writing` before an approved write-back, and read back each write, the log entry included.
 
 ## Input
 
@@ -65,7 +65,7 @@ disputed: true
 
 - `verified` only when all three criteria pass on evidence located in this session; `partial` when some claims check out and others could not be checked or gaps remain; `unverified` when nothing could be checked against located evidence; `disputed` when a credible conflict stands. Omit `disputed` or set it `false` when no conflict stands.
 - Apply approved disputed callouts, the approved `confidence` change, the drafted Bias Check, and missing frontmatter values. A claim's text changes only by an approved correction resting on verified evidence: the correction is drafted from the located source and the approved finding only, then a separate preservation review compares the before-image with the proposal, keeps valid existing content, and reduces it to a minimal patch with attribution kept; a disputed claim keeps its uncertainty stated. No blanket regeneration.
-- Apply Entity corrections and metadata through `principle-revise-and-consolidate` and [updating](../ingest/references/updating.md) (a narrow correction migrates nothing), keeping every owner sentence unchanged. Report a finding that would change an owner sentence without writing it.
+- Apply Entity corrections and metadata through `principle-writing` and [updating](../ingest/references/updating.md) (a narrow correction migrates nothing). Report a finding that would change an owner sentence without writing it.
 - Set `explored: true` (with `exploredBy`, `exploredDate`) only when the owner explicitly confirms this verification counts as explored.
 - Update `date_modified` on each changed page; keep unrelated and unknown keys, values and config exactly. No incidental metadata migration.
 - Read each changed page back, then append to the wiki log: `## [YYYY-MM-DD] verify | {Page}` with the verdict, `verificationStatus`, recommended `confidence`, and disputed counterparts. The wiki log is append-only; Git history never replaces it. Never commit or push; commit only when the owner separately asks.
@@ -101,7 +101,7 @@ verificationStatus: {verified|partial|unverified|disputed}; what could not be ch
 Write-back: exact edits, page by page (or "none — report only")
 explored gate: ask owner | stays false
 Follow-up /verify targets: [...]
-Principles: each principle leaf that changed a decision and what it changed
+Principles: each principle that changed a decision and what it changed
 ```
 
 ## Failure Modes

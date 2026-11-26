@@ -7,7 +7,7 @@ records the skills each query invokes, so siblings compete as they do in use. It
 
 - each skill's `trigger_evals`: a should-trigger query invokes that skill in at least half the runs,
   a should-not-trigger query in fewer than half;
-- `principle-*` leaves and `secondbrain-mode` (`disable-model-invocation: true`) are invoked 0 times.
+- `principle-*` principles and `secondbrain-mode` (`disable-model-invocation: true`) are invoked 0 times.
 
 Set --fixtures DIR or SB_EVAL_FIXTURES to the fixture root.
 
@@ -179,7 +179,7 @@ def main(argv=None):
         print("%-16s %d/%d" % (s, p, t))
     reads = sum(len(r["leaf_reads"]) for g in runs.values() for r in g)
     print("Skill-tool invocations of principle-* or secondbrain-mode: %d %s" % (len(leaked), sorted(set(leaked))))
-    print("principle leaves opened by path from a skill step: %d; runs not ok: %d %s" % (reads, len(errors), sorted(set(errors))))
+    print("principles opened by path from a skill step: %d; runs not ok: %d %s" % (reads, len(errors), sorted(set(errors))))
     path = a.json or os.path.join(HERE, "results", "trigger-plugin%s.json" % ("-full" if a.full else ""))
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w") as f:

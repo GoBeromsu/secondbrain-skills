@@ -7,7 +7,6 @@ has a finding; a last check per path fails on any finding no case expects.
 Set --fixtures DIR or SB_EVAL_FIXTURES to the fixture root.
 
   python3 evals/lint/run.py                       # current skill: python and marksman paths
-  python3 evals/lint/run.py --cli                 # also obsidian-lint.py (fixture open in Obsidian)
   python3 evals/lint/run.py --skill-dir <old>     # baseline from evals/baseline.sh lint
 """
 import argparse
@@ -52,7 +51,6 @@ def main(argv=None):
     ap = argparse.ArgumentParser()
     ap.add_argument("--fixtures", metavar="DIR", help="fixture root (default: SB_EVAL_FIXTURES)")
     ap.add_argument("--skill-dir", default=os.path.join(ROOT, "skills", "lint"))
-    ap.add_argument("--cli", action="store_true", help="also run obsidian-lint.py; Obsidian must already have the fixture open")
     ap.add_argument("--json", help="write per-case results to this file")
     a = ap.parse_args(argv)
     fixture_root = a.fixtures or os.environ.get("SB_EVAL_FIXTURES")
@@ -89,16 +87,18 @@ def main(argv=None):
     policy += [x for t in product_types for x in ("--product-type", t)]
     policy += ["--lifecycle", ",".join(declared["lifecycle"])]
 
-    python = run(os.path.join(scripts, "link-lint.py"), ["--vault", vault, "--checks", "all", *policy])
+    lint = os.path.join(scripts, "link-lint.py")
+    python = run(lint, ["--vault", vault, "--checks", "all", "--orphans", *policy])
     if python[0] is None and python[2] == 2 and os.path.realpath(a.skill_dir) != os.path.realpath(os.path.join(ROOT, "skills", "lint")):
-        # A release without the policy checks (0.28.1) still gets credit for its link-form rules.
-        python = run(os.path.join(scripts, "link-lint.py"), ["--vault", vault])
+        # Older releases get credit for what they have: policy checks without --orphans (0.29.0),
+        # or link-form rules only (0.28.1).
+        python = run(lint, ["--vault", vault, "--checks", "all", *policy])
+        if python[0] is None and python[2] == 2:
+            python = run(lint, ["--vault", vault])
     runs = {
         "python": python,
         "marksman": run(os.path.join(scripts, "marksman-lint.py"), ["--vault", vault]),
     }
-    if a.cli:
-        runs["obsidian-cli"] = run(os.path.join(scripts, "obsidian-lint.py"), ["--vault", vault, *policy])
 
     cases = [c for c in spec["evals"] if "paths" in c]
     # A misspelt path would make a clean-file or finding check pass vacuously.

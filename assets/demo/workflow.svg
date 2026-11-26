@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600" role="img" aria-labelledby="t d">
 <title id="t">From source to shelf</title>
-<desc id="d">Four stations: the book drop (capture, inbox), the archive (Raw source kept verbatim), the constellation (wiki pages, entities and maps linked into one network) and the reading room (answers that follow the links, with citations), with a shelf-care loop of lint, audit, verify, status and reindex underneath.</desc>
+<desc id="d">Four stations: the book drop (capture, with ingest's Inbox batch), the archive (Raw source kept verbatim), the constellation (wiki pages, entities and maps linked into one network) and the reading room (answers that follow the links, with citations), with a shelf-care loop of lint, audit and verify underneath.</desc>
 <defs>
 <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1d1936"/><stop offset="1" stop-color="#141224"/></linearGradient>
 <radialGradient id="lamp" cx=".85" cy=".1" r=".6"><stop offset="0" stop-color="#f0b85a" stop-opacity=".16"/><stop offset="1" stop-color="#f0b85a" stop-opacity="0"/></radialGradient>
@@ -22,8 +22,8 @@
 </g>
 <text x="282" y="190" text-anchor="end" font-size="13" letter-spacing="2" fill="#a78bfa" font-weight="700">01</text>
 <text x="80" y="276" font-size="24" font-weight="750" fill="#f4ead5">Book drop</text>
-<rect x="80" y="292" width="143" height="26" rx="13" fill="#a78bfa" fill-opacity=".16" stroke="#a78bfa" stroke-opacity=".45"/>
-<text x="90" y="310" font-size="13.5" fill="#d9ccff" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">capture · inbox</text>
+<rect x="80" y="292" width="190" height="26" rx="13" fill="#a78bfa" fill-opacity=".16" stroke="#a78bfa" stroke-opacity=".45"/>
+<text x="90" y="310" font-size="13.5" fill="#d9ccff" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace">capture · Inbox batch</text>
 <text x="80" y="354" font-size="16" fill="#c9c2e6">Tabs, files and chats</text>
 <text x="80" y="378" font-size="16" fill="#c9c2e6">arrive as candidates.</text>
 <text x="80" y="402" font-size="16" fill="#c9c2e6">Nothing is filed yet.</text>
@@ -84,6 +84,6 @@
 <path d="M1027.0 442 V501 H856" fill="none" stroke="#a78bfa" stroke-width="2" stroke-dasharray="5 6" marker-end="url(#arrv)"/>
 <line x1="745.0" y1="482" x2="745.0" y2="446" stroke="#a78bfa" stroke-width="2" stroke-dasharray="5 6" marker-end="url(#arrv)"/>
 <rect x="358" y="484" width="492" height="34" rx="17" fill="#141224" stroke="#a78bfa" stroke-opacity=".5"/>
-<text x="604.0" y="506" text-anchor="middle" font-size="14.5" fill="#d9ccff"><tspan font-weight="700" fill="#f4ead5">Shelf care</tspan>  ·  lint · audit · verify · status · reindex</text>
+<text x="604.0" y="506" text-anchor="middle" font-size="14.5" fill="#d9ccff"><tspan font-weight="700" fill="#f4ead5">Shelf care</tspan>  ·  lint · audit · verify</text>
 <text x="56" y="572" font-size="12.5" fill="#8f88b3">Illustration drawn for this repository. Not a screenshot, and not a claim that anything ran.</text>
 </g></svg>

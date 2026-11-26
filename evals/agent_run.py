@@ -1837,8 +1837,8 @@ def grader_self_test(prose_check, verdict, citation):
         print("PASS: background routing accepts successful structured or exact shell file operations, not shell substrings")
 
         for answer, expected in (
-            ("principle-provenance: The official announcement is more authoritative than the older post.", True),
-            ("principle-provenance: I updated the wiki page.", False),
+            ("principle-archival: The official announcement is more authoritative than the older post.", True),
+            ("principle-archival: I updated the wiki page.", False),
             ("노트 제목을 바꿨습니다.", False),
             ("No changes are needed to use block references.", True),
             ("No wiki changes were made.", False),

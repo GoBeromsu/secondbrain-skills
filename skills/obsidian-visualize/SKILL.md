@@ -26,7 +26,7 @@ Follow-up questions on the same subject extend the same drawing as numbered sect
 
 ## Canvas
 
-A `.canvas` file is JSON Canvas 1.0, written directly as a file; no plugin or CLI is required. Open [`references/canvas.md`](references/canvas.md) for the node, edge, color and ID schema and its validation checklist, [`references/canvas-operations.md`](references/canvas-operations.md) before changing a canvas that already holds user data, and [`references/canvas-examples.md`](references/canvas-examples.md) for complete documents. Existing IDs, unrelated nodes and edges, unknown keys and node order survive an edit; a duplicate or dangling ID is reported, never repaired silently.
+A `.canvas` file is JSON Canvas 1.0, written directly as a file; no plugin or CLI is required. Open [`references/canvas.md`](references/canvas.md) for the node, edge, color and ID schema and its validation checklist and a complete example, and [`references/canvas-operations.md`](references/canvas-operations.md) before changing a canvas that already holds user data. Existing IDs, unrelated nodes and edges, unknown keys and node order survive an edit; a duplicate or dangling ID is reported, never repaired silently.
 
 ## Excalidraw
 
@@ -62,17 +62,9 @@ Offline, or for a plain boxes-and-arrows graph, `scripts/draw.py` (usage above) 
 
 What the CLI cannot do (elbow arrows, Mermaid-to-elements, embedded notes and pages, frontmatter keys) goes through a trusted EA script, as `excalidraw-plugin.md` describes, only in a disposable or approved vault. `obsidian eval` is synchronous: start an async call that stores its result on `window`, then read it in a second call. Opening a drawing makes the plugin re-save it compressed, so never hand-edit the compressed block.
 
-Give every node that names a recognizable thing its image beside the label, unasked: a product, app, service or company gets its official logo or app icon, a public figure a public photo, a character its official art; a private person gets only an image already in the vault. Look first for a PNG on the thing's own site (`apple-touch-icon.png`, `icon.png`) or its GitHub organization avatar (`https://github.com/<org>.png`); keep a URL only after fetching it shows an image of that exact thing, never its maker's personal avatar or an unrelated favicon. When none is found, leave the node without one and list it as skipped with the reason; never draw a stand-in.
+**Images, unasked.** A node naming a product, app, service or company gets its official logo or app icon; a public figure a public photo; a private person only an image already in the vault. Try the thing's own site (`apple-touch-icon.png`, `icon.png`) or `https://github.com/<org>.png`, and keep a URL only after fetching it shows that exact thing. None found: leave the node bare and list it as skipped with the reason; never draw a stand-in. A node for an openable source (article, video, repo, docs page) gets a `link` to it and its preview image from `python3 scripts/thumbnail.py <url>...` when the page declares one. Something worth watching or reading in place goes in as a web embed in a closing section (it exports as an empty frame). `python3 scripts/place.py <drawing> <items.json|-> --vault <name>` adds images and embeds to an existing drawing (item fields in `excalidraw-plugin.md`); save with `save.py` afterwards.
 
-Give every node that stands for a source the reader can open (an article, a video, a repository, a documentation page) that source's own preview image and a `link` to it, unasked: the picture makes the source recognizable at a glance and the link turns the drawing into a way back to the evidence. `python3 scripts/thumbnail.py <url>...` prints the preview image each page declares; a page that declares none, or whose preview fails to decode at export, stays text with its link. A video or page worth watching or reading in place goes in as a web embed in a closing section of its own, since an embed plays only inside Obsidian and exports as an empty frame.
-
-```
-python3 scripts/place.py <vault-relative drawing> <items.json|-> --vault <name>
-```
-
-`place.py` puts images and web embeds on an existing drawing by URL, each with its `link`; `excalidraw-plugin.md` has the item fields. Save with `save.py` afterwards.
-
-Images: an external image (logo, icon, web screenshot) stays a URL in the drawing's Embedded Files (`icon` in the spec); never download it into the vault, and tell the user it loads from a third party on first open. To check layout without the network use `export.py --placeholder-images`, otherwise a live export. If export fails with `ASSETS_UNAVAILABLE` on remote images (seen with SVG logos from `cdn.simpleicons.org`), do not retry or download them: rerun `export.py --placeholder-images` to check layout and tell the user to confirm the logos by opening the drawing in Obsidian. Only images already in the vault are referenced as vault files.
+External images stay URLs in Embedded Files (`icon` in the spec), never downloaded into the vault; tell the user they load from a third party. If export fails with `ASSETS_UNAVAILABLE`, don't retry or download: rerun `export.py --placeholder-images` for layout and ask the user to confirm the images in Obsidian.
 
 A note shows a drawing by embedding the drawing itself (`![[name.excalidraw]]`). Leave no exported image in the vault unless the user asks for one: a copy goes stale on the next edit.
 
@@ -81,7 +73,7 @@ A note shows a drawing by embedding the drawing itself (`![[name.excalidraw]]`).
 A diagram inside a note is a `mermaid` fence. Pele draws it, so correct syntax is the work and a probe only confirms it. Obsidian 1.15.0+ only; earlier apps are out of scope.
 
 - Probe commands and the `loadMermaid` step are in [`references/pele.md`](references/pele.md).
-- When a block fails, check the "Syntax pitfalls" section of that file; [`references/pele-catalog.md`](references/pele-catalog.md) has copy-ready blocks for the rest.
+- Pick the family from the table in [`references/pele-catalog.md`](references/pele-catalog.md); it lists Pele's deltas for common families and verified blocks for beta and Pele-only ones. When a block fails, check "Syntax pitfalls" in `pele.md`.
 
 Extras (the `excalidraw-extras` companion plugin) adds two things to a drawing: Mermaid converted to editable elements, when the user wants to hand-edit a Mermaid diagram, and LaTeX for math. Otherwise use a Pele fence. Its absence is normal; install it only when asked. Details are in `excalidraw-plugin.md`; `pele.md` does not own them.
 

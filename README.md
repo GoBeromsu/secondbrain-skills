@@ -37,7 +37,7 @@ Other runtimes are under [Install](#install).
 ## How it works
 
 <p align="center">
-  <img src="assets/demo/workflow.svg" alt="Four stations: Book drop (capture, inbox), Archive (ingest keeps the Raw source verbatim), Constellation (wiki pages, Entities and Maps linked into one network) and Reading room (query answers by following the links, with citations), with a Shelf care loop of lint, audit, verify, status and reindex" width="100%">
+  <img src="assets/demo/workflow.svg" alt="Four stations: Book drop (capture, with ingest's Inbox batch), Archive (ingest keeps the Raw source verbatim), Constellation (wiki pages, Entities and Maps linked into one network) and Reading room (query answers by following the links, with citations), with a Shelf care loop of lint, audit and verify" width="100%">
 </p>
 
 | Principle | What it means in practice |
@@ -49,47 +49,28 @@ Other runtimes are under [Install](#install).
 
 ## Packages
 
-Forty-one independent packages. Every row links to the `SKILL.md` that defines it; its `description` is what an agent matches on. A `principle-*` leaf is never picked on its own; it is read when a package step or `secondbrain-mode` names it.
+Twenty-two independent packages. Every row links to the `SKILL.md` that defines it; its `description` is what an agent matches on. A `principle-*` package is never picked on its own; it is read when a package step or `secondbrain-mode` names it.
 
 | Shelf | Package | Job |
 | --- | --- | --- |
 | **Collect** | [`capture`](skills/capture/SKILL.md) | Save tabs, URLs, files, conversations or agent sessions as Inbox candidates. |
-| | [`inbox`](skills/inbox/SKILL.md) | Review the Inbox and route a selected scope through `ingest`. |
-| **Compile** | [`ingest`](skills/ingest/SKILL.md) | Turn one source into a preserved Raw note plus Wiki pages, Entities and Maps. |
+| **Compile** | [`ingest`](skills/ingest/SKILL.md) | Turn a source, or a selected Inbox batch, into a preserved Raw note plus Wiki pages, Entities and Maps; refresh the qmd index. |
 | | [`onboard`](skills/onboard/SKILL.md) | Set up a fresh vault through an owner interview, or diagnose an existing one. |
 | | [`refresh-context`](skills/refresh-context/SKILL.md) | Refresh the Core Context snapshot the agent keeps about the owner. |
-| | [`reindex`](skills/reindex/SKILL.md) | Refresh the qmd search index after notes change. |
 | | [`term`](skills/term/SKILL.md) | Research a field term and write or update its Term page. |
 | | [`concept`](skills/concept/SKILL.md) | Research an idea or method and write or update its Concept page. |
 | | [`entity`](skills/entity/SKILL.md) | Research a named thing and write or update its Entity page from its type template. |
 | **Ask** | [`query`](skills/query/SKILL.md) | Answer from the Wiki with citations, and feed gaps back into it. |
 | **Mode** | [`secondbrain-mode`](skills/secondbrain-mode/SKILL.md) | While on, route new words, methods and named things to wiki workers. One runs in the foreground; two or more run in the background. The parent waits silently and reports writes in one line. |
-| **Shelf care** | [`lint`](skills/lint/SKILL.md) | Mechanical health: links, placement, frontmatter, index and log sync. |
+| **Shelf care** | [`lint`](skills/lint/SKILL.md) | Mechanical health: links, placement, frontmatter, index and log sync; or a counts-only status snapshot. |
 | | [`audit`](skills/audit/SKILL.md) | Sample Wiki pages per Map cluster and score their quality, read-only. |
 | | [`verify`](skills/verify/SKILL.md) | Check one page's claims against its cited evidence. |
-| | [`status`](skills/status/SKILL.md) | A read-only snapshot of counts, backlog and coverage. |
-| **Principles** | [`principle-vault-roles`](skills/principle-vault-roles/SKILL.md) | Which writes each vault area allows: wiki, source and work. |
-| | [`principle-resolve-target`](skills/principle-resolve-target/SKILL.md) | State the vault, note, effect and authority before any write. |
-| | [`principle-preserve-unrequested`](skills/principle-preserve-unrequested/SKILL.md) | Change only what was asked; keep the rest byte-identical. |
-| | [`principle-read-back`](skills/principle-read-back/SKILL.md) | Re-read and resolve every write before calling it done. |
-| | [`principle-provenance`](skills/principle-provenance/SKILL.md) | Find and keep the true creator of a record. |
-| | [`principle-original-order`](skills/principle-original-order/SKILL.md) | Keep a source's own order and wording. |
-| | [`principle-hierarchy`](skills/principle-hierarchy/SKILL.md) | Place an item under the whole it belongs to. |
-| | [`principle-collective-description`](skills/principle-collective-description/SKILL.md) | Describe a collection's scope, coverage and gaps at its hub. |
-| | [`principle-note-kinds`](skills/principle-note-kinds/SKILL.md) | Decide whether knowledge is a Term, Concept, Guide or Entity. |
-| | [`principle-entity-types`](skills/principle-entity-types/SKILL.md) | Pick an Entity's type, template and folder. |
-| | [`principle-revise-and-consolidate`](skills/principle-revise-and-consolidate/SKILL.md) | Update an existing page without losing anything valid on it. |
-| | [`principle-not-a-research-log`](skills/principle-not-a-research-log/SKILL.md) | Keep the research process off the page. |
-| | [`principle-plain-tldr`](skills/principle-plain-tldr/SKILL.md) | Write the TL;DR as plain sentences. |
-| | [`principle-draw-structure`](skills/principle-draw-structure/SKILL.md) | Draw a diagram where prose makes the reader rebuild a structure. |
-| | [`principle-standalone-note`](skills/principle-standalone-note/SKILL.md) | Write for a reader who never saw the conversation. |
-| | [`principle-quotation-attribution`](skills/principle-quotation-attribution/SKILL.md) | Keep quotation, translation, interpretation and own words apart. |
-| | [`principle-preserve-voice`](skills/principle-preserve-voice/SKILL.md) | Keep the author's sentences when revising around them. |
-| | [`principle-note-shape`](skills/principle-note-shape/SKILL.md) | Headings, lists, tables, bold and one term per concept. |
-| | [`principle-frontmatter`](skills/principle-frontmatter/SKILL.md) | Key order, URL keys, links and status in frontmatter. |
-| | [`principle-link-form`](skills/principle-link-form/SKILL.md) | Wikilinks, external links, first-mention links and embeds. |
-| | [`principle-markdown-blocks`](skills/principle-markdown-blocks/SKILL.md) | Nested lists, code fences, emphasis, callouts and other blocks. |
-| **Obsidian** | [`bases`](skills/bases/SKILL.md) | Obsidian Bases: `.base` files and embedded base blocks. |
+| **Principles** | [`principle-editing`](skills/principle-editing/SKILL.md) | State the target before a write, change only what was asked, read it back. |
+| | [`principle-knowledge-notes`](skills/principle-knowledge-notes/SKILL.md) | Term, Concept, Guide or Entity; Entity types; which writes each vault area allows. |
+| | [`principle-archival`](skills/principle-archival/SKILL.md) | Provenance, original order, hierarchy and collective description of records. |
+| | [`principle-writing`](skills/principle-writing/SKILL.md) | Standalone notes, no research log, the author's voice, revise and consolidate. |
+| | [`principle-markdown`](skills/principle-markdown/SKILL.md) | Frontmatter, links, blocks, TL;DR, quotation, note shape and diagrams. |
+| **Obsidian** | [`obsidian-bases`](skills/obsidian-bases/SKILL.md) | Obsidian Bases: `.base` files and embedded base blocks. |
 | | [`obsidian-cli`](skills/obsidian-cli/SKILL.md) | Drive the running desktop app through the official `obsidian` CLI. |
 | | [`obsidian-clipper`](skills/obsidian-clipper/SKILL.md) | Author and repair Web Clipper template JSON. |
 | | [`obsidian-sync`](skills/obsidian-sync/SKILL.md) | Headless Obsidian Sync with the `ob` client. |

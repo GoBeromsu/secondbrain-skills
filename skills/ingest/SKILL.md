@@ -1,149 +1,109 @@
 ---
 name: "ingest"
-description: "Ingests one selected source into the wiki: a URL, file, text, paper, book or Inbox candidate becomes a preserved Raw source plus Wiki pages, Entity updates and Maps. A repository becomes a Product Entity about why the owner needs the tool, with no Raw. Use when the owner hands over material to compile: adding a source, ingesting a paper by DOI or citekey, reading a book chapter, adding a book's table of contents, adding source facts to a person, organization, paper, book, media or product Entity, and attributed Persona updates. Saving without compiling belongs to capture."
+description: "Ingests selected sources into the wiki: a URL, file, text, paper, book or Inbox candidate becomes a preserved Raw source plus Wiki pages, Entity updates and Maps, and the qmd search index is refreshed after. A repository becomes a Product Entity about why the owner needs the tool, with no Raw. Use when the owner hands over material to compile: adding a source, ingesting a paper by DOI or citekey, reading a book chapter, adding a book's table of contents, adding source facts to a person, organization, paper, book, media or product Entity, attributed Persona updates, reviewing, counting or batch-processing the Inbox, and reindexing qmd search after notes change. Saving without compiling belongs to capture."
 ---
 
 # Ingest
 
-Execute every step in order. Asking for ingest authorizes the writes this recipe names in the destination vault — Raw, Wiki pages, Maps, the Step 6 person-impressions move, and the wiki index and log in [records](references/records.md) — under the vault's live policy. It does not authorize deleting an Inbox original or any other file, committing, pushing, or rewriting owner sentences. [Frontmatter](references/frontmatter.md) governs every key; YAML uses 2 spaces, the body tabs, YAML wikilinks are quoted.
+Execute every step in order. Asking for ingest authorizes, under the vault's live policy, the writes this recipe names: the Raw, Wiki pages, Maps, the Step 6 person-impressions move, and the wiki index and log in [records](references/records.md). It does not authorize deleting an Inbox original or any other file, committing, pushing, or rewriting owner sentences. [Frontmatter](references/frontmatter.md) governs every key.
 
-This recipe decides what is written and where, not how a note is formed. Each step names the principle leaves it applies; read `../<leaf>/SKILL.md` at that step, before writing. Open `principle-vault-roles` and `principle-resolve-target` before the first write: an ingest request is the owner's explicit request that lets a Raw into the source area.
+This recipe decides what is written and where. How a note is formed comes from the principles each step names; read `../<principle>/SKILL.md` at that step. Open `principle-knowledge-notes` and `principle-editing` before the first write.
 
-Read the vault's Core Context once per session before the first ingest. Use the reuse axes actually registered in its §2 (normally 5–9), never a fixed list.
+Read the vault's Core Context once per session; use the reuse axes actually registered in its §2, never a fixed list.
 
 ## Input
 
-- URL: fetch the content, then process.
+- URL: fetch it with `defuddle` per [articles](references/articles.md) or [videos](references/videos.md) (YouTube included).
 - File path or name: read it from the vault, checking the Inbox and its lanes first.
-- Blank or `all`: delegate selection to `inbox`.
-- Named Term request with no material handed over: that is [`term`](../term/SKILL.md)'s job; run it instead of this recipe. With material handed over, preserve it as Raws through Steps 3 and 5, then compile the Term by `term`'s rules from those Raws.
+- Blank, `all`, an Inbox lane, `count`/`status`, or "process the Inbox": the batch in [inbox](references/inbox.md).
 - Raw text: the argument is the source.
-- Repository URL or README: [repositories](references/repositories.md). A repository becomes a Product Entity and saves no Raw.
-- Academic paper (DOI, arXiv or journal URL, citekey, or a PDF with Abstract and References): the Steps below with [papers](references/papers.md). For a Term request, preserve through Steps 3 and 5 only the papers the owner handed over; a paper found while researching is cited as `[label](URL)`, or by its existing Raw.
-- Book, book chapter, or multi-page docs site (5+ chapters in its sidebar or TOC): the Steps below with [books](references/books.md).
-- Binary or non-Markdown file: Step 3 after Steps 1 and 2.
+- Named Term with no material handed over: run [`term`](../term/SKILL.md) instead. With material, preserve it as Raws (Steps 3 and 5), then compile the Term by `term`'s rules.
+- Repository: [repositories](references/repositories.md) — a Product Entity, no Raw.
+- Paper (DOI, arXiv or journal URL, citekey, or a PDF with Abstract and References): [papers](references/papers.md).
+- Book, chapter, or a docs site with 5+ chapters in its sidebar or TOC: [books](references/books.md).
+- Mail or conversation export: [mail](references/mail.md), [conversations](references/conversations.md).
+- An already-ingested source that changed, or a Raw that needs another pass: [reingest](references/reingest.md).
 
-Per-material acquisition detail: [articles](references/articles.md), [videos](references/videos.md), [repositories](references/repositories.md), [mail](references/mail.md), [conversations](references/conversations.md).
+## Category
 
-## Category detection
+Pick the Raw `category` in this order: the Inbox lane the file sits in; a Web Clipper `category`; inference from the content; default `Articles`. Save into the destination's Raw folder for that category.
 
-Pick the Raw `category` in this order: the Inbox lane the file sits in; a `category` in Web Clipper frontmatter; inference from the content; default `Articles`. Save into the destination's Raw folder for that category.
+## Step 1 — Collection purpose
 
-## Step 1 — Collection purpose (a letter to your future self)
-
-Ask exactly one collection-purpose question before ingest, and nothing else:
+Ask exactly one question, and nothing else:
 
 > When your future self opens this source again — why did you collect it, and where do you plan to use it? Leave one line.
 > Reuse axes for reference: {axes registered in Core Context §2}
 
-- Save the answer verbatim as `collectionPurpose`.
-- Do not ask when the task already states a valid purpose, or the capture candidate carries `collectionPurpose`; use it.
-- When the owner says "you decide" or "automatically", infer the most likely axis from the source and Core Context §2, state the inference and its reason, and record that in `collectionPurpose`.
-- Batch: ask once up front — "{N} sources came in today. Should they all share one purpose, or should I ask for each one?" — and follow the choice.
+- Save the answer verbatim as `collectionPurpose`. Skip the question when the task or the capture candidate already states the purpose.
+- When the owner says "you decide", infer the most likely axis, and record the inference and its reason.
+- Batch: ask once whether all sources share one purpose or each gets its own.
 
-## Step 2 — Connections in this vault
+## Step 2 — Connections
 
-Search the vault read-only with the source's key concepts and the purpose (`qmd`, keyword fallback) and keep the 2–5 most relevant existing notes (the owner's essays, MOC or hub notes, category pages, recent teaching or consulting notes when the purpose is teaching or consulting). Confirm each file exists, drop any that does not, and record the rest as quoted wikilinks `"[[Note Name]]"` in `related` on the Raw and the relevant Wiki pages, adding a folder path only when the basename collides. Notes the owner names in the task join the list after the same check. Ask no further question here. Related owner notes stay untouched; only the Wiki targets selected for compilation are updated under Step 6.
+Search the vault read-only (`qmd`, keyword fallback) with the source's key concepts and the purpose; keep the 2–5 most relevant existing notes (essays, MOCs, hubs, notes tied to the purpose) plus any the owner names. Confirm each exists and record them in `related` on the Raw and the relevant Wiki pages. Those owner notes stay untouched.
 
 ## Step 3 — Format conversion
 
-Skip for `.md`, `.markdown`, `.txt`. Transcribe audio (`.mp3`, `.wav`, `.m4a`) with a transcription tool; leave the audio file where it is and report it. Convert any other document (`.pdf`, `.pptx`, `.docx`, `.hwp`, `.epub`, `.html`, images, …) with an available converter (`markitdown`, `pandoc`, `hwp5txt`, `defuddle`). Move the original binary into the vault's attachments folder under its original filename, place the converted `.md` beside where the binary was, and carry the conversion keys listed in [frontmatter](references/frontmatter.md#raw-source-keys) into the Raw. `## Original Content` then holds the converted Markdown; the binary stays preserved as the attachment. When no available converter succeeds, leave the binary where it is, name the missing tool or ask the owner to convert, and stop this input; other inputs in the run continue.
+Skip for `.md`, `.markdown`, `.txt`. Transcribe audio with a transcription tool and leave the audio in place. Convert other documents (`.pdf`, `.pptx`, `.docx`, `.hwp`, `.epub`, `.html`, images) with `markitdown`, `pandoc`, `hwp5txt` or `defuddle`; move the binary into the attachments folder under its original filename, put the converted `.md` where the binary was, and add the conversion keys from [frontmatter](references/frontmatter.md#raw-source-keys). When no converter succeeds, leave the binary, name the missing tool, and stop this input; other inputs continue.
 
 ## Step 4 — Analyze
 
-Read the whole source and classify the extracted knowledge with `principle-note-kinds` and, for Entities, `principle-entity-types`. Open `principle-provenance` for every claim that reports another creator's work.
+Read the whole source and classify what it holds with `principle-knowledge-notes`: 3–8 terms and concepts, 1–5 entities, 0–3 guides worth writing, key claims, and connections to existing pages.
 
-Extract:
+Look up existing pages first in the wiki index ([records](references/records.md)) and the vault: updating beats creating. Match by `source` URL or reference before title. This lookup fixes identity and targets only; existing page prose stays out of Step 6's writer.
 
-- terms and concepts (3–8 together), candidates that may land on existing pages;
-- entities (1–5);
-- practical guidance (0–3) worth a Guide;
-- key claims to track;
-- connections to existing Wiki pages.
+Open `principle-archival` for every claim that reports another creator's work: attribute it to this source's author as a secondary claim and put the original in the Raw's `referenced` (its vault wikilink, else its canonical URL) without fetching it. When the owner selects a Term for research, retrieve originals through their DOI, publisher or author repository, reuse an existing Raw, and otherwise cite `[label](URL)` with no new Raw. Record abstract-only or partial readings and unknown provenance in `## Ingest Notes`. A Concept resting only on secondary claims is at most `confidence: medium`.
 
-Read the wiki index in [records](references/records.md) and search the vault (`qmd`) for existing pages first; updating an existing page beats creating a new one. Match a source by `source` URL or reference before title. This lookup establishes identity and targets from titles, aliases, paths, `source` and index lines; existing page prose stays out of Step 6's Term, Concept and Guide writer.
+## Step 5 — Save the Raw
 
-When a claim reports another creator's work, attribute it to this source's author as a secondary claim and put the original in the Raw's `referenced`: its Raw or Entity wikilink when already in the vault, otherwise its canonical URL. For single-source ingest, record that link without fetching or ingesting the original. When the owner selects a Term for creation or research, retrieve the original through its DOI, publisher or author repository, reuse its Raw when the vault has one, and otherwise cite it as `[label](URL)` without saving a Raw; for a Term extracted from one source, attribute secondary claims to the selected source. Record what was actually inspected, including an abstract-only or partial reading, and record provenance unknown in `## Ingest Notes` when it cannot be located. A Concept resting only on secondary claims is at most `confidence: medium`. Each claim stays with its creator and the source it arrived through; never merge claims from different creators into one unattributed statement.
+Open `principle-archival` and `principle-markdown`. Use [raw](assets/raw.md), filename `{Title}.md` (`{Title} (YYYY-MM-DD).md` when taken).
 
-## Step 5 — Save Raw Source
+- `## Original Content` holds the source verbatim however long: no summary, no "redacted for brevity". Images stay `![alt](url)` (never downloaded); media URLs, quotes, citations, code and timestamps survive. Follow it with `<!-- end-original-content -->` on its own line.
+- Pasted text is preserved from its first line, including any title, byline, date or URL inside the excerpt; the owner's instructions stay outside it.
+- OCR every image that contains text into a `>` blockquote directly below it, spelling unchanged; note the method and uncertain readings in `## Ingest Notes`.
+- A clipper body already under `## Original Content` is copied as is. Remove only an obvious clipper artifact and say so in `## Ingest Notes`.
+- From a Web Clipper or capture candidate carry `source_url` → `source`, `author` → `"[[Name]]"`, `published` → `date_published`, `collectionPurpose` and `referenced`. A capture's Source Manifest and Agent Capture Notes go under `## Ingest Notes` unchanged.
 
-Open `principle-original-order`, `principle-provenance`, `principle-hierarchy` and `principle-frontmatter`. Use [raw](assets/raw.md), filename `{Title}.md` (`{Title} (YYYY-MM-DD).md` when that name is taken). The Raw keeps the source's own order and structure; nothing is reordered, regrouped or normalized.
+Pre-flight: read the saved Raw back and compare it with the obtained source — pasted text and short clippings in full, an Inbox source on at least 80% of its body lines; media, quotes, citations and code survived; the 7 required keys are present.
 
-- Preserve the original verbatim under `## Original Content` — no summaries, no "redacted for brevity", however long. Keep image lines `![alt](url)`, video and media URLs, quote blocks, citation lists and code blocks.
-- In each new Raw, write `<!-- end-original-content -->` on its own line immediately after the verbatim content, never inside it.
-- For text pasted into the request, preserve the entire handed-over excerpt from its first line, including any title, byline, date or URL supplied as part of the excerpt. Putting those details in frontmatter or the Raw title is not a substitute. Keep the owner's instructions outside the excerpt.
-- Keep each image as its original `![alt](url)`; do not download it.
-- OCR every image that contains text and put the text, as Markdown with spelling unchanged, in a `>` blockquote directly below the image. Record the OCR method and any uncertain reading in `## Ingest Notes`.
-- A clipper body already wrapped in `## Original Content` is copied verbatim. A fetched URL keeps the fetched content.
-- Remove only obvious clipper artifacts (a block repeated by a clipper bug) and say so in `## Ingest Notes`.
-- From a Web Clipper or capture candidate carry over `source_url` → `source`, `author` → `author` as `"[[Name]]"`, `published` → `date_published`, `collectionPurpose` and `referenced`. A capture's Source Manifest and Agent Capture Notes go under `## Ingest Notes`, unchanged; they guide Step 6 and never enter Original Content.
-- Never rewrite an existing Raw body. When an already-ingested source changed, ask the owner first: a minor change keeps the Raw; a major change becomes `{Title}-v2.md` with `supersedes`, the earlier Raw gains `superseded-by`, and both stay. See [source update and reprocessing](references/reingest.md).
-
-Pre-flight before moving on:
-
-- `## Original Content` is present;
-- read the saved body back and compare it with the obtained source: pasted text and short clippings must match in full; for an Inbox source, verify at least 80% of its body lines, or all lines for a short clipping;
-- images, media URLs, quotes, citations and code blocks survived;
-- the 7 required properties are present.
-
-Inbox cleanup: open `principle-read-back` and read the saved Raw back first. Delete the Inbox original only when the owner's request or the vault's live policy authorizes removing it, and only after that read-back and the pre-flight pass; when several Inbox files went into one Raw, the same applies to each and `## Ingest Notes` lists them. Without that authorization leave the original in place and report it as awaiting cleanup. A URL, an external file or raw text leaves nothing to delete.
+Inbox cleanup: delete the Inbox original only when the owner's request or live policy authorizes it, after that read-back and pre-flight; otherwise report it as awaiting cleanup.
 
 ## Step 6 — Compile Wiki pages
 
-For a named Term request, compile the selected Term. For a source ingest, compile each extracted term, concept, entity and guide. In either case, update the existing page or create one: Terms with [term](../term/assets/term.md) and the rules in [`term`](../term/SKILL.md), Concepts with [concept](../concept/assets/concept.md) and the rules in [`concept`](../concept/SKILL.md), Guides with [guide](assets/guide.md), and Entities with `../entity/assets/{type}.md` (person, organization, place, paper, book, media, product, or `other` for an optional type) and the rules in [`entity`](../entity/SKILL.md). A template the vault registers for a kind or type wins for frontmatter keys and headings, except that it never brings back an append-only zone (`## Wiki`, `## From Sources`).
+Open `principle-writing`, `principle-markdown` and `principle-editing` for every page. Compile each extracted term, concept, entity and guide (for a Term request, the selected Term), updating the existing page or creating one from its template: Terms by [`term`](../term/SKILL.md), Concepts by [`concept`](../concept/SKILL.md), Entities by [`entity`](../entity/SKILL.md) with `../entity/assets/{type}.md`, Guides with [guide](assets/guide.md). A template the vault registers wins for keys and headings but never brings back an append-only zone (`## Wiki`, `## From Sources`). Write every page to [conformance](references/conformance.md).
 
-Open `principle-revise-and-consolidate` and `principle-preserve-voice` for every existing page, and `principle-standalone-note`, `principle-not-a-research-log`, `principle-plain-tldr`, `principle-quotation-attribution`, `principle-note-shape`, `principle-draw-structure`, `principle-frontmatter`, `principle-link-form`, `principle-markdown-blocks` and `principle-read-back` for every page written.
+- Title a Concept in the idea's original language, translations in `aliases`; its Overview says what the idea offers for the Raw's `collectionPurpose`.
+- Ground facts in the selected source and personal context in the owner notes from Step 2. For a multi-source Term, give the writer each Raw's Original Content with its identity and locators kept distinct.
+- Update an existing page by [updating](references/updating.md), in three separate contexts:
+	1. Writer — sees only policy, this run's extraction and the Raw's Original Content (for a Term, also owner excerpts with their paths, quoted as the owner's context, never as evidence); never the page's prose. It drafts source-grounded additions.
+	2. Reviewer — sees the before-image and the proposal; keeps every valid statement, link and value, reduces the proposal to the minimal patch (additions, the Raw appended to `source`, `date_modified`, template migration) and drops anything the source does not support.
+	3. Apply, read back against the before-image. Links come later (Step 8).
+	Without separate contexts, skip that page's update and report it; the rest of the run continues.
+- Every Raw author whose real name the source confirms is a person Entity: update or create it with this Raw in `source`, linked from the Raw's `author`. Other significant individuals of a required type (person, organization, place, paper, book, media, product) are created or updated without asking.
+- Title a person with the source-confirmed real name in its original script; handles, channel names and romanizations go in `aliases`. Never infer a real name.
+- A new Entity goes into the folder live policy registers for its type, or the folder existing notes of that type (or a synonym: `channel` → media, `people` → person) already use. Only when none exists create one beside the other Entity folders, following their naming, and ask the owner to register it. An optional type (event, movie, album, …) without a folder: ask first; without approval list the Entities as candidates.
+- When the update touches a person page holding owner impressions, perform `entity`'s person migration without asking: move them byte-for-byte to `{date_created} {Name}.md` in the permanent-notes folder (`authorship: user`, `related` both ways), verify the destination before removing the original, never overwrite existing destination content.
+- Before creating a Term, search titles and aliases for the same referent; a match is updated. A new Term goes into the registered Term folder, else the Concept folder (reported).
+- A Guide keeps a Contradiction callout only for an explicit conflict, and a Bias Check only for `confidence: high` or synthesis-heavy pages. A Guide `secondbrain-mode` sends for a How-to solved in conversation runs only this step and Step 10's read-back and conformance: no Raw, Map, index or log; `source` cites the work note where it was solved (empty when solved only in chat, with the confirmation date in Overview), and its writer takes the confirmed steps as evidence.
+- New pages get `explored: false`; set `claimType` and `evidenceScope` when the classification is clear.
 
-Title a Concept `{Topic Name}` in the idea's original language, whichever language that is, with translations in `aliases`.
-Explain in its Overview what the idea offers for the Raw's `collectionPurpose`.
+Aim for 10–15 pages touched for a substantial source; a thin source reports the shortfall instead of padding.
 
-- For single-source ingest, ground factual claims in the selected source and personal context in the inspected owner records from Step 2. For a selected Term with multiple sources, give the writer the inspected Original Content of each Raw used, with source identity, access scope and locators kept distinct.
-- Every existing page follows [updating](references/updating.md), template migration included. An existing Term, Concept or Guide is updated in three separate contexts, in this order:
-	1. Writer — a fresh context given only the vault's approved policy, this run's extraction and the relevant Raw source text under `## Original Content`. It never sees the existing page's prose or examples; the page's path, title, aliases, `type`, `layer` and `source` list may be passed to fix identity and target. For a Term it also receives excerpts of the owner's notes and earlier queries that vault search returns for the term, each with its path. It drafts only source-grounded additions for that page; an owner excerpt is quoted as the owner's own context, never as evidence for a fact.
-	2. Preservation reviewer — a separate context given the page's before-image and the writer's proposal. It first checks that every valid existing statement, link and frontmatter value survives, then reduces the proposal to the minimal patch: additions under the relevant sections, each newly used Raw appended to `source`, `date_modified` updated, and the template migration [updating](references/updating.md) defines. It drops anything the source does not support, except a connection quoting an owner excerpt by its path, and never regenerates the page.
-	3. Apply the reviewed patch, read the page back and compare it with the before-image. Links to and from the page are added only after this validation (Step 8).
-- When the runtime cannot provide separate contexts, stop the update of that existing page and report it; new pages and the rest of the run continue.
-- The existing Wiki is not ground truth, and neither is one source. An existing statement changes only when the correction rests on verified evidence (a `verify` result or the owner's confirmation) and the reviewer accepted it. When this source explicitly conflicts with an existing claim, keep both, attributed, with `> [!warning] Contradiction` and the uncertainty stated. A source that is silent on a claim does not contradict it.
-- An Entity exists because the analysis found it significant. Every Raw author whose real name the source confirms is also a person Entity: update the existing one or create it with this Raw in `source`, and link it from the Raw's `author`. A significant named individual of a required type (person, organization, place, paper, book, media, product) is likewise created or updated without asking for approval.
-- Update an Entity through its type template, the type rules in [`entity`](../entity/SKILL.md) and `principle-revise-and-consolidate`, by the steps in [updating](../ingest/references/updating.md). Draft from the inspected evidence, apply the required preservation review, and read back the result before adding links.
-- When ingest touches a person page containing owner impressions, perform `entity`'s person migration as part of the authorized update; do not ask whether to move them. Resolve the permanent-notes folder from live policy and use `{date_created} {Name}.md` with the person page's `date_created`. Move the impressions byte-for-byte, without translation, rewriting or linkification. The destination has `authorship: user` and `related` linking the person; the person's `related` links back. Verify the destination and exact text before removing the original from the person page. Preserve existing destination content; do not overwrite it. Ask only when required live policy or destination information is missing; preserve the original if the move cannot be completed safely.
-- Title a person Entity with their source-confirmed real name in its original language and script; put handles, channel names, localized names and romanizations in `aliases`. Never infer a real name; if unconfirmed, report it without presenting an alias as a real name. An explicit live-policy naming exception wins and is reported.
-- A new Entity goes into the folder the live policy registers for its type; an existing Entity is not moved. Before creating a required type's folder, map the type to the folder existing notes of that type, or a synonym (`channel` → media, `people` → person), already use. Only when none exists, create one beside the existing Entity type folders, following their naming and numbering, without asking; the report names it and asks the owner to register it in the live policy. For an optional type (event, movie, album, game, …) with no folder yet, ask the owner before creating it, naming the type, the proposed folder and the Entities; without approval create nothing and list them as candidates in the report. A kind, such as a species or a genre, is never an Entity.
-- Before creating a Term, search titles and aliases for the same referent; a match is updated, never duplicated, and a new related sense is incorporated into the existing page.
-- A new Term goes into the folder the live policy registers for Terms; when none is registered, it goes into the Concept folder and the report says so. Ingest never moves or retypes an existing page.
-Write every Wiki page to [conformance](references/conformance.md).
+## Step 7 — Persona
 
-A Guide keeps the Contradiction callout only when a source explicitly conflicts with an existing claim (both kept, attributed, uncertainty stated; silence is not a contradiction) and the Bias Check only for `confidence: high` or synthesis-heavy pages; omit either block on a new page otherwise; on an existing page an earlier Contradiction stays until `verify` resolves it. A Guide `secondbrain-mode` sends for a How-to solved in conversation runs only this Step 6 and Step 10's readback: no Raw, no Map, no index or log entry; it cites the work note where it was solved in `source` and the web pages it rests on in Sources, or, when it was solved only in chat, leaves `source` empty and says in Overview when it was confirmed. Its writer takes the confirmed steps and that note as evidence in place of Raw text, and its Step 10 is only the page read-back and [conformance](references/conformance.md).
-
-- Set `explored: true` only after a human or agent completed the Exploration Gate check and documented it in the page body.
-- When the classification is clear, set `claimType` and `evidenceScope` for later `verify`.
-
-Target: 10–15 Wiki pages touched per ingest when the source is substantial, created or updated. It is not a creation quota; a thin source reports the shortfall instead of padding.
-
-## Step 7 — Persona accumulation
-
-When the source's author or primary speaker matches an existing Persona card, append to it as [persona](assets/persona.md) shows, recording the runtime contribution as [frontmatter](references/frontmatter.md#existing-notes-and-migration) specifies. Never create a Persona during ingest.
+When the author or primary speaker matches an existing Persona card, append to it as [persona](assets/persona.md) shows, with the provenance update in [frontmatter](references/frontmatter.md#existing-notes-and-migration). Never create a Persona.
 
 ## Step 8 — Connect
 
-Open `principle-link-form`, `principle-collective-description` for a Map, and `principle-read-back`. After Step 6's readback, check each target against `principle-vault-roles` and `principle-resolve-target`: body links go only into wiki pages, and this ingest's Raw takes only the frontmatter Entity links below. Then add `[[wikilinks]]` between related wiki pages (a work-area note is not one: there only `principle-vault-roles`' first-mention rule applies, in the one note the conversation is about), create or update the relevant Map (MOC), and leave no orphan: every new page is linked from at least one other page.
+Open `principle-markdown`, `principle-archival` for a Map, and `principle-editing`. Body links go only into wiki pages; the Raw gets only frontmatter Entity links; a work note follows the vault roles' first-mention rule. Link related wiki pages and leave no orphan.
 
-Find the existing topical MOC before creating a new Map. Resolve the Map folder from the live policy, then search within that folder for the source's topics and links to confirmed related wiki pages. If topic search yields nothing, list the folder with a file discovery tool and read candidate notes with the Map type registered by policy. Also follow Map links from the wiki index or related notes; these are useful when directory discovery is unavailable. Confirm scope from the actual contents rather than guessing filenames. In the Map itself, add a link to each new Wiki page that fits its scope, preserving existing entries and avoiding duplicates. Read the Map back and confirm the link before marking Connect complete. A Raw `related` entry, a backlink from the new page, or an index entry is not a Map update. If discovery cannot confirm a target, report that limit rather than assuming no Map exists and creating a duplicate.
+- Map: find the existing topical MOC in the live Map folder (topic search, then a folder listing, then Map links from the index or related notes) before creating one. Add each new page in its scope without duplicates, read the Map back, and report a target discovery could not confirm instead of creating a duplicate. A `related` entry, backlink or index line is not a Map update.
+- Entity links: where a page this ingest created or changed names an existing Entity's title or alias with the same referent, link its first eligible prose mention (`[[Entity|original text]]`); frontmatter Entity-reference values link the same way. Original Content, quotes, owner sentences, code and URLs stay; an ambiguous mention is reported, not linked.
 
-Where a Wiki page this ingest created or changed, or a Wiki page mentioning an Entity it created, names an existing Entity's title or alias and context confirms the same referent, link it once at its first eligible prose mention (`[[Entity|original text]]`). Do not add a duplicate where the body already links that Entity. Read the page back. In those pages and this ingest's Raw, a frontmatter value under a key the schema or live policy defines as an Entity reference likewise links to the existing same-vault Entity it names, only when identity is confirmed and the key's meaning stays unchanged. Raw `## Original Content`, quotes, preserved owner sentences, code, URLs, other frontmatter and existing links stay unchanged; an ambiguous mention or value is reported as a candidate, not linked.
+## Step 9 — Index and log
 
-## Step 9 — Update index and log
-
-Resolve live index and log paths and validate them against the wiki role as described in [records](references/records.md). If the role or live path is missing, or the path is outside the wiki role, the record is unavailable; do not guess a replacement. Update the index only at a valid destination, completing all four:
-
-- each new Wiki page under its section (Terms, Concepts, Entities, Guides, Maps) as `- [[Page Name]] — one-line description` grounded in the inspected page;
-- the Stats table recounted from the folders (Raw Sources, Wiki Pages, Terms, Concepts, Entities, Guides, MOCs, Queries; Terms counted by `layer: terms` when they share the Concept folder), never incremented by guess;
-- one Recent Ingests row at the top: date, Raw link, pages touched;
-- the index's modification date.
-
-Describe only catalog coverage verified against the actual entries and page or Map contents. Do not use a topic match or an old page's absence from the index to infer that it is reachable through a Map. Omit unverified coverage claims. Re-read that index and confirm every new page appears. When the resolved index is missing, create it only at the resolved path, including its parent directory, and say so. When that path is the vault root, stop and report it. Never create `index.md` at the vault root.
-
-Append to the wiki log only at a valid destination, never editing earlier entries:
+Resolve both paths by [records](references/records.md); an unavailable record is skipped and reported, never guessed, and `index.md` is never created at the vault root. In the index add each new page under its section as `- [[Page]] — one-line description`, recount the Stats table from the folders (Terms by `layer: terms` when they share the Concept folder), add one Recent Ingests row at the top (date, Raw link, pages touched), update its modification date, and re-read it. Describe only coverage you verified. Append to the log, never editing earlier entries:
 
 ```markdown
 ## [YYYY-MM-DD] ingest | {source title}
@@ -155,49 +115,39 @@ Append to the wiki log only at a valid destination, never editing earlier entrie
 - Pages updated: [[page3]], [[page4]], ...
 ```
 
-Git history does not replace the wiki index or log. Ingest never commits or pushes; when the owner separately asks for a commit, its subject is `ingest: {source title}`.
+Never commit or push; a commit the owner asks for separately follows [git provenance](references/git-provenance.md).
 
 ## Step 10 — Review
 
-Check every item and fix failures:
+Check and fix:
 
-- the Raw has `## Original Content` with a substantive verbatim body (compared against the Inbox body before any deletion);
-- the Inbox original is deleted when deletion was authorized, otherwise reported as awaiting cleanup;
-- every new `source`, `related` and body wikilink resolves or is an intentional placeholder allowed by the live policy or selected template; every confirmed author has a person Entity; no duplicate page was created, and no new Term duplicates an existing title or alias for the same referent;
-- every touched Entity follows its type template's structure, the type rules in `entity` and `principle-revise-and-consolidate`, with owner sentences unchanged; for a person impressions migration, compare the relocated text byte-for-byte to the before-image and confirm both `related` links and removal of the old copy;
-- every updated existing page still holds every valid statement, link and frontmatter value of its before-image, apart from reviewed corrections;
-- every new Term, Concept and Guide, and every new Entity the live policy types `wiki-page`, has `explored: false`; every `confidence: high` page has a Bias Check with `Counter-argument:` and `Data gap:` lines;
-- every `related` link from Step 2 resolves to an existing note and no literal placeholder remains; external URLs in bodies are `[label](URL)` and no `obsidian://` link is written;
-- the relevant verified Map links to the new Wiki pages in its scope;
-- reopen each touched Wiki page and scan the whole saved body for Entity titles and aliases, explicitly inspecting authored citations, footnotes, References entries, attributions and table cells. Check named authors, publishers and organizations from the source as well as other entities mentioned on the page. Confirm the referent against the registered Entity folders and check that it is linked in the body at its first eligible mention; resolving the links already present does not detect missing ones. A Raw link, external source link or frontmatter link does not link the named Entity. Fix missing links and read back the corrected passage. Keep quotations, preserved owner text and Raw `## Original Content` unchanged; when the only mention is in preserved text, link the Entity in the adjacent authored attribution;
-- each new or revised Term passage meets the [Term template](../term/assets/term.md) and the rules in `term`, including its claim locators and source access records;
-- every touched Wiki page passes [conformance](references/conformance.md), each item recorded present or absent in the run report;
-- when the index destination is valid, every new page appears there and the Stats counts match the folders;
-- when the log destination is valid, its entry is appended;
-- the qmd index status is known: when `reindex` reports pending or failed work, run it and report the result.
+- the Raw's Original Content is substantive and verbatim; the Inbox original is deleted only if authorized;
+- every new `source`, `related` and body wikilink resolves; every confirmed author has a person Entity; no duplicate page or Term;
+- every updated page keeps every valid statement, link and value of its before-image; owner sentences and relocated impressions are byte-identical;
+- new Terms, Concepts, Guides and `wiki-page` Entities have `explored: false`; every `confidence: high` page has a Bias Check with `Counter-argument:` and `Data gap:` lines;
+- no `obsidian://` link and no raw URL in authored prose;
+- the relevant Map links the new pages; the index lists them with recounted Stats; the log entry is appended;
+- re-read each touched page for Entity titles and aliases — citations, footnotes, References, attributions and table cells included — and link the first eligible mention; when the only mention is preserved text, link it in the adjacent attribution;
+- each Term passage meets the [Term template](../term/assets/term.md), and each page passes [conformance](references/conformance.md), every item recorded present or absent;
+- the qmd index is fresh (see Reindex below).
 
-Then invoke `secondbrain-skills:lint` and `secondbrain-skills:verify` on the Wiki pages this ingest created or changed, plus the new Raw for lint; each keeps its own contract.
+Then run `secondbrain-skills:lint` on the changed Wiki pages and the Raw, and `secondbrain-skills:verify` on the changed Wiki pages.
 
-Before returning outcomes, invoke `python3` on `../lint/scripts/link-lint.py` with `--checks policy --vault <vault>`. Pass every changed wiki file as a separate quoted path after one `--scope`; repeat `--wiki` and `--entity-folder` for each registered folder of the respective role, `--book-type` for each declared book Entity type, and `--product-type` for each declared product Entity type. Omit Entity-folder and type flags the policy does not declare; pass only other lifecycle types in `--lifecycle` as a comma-separated list, never book types (see [`lint` Step 12](../lint/SKILL.md)). Read the command's output and exit status directly, without piping or filtering. Resolve unambiguous `ENTITY-UNLINKED` findings in authored text, including References entries, citations and footnotes, and rerun the check. A clean check does not replace the citation read-back above. If the check cannot run, manually repeat the final entity-link read-back; do not equate an unavailable tool with a clean result.
+Run `python3 ../lint/scripts/link-lint.py --checks policy --vault <vault> --scope <each changed wiki file, quoted>`, repeating `--wiki` and `--entity-folder` per registered folder, `--book-type` and `--product-type` per declared type, and `--lifecycle` for other lifecycle types (see [`lint` Step 12](../lint/SKILL.md)). Read its output unfiltered, fix unambiguous `ENTITY-UNLINKED` findings, rerun. A clean check does not replace the read-back above, and an unavailable tool is not a clean result.
+
+**Reindex.** Run `qmd update`, then `qmd embed`, then `qmd status`, over the collections qmd already registers (the Inbox stays out until ingested); confirm the commands with `qmd --help`. Report the document and vector counts and any `Pending: N need embedding` line; a non-zero exit or unreadable status is unfinished, never zero pending. Never run `qmd embed -f`, or change qmd models, collections or configuration, unless the owner approved that change. Without `qmd`, report it and continue. When the owner asks only to reindex, this paragraph is the whole run.
 
 ## Output
 
-When routed through secondbrain-mode, return only these separate fields, not the standalone report or a rendered footer:
+When routed through secondbrain-mode, return only these fields:
 
-- `findings`: source title and citation, substantive source findings relevant to the user, and evidence gaps or contradictions. No descriptions of writes, cleanup or wiki maintenance.
-- `wiki_outcomes`: `created` and `updated` lists of vault-relative paths confirmed by final read-back, and `failed` entries with a vault-relative path and reason only for an actually attempted wiki write that failed. Include changed Maps, index and log when they are in the live policy's wiki area. Exclude Raw, work notes, impressions outside the wiki and unattempted work. Classify each successful page once by whether it existed at the start.
-- `principle_decisions`: decision-changing leaves and their reasoning, phrased as judgments about the subject, classification or evidence, not accounts of edits. Omit a decision that cannot be stated without reporting wiki work. `owner_questions`: questions only the owner can resolve to finish the requested task, including missing role mappings or collection purpose; no offers of unrelated edits.
+- `findings`: source title and citation, substantive findings relevant to the user, evidence gaps or contradictions; nothing about writes or maintenance.
+- `wiki_outcomes`: `created` and `updated` lists of vault-relative paths confirmed by read-back, and `failed` entries (path and reason) for attempted wiki writes that failed. Include changed Maps, index and log in the wiki area; exclude Raw, work notes and unattempted work. Classify each page once by whether it existed at the start.
+- `principle_decisions`: decision-changing principles as judgments about the subject, classification or evidence, not accounts of edits.
+- `owner_questions`: only questions the owner must answer to finish the task.
 
-For standalone ingest, report the principle decisions, source (title, URL), Raw location, key connections, the touched count against 10–15, originals in `referenced` or provenance unknown, Inbox and binary originals left in place, Term folder fallback, required Entity folders created, optional-type candidates awaiting approval, and open questions, gaps and contradictions. Format wiki outcomes as the final line: `Wiki: created [[X]], updated [[Y]], failed [[Z]] (reason)`. Use the same wiki-only outcome rules above, omit empty clauses, and omit the line when there are no successful or failed wiki writes. Nothing follows it.
-
-## Papers
-
-Follow [papers](references/papers.md): the ordinary Steps, with the original retrieved through its DOI, `citekey` and `doi` resolved against the actual paper, and the paper Entity as the paper's hub.
-
-## Books
-
-Follow [books](references/books.md): Steps 1 and 2 once for the whole book; bibliographic acquisition and the TOC; one chapter Raw per chapter with [book chapter](assets/book-chapter.md); the book Entity as the hub, listing chapter Raws, reading progress and derived pages in its sections. Never compile unread chapter content. Chapter Raws go into the Books Raw folder with `category: Books`, unless the live policy or the owner's task names another folder and `category` for books.
+Standalone, report the principle decisions, source (title, URL), Raw location, key connections, pages touched against 10–15, originals in `referenced` or provenance unknown, Inbox and binary originals left in place, Term folder fallback, Entity folders created, optional-type candidates, and open questions, gaps and contradictions. End with one line, omitting empty clauses and the line itself when no wiki write happened: `Wiki: created [[X]], updated [[Y]], failed [[Z]] (reason)`.
 
 ## Tools
 
-Pages: `defuddle`; transcripts: `defuddle`, `yt-dlp`; pages behind login or JavaScript: the aside browser; search: `qmd`; app operations: `obsidian-cli`.
+Pages and YouTube transcripts: `defuddle parse "$URL" --md`; other video: `yt-dlp`; pages behind login or JavaScript: the aside browser; search: `qmd`; app operations: `obsidian-cli`.

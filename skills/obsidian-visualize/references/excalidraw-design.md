@@ -30,24 +30,9 @@ Text is free by default. A shape is for something an arrow lands on, a shape who
 
 ## Real values and zoom
 
-Put the evidence in a small neutral `rectangle` with `fontFamily` 3 text (fixed width, observed) beside the box it explains, tied by a thin dashed line: a three-line payload, an endpoint, a sample row. Synthetic values only. Layer the drawing for three reading distances: a one-line flow, labelled zones, then detail inside the zones; a small drawing needs the first two.
+Put evidence (a three-line payload, an endpoint, a sample row) in a small neutral `rectangle` with `fontFamily` 3 text beside the box it explains, tied by a thin dashed line.
 
-## What to look at
-
-Open the one that matches the design problem before choosing; each is a picture to look at, not a template to copy.
-
-| To decide | Look at |
-| --- | --- |
-| Colour restraint and neutral structure | the previews in https://github.com/excalidraw/excalidraw-libraries |
-| A small repeated icon set | the communication and domain-storytelling icon previews there |
-| Decision flows with coloured Yes and No exits | the decision-flow-control preview there |
-| Type scale and section pills | the system-design template preview there |
-| Hand-drawn flow with labelled edges | the sketchy-flow image at https://robtaylor.github.io/excalidraw-diagrams/ |
-| Dense node graphs on a dark canvas | the mind-map views in the README of https://github.com/zsviczian/obsidian-excalidraw-plugin |
-
-Rules that hold across them: one hue per meaning; edge labels on the arrow; numbered section pills with a dashed rule and whitespace between phases; icons labelled and never decorative; a diamond kept neutral while its exits are coloured. A shaft that runs through a node or a label that collides with a line is the defect to look for in every gallery image, including your own.
-
-Sketch fonts and `roughness: 1` suit informal and teaching drawings.
+Rules that hold: one hue per meaning; edge labels on the arrow; numbered section pills with a dashed rule and whitespace between phases; icons labelled, never decorative; a diamond kept neutral while its exits are coloured.
 
 ## Palette
 
@@ -63,13 +48,7 @@ Six pairs, one neutral and five with a meaning; use at most four of the five in 
 | External actor, neutral | `gray` | `--text-muted` |
 | Sticky note | `note` | `--color-yellow` |
 
-Theme colours:
-
-- Read the resolved values from `document.body` with a read-only `obsidian eval`; assigning a value to a detached canvas context's `fillStyle` returns it as `#rrggbb`. Also read `--text-normal` (`ink`), `--background-primary` (`background`) and whether the body has `theme-dark` (`dark`).
-- Pass each hue as one `palette` colour: it becomes the stroke, shifted until it stands 3:1 against the background, and the fill is that hue mixed three quarters toward the background.
-- The plugin recolours stored colours only in a scene whose own theme is dark, whatever the app's theme. `draw.py` with `dark: true` writes a dark scene and stores the values that render as the theme's colours; a saturated hue clips there and renders slightly off.
-- Native `create` makes a light scene. Under a dark app give `draw.py` the hues without `ink`, `background` or `dark`; run without an output path, it prints the pairs to use.
-- When the app cannot be read, use the built-in pairs, which `draw.py` holds and prints for an empty spec, and say so.
+Theme colours: read the resolved variables from `document.body` with a read-only `obsidian eval` (assigning to a detached canvas context's `fillStyle` returns `#rrggbb`), plus `--text-normal` (`ink`), `--background-primary` (`background`) and `theme-dark` (`dark`). Each `palette` hue becomes the stroke (shifted to 3:1 contrast) and a fill mixed three quarters toward the background. `draw.py` with `dark: true` writes a dark scene whose stored colours render as the theme's; native `create` makes a light scene, so under a dark app give `draw.py` hues only and run it without an output path to get the pairs. When the app cannot be read, use the built-in pairs (`draw.py` prints them for an empty spec) and say so.
 
 Text is `ink`, inside a fill and on an arrow alike; a hue colours strokes and fills, never text. Native `create` gives a label its shape's or arrow's stroke colour, so set labels to `ink` with `apply` afterwards. With the built-in pairs `ink` is `#1e1e1e`, and on a dark canvas free text uses `#e9ecef` and structural lines `#868e96`. Spend one accent color once, on the thing the reader must not miss.
 
@@ -93,9 +72,7 @@ Text is `ink`, inside a fill and on an arrow alike; a hue colours strokes and fi
 
 ## Recipes
 
-Each recipe was submitted through the plugin's `create` on a disposable vault (plugin 2.29.1) and its exported PNG was looked at. Styling fields (`strokeColor`, `backgroundColor`, `fillStyle`, `strokeStyle`, `roughness`, `roundness`, `fontSize`, `fontFamily`, `points`, `label`) are in the live `schema action=create`; `label` accepted `{text, fontSize}`.
-
-Facts that bit during testing:
+Coordinates for native `create`, each exported and looked at on plugin 2.29.1. Field names are in the live `schema action=create`. Facts that bit:
 
 - A bound arrow still needs `points`. With only `start`/`end` it drew a short stub in the wrong place. Set `x,y` to the start point and `points: [[0,0],[dx,dy]]` to the end point; the plugin then snaps both ends to the shapes.
 - Text-only `text` elements are free; bound labels use `label.text`.
@@ -122,11 +99,11 @@ Notation: `box(id,x,y,w,h,"Label",color)` is a skeleton `rectangle` with `label`
 
 **Sequence.** Participants `box` `160x56` at `x=0/280/560`. Lifelines dashed `line` from `(x+80,56)` down 300. Messages are free `arrow`s with `points [[0,0],[dx,0]]`, `label` 16 px, `y` pitch 50, replies `strokeStyle: "dashed"`. Past five participants or fifteen messages, use Mermaid instead.
 
-**Swimlane.** Stage names as free `t` at `x=200+k*260`, one arrow under them spanning all columns. One row per actor at `y` pitch 130, cells `240x90`, the row name as free text at `x=0`. Give the shared artifact (a note, a ticket, a file) the middle row so the rows above and below read as the two sides writing to it. A cell an actor does not take part in stays as a dashed neutral cell holding a dash; mark the cells that need the reader's attention with one accent stroke. Things kept outside the artifact go in a last pale row under a dashed rule.
+**Swimlane.** Stage names as free `t` at `x=200+k*260`; one row per actor at `y` pitch 130, cells `240x90`, row name free at `x=0`. The shared artifact (note, ticket, file) takes the middle row; a cell an actor skips is a dashed neutral cell holding a dash.
 
-**Bars.** Axis `l(x0,base,[[0,0],[n*40,0]])`; bar `k` is an unlabelled `rectangle (x0+k*40, base-v*scale, 30, v*scale)` with `roundness: null`; choose `scale` so the tallest bar is about 400 px. Dashed grid lines and 14 px tick text at round values; one dashed line in the `red` stroke for a baseline, named once. Colour bars by period, never by value. To relate two measures, stack a second bar row on the same `x` positions under the first and run each event marker as one dashed vertical `line` through both rows, its name at the top; the alignment is the argument, so it needs no caption.
+**Bars.** Axis `l(x0,base,[[0,0],[n*40,0]])`; bar `k` is `rectangle (x0+k*40, base-v*scale, 30, v*scale)`, `roundness: null`, tallest about 400 px. Colour by period, never by value. To relate two measures stack a second row on the same `x` and run each event as one dashed vertical `line` through both.
 
-**Source timeline.** The Timeline recipe laid horizontally: dots on one spine, above each dot the date (16 px, the period's stroke colour), a two or three word name (18 to 20 px) and one keyword line (16 px, grey); under each dot the source's preview image at one shared width with a height cap, linked to the source. Link the name too.
+**Source timeline.** The Timeline laid horizontally, each source's preview image under its dot at one shared width, image and name linked to the source.
 
 **Mind map.** Centre `ellipse (0,0,180,90)`. Branches `160x60` on a radius of about 300 at 45, 135, 225, 315 degrees snapped to 20, one hue each. Arrows run from the centre (`90,45`) to each branch centre.
 
@@ -134,12 +111,7 @@ Notation: `box(id,x,y,w,h,"Label",color)` is a skeleton `rectangle` with `label`
 
 ## Text budget
 
-Read the export with the labels covered, then with only the labels. If the labels alone tell the story, the drawing is a list: move the sentences to the note and let position say it.
-
-- A node label is a name or a value, with at most one qualifying line; a timeline step is a date, a name and one keyword.
-- A legend is one grey line under the section title. A box titled as reading instructions, a summary paragraph or a restated conclusion belongs in the note.
-- Section titles are numbered and short; the question a section answers goes in the note's heading.
-- When two sections share an axis, merge them into one arrangement (extra lanes, an extra row) instead of repeating the axis.
+A node label is a name or a value with at most one qualifying line. Legends, reading instructions, summaries and the question a section answers belong in the note. If the labels alone tell the story, the drawing is a list: let position say it.
 
 ## Fidelity to the request
 
@@ -157,15 +129,15 @@ A request for a sketch or hand-drawn look changes the look, not only the font. C
 - Lines and connectors curved or slightly bent, free title text, unequal spacing.
 - `fontFamily` and `fontSize` on a shape go inside its `label`, not on the shape; the CLI rejects them on the shape.
 
-For hand-style Korean set `fontFamily` 5 and check the export: it is the only family whose Hangul is hand-style on plugin 2.29.1 (visual reading; the per-family table and its network note are in [`excalidraw-plugin.md`](excalidraw-plugin.md)). Family 4 with a local font was not tried. `scripts/draw.py` hard-codes family 2 and its spec has no font field, so its Hangul should be that plain sans (inferred from family 2; no `draw.py` Hangul render was looked at). Use node `roughness` and shapes there, or create the drawing through the CLI when you need more of the sketch look: `draw.py` edges take no `roughness` or curve.
+For hand-style Korean set `fontFamily` 5 (the only hand-style Hangul on plugin 2.29.1) and check the export. `draw.py` hard-codes family 2 and its edges take no `roughness` or curve; use node `roughness` and shapes there, or the CLI for more of the sketch look.
 
 ## Sticky notes
 
-A `stickynote` made through the CLI always carries a date stamp (such as `6 Nov`); the CLI has no field to remove it, a `date` key is rejected, and the stamp is not a separate element `apply delete` can remove. `ea.addStickyNote` stamps it too. A raw `stickynote` element in a file written by `scripts/draw.py` had no stamp on a disk export and after opening and exporting live; the cause is unknown. For a dateless note through the CLI, draw a yellow `rectangle` with `label`.
+A CLI or `ea.addStickyNote` sticky note always carries a date stamp (`6 Nov`) that no field or `apply delete` removes. `draw.py`'s `note` shape had none. For a dateless note through the CLI, draw a yellow `rectangle` with `label`.
 
 ## Fixing a drawing
 
-`create` never overwrites, so do not delete and recreate. `open` the drawing, `read source=live` for the `revision` (detail `elements` lists ids), then `apply` with `expectedRevision`. Observed: one `apply` combining `update` (colour and roughness), `delete` and `add` succeeded, `saveStatus` was persisted, `read source=disk` showed the changes, a moved element's bound label moved with it, and deleting a shape also removed its bound text. Use the real ids from the read. For a redesign rather than a fix, `create` a new path. Operation fields are in [`excalidraw-plugin.md`](excalidraw-plugin.md).
+`create` never overwrites, so do not delete and recreate. `open` the drawing, `read source=live` for the `revision` and real ids, then `apply` with `expectedRevision`. One `apply` may combine `update`, `delete` and `add`; a bound label moves with its shape and is deleted with it. For a redesign, `create` a new path.
 
 ## Render, look, fix
 

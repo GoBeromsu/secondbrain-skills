@@ -10,8 +10,11 @@ require it.
 1. MIT-licensed upstream: obsidian-skills
 -----------------------------------------
 
-Upstream project: obsidian-skills — https://github.com/kepano/obsidian-skills
+Upstream project: obsidian-skills — https://github.com/obsidianmd/obsidian-skills
+(formerly https://github.com/kepano/obsidian-skills)
 Revision imported: 3ccff5338ea700537839b21900aa5358a0402c98
+Later revision also drawn on: 79e85b7 (2026-11-25), where the packages live
+under `plugins/obsidian/skills/`; section 1.2 says what came from it
 Upstream licence file at that revision: `LICENSE` (MIT), SHA-256
 64c64d48361edfe8610016441bf593256ea9b67f133b00f47c55aa29ee878567
 
@@ -50,32 +53,42 @@ these files was imported and then modified; the modifications are listed in the
 owning package's Git history. The notice is kept here, in the root `LICENSE`
 and in the README attribution, not inside each package.
 
-    skills/principle-link-form/SKILL.md                     <- skills/obsidian-markdown/SKILL.md
-    skills/principle-markdown-blocks/SKILL.md               <- skills/obsidian-markdown/SKILL.md
-    skills/principle-preserve-unrequested/SKILL.md          <- skills/obsidian-markdown/SKILL.md
-    skills/principle-read-back/SKILL.md                     <- skills/obsidian-markdown/SKILL.md
-    skills/principle-resolve-target/SKILL.md                <- skills/obsidian-markdown/SKILL.md
-    skills/principle-frontmatter/SKILL.md                   <- skills/obsidian-markdown/SKILL.md
-    skills/principle-link-form/references/links.md          <- skills/obsidian-markdown/SKILL.md
-    skills/principle-markdown-blocks/references/syntax.md   <- skills/obsidian-markdown/SKILL.md
-    skills/principle-markdown-blocks/references/callouts.md <- skills/obsidian-markdown/references/CALLOUTS.md
-    skills/principle-link-form/references/embeds.md         <- skills/obsidian-markdown/references/EMBEDS.md
-    skills/principle-frontmatter/references/properties.md   <- skills/obsidian-markdown/references/PROPERTIES.md
-    skills/bases/SKILL.md                         <- skills/obsidian-bases/SKILL.md
-    skills/bases/references/FUNCTIONS_REFERENCE.md <- skills/obsidian-bases/references/FUNCTIONS_REFERENCE.md
+    skills/principle-markdown/SKILL.md                      <- skills/obsidian-markdown/SKILL.md
+    skills/principle-editing/SKILL.md                       <- skills/obsidian-markdown/SKILL.md
+    skills/principle-markdown/references/links.md           <- skills/obsidian-markdown/SKILL.md
+    skills/principle-markdown/references/syntax.md          <- skills/obsidian-markdown/SKILL.md
+    skills/principle-markdown/references/callouts.md        <- skills/obsidian-markdown/references/CALLOUTS.md
+    skills/principle-markdown/references/embeds.md          <- skills/obsidian-markdown/references/EMBEDS.md
+    skills/principle-markdown/references/properties.md      <- skills/obsidian-markdown/references/PROPERTIES.md
+    skills/obsidian-bases/SKILL.md                         <- skills/obsidian-bases/SKILL.md
+    skills/obsidian-bases/references/FUNCTIONS_REFERENCE.md <- skills/obsidian-bases/references/FUNCTIONS_REFERENCE.md
     skills/obsidian-visualize/references/canvas.md         <- skills/json-canvas/SKILL.md
-    skills/obsidian-visualize/references/canvas-examples.md <- skills/json-canvas/references/EXAMPLES.md
+    skills/obsidian-visualize/references/canvas.md         <- skills/json-canvas/references/EXAMPLES.md
     skills/obsidian-cli/SKILL.md                           <- skills/obsidian-cli/SKILL.md
 
 One further upstream section is owned elsewhere in this repository: the Mermaid
 diagram-block section of the upstream Markdown skill is answered by
 the Pele branch of `skills/obsidian-visualize/` (`references/pele*.md`). Its rules were re-derived from public
 Mermaid and Obsidian documentation rather than copied, so it is not listed above;
-the imported section itself survives inside `skills/principle-markdown-blocks/references/syntax.md`
+the imported section itself survives inside `skills/principle-markdown/references/syntax.md`
 and is covered by the notice in section 1.
 
+1.2 Changes drawn from that upstream at 79e85b7
+------------------------------------------------
+
 Not imported from that upstream, and no rights exercised over them here: its
-`skills/defuddle/` and `skills/knap/` packages.
+`defuddle` and `knap` packages. The `defuddle` commands in `skills/ingest/` and
+`skills/capture/`, and the `knap` commands in `skills/obsidian-clipper/`, were
+written from each tool's own `--help` and checked by running them.
+
+The Markdown changes made upstream between the two revisions (table pipes and
+spacing, alias resolution, tag characters, coloured highlights, property types)
+were carried into the `skills/principle-markdown/references/` files of section 1.1 that already
+derive from `obsidian-markdown`.
+
+The upstream changes to `obsidian-bases`, `obsidian-cli` and `json-canvas`
+between the two revisions were likewise carried into `skills/obsidian-bases/`,
+`skills/obsidian-cli/` and `skills/obsidian-visualize/references/canvas.md`.
 
 
 2. Packages authored in this repository

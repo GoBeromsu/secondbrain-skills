@@ -93,6 +93,10 @@ Nodes are objects placed on the canvas. Array order determines z-index: first no
 
 **Newline pitfall**: Use `\n` for line breaks in JSON strings. Do **not** use the literal `\\n` -- Obsidian renders that as the characters `\` and `n`.
 
+**Quote pitfall**: Escape double quotes inside `text` and `file` values as `\"` (`"file": "My \"Notes\".md"`); an unescaped quote breaks the parse and the canvas fails to render. Generate canvas JSON with a JSON serializer, not string concatenation.
+
+Write `.canvas` files directly. Don't create them with `obsidian create content=`, which turns every `\n` into a raw newline and breaks the JSON.
+
 ### File Nodes
 
 | Attribute | Required | Type | Description |
@@ -222,6 +226,8 @@ Check every generated ID against the union of existing node IDs and edge IDs bef
 | File preview | 300-500 | 200-400 |
 | Link preview | 250-400 | 100-200 |
 
+CJK characters (Chinese, Japanese, Korean) are wider than Latin ones. For mostly CJK content multiply the width by about 1.5 to avoid cramped layouts and awkward line breaks.
+
 ## Validation Checklist
 
 After creating or editing a canvas file, verify:
@@ -233,7 +239,8 @@ After creating or editing a canvas file, verify:
 5. `fromSide`/`toSide` values are one of: `top`, `right`, `bottom`, `left`
 6. `fromEnd`/`toEnd` values are one of: `none`, `arrow`
 7. Color presets are `"1"` through `"6"` or valid hex (e.g., `"#FF0000"`)
-8. JSON is valid and parseable
+8. Double quotes in `text` and `file` values are escaped as `\"`
+9. JSON is valid and parseable
 
 If validation fails, check for duplicate IDs, dangling edge references, or malformed JSON strings (especially unescaped newlines in text content). Report the failure with the offending `id` and field and leave the file unchanged; do not rename, drop, or invent objects to make the checklist pass.
 
@@ -243,9 +250,24 @@ This checklist is static validation of a document you hold. It does not prove th
 
 [canvas-operations.md](canvas-operations.md) covers safe graph extension, duplicate and dangling ID errors, malformed input and missing attachments, exact readback versus rendering, and the optional Markdown embed boundary.
 
-## Complete Examples
+## Complete Example
 
-See [canvas-examples.md](canvas-examples.md) for full canvas examples including mind maps, project boards, research canvases, and flowcharts.
+A group holding a file node and a text node, a link node outside it, and labelled edges. Generate fresh IDs; these are examples. Group first so it sits underneath its children.
+
+```json
+{
+  "nodes": [
+    {"id": "5e6f7a8b9c0d1e2f", "type": "group", "x": 0, "y": 0, "width": 460, "height": 400, "label": "Sources", "color": "4"},
+    {"id": "7a8b9c0d1e2f3a4b", "type": "file", "x": 30, "y": 50, "width": 400, "height": 140, "file": "Notes/Paper A.md"},
+    {"id": "8b9c0d1e2f3a4b5c", "type": "text", "x": 30, "y": 230, "width": 400, "height": 140, "text": "## Open question\n\nDoes it replicate?", "color": "1"},
+    {"id": "9c0d1e2f3a4b5c6d", "type": "link", "x": 560, "y": 50, "width": 320, "height": 160, "url": "https://jsoncanvas.org"}
+  ],
+  "edges": [
+    {"id": "0d1e2f3a4b5c6d7e", "fromNode": "7a8b9c0d1e2f3a4b", "fromSide": "right", "toNode": "9c0d1e2f3a4b5c6d", "toSide": "left", "label": "cites"},
+    {"id": "1e2f3a4b5c6d7e8f", "fromNode": "7a8b9c0d1e2f3a4b", "fromSide": "bottom", "toNode": "8b9c0d1e2f3a4b5c", "toSide": "top", "toEnd": "none"}
+  ]
+}
+```
 
 ## References
 
@@ -254,4 +276,4 @@ See [canvas-examples.md](canvas-examples.md) for full canvas examples including 
 
 ## Attribution
 
-The format documentation and examples in this reference and `canvas-examples.md` are derived from the `json-canvas` skill in [kepano/obsidian-skills](https://github.com/kepano/obsidian-skills) at commit `3ccff5338ea700537839b21900aa5358a0402c98`, MIT License, Copyright (c) 2026 Steph Ango (@kepano). See Git history for the recorded revision and modifications.
+The format documentation and example in this reference are derived from the `json-canvas` skill in [kepano/obsidian-skills](https://github.com/kepano/obsidian-skills) at commit `3ccff5338ea700537839b21900aa5358a0402c98`, MIT License, Copyright (c) 2026 Steph Ango (@kepano). See Git history for the recorded revision and modifications.

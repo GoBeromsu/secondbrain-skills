@@ -24,6 +24,11 @@ TRAIL = ".,;:!?'\"*"
 SKIP_DIRS = {".git", ".obsidian", ".trash", "node_modules"}
 
 
+def link_target(inner):
+    """Note part of a wikilink's inner text; a table cell escapes the alias pipe as `\\|`."""
+    return re.split(r"\\?\|", inner, maxsplit=1)[0].split("#", 1)[0]
+
+
 def nfc(s):
     return unicodedata.normalize("NFC", s)
 
@@ -177,7 +182,7 @@ def find(text, names, paths, daily_folder=None):
     for m in WIKILINK.finditer(text):
         if inside(sp, m.start(), m.end()):
             continue
-        target = m.group(2).split("|", 1)[0].split("#", 1)[0]
+        target = link_target(m.group(2))
         if not target.strip():
             continue
         if "/" in target.strip("/"):
@@ -185,14 +190,14 @@ def find(text, names, paths, daily_folder=None):
             key = base[:-3] if base.endswith(".md") else base
             if len(names.get(key, [])) == 1 and resolves(target, names, paths):
                 out.append(("PATH-WIKILINK", m.start(), m.group(0)))
-        daily = not m.group(1) and planned_daily_note(m.group(2), daily_folder)
+        daily = not m.group(1) and planned_daily_note(m.group(2).replace("\\|", "|"), daily_folder)
         if m.start() != planned and not daily and not resolves(target, names, paths):
             out.append(("BROKEN", m.start(), m.group(0)))
     return sorted(out, key=lambda r: (r[1], r[0]))
 
 
-# Policy checks (`--checks policy`): the fallback for scripts/obsidian-lint.py when Obsidian is not
-# running. Same rules, same report lines; keep the two in step (evals/lint/run.py checks both).
+# Policy checks (`--checks policy`): Step 12 and frontmatter BROKEN (Step 3); with `--orphans`, ORPHAN
+# (Step 2), a vault-wide check kept out of per-page runs because a newly written page has no inbound link yet.
 KEY = re.compile(r"^([^\s#:\-][^:]*?):(?:[ \t]+(.*?))?[ \t]*$")
 ITEM = re.compile(r"^[ \t]*-(?:[ \t]+(.*?))?[ \t]*$")
 QUOTED = re.compile(r"""^('(?:[^']|'')*'|"(?:[^"\\]|\\.)*")(?:[ \t]+#.*)?$""")
@@ -526,7 +531,38 @@ def blocks(text, spans):
     return out
 
 
-def find_policy(rel, text, names, entities, pattern, wiki, lifecycle, entity_folders, book_types, product_types):
+def link_spans(text):
+    """Where a wikilink is not a link: code, comments and a Raw's verbatim original content."""
+    spans = raw_original_span(text)
+    for rx in (FENCE, COMMENT, OBS_COMMENT, INLINE):
+        spans += [(x.start(), x.end()) for x in rx.finditer(text)]
+    return spans
+
+
+def inbound_links(root, names):
+    """Vault paths some other note wikilinks to, in its body or frontmatter, plus the wiki index and log
+    the vault-root AGENTS.md names: records are reached from the wiki role, not by links."""
+    out = set()
+    try:
+        with open(os.path.join(root, "AGENTS.md"), encoding="utf-8") as f:
+            out.update(nfc(p.strip("/")) for p in re.findall(r"^wiki-(?:index|log):[ \t]*(.+?)[ \t]*$", f.read(), re.M))
+    except OSError:
+        pass
+    for rel in walk(root):
+        rel = nfc(rel)
+        if not rel.endswith(".md") or rel.endswith(".excalidraw.md") or any(p.startswith(".") for p in rel.split("/")):
+            continue
+        with open(os.path.join(root, rel), encoding="utf-8", errors="replace") as f:
+            text = f.read()
+        spans = link_spans(text)
+        for m in WIKILINK.finditer(text):
+            if not inside(spans, m.start(), m.end()):
+                out.update(t for t in resolve_path(link_target(m.group(2)), names) if t != rel)
+    return out
+
+
+def find_policy(rel, text, names, paths, entities, pattern, wiki, lifecycle, entity_folders, book_types,
+                product_types, inbound, daily_folder):
     out = []
     is_wiki = in_dirs(rel, wiki)
     keys = frontmatter(text)
@@ -560,6 +596,19 @@ def find_policy(rel, text, names, entities, pattern, wiki, lifecycle, entity_fol
                     out.append(("FM-URL-FORM", at(line), "%s: %s" % (key, v)))
             elif is_wiki and ANY_URL.search(v):
                 out.append(("FM-URL-KEY", at(line), "%s: %s" % (key, v)))
+    # Frontmatter links to missing notes, read from each key's raw lines so nested and unquoted
+    # values count. Author names and a Term's domain vocabulary may stay unresolved.
+    if keys:
+        raw = text.split("\n")
+        ends = [line for _, line, _ in keys[1:]] + [FRONT.match(text).group(0).rstrip("\n").count("\n") + 1]
+        is_term = fm.get("layer", (0, []))[1][:1] == ["terms"]
+        for (key, line, _), end in zip(keys, ends):
+            if key == "author" or (key == "domain" and is_term):
+                continue
+            for m in WIKILINK.finditer("\n".join(strip_comment(x) for x in raw[line - 1:end - 1])):
+                if (m[1] or not planned_daily_note(m[2].replace("\\|", "|"), daily_folder)) and \
+                        not resolves(link_target(m[2]), names, paths):
+                    out.append(("BROKEN", at(line), m[0]))
     spans = block_spans(text) + raw_original_span(text)
     found = blocks(text, spans)
     headings = [b for b in found if b[0] == "heading"]
@@ -581,6 +630,8 @@ def find_policy(rel, text, names, entities, pattern, wiki, lifecycle, entity_fol
     if not is_wiki:
         return out
     out += [("HR-IN-WIKI", b[1], b[2]) for b in found if b[0] == "break"]
+    if inbound is not None and rel not in inbound and kind != "moc":  # a MOC is where orphans get linked from
+        out.append(("ORPHAN", 0, "no inbound wikilink from another note"))
 
     if pattern is None:
         return out
@@ -598,7 +649,7 @@ def find_policy(rel, text, names, entities, pattern, wiki, lifecycle, entity_fol
     code = spans + [(m.start(), m.end()) for m in INLINE.finditer(text)] + [(b[1], b[2]) for b in found if b[0] == "code"]
     for m in WIKILINK.finditer(text):
         if m.start() >= body_start and not inside(code, m.start(), m.end()):
-            linked.update(resolve_path(m.group(2).split("|", 1)[0].split("#", 1)[0], names))
+            linked.update(resolve_path(link_target(m.group(2)), names))
     masked = code + [(h[1], h[4]) for h in headings] + [(b[1], b[2]) for b in found if b[0] in ("quote", "code")]
     for rx in (WIKILINK, AUTOLINK, BARE):
         masked += [(m.start(), m.end()) for m in rx.finditer(text)]
@@ -626,12 +677,15 @@ def main(argv=None):
     ap.add_argument("--book-type", action="append", default=[], help="book Entity type from the live policy (repeatable)")
     ap.add_argument("--product-type", action="append", default=[], help="product Entity type from the live policy (repeatable)")
     ap.add_argument("--lifecycle", help="comma-separated `type` values the live policy names as lifecycle notes")
+    ap.add_argument("--orphans", action="store_true", help="also report ORPHAN wiki pages (with --checks policy or all)")
     a = ap.parse_args(argv)
     if a.checks != "link" and (not a.wiki or a.lifecycle is None):
         ap.error("--checks %s needs --wiki and --lifecycle from the vault's live policy" % a.checks)
+    if a.orphans and a.checks == "link":
+        ap.error("--orphans needs --checks policy or all")
     root = os.path.abspath(a.vault)
     names, paths = index_vault(root)
-    daily_folder = daily_notes_folder(root) if a.checks != "policy" else None
+    daily_folder = daily_notes_folder(root)
     wiki = [nfc(w.strip("/")) for w in a.wiki]
     lifecycle = {t.strip() for t in (a.lifecycle or "").split(",") if t.strip()}
     folders = [nfc(d.strip("/")) for d in a.entity_folder]
@@ -639,6 +693,7 @@ def main(argv=None):
     product_types = set(a.product_type)
     entities = index_entities(root, folders) if a.checks != "link" else {}
     pattern = entity_pattern(entities)
+    inbound = inbound_links(root, names) if a.orphans else None
     known = set()
     if a.baseline:
         with open(a.baseline, encoding="utf-8") as f:
@@ -665,10 +720,11 @@ def main(argv=None):
         if a.checks != "policy":
             found += find(text, names, paths, daily_folder)
         if a.checks != "link":
-            found += find_policy(nfc(rel), text, names, entities, pattern, wiki, lifecycle, folders, book_types, product_types)
+            found += find_policy(nfc(rel), text, names, paths, entities, pattern, wiki, lifecycle, folders, book_types,
+                                 product_types, inbound, daily_folder)
         rows = [(rule, text.count("\n", 0, pos) + 1, snip[:120].replace("\t", " ").replace("\n", " "), pos)
                 for rule, pos, snip in found]
-        # Link-only output keeps its historical order; policy output sorts like obsidian-lint.py.
+        # Link-only output keeps its historical order; policy output sorts by line.
         order = (lambda r: (r[3], r[0], r[2])) if a.checks == "link" else (lambda r: (r[1], r[0], r[2]))
         for rule, line, snip, _ in sorted(rows, key=order):
             if (rule, nfc(rel), snip) in known:

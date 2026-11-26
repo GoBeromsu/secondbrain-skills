@@ -25,7 +25,7 @@ While the scope is unknown, do **not**:
 - run `git reset`, `git checkout .`, `git clean`, or any bulk overwrite,
 - delete `(Conflicted copy ...)` files.
 
-Every one of those destroys the evidence that would have explained the incident, and several of them cause a second, larger one. A lock that is not stale means a live writer you have not found yet; find it instead of removing the lock.
+Every one of those destroys the evidence that would have explained the incident, and several cause a second, larger one.
 
 ## 2. Preserve evidence
 
@@ -47,9 +47,7 @@ find "$OBSIDIAN_VAULT_PATH" -name '*.md' -not -path '*/.git/*' | wc -l
 ob --version; node --version
 ```
 
-Copying `sync.log` first is not optional. `ob sync-unlink` deletes the entire per-vault client directory - `config.json`, `state.db`, and `sync.log` together - so one unlink removes the only record of what was deleted and when.
-
-The `--json` capture is the safe form of the configuration: it carries the vault ID, root, mode, conflict strategy, device name, config directory, file types, configs, and excluded folders, and it carries no host, key, salt, or token. Use it instead of copying `config.json`.
+Copying `sync.log` first is not optional: `ob sync-unlink` deletes it along with `config.json` and `state.db`. No `ob` command exports the log, hence the `cp`. The `--json` capture is the redacted form of the configuration; use it instead of copying `config.json`.
 
 If that command exits 2 with `End-to-end encryption key missing. Run setup again.` - which is exactly the class that most needs a capture - use `ob sync-config --path "$OBSIDIAN_VAULT_PATH" --json` instead. With no other flags it is a read-only reader, it emits the same payload, and it does not check the encryption key.
 
@@ -73,8 +71,6 @@ Name the failure class before choosing a response. Look-alike symptoms have oppo
 | Configuration damage | `Encryption key not found. Run setup again.`, `End-to-end encryption key missing.`, `Encryption version not supported` | The stored config is unusable. Follow [configuration restore](#restore-the-configuration-exactly); never hand-edit `config.json`. |
 | Runtime or version skew | A flag rejected that this manual documents, a native-module failure, a binary-path error, crash loops with no vault mutation | Repair the runtime and the version. The vault is not the problem. |
 
-`Deleting` appears in every mode, including `pull-only`. It is the propagation of a remote deletion, and it is the line most often misread as a local mistake.
-
 ## 4. Restore exactly
 
 There are three independent restores. Do only the ones the incident actually requires, and keep them separate in the report.
@@ -92,14 +88,14 @@ Then re-run the [version check](commands.md#version-check) against that binary. 
 
 ### Restore the configuration exactly
 
-`ob sync-setup` does not repair a configuration - it replaces one. A fresh pairing writes `conflictStrategy: merge`, no stored mode (which means bidirectional), default attachment types, no excluded folders, and no config categories. Any policy the vault had is silently gone, and the next run uploads.
+`ob sync-setup` does not repair a configuration - it replaces one with a bidirectional, merge, default-scope policy ([commands.md](commands.md#per-command-notes)), and the next run uploads.
 
 So a configuration restore is capture, re-pair, replay, verify:
 
 1. **Capture** - already done in step 2, as `ob-incident-config.json`. That file holds every field a re-pair discards.
 2. **Re-pair as narrowly as the damage requires.**
    - If the remote identity and the root are both correct and only the stored config is damaged, re-run `ob sync-setup` for the **same vault ID and the same resolved root**. This rewrites `config.json` and leaves `state.db` in place, so the client keeps knowing what it had already reconciled.
-   - Run `ob sync-unlink` only when classification proved the pairing itself wrong. Unlinking deletes `state.db`, which makes the next run an **initial** reconciliation - and during initial reconciliation `conflictStrategy` is not consulted at all: the newer modification time simply wins and the older side is overwritten. On a damaged tree that is how a recoverable incident becomes an unrecoverable one.
+   - Run `ob sync-unlink` only when classification proved the pairing itself wrong. Unlinking deletes `state.db`, so the next run is an **initial** reconciliation, where `conflictStrategy` is ignored and the newer mtime overwrites the older side. On a damaged tree that turns a recoverable incident into an unrecoverable one.
 3. **Set the download-only mode before anything else**, in the same phase as the pairing:
 
    ```bash
@@ -117,7 +113,7 @@ So a configuration restore is capture, re-pair, replay, verify:
      --configs          "<comma-joined configs, empty string when the capture lists none>"
    ```
 
-   Three things to expect. Replay makes previously implicit defaults explicit - the capture already resolved them, so the effective behavior matches even though the stored keys differ. Changing the scope flags queues every file that newly enters scope for download on the next run, so a scope replay is a scheduled transfer, not a passive setting. And an empty `--file-types` does not disable attachments - it clears the stored list back to the `image, audio, pdf, video` default, which is why a capture never reports an empty `fileTypes` and the replay always passes the recorded list.
+   Replay makes the capture's resolved defaults explicit, so behavior matches even though stored keys differ. A scope replay is a scheduled transfer (newly in-scope files download on the next run). An empty `--file-types` resets to the default attachment set rather than disabling attachments, so always pass the recorded list.
 
    `--config-dir` is replayed only if the capture shows a non-default value.
 

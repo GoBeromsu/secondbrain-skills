@@ -4,17 +4,11 @@ The destination's live policy wins wherever it defines a field, value or placeme
 
 ## Writing rules
 
-- YAML frontmatter is indented with 2 spaces; the Markdown body with tabs.
-- Wikilinks inside YAML are double-quoted: `"[[Name]]"`. Body wikilinks are bare.
-- `description` is English, one or two sentences, always double-quoted (`description: ""` when empty).
-- Dates are ISO 8601 (`YYYY-MM-DD`, time optional). An existing value keeps its form.
-- Keys appear in alphabetical order on every note ingest writes, including Raws, as the vault's linter sorts them; `principle-frontmatter` holds the rule.
-- Within the note kinds ingest handles, only a note in the vault's Entity folder with a book type and a `## Reading Progress` section may carry frontmatter `status`. Preserve an existing owner-maintained value from the live policy's book reading statuses; ingest never sets or changes it. Chapter Raws track acquisition in the body callout, not in frontmatter.
-- Put plain external URLs on a wiki page under snake_case `*_url` keys (`blog_url`, `github_url`, `instagram_url`, `linkedin_url`, `website_url`, `x_url`, `youtube_url`, and any other `*_url` key the vault's properties define, such as `feed_url` or `source_url`). Use `url` only for a non-product Entity's canonical homepage. Put a product's repository or homepage under `github_url` for `github.com` and `www.github.com`, regardless of path, or `website_url` for any other host, including `github.io`. Never use bare `url` on a product; follow [`entity`'s update rules](../../entity/SKILL.md) for legacy values. Put other web references in the body as `[label](URL)`.
-- New keys are camelCase, except the `*_url` keys above, the snake_case date keys below and these kebab-case keys (`source-attachment`, `source-format`, `conversion-tool`, `conversion-fidelity`, `superseded-by`). The snake_case date keys are exactly `date_created`, `date_modified`, `date_ingested`, `date_published` and `conversion_date`; the verification timestamps are `exploredDate` and `verifiedAt`.
-- Unknown applicable metadata stays unknown, never invented. An inapplicable optional key is omitted.
-- Fill every slot as a value serialized by YAML's own rules, never by pasting raw text. A person name containing `"` or `\` inside a double-quoted `"[[Name]]"` follows YAML double-quoted escaping (`\"`, `\\`). Emit lists as YAML lists, one item per existing value; never collapse several existing items into one string.
-- A Persona's `source` keeps every existing item as a separate list item and appends this Raw.
+Key form (indentation, quoting, alphabetical order, `*_url` keys, `status`, unknown values) follows `principle-markdown`. In addition:
+
+- `description` is English, one or two sentences, always double-quoted (`""` when empty).
+- New keys are camelCase, except `*_url` keys, the date keys `date_created`, `date_modified`, `date_ingested`, `date_published` and `conversion_date`, and the kebab-case `source-attachment`, `source-format`, `conversion-tool`, `conversion-fidelity` and `superseded-by`.
+- Only a book Entity with `## Reading Progress` carries `status` (the owner's reading status, never set or changed by ingest); chapter Raws track acquisition in their body callout.
 
 ## Required on every note (7) plus provenance
 
@@ -23,13 +17,13 @@ The destination's live policy wins wherever it defines a field, value or placeme
 | `type` | role value from the table below |
 | `aliases` | list of alternative names |
 | `description` | English, double-quoted |
-| `author` | list. People are quoted wikilinks `"[[Name]]"` whether or not that note exists; a missing target alone is not a reason to create an Entity; SKILL Step 6 decides which Raw authors get one. Raw: the original author(s). Book and paper Entities: the work's authors as quoted wikilinks, in source order. Wiki and other agent-written pages: the author the live policy names, otherwise the writing agent's role name (`Claude`, `Codex`, …). |
+| `author` | list of quoted `"[[Name]]"` people (a missing target is no reason to create an Entity). Raw: the original author(s). Book and paper Entities: the work's authors in source order. Agent-written pages: the author live policy names, else the agent's role name (`Claude`, `Codex`, …). |
 | `date_created` | creation date of this note |
 | `date_modified` | last modification date of this note |
 | `tags` | list |
-| `model`, `effort` | on every agent-written content page, in alphabetical order with the other keys: the runtime-reported model id (a list when several contributed) and reasoning effort, `default` when unreported. Never fabricate a model. |
+| `model`, `effort` | on every agent-written page: the runtime-reported model id (a list when several contributed) and reasoning effort, `default` when unreported. Never fabricate a model. |
 
-No `created_by` or `authorship` default. A vault whose live policy defines its own provenance keys (for example `created_by`) gets exactly those values from that policy; never infer them.
+No `created_by` or `authorship` default; a vault whose policy defines its own provenance keys gets exactly those.
 
 ## Roles
 
@@ -88,9 +82,7 @@ No `created_by` or `authorship` default. A vault whose live policy defines its o
 
 ## Existing notes and migration
 
-New notes use the schema above. A run that touches an existing note preserves what it already holds.
-
-- Keep every existing key and value, including unknown keys and earlier identity, location and history values. Ordinary ingest changes only the keys its update names (`source`, `related`, `date_modified` and additions the preservation review accepted, plus the template migration on touch [updating](updating.md) defines for every page ingest revises, which also moves a legacy URL key such as `youtube` or `x` to its `*_url` key); it renames, re-forms, copies or removes nothing else, date keys and `author` values included, except ingest Step 8's Entity reference links.
-- For a Persona append, also refresh `effort` to the contributing runtime's reported effort (`default` when unreported), and preserve prior `model` IDs in order while adding newly reported contributing model IDs once each. Use a scalar for one ID, a list for several, and `default` only when no model ID is known. This provenance update leaves `author` and all Persona-specific properties unchanged.
-- Identity matching reads `source` first, and any other source address or locator the existing note already records; compare the destination URL of a Markdown link with a bare URL independent of its display label. Titles never prove sameness. Ingest requires no identity key beyond this schema.
-- Key migration runs only when the owner explicitly authorizes it for named notes, apart from the template migration on touch that [updating](updating.md) defines for a page `term`, `concept`, `entity` or `ingest` revises. Record each note's before-image first; map a value only when its meaning is verified equivalent to the target key (`source_obtained_at` is not `date_ingested` without proof that both record the same acquisition); stop on any conflict, such as a target key already holding a different value or an ambiguous meaning, and report it. A completed migration leaves one key per meaning, with no permanent dual keys. A value still needed for identity, location or history is never dropped merely as legacy.
+- Keep every existing key and value, unknown keys included. Ingest changes only `source`, `related`, `date_modified`, reviewed additions, Step 8's Entity reference links and the template migration in [updating](updating.md) (which also moves a legacy URL key such as `youtube` to its `*_url` key).
+- A Persona append keeps every `source` item and appends this Raw, refreshes `effort`, and keeps prior `model` IDs in order while adding new ones once (scalar for one, list for several); `author` and Persona keys stay.
+- Identity matching reads `source` first, then any other locator the note records, comparing a Markdown link's URL independent of its label. Titles never prove sameness.
+- Any other key migration needs the owner's explicit authorization for named notes: keep a before-image, map a value only when its meaning is verified equivalent (`source_obtained_at` is not `date_ingested` without proof), stop and report on any conflict, and leave one key per meaning. A value still needed for identity, location or history is never dropped as legacy.
